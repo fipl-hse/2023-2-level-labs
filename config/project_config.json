@@ -1,10 +1,5 @@
 {
-    "labs": [
-        {
-            "name": "lab_1_classify_by_frequencies",
-            "coverage": 98
-        }
-    ],
+    "labs": [],
     "addons": [],
     "repository": {
         "admins": [
