@@ -1,0 +1,220 @@
+name: "Check Pull Request Readiness"
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+concurrency:
+  group: ${{ github.repository }}-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  REPOSITORY_TYPE: public
+  GITHUB_REPOSITORY: ${{ github.repository }}
+  BRANCH_NAME: ${{ github.ref }}
+
+jobs:
+  install-dependencies:
+    name: Installing dependencies
+    runs-on: ubuntu-latest
+    timeout-minutes: 2
+
+    steps:
+      - uses: actions/checkout@v3
+      - name: Setup FIPL environment
+        uses: fipl-hse/setup-env-action@v0.8
+      - name: Confirming everything is OK
+        run: |
+          ls -la venv
+
+  pr-name-check:
+    name: PR name check
+    runs-on: ubuntu-latest
+    if: github.event_name == 'pull_request'
+    timeout-minutes: 2
+    needs: [ install-dependencies ]
+    env:
+      PR_NAME: ${{ github.event.pull_request.title }}
+      PR_AUTHOR: ${{ github.actor }}
+
+    steps:
+      - uses: actions/checkout@v3
+      - name: Setup FIPL environment
+        uses: fipl-hse/setup-env-action@v0.8
+      - name: PR name check
+        run: |
+          bash config/stage_1_style_tests/_stage_pr_name_check.sh "$PR_NAME" "$PR_AUTHOR"
+
+  code-style:
+    name: Code Style
+    runs-on: ubuntu-latest
+    timeout-minutes: 2
+    needs: [ install-dependencies ]
+    env:
+      PR_NAME: ${{ github.event.pull_request.title }}
+      PR_AUTHOR: ${{ github.actor }}
+
+    steps:
+      - uses: actions/checkout@v3
+      - name: Setup FIPL environment
+        uses: fipl-hse/setup-env-action@v0.8
+      - name: Code Style
+        run: |
+          bash config/stage_1_style_tests/_stage_run_lint.sh "$PR_NAME" "$PR_AUTHOR"
+
+  mypy-checks:
+    name: Mypy checks
+    runs-on: ubuntu-latest
+    timeout-minutes: 2
+    needs: [ install-dependencies ]
+
+    steps:
+      - uses: actions/checkout@v3
+      - name: Setup FIPL environment
+        uses: fipl-hse/setup-env-action@v0.8
+      - name: MyPy check
+        run: |
+          bash config/stage_1_style_tests/_stage_run_mypy.sh
+
+  unittests:
+    name: Unittests
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    needs: [ install-dependencies ]
+    env:
+      PR_NAME: ${{ github.event.pull_request.title }}
+
+    steps:
+      - uses: actions/checkout@v3
+      - name: Setup FIPL environment
+        uses: fipl-hse/setup-env-action@v0.8
+      - name: Run tests
+        run: |
+          bash config/run_tests.sh "$PR_NAME"
+
+  start:
+    name: Check start.py
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    needs: [ install-dependencies ]
+    env:
+      PR_NAME: ${{ github.event.pull_request.title }}
+
+    steps:
+      - uses: actions/checkout@v3
+      - name: Setup FIPL environment
+        uses: fipl-hse/setup-env-action@v0.8
+      - name: Run start
+        run: |
+          bash config/run_start.sh "$PR_NAME"
+
+  coverage:
+    name: Coverage
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    needs: [ unittests ]
+    env:
+      PR_NAME: ${{ github.event.pull_request.title }}
+
+    steps:
+      - uses: actions/checkout@v3
+      - name: Setup FIPL environment
+        uses: fipl-hse/setup-env-action@v0.8
+      - name: Run start
+        if: ${{ env.REPOSITORY_TYPE == 'admin' }}
+        run: |
+          bash config/collect_coverage/run_coverage.sh "$PR_NAME"
+
+  spellcheck:
+    name: Spellcheck
+    runs-on: ubuntu-latest
+    timeout-minutes: 2
+    needs: [ install-dependencies ]
+    steps:
+      - uses: actions/checkout@master
+      - name: Install Aspell
+        run: |
+          sudo apt-get install aspell aspell-en aspell-ru
+      - name: Setup FIPL environment
+        uses: fipl-hse/setup-env-action@v0.8
+      - name: Spell check
+        run: |
+          bash config/spellcheck/_stage_spellcheck.sh
+
+  stubgen:
+    name: Stub generation
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    needs: [
+      install-dependencies
+    ]
+    steps:
+      - uses: actions/checkout@master
+      - name: Install Aspell
+        run: |
+          sudo apt-get install aspell aspell-en aspell-ru
+      - name: Setup FIPL environment
+        uses: fipl-hse/setup-env-action@v0.8
+      - name: Stubgen check
+        if: ${{ env.REPOSITORY_TYPE == 'admin' }}
+        run: |
+          bash config/stage_1_style_tests/_stage_run_stubgen.sh
+
+  flake8-checks:
+    name: Import style checks
+    runs-on: ubuntu-latest
+    timeout-minutes: 2
+    needs: [ install-dependencies ]
+
+    steps:
+      - uses: actions/checkout@v3
+      - name: Setup FIPL environment
+        uses: fipl-hse/setup-env-action@v0.8
+      - name: Flake8 check
+        run: |
+          bash config/stage_1_style_tests/_stage_run_flake8.sh
+
+  pymarkdownlnt-checks:
+    name: Pymarkdownlnt checks
+    runs-on: ubuntu-latest
+    timeout-minutes: 2
+    needs: [ install-dependencies ]
+
+    steps:
+      - uses: actions/checkout@v3
+      - name: Setup FIPL environment
+        uses: fipl-hse/setup-env-action@v0.8
+      - name: Pymarkdownlnt check
+        run: |
+          bash config/stage_1_style_tests/_stage_run_pymarkdownlnt.sh
+
+  requirements-check:
+    name: Requirements check
+    runs-on: ubuntu-latest
+    timeout-minutes: 2
+    needs: [ install-dependencies ]
+
+    steps:
+      - uses: actions/checkout@v3
+      - name: Setup FIPL environment
+        uses: fipl-hse/setup-env-action@v0.8
+      - name: Dependencies check
+        run: |
+          bash config/stage_1_style_tests/_stage_requirements_check.sh
+
+  newline-check:
+    name: Newline check
+    runs-on: ubuntu-latest
+    timeout-minutes: 2
+    needs: [ install-dependencies ]
+
+    steps:
+      - uses: actions/checkout@v3
+      - name: Setup FIPL environment
+        uses: fipl-hse/setup-env-action@v0.8
+      - name: Newline check
+        if: ${{ env.REPOSITORY_TYPE == 'admin' }}
+        run: |
+          bash config/stage_1_style_tests/_stage_newline_check.sh
