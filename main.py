@@ -1,3 +1,1 @@
-print('Hallo, Welt!')
-
-print('Auf Wiedersehen, Welt')
+# Place for the first lab?
