@@ -12,7 +12,7 @@
             "Vasilisa-Blyudova",
             "vitazaytseva"
         ],
-        "pr_name_regex": "Laboratory Work #\\d, \\w+ \\w+ - 2\\dFPL\\d",
-        "pr_name_example": "Laboratory Work #1, Andrei Kashchikhin - 21FPL2"
+        "pr_name_regex": "Laboratory work #\\d, \\w+ \\w+ - 2\\dFPL\\d",
+        "pr_name_example": "Laboratory work #1, Andrei Kashchikhin - 21FPL2"
     }
 }
