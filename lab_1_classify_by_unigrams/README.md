@@ -64,7 +64,7 @@ if __name__ == '__main__':
 Интерфейс:
 
 ```py
-def tokenize(text: str) -> Optional[list]:
+def tokenize(text: str) -> list[str] | None:
   pass
 ```
 
@@ -94,7 +94,7 @@ def tokenize(text: str) -> Optional[list]:
 Интерфейс:
 
 ```py
-def calculate_frequencies(tokens: Optional[list[str]]) -> Optional[dict[str, float]]:
+def calculate_frequencies(tokens: list[str] | None) -> dict[str, float] | None:
   pass
 ```
 
@@ -113,7 +113,7 @@ def calculate_frequencies(tokens: Optional[list[str]]) -> Optional[dict[str, flo
 
 Пример языкового профиля, который требуется в настоящей лабораторной работе:
 
-```py
+```json
 {
     "name": "en",
     "freq": {
@@ -139,8 +139,7 @@ def calculate_frequencies(tokens: Optional[list[str]]) -> Optional[dict[str, flo
 Интерфейс:
 
 ```py
-def create_language_profile(language: str, text: str) 
-                            -> Optional[dict[str, Union[str, dict[str, float]]]]:
+def create_language_profile(language: str, text: str) -> dict[str, str | dict[str, float]] | None:
   pass
 ```
 
@@ -173,7 +172,7 @@ $$MSE = \frac{\sum (y_{i} - p_{i})^{2}}{n}$$
 Некорректными признаются аргументы, не являющиеся списками, либо списки разной длины.
 
 ```py
-def calculate_mse(predicted: list, actual: list) -> Optional[float]:
+def calculate_mse(predicted: list, actual: list) -> float | None:
     pass
 ```
 
@@ -225,9 +224,10 @@ profile_2 = {
 Интерфейс:
 
 ```py
-def compare_profiles(unknown_profile: dict[str, Union[str, dict[str, float]]],
-                     profile_to_compare: dict[str, Union[str, dict[str, float]]]) 
-                     -> Optional[float]:
+def compare_profiles(
+        unknown_profile: dict[str, str | dict[str, float]],
+        profile_to_compare: dict[str, str | dict[str, float]]
+) -> float | None:
   pass
 ```
 
@@ -251,9 +251,9 @@ def compare_profiles(unknown_profile: dict[str, Union[str, dict[str, float]]],
 Интерфейс:
 
 ```py
-def detect_language(unknown_profile: dict[str, Union[str, dict[str, float]]],
-                    profile_1: dict[str, Union[str, dict[str, float]]],
-                    profile_2: dict[str, Union[str, dict[str, float]]]) -> Optional[Any]:
+def detect_language(unknown_profile: dict[str, str | dict[str, float]],
+                    profile_1: dict[str, str | dict[str, float]],
+                    profile_2: dict[str, str | dict[str, float]]) -> str | None:
   pass
 ```
 
@@ -289,7 +289,7 @@ def detect_language(unknown_profile: dict[str, Union[str, dict[str, float]]],
 Некорректными считаются аргументы любого типа, кроме строки.
 
 ```py
-def load_profile(path_to_file: str) -> Any:
+def load_profile(path_to_file: str) -> dict | None:
     pass
 ```
 
@@ -359,7 +359,7 @@ profile_raw = {
 или `n_words`.
 
 ```py
-def preprocess_profile(profile: dict[str, Any]) -> Optional[dict[str, Any]]:
+def preprocess_profile(profile: dict) -> dict[str, str | dict] | None:
     pass
 ```
 
@@ -383,8 +383,7 @@ processed_profile = preprocess_profile(profile_raw)
 Функция должна вызывать `load_profile` и `preprocess_profile`.
 
 ```py
-def collect_profiles(paths_to_profiles: list) -> 
-        Optional[list[Optional[dict[str, Union[str, dict[str, float]]]]]]:
+def collect_profiles(paths_to_profiles: list) -> list[dict[str, str | dict[str, float]]] | None:
     pass
 ```
 
@@ -413,8 +412,8 @@ collected_profiles = collect_profiles(paths_to_profiles)
 Некорректным аргументом `known_profiles` считается значение любого типа, кроме списка.
 
 ```py
-def detect_language_advanced(unknown_profile: dict[str, Union[str, dict[str, float]]],
-                             known_profiles: list) -> Optional[list]:
+def detect_language_advanced(unknown_profile: dict[str, str | dict[str, float]],
+                             known_profiles: list) -> list | None:
     pass
 ```
 
@@ -448,7 +447,7 @@ fr: MSE 0.0001
 Функция ничего не возвращает.
 
 ```py
-def print_report(detections: list[list[Union[str, float]]]) -> None:
+def print_report(detections: list[list[str | float]]) -> None:
     pass
 ```
 
@@ -456,7 +455,7 @@ def print_report(detections: list[list[Union[str, float]]]) -> None:
 французского, итальянского, русского, испанского и турецкого языков в файле `start.py`.
 Для вывода отчета в консоль вызовите функцию `print_report`.
 
-## Узнать больше
+## Полезные ссылки
 
 * [Коллекция языковых профилей](https://github.com/shuyo/language-detection)
 * [Описание метрики Mean Squared Error](https://en.wikipedia.org/wiki/Mean_squared_error)

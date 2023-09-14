@@ -2,10 +2,9 @@
 Lab 1
 Language detection
 """
-from typing import Any, Optional, Union
 
 
-def tokenize(text: str) -> Optional[list[str]]:
+def tokenize(text: str) -> list[str] | None:
     """
     Splits a text into tokens, converts the tokens into lowercase,
     removes punctuation, digits and other symbols
@@ -14,7 +13,7 @@ def tokenize(text: str) -> Optional[list[str]]:
     """
 
 
-def calculate_frequencies(tokens: Optional[list[str]]) -> Optional[dict[str, float]]:
+def calculate_frequencies(tokens: list[str] | None) -> dict[str, float] | None:
     """
     Calculates frequencies of given tokens
     :param tokens: a list of tokens
@@ -22,7 +21,7 @@ def calculate_frequencies(tokens: Optional[list[str]]) -> Optional[dict[str, flo
     """
 
 
-def create_language_profile(language: str, text: str) -> Optional[dict[str, Union[str, dict[str, float]]]]:
+def create_language_profile(language: str, text: str) -> dict[str, str | dict[str, float]] | None:
     """
     Creates a language profile
     :param language: a language
@@ -31,7 +30,7 @@ def create_language_profile(language: str, text: str) -> Optional[dict[str, Unio
     """
 
 
-def calculate_mse(predicted: list, actual: list) -> Optional[float]:
+def calculate_mse(predicted: list, actual: list) -> float | None:
     """
     Calculates mean squared error between predicted and actual values
     :param predicted: a list of predicted values
@@ -41,9 +40,9 @@ def calculate_mse(predicted: list, actual: list) -> Optional[float]:
 
 
 def compare_profiles(
-    unknown_profile: dict[str, Union[str, dict[str, float]]],
-    profile_to_compare: dict[str, Union[str, dict[str, float]]],
-) -> Optional[float]:
+        unknown_profile: dict[str, str | dict[str, float]],
+        profile_to_compare: dict[str, str | dict[str, float]]
+) -> float | None:
     """
     Compares profiles and calculates the distance using symbols
     :param unknown_profile: a dictionary of an unknown profile
@@ -53,10 +52,10 @@ def compare_profiles(
 
 
 def detect_language(
-    unknown_profile: dict[str, Union[str, dict[str, float]]],
-    profile_1: dict[str, Union[str, dict[str, float]]],
-    profile_2: dict[str, Union[str, dict[str, float]]],
-) -> Optional[Any]:
+        unknown_profile: dict[str, str | dict[str, float]],
+        profile_1: dict[str, str | dict[str, float]],
+        profile_2: dict[str, str | dict[str, float]],
+) -> str | None:
     """
     Detects the language of an unknown profile
     :param unknown_profile: a dictionary of a profile to determine the language of
@@ -66,7 +65,7 @@ def detect_language(
     """
 
 
-def load_profile(path_to_file: str) -> Any:
+def load_profile(path_to_file: str) -> dict | None:
     """
     Loads a language profile
     :param path_to_file: a path to the language profile
@@ -74,7 +73,7 @@ def load_profile(path_to_file: str) -> Any:
     """
 
 
-def preprocess_profile(profile: dict[str, Any]) -> Optional[dict[str, Any]]:
+def preprocess_profile(profile: dict) -> dict[str, str | dict] | None:
     """
     Preprocesses profile for a loaded language
     :param profile: a loaded profile
@@ -83,7 +82,7 @@ def preprocess_profile(profile: dict[str, Any]) -> Optional[dict[str, Any]]:
     """
 
 
-def collect_profiles(paths_to_profiles: list) -> Optional[list[Optional[dict[str, Union[str, dict[str, float]]]]]]:
+def collect_profiles(paths_to_profiles: list) -> list[dict[str, str | dict[str, float]]] | None:
     """
     Collects profiles for a given path
     :paths_to_profiles: a list of strings to the profiles
@@ -91,9 +90,8 @@ def collect_profiles(paths_to_profiles: list) -> Optional[list[Optional[dict[str
     """
 
 
-def detect_language_advanced(
-    unknown_profile: dict[str, Union[str, dict[str, float]]], known_profiles: list
-) -> Optional[list]:
+def detect_language_advanced(unknown_profile: dict[str, str | dict[str, float]],
+                             known_profiles: list) -> list | None:
     """
     Detects the language of an unknown profile
     :param unknown_profile: a dictionary of a profile to determine the language of
@@ -102,7 +100,7 @@ def detect_language_advanced(
     """
 
 
-def print_report(detections: list[list[Union[str, float]]]) -> None:
+def print_report(detections: list[list[str | float]]) -> None:
     """
     Prints report for detection of language
     :param detections: a list with distances for each available language
