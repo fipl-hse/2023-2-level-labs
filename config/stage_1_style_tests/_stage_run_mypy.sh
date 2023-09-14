@@ -25,9 +25,8 @@ for LAB_NAME in $LABS; do
   else
     continue
   fi
-
-  echo "Running mypy checks for lab ${LAB_NAME}"
   check_if_failed
+
 done
 
 echo "Mypy check passed."
