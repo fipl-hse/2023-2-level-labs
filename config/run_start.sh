@@ -1,15 +1,9 @@
 #!/bin/bash
-source config/common.sh
-
 set -ex
 
-source venv/bin/activate
+source config/common.sh
 
-echo "Running start.py checks..."
-
-source venv/bin/activate
-
-export PYTHONPATH="$(pwd):${PYTHONPATH}"
+configure_script
 
 LABS=$(get_labs)
 WAS_FAILED=0
@@ -21,6 +15,14 @@ for LAB_NAME in $LABS; do
 	  echo '[skip-lab] option was enabled, skipping check...'
 	  continue
 	fi
+
+	TARGET_SCORE=$(get_score "${LAB_NAME}")
+
+	if [[ ${TARGET_SCORE} == 0 ]]; then
+    echo "Skipping stage"
+    continue
+  fi
+
   cd ${LAB_NAME}
 	if ! python start.py;  then
     	WAS_FAILED=1
