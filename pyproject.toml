@@ -44,6 +44,12 @@ disable_error_code = [
 module = ['memory_profiler', 'ghapi.all', 'ast_comments', 'pydantic']
 ignore_missing_imports = true
 
+[[tool.mypy.overrides]]
+module = ['seminars.*', ]
+disable_error_code = [
+    'empty-body'
+]
+
 [tool.black]
 line-length = 120
 target-version = ['py39']
