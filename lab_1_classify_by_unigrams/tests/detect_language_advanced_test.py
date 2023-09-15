@@ -52,7 +52,6 @@ class DetectLanguageAdvancedTest(unittest.TestCase):
              '▸': 3.4105e-05}}]
 
     @pytest.mark.lab_1_classify_by_unigrams
-    @pytest.mark.mark8
     @pytest.mark.mark10
     def test_detect_language_advanced_ideal(self):
         """
@@ -77,7 +76,6 @@ class DetectLanguageAdvancedTest(unittest.TestCase):
                                    delta=1e-4)
 
     @pytest.mark.lab_1_classify_by_unigrams
-    @pytest.mark.mark8
     @pytest.mark.mark10
     def test_detect_language_advanced_bad_input_unknown_profile(self):
         """
@@ -91,7 +89,6 @@ class DetectLanguageAdvancedTest(unittest.TestCase):
         self.assertEqual(expected, actual)
 
     @pytest.mark.lab_1_classify_by_unigrams
-    @pytest.mark.mark8
     @pytest.mark.mark10
     def test_detect_language_advanced_bad_input_known_profile(self):
         """
