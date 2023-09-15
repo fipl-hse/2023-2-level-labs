@@ -11,7 +11,7 @@ configure_script
 FAILED=0
 LABS=$(get_labs)
 
-mypy config
+mypy config seminars
 
 check_if_failed
 
@@ -25,9 +25,8 @@ for LAB_NAME in $LABS; do
   else
     continue
   fi
-
-  echo "Running mypy checks for lab ${LAB_NAME}"
   check_if_failed
+
 done
 
 echo "Mypy check passed."
