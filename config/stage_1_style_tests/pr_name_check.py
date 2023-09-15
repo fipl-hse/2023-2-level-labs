@@ -32,8 +32,8 @@ if __name__ == '__main__':
     project_config = ProjectConfig(PROJECT_CONFIG_PATH)
 
     parser = argparse.ArgumentParser(description='Checks that PR name is done using the template')
-    parser.add_argument('--pr-name', type=str, help='Current PR name')
-    parser.add_argument('--pr-author', type=str, help='Current PR author')
+    parser.add_argument('--pr-name', type=str, required=True, help='Current PR name')
+    parser.add_argument('--pr-author', type=str, required=True, help='Current PR author')
     args: argparse.Namespace = parser.parse_args()
 
     if '[skip-name]' in args.pr_name:

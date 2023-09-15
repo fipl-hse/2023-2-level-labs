@@ -33,7 +33,16 @@ def remove_implementation_from_function(original_declaration: ast.stmt,
         raise NoDocStringForAMethodError(f'You have to provide docstring for a method '
                                          f'{parent.name + "." if parent is not None else ""}'
                                          f'{original_declaration.name}')
-    original_declaration.body[1:] = []
+
+    opening_files = []
+    for decl in original_declaration.body:
+        if isinstance(decl, ast.With):
+            if 'assets/texts' in ast.unparse(decl.items[0].context_expr.args[0]):  # type: ignore
+                opening_files.append(decl)
+
+        if isinstance(decl, ast.Assert):
+            opening_files.append(decl)  # type: ignore
+    original_declaration.body[1:] = opening_files
 
 
 # pylint: disable=too-many-branches
@@ -76,14 +85,15 @@ def cleanup_code(source_code_path: Path) -> str:
                                                       for name in names_to_import]))
                 continue
 
-        if isinstance(decl, ast.ClassDef):
+        if isinstance(decl, ast.ClassDef) and \
+                isinstance(ast.get_docstring(decl), str):
             if 'Note: remove' in ast.get_docstring(decl):  # type: ignore
                 decl = []  # type: ignore
             else:
-                for ind, class_decl in enumerate(decl.body):
-                    if isinstance(class_decl, ast.FunctionDef) \
-                            and 'Note: remove' in ast.get_docstring(class_decl):  # type: ignore
-                        decl.body[ind] = []  # type: ignore
+                for class_decl in decl.body:
+                    if isinstance(class_decl, ast.FunctionDef) and \
+                            'Note: remove' in ast.get_docstring(class_decl):  # type: ignore
+                        decl.body[decl.body.index(class_decl)] = []  # type: ignore
 
         if isinstance(decl, ast.ClassDef) and decl.bases:
             name = decl.bases[0]
@@ -95,7 +105,9 @@ def cleanup_code(source_code_path: Path) -> str:
         if isinstance(decl, ast.ClassDef):
             for class_decl in decl.body:
                 remove_implementation_from_function(class_decl, parent=decl)
+
         remove_implementation_from_function(decl)
+
         new_decl.append(decl)
 
     data.body = list(new_decl)
