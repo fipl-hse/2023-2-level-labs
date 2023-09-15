@@ -19,6 +19,7 @@ def calculate_frequencies(tokens: list[str] | None) -> dict[str, float] | None:
     :param tokens: a list of tokens
     :return: a dictionary with frequencies
     """
+    None
 
 
 def create_language_profile(language: str, text: str) -> dict[str, str | dict[str, float]] | None:
