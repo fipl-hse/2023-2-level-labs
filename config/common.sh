@@ -12,6 +12,8 @@ configure_script() {
   if [[ "$OSTYPE" == "linux-gnu"* ]]; then
     source venv/bin/activate
     export PYTHONPATH=$(pwd):$PYTHONPATH
+    which python
+    python -m pip list
   elif [[ "$OSTYPE" == "msys" ]]; then
     source venv/Scripts/activate
     export PYTHONPATH=$(pwd)
