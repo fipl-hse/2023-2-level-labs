@@ -10,7 +10,7 @@ configure_script
 
 FAILED=0
 
-lint_output=$(python -m pylint --exit-zero --rcfile config/stage_1_style_tests/.pylintrc config)
+lint_output=$(python -m pylint --exit-zero --rcfile config/stage_1_style_tests/.pylintrc config seminars)
 
 python config/stage_1_style_tests/lint_level.py \
   --lint-output "${lint_output}" \
