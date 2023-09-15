@@ -36,9 +36,9 @@
 датасета
 дедлайн
 демидовский
-детерминирующим
 детекции
 детекцию
+детерминирующим
 ещё
 её
 жаккара
@@ -118,8 +118,8 @@
 переподсчете
 переподсчёта
 переподсчёте
-полиморфность
 по-разному
+полиморфность
 предобрабатывает
 предобрабатывает
 предобрабатывается
@@ -140,6 +140,7 @@
 процентиль
 процентиля
 пулл
+путём
 ранжируются
 расcчитать
 реквеста
@@ -306,7 +307,7 @@ inout
 inverse
 itertools
 jaccard
-JavaScript
+javascript
 json
 k-ближайших
 keyword
@@ -339,9 +340,9 @@ n-процентов
 name
 nb
 negative
-note
-notation
 nltk
+notation
+note
 object
 object-oriented
 observed
@@ -373,10 +374,10 @@ score
 scores
 similarity
 sports
+squared
 stopwords
 sum
 summary
-squared
 tbd
 tech
 term
