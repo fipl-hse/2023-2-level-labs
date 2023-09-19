@@ -51,7 +51,12 @@ def create_language_profile(language: str, text: str) -> dict[str, str | dict[st
     """
 
     if isinstance(language, str) and isinstance(text, str):
-
+        tokens = tokenize(text)
+        profile = {
+            "name": language,
+            "freq": calculate_frequencies(tokens)
+        }
+        return profile
     else:
         return None
 
