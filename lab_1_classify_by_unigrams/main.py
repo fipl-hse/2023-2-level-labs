@@ -5,6 +5,18 @@ Language detection
 
 
 def tokenize(text: str) -> list[str] | None:
+    if isinstance(text, str):
+        punc="!#$%&'()*+,-./:;<=>?@[\]^_`{|}~1234567890"
+        tokens = "".join(text.split()).lower()
+        for el in tokens:
+            if el in punc:
+                tokens = tokens.replace(el, '')
+        tokens = list(tokens)
+        return tokens
+    else:
+        return None
+
+
     """
     Splits a text into tokens, converts the tokens into lowercase,
     removes punctuation, digits and other symbols
