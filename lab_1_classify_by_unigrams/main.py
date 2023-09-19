@@ -3,7 +3,6 @@ Lab 1
 Language detection
 """
 
-
 def tokenize(text: str) -> list[str] | None:
     if isinstance(text, str):
         tokens = []
