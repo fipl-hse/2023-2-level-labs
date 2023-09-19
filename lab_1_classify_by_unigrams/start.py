@@ -2,6 +2,7 @@
 Language detection starter
 """
 
+#line to be deleted
 
 def main() -> None:
     """

@@ -5,6 +5,14 @@ Language detection
 
 
 def tokenize(text: str) -> list[str] | None:
+    if type(text) != str:
+        return None
+    tokens = []
+    for symbol in text:
+        if symbol.isalpha():
+            tokens += symbol.lower()
+    return tokens
+
     """
     Splits a text into tokens, converts the tokens into lowercase,
     removes punctuation, digits and other symbols
@@ -14,6 +22,17 @@ def tokenize(text: str) -> list[str] | None:
 
 
 def calculate_frequencies(tokens: list[str] | None) -> dict[str, float] | None:
+    if type(tokens) != list or tokens == [] or not all(isinstance(element, str) for element in tokens):
+        return None
+    frequencies = {}
+    unit = 1/len(tokens)
+    for letter in tokens:
+        if letter in frequencies:
+            frequencies[letter] += unit
+        else:
+            frequencies[letter] = unit
+    return frequencies
+
     """
     Calculates frequencies of given tokens
     :param tokens: a list of tokens
