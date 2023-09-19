@@ -11,6 +11,17 @@ def tokenize(text: str) -> list[str] | None:
     :param text: a text
     :return: a list of lower-cased tokens without punctuation
     """
+    if not isinstance(text, str):
+        return None
+    tokens = ''
+    punc = ''''!"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~'''
+    text = text.replace(' ', '')
+    text = text.replace('\n', '')
+    for token in text:
+        if token not in punc:
+            tokens += token.lower()
+    return [*tokens]
+
 
 
 def calculate_frequencies(tokens: list[str] | None) -> dict[str, float] | None:
@@ -19,7 +30,6 @@ def calculate_frequencies(tokens: list[str] | None) -> dict[str, float] | None:
     :param tokens: a list of tokens
     :return: a dictionary with frequencies
     """
-    None
 
 
 def create_language_profile(language: str, text: str) -> dict[str, str | dict[str, float]] | None:
