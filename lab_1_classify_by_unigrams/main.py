@@ -2,32 +2,33 @@
 Lab 1
 Language detection
 """
-
-
 def tokenize(text: str) -> list[str] | None:
-    """
-    Splits a text into tokens, converts the tokens into lowercase,
-    removes punctuation, digits and other symbols
-    :param text: a text
-    :return: a list of lower-cased tokens without punctuation
-    """
+    text = text.lower()
+    cleaned_text = ""
+    for symbol in text:
+        for letter in symbol:
+            if letter.isalpha() and symbol != " ":
+                cleaned_text += letter
+    tokens = list(cleaned_text)
+    if not isinstance(text, str):
+        return None
+    return tokens
 
 
 def calculate_frequencies(tokens: list[str] | None) -> dict[str, float] | None:
-    """
-    Calculates frequencies of given tokens
-    :param tokens: a list of tokens
-    :return: a dictionary with frequencies
-    """
+    freqs = {}
+    element_count = len(tokens)
+    for token in tokens:
+        if token in freqs:
+            freqs[token] += 1 / element_count
+        else:
+            freqs[token] = 1 / element_count
+    return freqs
 
 
 def create_language_profile(language: str, text: str) -> dict[str, str | dict[str, float]] | None:
-    """
-    Creates a language profile
-    :param language: a language
-    :param text: a text
-    :return: a dictionary with two keys – name, freq
-    """
+    dict_language_profile = {"name": language, "freq": calculate_frequencies(tokenize(text))}
+    return dict_language_profile
 
 
 def calculate_mse(predicted: list, actual: list) -> float | None:
