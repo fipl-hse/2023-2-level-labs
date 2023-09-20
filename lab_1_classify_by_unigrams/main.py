@@ -88,7 +88,8 @@ def validate_input(dict1: Any) -> bool:
 
 
 def compare_profiles(
-    unknown_profile: dict[str, str | dict[str, float]], profile_to_compare: dict[str, str | dict[str, float]]
+    unknown_profile: dict[str, str | dict[str, float]],
+    profile_to_compare: dict[str, str | dict[str, float]]
 ) -> float | None:
     """
     Compares profiles and calculates the distance using symbols
@@ -121,7 +122,10 @@ def detect_language(
     :return: a language
     @rtype: object
     """
-    if isinstance(unknown_profile, dict) and isinstance(profile_1, dict) and isinstance(profile_2, dict):
+    if (
+            isinstance(unknown_profile, dict)
+            and isinstance(profile_1, dict) and isinstance(profile_2, dict)
+    ):
         metrics = {
             profile_1["name"]: compare_profiles(unknown_profile, profile_1),
             profile_2["name"]: compare_profiles(unknown_profile, profile_2),
@@ -144,7 +148,7 @@ def load_profile(path_to_file: str) -> dict | None:
     if isinstance(path_to_file, str):
         with open(path_to_file, "r", encoding="utf-8") as file:
             profile = json.load(file)
-        return profile
+        return dict(profile)
 
     return None
 
@@ -156,7 +160,10 @@ def preprocess_profile(profile: dict) -> dict[str, str | dict] | None:
     :return: a dict with a lower-cased loaded profile
     with relative frequencies without unnecessary ngrams
     """
-    if isinstance(profile, dict) and "name" in profile and "freq" in profile and "n_words" in profile:
+    if (
+            isinstance(profile, dict) and "name" in profile
+            and "freq" in profile and "n_words" in profile
+    ):
         preprocessed_profile = {"name": profile["name"], "freq": {}}
         unigrams = profile["n_words"][0]
         for token in profile["freq"]:
