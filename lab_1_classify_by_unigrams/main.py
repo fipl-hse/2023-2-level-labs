@@ -32,11 +32,12 @@ def calculate_frequencies(tokens: list[str] | None) -> dict[str, float] | None:
     check_relevance = True
     if not isinstance(tokens, list):
         check_relevance = False
-    for element in tokens:
-        if isinstance(element, str):
-            check_relevance = False
-            break
-    if not check_relevance:
+    else:
+        for element in tokens:
+            if not isinstance(element, str):
+                check_relevance = False
+                break
+    if check_relevance:
         frequency = {}
         for token in tokens:
             if token not in frequency:
