@@ -24,7 +24,7 @@ jobs:
     steps:
       - uses: actions/checkout@v3
       - name: Setup FIPL environment
-        uses: fipl-hse/setup-env-action@v0.8
+        uses: fipl-hse/setup-env-action@v0.9
       - name: Confirming everything is OK
         run: |
           ls -la venv
@@ -42,7 +42,7 @@ jobs:
     steps:
       - uses: actions/checkout@v3
       - name: Setup FIPL environment
-        uses: fipl-hse/setup-env-action@v0.8
+        uses: fipl-hse/setup-env-action@v0.9
       - name: PR name check
         run: |
           bash config/stage_1_style_tests/_stage_pr_name_check.sh "$PR_NAME" "$PR_AUTHOR"
@@ -59,7 +59,7 @@ jobs:
     steps:
       - uses: actions/checkout@v3
       - name: Setup FIPL environment
-        uses: fipl-hse/setup-env-action@v0.8
+        uses: fipl-hse/setup-env-action@v0.9
       - name: Code Style
         run: |
           bash config/stage_1_style_tests/_stage_run_lint.sh "$PR_NAME" "$PR_AUTHOR"
@@ -73,7 +73,7 @@ jobs:
     steps:
       - uses: actions/checkout@v3
       - name: Setup FIPL environment
-        uses: fipl-hse/setup-env-action@v0.8
+        uses: fipl-hse/setup-env-action@v0.9
       - name: MyPy check
         run: |
           bash config/stage_1_style_tests/_stage_run_mypy.sh
@@ -89,7 +89,7 @@ jobs:
     steps:
       - uses: actions/checkout@v3
       - name: Setup FIPL environment
-        uses: fipl-hse/setup-env-action@v0.8
+        uses: fipl-hse/setup-env-action@v0.9
       - name: Run tests
         run: |
           bash config/run_tests.sh "$PR_NAME"
@@ -105,7 +105,7 @@ jobs:
     steps:
       - uses: actions/checkout@v3
       - name: Setup FIPL environment
-        uses: fipl-hse/setup-env-action@v0.8
+        uses: fipl-hse/setup-env-action@v0.9
       - name: Run start
         run: |
           bash config/run_start.sh "$PR_NAME"
@@ -121,7 +121,7 @@ jobs:
     steps:
       - uses: actions/checkout@v3
       - name: Setup FIPL environment
-        uses: fipl-hse/setup-env-action@v0.8
+        uses: fipl-hse/setup-env-action@v0.9
       - name: Run start
         if: ${{ env.REPOSITORY_TYPE == 'admin' }}
         run: |
@@ -138,8 +138,9 @@ jobs:
         run: |
           sudo apt-get install aspell aspell-en aspell-ru
       - name: Setup FIPL environment
-        uses: fipl-hse/setup-env-action@v0.8
+        uses: fipl-hse/setup-env-action@v0.9
       - name: Spell check
+        if: ${{ env.REPOSITORY_TYPE == 'admin' }}
         run: |
           bash config/spellcheck/_stage_spellcheck.sh
 
@@ -156,7 +157,7 @@ jobs:
         run: |
           sudo apt-get install aspell aspell-en aspell-ru
       - name: Setup FIPL environment
-        uses: fipl-hse/setup-env-action@v0.8
+        uses: fipl-hse/setup-env-action@v0.9
       - name: Stubgen check
         if: ${{ env.REPOSITORY_TYPE == 'admin' }}
         run: |
@@ -171,7 +172,7 @@ jobs:
     steps:
       - uses: actions/checkout@v3
       - name: Setup FIPL environment
-        uses: fipl-hse/setup-env-action@v0.8
+        uses: fipl-hse/setup-env-action@v0.9
       - name: Flake8 check
         run: |
           bash config/stage_1_style_tests/_stage_run_flake8.sh
@@ -185,8 +186,9 @@ jobs:
     steps:
       - uses: actions/checkout@v3
       - name: Setup FIPL environment
-        uses: fipl-hse/setup-env-action@v0.8
+        uses: fipl-hse/setup-env-action@v0.9
       - name: Pymarkdownlnt check
+        if: ${{ env.REPOSITORY_TYPE == 'admin' }}
         run: |
           bash config/stage_1_style_tests/_stage_run_pymarkdownlnt.sh
 
@@ -199,8 +201,9 @@ jobs:
     steps:
       - uses: actions/checkout@v3
       - name: Setup FIPL environment
-        uses: fipl-hse/setup-env-action@v0.8
+        uses: fipl-hse/setup-env-action@v0.9
       - name: Dependencies check
+        if: ${{ env.REPOSITORY_TYPE == 'admin' }}
         run: |
           bash config/stage_1_style_tests/_stage_requirements_check.sh
 
@@ -213,7 +216,7 @@ jobs:
     steps:
       - uses: actions/checkout@v3
       - name: Setup FIPL environment
-        uses: fipl-hse/setup-env-action@v0.8
+        uses: fipl-hse/setup-env-action@v0.9
       - name: Newline check
         if: ${{ env.REPOSITORY_TYPE == 'admin' }}
         run: |
