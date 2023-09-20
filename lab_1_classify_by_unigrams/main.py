@@ -23,6 +23,7 @@ tokens = tokenize(text)
 
 def calculate_frequencies(tokens):
     dictionary = {}
+    explanation = {}
     length = len(tokens)
     for i in tokens:
         dictionary[i] = (dictionary.setdefault(i, 0) + 1) / length
