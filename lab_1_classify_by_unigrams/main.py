@@ -2,6 +2,7 @@
 Lab 1
 Language detection
 """
+from typing import List
 
 
 def tokenize(text: str) -> list[str] | None:
@@ -11,7 +12,8 @@ def tokenize(text: str) -> list[str] | None:
     :param text: a text
     :return: a list of lower-cased tokens without punctuation
     """
-
+    tokens: list[str] = [t for t in text.lower() if t.isalpha()]
+    return tokens
 
 def calculate_frequencies(tokens: list[str] | None) -> dict[str, float] | None:
     """
@@ -19,6 +21,17 @@ def calculate_frequencies(tokens: list[str] | None) -> dict[str, float] | None:
     :param tokens: a list of tokens
     :return: a dictionary with frequencies
     """
+    dict_tokens = {}
+    all_tokens = 0
+    for token in tokens:
+        all_tokens += 1
+        num_token = tokens.count(token)
+        dict_tokens[token] = num_token
+    dict_freq = {}
+    for key, value in dict_tokens.items():
+        freq = value/all_tokens
+        dict_freq[key] = freq
+    return dict_freq
 
 
 def create_language_profile(language: str, text: str) -> dict[str, str | dict[str, float]] | None:
@@ -28,6 +41,10 @@ def create_language_profile(language: str, text: str) -> dict[str, str | dict[st
     :param text: a text
     :return: a dictionary with two keys – name, freq
     """
+    lang_profile = {}
+    lang_profile['name'] = language
+    lang_profile['freq'] = calculate_frequencies(tokenize(text))
+    return lang_profile
 
 
 def calculate_mse(predicted: list, actual: list) -> float | None:
