@@ -26,12 +26,12 @@ def main() -> None:
     result = None
     assert result, "Detection result is None"
     en_tokens = tokenize(en_text)
-    det_tokens = tokenize(de_text)
+    de_tokens = tokenize(de_text)
     unknown_tokens = tokenize(unknown_text)
     en_profile = create_language_profile(calculate_frequencies(en_tokens))
-    det_profile = create_language_profile(calculate_frequencies(det_tokens))
+    de_profile = create_language_profile(calculate_frequencies(de_tokens))
     unknown_profile = create_language_profile(calculate_frequencies(unknown_tokens))
-    detected_language = detect_language(unknown_profile, en_profile, det_profile)
+    detected_language = detect_language(unknown_profile, en_profile, de_profile)
     paths_to_profiles = [
         'assets/profiles/de.json',
         'assets/profiles/en.json',

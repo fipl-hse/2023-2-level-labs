@@ -204,5 +204,5 @@ def print_report(detections: list[list[str | float]]) -> None:
     :param detections: a list with distances for each available language
     """
     for score in detections:
-        score_value = f'{score[1]:.5f}'
-        print(f'{score[0]}: MSE {score_value}')
+        score_val = f'{score[1]:.5f}'
+        print(f'{score[0]}: MSE {score_val}')
