@@ -166,10 +166,10 @@ def collect_profiles(paths_to_profiles: list) -> list[dict[str, str | dict[str, 
     :return: a list of loaded profiles
     """
     if isinstance(paths_to_profiles, list):
-        preprocess_profile_list = []
+        preprocess_profiles_list = []
         for path in paths_to_profiles:
-            preprocess_profile_list.append(preprocess_profile(load_profile(path)))
-        return preprocess_profile_list
+            preprocess_profiles_list.append(preprocess_profile(load_profile(path)))
+        return preprocess_profiles_list
     else:
         return None
 

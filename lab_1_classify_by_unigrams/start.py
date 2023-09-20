@@ -32,7 +32,7 @@ def main() -> None:
     de_profile = create_language_profile(calculate_frequencies(de_tokens))
     unknown_profile = create_language_profile(calculate_frequencies(unknown_tokens))
     detected_language = detect_language(unknown_profile, en_profile, de_profile)
-    paths_to_profiles = [
+    path_to_profiles = [
         'assets/profiles/de.json',
         'assets/profiles/en.json',
         'assets/profiles/es.json',
@@ -41,7 +41,7 @@ def main() -> None:
         'assets/profiles/ru.json',
         'assets/profiles/tr.json'
     ]
-    preprocessed_profiles = collect_profiles(paths_to_profiles)
+    preprocessed_profiles = collect_profiles(path_to_profiles)
     frequencies = detect_language_advanced(unknown_profile, preprocessed_profiles)
     print_report(frequencies)
 
