@@ -11,32 +11,14 @@ def tokenize(text: str) -> list[str] | None:
     :param text: a text
     :return: a list of lower-cased tokens without punctuation
     """
-    text = '''Von Frisch noted something further. When the scout bees came home to tell their
-sisters about the food source, sometimes they would dance outside on the horizontal
-entrance platform of the hive, and sometimes on the vertical wall inside. And,
-depending on where they danced, the straight portion of the waggle dance would
-point in different directions. The outside dance was fairly easy to decode: the straight
-portion of the dance pointed directly to the food source, so the bees would merely
-have to decode the distance message and fly off in that direction to find their food.
-But by studying the dance on the inner wall of the hive, von Frisch discovered a
-remarkable method which the dancer used to tell her sisters the direction of the food
-in relation to the sun. When inside the hive, the dancer cannot use the sun, so she
-uses gravity instead. The direction of the sun is represented by the top of the hive
-wall. If she runs straight up, this means that the feeding place is in the same
-direction as the sun. However, if, for example, the feeding place is 40º to the left of
-the sun, then the dancer would run 40º to the left of the vertical line. This was to be
-the first of von Frisch’s remarkable discoveries. Soon he would also discover a
-number of other remarkable facts about how bees communicate and, in doing so,
-revolutionise the study of animal behaviour generally.'''
+    en_text = ''
 
-if isinstance(text, str):
-    text = text.lower()
+if isinstance(en_text, str):
+    en_text = en_text.lower()
 
-    punctuation = [',', '.', ';', ':', '*', '!', '?', " ", "\n"]
     text_new = []
-    text_2 = ''.join(i for i in text if i not in punctuation)
 
-    for i in text_2:
+    for i in en_text:
         if i.isalpha():
             text_new.append(i)
 

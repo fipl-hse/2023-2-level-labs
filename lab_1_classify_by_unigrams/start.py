@@ -16,6 +16,8 @@ def main() -> None:
     result = None
     assert result, "Detection result is None"
 
+from main.py import tokenize
+tokenize()
 
 if __name__ == "__main__":
     main()
