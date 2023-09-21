@@ -4,33 +4,50 @@ Language detection
 """
 
 def tokenize(text: str) -> list[str] | None:
-    if isinstance(text, str):
+    """
+    Splits a text into tokens, converts the tokens into lowercase,
+    removes punctuation, digits and other symbols
+    :param text: a text
+    :return: a list of lower-cased tokens without punctuation
+    """
+    if not isinstance(text, str):
+        return None
+    else:
         tokens = []
         text = text.lower()
         for i in text:
             if i.isalpha():
                 tokens.append(i)
         return tokens
-    else:
-        return None
 
 
 def calculate_frequencies(tokens: list[str] | None) -> dict[str, float] | None:
-    if isinstance(tokens, list) and all(isinstance(el, str) for el in tokens):
+    """
+    Calculates frequencies of given tokens
+    :param tokens: a list of tokens
+    :return: a dictionary with frequencies
+    """
+    if not (isinstance(tokens, list) and all(isinstance(el, str) for el in tokens)):
+        return None
+    else:
         frequency_dict = {el: (tokens.count(el) / len(tokens)) for el in tokens}
         return frequency_dict
-    else:
-        return None
 
 
 def create_language_profile(language: str, text: str) -> dict[str, str | dict[str, float]] | None:
-    if isinstance(language, str) and isinstance(text, str):
+    """
+    Creates a language profile
+    :param language: a language
+    :param text: a text
+    :return: a dictionary with two keys – name, freq
+    """
+    if not (isinstance(language, str) and isinstance(text, str)):
+        return None
+    else:
         tokens = tokenize(text)
         frequency_dict = calculate_frequencies(tokens)
         language_profile = {'name': language, 'freq': frequency_dict}
         return language_profile
-    else:
-        return None
 
 
 def calculate_mse(predicted: list, actual: list) -> float | None:
@@ -40,6 +57,7 @@ def calculate_mse(predicted: list, actual: list) -> float | None:
     :param actual: a list of actual values
     :return: the score
     """
+
 
 
 def compare_profiles(
