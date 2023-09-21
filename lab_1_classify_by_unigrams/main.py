@@ -211,7 +211,7 @@ def detect_language_advanced(
     return None
 
 
-def print_report(detections: list[list[str | float]]) -> None:
+def print_report(detections: list[tuple[str, float]]) -> None:
     """
     Prints report for detection of language
     :param detections: a list with distances for each available language
