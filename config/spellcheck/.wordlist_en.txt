@@ -1,2 +1,6 @@
 breakpoint
+cos
+epsilon
+operatorname
 pycharm
+sqrt
