@@ -53,14 +53,14 @@ def multiply_string(input_string: str, how_many: int) -> str:
     display the given string the number of times given in the `how_many`.
     """
     # student realisation goes here
-    return how_many * input_string
+    # return how_many * input_string
 
 
 # Function calls with expected result:
-multiply_string('Hi', 2) # → 'HiHi'
-multiply_string('Hi', 3) # → 'HiHiHi'
-multiply_string('Hi', 1) # → 'Hi'
-multiply_string('Hi', 0) # → ''
+# multiply_string('Hi', 2) # → 'HiHi'
+# multiply_string('Hi', 3) # → 'HiHiHi'
+# multiply_string('Hi', 1) # → 'Hi'
+# multiply_string('Hi', 0) # → ''
 
 
 # Task 2:
