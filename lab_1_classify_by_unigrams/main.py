@@ -37,7 +37,12 @@ def calculate_frequencies(tokens):
     explanation = {}
     length = len(tokens)
     for i in tokens:
-        dictionary[i] = (dictionary.setdefault(i, 0) + 1) / length
+        if i in dictionary:
+            dictionary[i] += 1/length
+        else:
+            dictionary[i] = 1/length
+
+
 
 
 
