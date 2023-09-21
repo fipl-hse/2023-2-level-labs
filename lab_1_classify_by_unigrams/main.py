@@ -7,11 +7,12 @@ Language detection
 def tokenize(langtext):
     if type(langtext) != str:
         return None
-    langtext.lower()
+    langtext = langtext.lower()
     tokens = []
     for token in langtext:
         if token.isalpha():
             tokens.append(token)
+    print(tokens)
     return tokens
 
 
