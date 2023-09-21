@@ -1,11 +1,12 @@
-"""
-Language detection starter
-"""
 from lab_1_classify_by_unigrams.main import create_language_profile
 from lab_1_classify_by_unigrams.main import detect_language_advanced
 from lab_1_classify_by_unigrams.main import print_report
 from lab_1_classify_by_unigrams.main import preprocess_profile
 from lab_1_classify_by_unigrams.main import load_profile
+
+"""
+Language detection starter
+"""
 
 
 def main() -> None:
@@ -21,7 +22,9 @@ def main() -> None:
                       ]
     language_profiles = []
     for path in profiles_paths:
-        language_profiles.append(preprocess_profile(load_profile(path)))
+        profile = load_profile(path)
+        preprocessed_profile = preprocess_profile(profile)
+        language_profiles.append(preprocessed_profile)
 
     with open("assets/texts/en.txt", "r", encoding="utf-8") as file_to_read_en:
         en_text = file_to_read_en.read()
@@ -42,6 +45,7 @@ def main() -> None:
     print('The distances to En, Fr, It, Ru, Es and Tr languages:')
     print_report(result_complex)
 
+    assert result, "Detection result is None"
 
 
 if __name__ == "__main__":
