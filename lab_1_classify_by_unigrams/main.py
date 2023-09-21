@@ -12,7 +12,6 @@ def tokenize(langtext):
     for token in langtext:
         if token.isalpha():
             tokens.append(token)
-    print(tokens)
     return tokens
 
 
