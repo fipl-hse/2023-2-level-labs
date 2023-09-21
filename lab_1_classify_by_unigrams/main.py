@@ -18,4 +18,4 @@ def calculate_frequencies(tokens: list[str] | None) -> dict[str, float] | None:
     return frequency
 
 
-calculate_frequencies(tokenize('Hey! How are you?'))
+calculate_frequencies(tokenize('Hey!! How are you?'))
