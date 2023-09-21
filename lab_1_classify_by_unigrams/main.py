@@ -61,15 +61,16 @@ def calculate_mse(predicted: list, actual: list) -> float | None:
     :param actual: a list of actual values
     :return: the score
     """
-    if not isinstance(predicted, list) or not isinstance(actual, list) or len(predicted) != len(actual):
+    if not isinstance(predicted, list) or not isinstance(actual, list) \
+            or len(predicted) != len(actual):
         return None
 
-    MSE = 0
+    mse = 0
     for index in range(len(predicted)):
-        MSE += (predicted[index] - actual[index])**2
+        mse += (predicted[index] - actual[index])**2
 
-    MSE /= len(predicted)
-    return MSE
+    mse /= len(predicted)
+    return mse
 
 
 def compare_profiles(
@@ -83,7 +84,8 @@ def compare_profiles(
     :return: the distance between the profiles
     """
     if not isinstance(unknown_profile, dict) or not isinstance(profile_to_compare, dict) \
-            or ('name' or 'freq') not in unknown_profile or ('name' or 'freq') not in profile_to_compare:
+            or ('name' or 'freq') not in unknown_profile \
+            or ('name' or 'freq') not in profile_to_compare:
         return None
 
     mutual_profile = {}
@@ -119,15 +121,14 @@ def detect_language(
     if not all(isinstance(one_profile, dict) for one_profile in [unknown_profile, profile_1, profile_2]):
         return None
 
-    MSE_1 = compare_profiles(unknown_profile, profile_1)
-    MSE_2 = compare_profiles(unknown_profile, profile_2)
+    mse_1 = compare_profiles(unknown_profile, profile_1)
+    mse_2 = compare_profiles(unknown_profile, profile_2)
 
-    if MSE_1 == MSE_2:
-        return sorted([profile_1['name'], profile_2['name']])[0]
-    elif MSE_1 < MSE_2:
-        return profile_1['name']
-    else:
+    if mse_1 > mse_2:
         return profile_2['name']
+    elif mse_1 < mse_2:
+        return profile_1['name']
+    return sorted([profile_1['name'], profile_2['name']])[0]
 
 
 def load_profile(path_to_file: str) -> dict | None:
@@ -159,9 +160,11 @@ def preprocess_profile(profile: dict) -> dict[str, str | dict] | None:
 
     for sequence in profile['freq']:
         if sequence.lower() in perfect_profile['freq']:
-            perfect_profile['freq'][sequence.lower()] += profile['freq'][sequence] / profile['n_words'][0]
+            perfect_profile['freq'][sequence.lower()] += \
+                profile['freq'][sequence] / profile['n_words'][0]
         elif len(sequence) == 1:
-            perfect_profile['freq'][sequence.lower()] = profile['freq'][sequence] / profile['n_words'][0]
+            perfect_profile['freq'][sequence.lower()] = \
+                profile['freq'][sequence] / profile['n_words'][0]
 
     return perfect_profile
 
@@ -194,6 +197,16 @@ def detect_language_advanced(unknown_profile: dict[str, str | dict[str, float]],
     :param known_profiles: a list of known profiles
     :return: a sorted list of tuples containing a language and a distance
     """
+    if not isinstance(unknown_profile, dict) or \
+            not isinstance(known_profiles, list):
+        return None
+
+    distances = []
+    for profile in known_profiles:
+        distances.append((profile['name'], compare_profiles(unknown_profile, profile)))
+
+    distances.sort(key=lambda x: x[1])
+    return distances
 
 
 def print_report(detections: list[list[str | float]]) -> None:
@@ -201,3 +214,5 @@ def print_report(detections: list[list[str | float]]) -> None:
     Prints report for detection of language
     :param detections: a list with distances for each available language
     """
+    for language in detections:
+        print(f'{language[0]}: MSE {language[1]:.5f}')
