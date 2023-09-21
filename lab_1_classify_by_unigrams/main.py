@@ -4,13 +4,18 @@ Language detection
 """
 
 
-def tokenize(text: str) -> list[str] | None:
-    """
-    Splits a text into tokens, converts the tokens into lowercase,
-    removes punctuation, digits and other symbols
-    :param text: a text
-    :return: a list of lower-cased tokens without punctuation
-    """
+def tokenize(langtext):
+    if type(langtext) != str:
+        return None
+    langtext.lower()
+    tokens = []
+    for token in langtext:
+        if token.isalpha():
+            tokens.append(token)
+    return tokens
+
+
+
 
 
 def calculate_frequencies(tokens: list[str] | None) -> dict[str, float] | None:
