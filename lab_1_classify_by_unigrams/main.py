@@ -66,8 +66,8 @@ def calculate_mse(predicted: list, actual: list) -> float | None:
         return None
 
     mse = 0
-    for index in range(len(predicted)):
-        mse += (predicted[index] - actual[index])**2
+    for index, pred_value in enumerate(predicted):
+        mse += (pred_value - actual[index])**2
 
     mse /= len(predicted)
     return mse
@@ -118,7 +118,8 @@ def detect_language(
     :param profile_2: a dictionary of a known profile
     :return: a language
     """
-    if not all(isinstance(one_profile, dict) for one_profile in [unknown_profile, profile_1, profile_2]):
+    if not all(isinstance(one_profile, dict) for one_profile \
+               in [unknown_profile, profile_1, profile_2]):
         return None
 
     mse_1 = compare_profiles(unknown_profile, profile_1)
@@ -126,7 +127,7 @@ def detect_language(
 
     if mse_1 > mse_2:
         return profile_2['name']
-    elif mse_1 < mse_2:
+    if mse_1 < mse_2:
         return profile_1['name']
     return sorted([profile_1['name'], profile_2['name']])[0]
 
