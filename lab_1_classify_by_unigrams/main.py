@@ -3,26 +3,27 @@ Lab 1
 Language detection
 """
 def tokenize(text: str) -> list[str] | None:
-    text = text.lower()
-    cleaned_text = ""
-    for symbol in text:
-        for letter in symbol:
-            if letter.isalpha() and symbol != " ":
-                cleaned_text += letter
-    tokens = list(cleaned_text)
     if not isinstance(text, str):
         return None
-    return tokens
+    else:
+        text = text.lower()
+        cleaned_text = ""
+        for symbol in text:
+            if symbol.isalpha() and symbol != " ":
+                cleaned_text += symbol
+        tokens = list(cleaned_text)
+        return tokens
 
 
 def calculate_frequencies(tokens: list[str] | None) -> dict[str, float] | None:
     freqs = {}
-    element_count = len(tokens)
     for token in tokens:
         if token in freqs:
-            freqs[token] += 1 / element_count
+            freqs[token] += 1
         else:
-            freqs[token] = 1 / element_count
+            freqs[token] = 1
+    for token, freq in freqs:
+        freqs[token] = freq / len(tokens)
     return freqs
 
 
