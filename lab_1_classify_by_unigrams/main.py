@@ -51,7 +51,8 @@ def create_language_profile(language: str, text: str) -> dict[str, str | dict[st
     tokens = tokenize(text)
     text_freq = calculate_frequencies(tokens)
 
-    return {'name': language, 'freq': text_freq}
+    if isinstance(text_freq, dict):
+        return {'name': language, 'freq': text_freq}
 
 
 def calculate_mse(predicted: list, actual: list) -> float | None:
@@ -89,14 +90,17 @@ def compare_profiles(
         return None
 
     mutual_characters = [[], []]
-    for character in (unknown_profile['freq'] | profile_to_compare['freq']):
-        mutual_characters[0].append(0.)
-        mutual_characters[1].append(0.)
-
-        if character in unknown_profile['freq']:
-            mutual_characters[0][-1] = unknown_profile['freq'][character]
-        if character in profile_to_compare['freq']:
-            mutual_characters[1][-1] = profile_to_compare['freq'][character]
+    if all(isinstance(profile['freq'], dict) for profile \
+           in [unknown_profile, profile_to_compare]):
+        for character in (unknown_profile['freq'] | profile_to_compare['freq']):
+            if character in unknown_profile['freq']:
+                mutual_characters[0].append(unknown_profile['freq'][character])
+            else:
+                mutual_characters[0].append(0.)
+            if character in profile_to_compare['freq']:
+                mutual_characters[1].append(profile_to_compare['freq'][character])
+            else:
+                mutual_characters[1].append(0.)
 
     if len(mutual_characters[0]) == len(mutual_characters[1]) == 0:
         return 1.
@@ -122,13 +126,14 @@ def detect_language(
     mse_1 = compare_profiles(unknown_profile, profile_1)
     mse_2 = compare_profiles(unknown_profile, profile_2)
 
-    if (mse_1 and mse_2) is None:
-        return None
-    if mse_1 is None or mse_1 > mse_2:
+    if mse_2 and (not mse_1 or mse_1 > mse_2):
         return profile_2['name']
-    if mse_2 is None or mse_1 < mse_2:
+    if mse_1 and (not mse_2 or mse_1 < mse_2):
         return profile_1['name']
-    return sorted([profile_1['name'], profile_2['name']])[0]
+    if mse_1 and mse_2:
+        alphabetical_order = [profile_1['name'], profile_2['name']]
+        alphabetical_order.sort()
+        return alphabetical_order[0]
 
 
 def load_profile(path_to_file: str) -> dict | None:
@@ -142,7 +147,8 @@ def load_profile(path_to_file: str) -> dict | None:
 
     with open(path_to_file, 'r', encoding='utf-8') as file:
         profile = json.load(file)
-        return profile
+        if profile:
+            return profile
 
 
 def preprocess_profile(profile: dict) -> dict[str, str | dict] | None:
@@ -182,12 +188,14 @@ def collect_profiles(paths_to_profiles: list) -> list[dict[str, str | dict[str, 
     loaded_profiles = []
     for path in paths_to_profiles:
         loaded_profile = load_profile(path)
-        loaded_profiles.append(loaded_profile)
+        if loaded_profile:
+            loaded_profiles.append(loaded_profile)
 
     preprocessed_profiles = []
     for profile in loaded_profiles:
         preprocessed_profile = preprocess_profile(profile)
-        preprocessed_profiles.append(preprocessed_profile)
+        if preprocessed_profile:
+            preprocessed_profiles.append(preprocessed_profile)
 
     return preprocessed_profiles
 
@@ -207,7 +215,8 @@ def detect_language_advanced(unknown_profile: dict[str, str | dict[str, float]],
     distances = []
     for profile in known_profiles:
         distance = compare_profiles(unknown_profile, profile)
-        distances.append((profile['name'], distance))
+        if distance:
+            distances.append((profile['name'], distance))
 
     distances.sort(key=lambda x: x[1])
     return distances
