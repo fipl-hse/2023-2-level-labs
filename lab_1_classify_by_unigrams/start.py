@@ -7,6 +7,7 @@ from lab_1_classify_by_unigrams.main import print_report
 
 
 def main() -> None:
+    """Launches an implementation"""
     profiles_paths = ['assets/profiles/en.json',
                       'assets/profiles/es.json',
                       'assets/profiles/fr.json',
@@ -34,12 +35,13 @@ def main() -> None:
     unk_profile = create_language_profile('unk', unknown_text)
 
     result = detect_language_advanced(unk_profile, [en_profile, de_profile])
-    print('The distances to English and German languages:')
-    print_report(result)
+    if result:
+        print('The distances to English and German languages:')
+        print_report(result)
 
     result = detect_language_advanced(unk_profile, language_profiles)
-    print('The distances to En, Fr, It, Ru, Es and Tr languages:')
     if result:
+        print('The distances to En, Fr, It, Ru, Es and Tr languages:')
         print_report(result)
 
     assert result, "Detection result is None"

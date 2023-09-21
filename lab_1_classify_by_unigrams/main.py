@@ -53,6 +53,7 @@ def create_language_profile(language: str, text: str) -> dict[str, str | dict[st
 
     if isinstance(text_freq, dict):
         return {'name': language, 'freq': text_freq}
+    return None
 
 
 def calculate_mse(predicted: list, actual: list) -> float | None:
@@ -89,18 +90,22 @@ def compare_profiles(
             or ('name' or 'freq') not in profile_to_compare:
         return None
 
+    unknown_freq = unknown_profile['freq']
+    compare_freq = profile_to_compare['freq']
     mutual_characters = [[], []]
-    if all(isinstance(profile['freq'], dict) for profile \
-           in [unknown_profile, profile_to_compare]):
-        for character in (unknown_profile['freq'] | profile_to_compare['freq']):
-            if character in unknown_profile['freq']:
-                mutual_characters[0].append(unknown_profile['freq'][character])
+    if isinstance(unknown_freq, dict) and \
+            isinstance(compare_freq, dict):
+        for character in (unknown_freq | compare_freq):
+            if character in unknown_freq:
+                mutual_characters[0].append(unknown_freq[character])
             else:
                 mutual_characters[0].append(0.)
-            if character in profile_to_compare['freq']:
-                mutual_characters[1].append(profile_to_compare['freq'][character])
+            if character in compare_freq:
+                mutual_characters[1].append(compare_freq[character])
             else:
                 mutual_characters[1].append(0.)
+    else:
+        return None
 
     if len(mutual_characters[0]) == len(mutual_characters[1]) == 0:
         return 1.
@@ -126,14 +131,17 @@ def detect_language(
     mse_1 = compare_profiles(unknown_profile, profile_1)
     mse_2 = compare_profiles(unknown_profile, profile_2)
 
-    if mse_2 and (not mse_1 or mse_1 > mse_2):
+    if mse_2 and (not mse_1 or mse_1 > mse_2) and \
+            isinstance(profile_2['name'], str):
         return profile_2['name']
-    if mse_1 and (not mse_2 or mse_1 < mse_2):
+    if mse_1 and (not mse_2 or mse_1 < mse_2) and \
+            isinstance(profile_1['name'], str):
         return profile_1['name']
     if mse_1 and mse_2:
         alphabetical_order = [profile_1['name'], profile_2['name']]
         alphabetical_order.sort()
         return alphabetical_order[0]
+    return None
 
 
 def load_profile(path_to_file: str) -> dict | None:
@@ -149,6 +157,7 @@ def load_profile(path_to_file: str) -> dict | None:
         profile = json.load(file)
         if profile:
             return profile
+        return None
 
 
 def preprocess_profile(profile: dict) -> dict[str, str | dict] | None:
