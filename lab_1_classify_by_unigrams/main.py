@@ -11,16 +11,11 @@ def tokenize(text: str) -> list[str] | None:
     :param text: a text
     :return: a list of lower-cased tokens without punctuation
     """
-    if isinstance(text, str):
-        punctuation = '''!()-[]{};:'",<>./?@#$%^&*_~0123456789\\ '''
-        tokenized = []
-        for el in text.lower():
-            if el not in punctuation:
-                tokenized.append(el)
-        tokenized = list(tokenized)
-        return tokenized
-    else:
+    if not isinstance(text, str):
         return None
+    punctuation = '''!()-[]{};:'",<>./?@#$%^&*_~0123456789\\ '''
+    tokenized = [el for el in text.lower() if el not in punctuation]
+    return tokenized
 
 
 def calculate_frequencies(tokens: list[str] | None) -> dict[str, float] | None:
@@ -29,15 +24,12 @@ def calculate_frequencies(tokens: list[str] | None) -> dict[str, float] | None:
     :param tokens: a list of tokens
     :return: a dictionary with frequencies
     """
-    if isinstance(tokens, list):
-        frequency = {}
-        for el in tokens:
-            if isinstance(el, str):
-                frequency[el] = tokens.count(el)/len(tokens)
-            else:
-                return None
-    else:
+    if not isinstance(tokens, list):
         return None
+    frequency = {el: tokens.count(el)/len(tokens) for el in tokens}
+    for el in tokens:
+        if not isinstance(el, str):
+            return None
     return frequency
 
 
