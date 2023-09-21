@@ -13,7 +13,7 @@ def tokenize(text) -> list[str]:
         """
     text = text.lower()
     for i in text:
-        if not i.isalnum() and i != ' ':
+        if not i.isalpha() and i != ' ':
             text = text.replace(i, '')
     for i in text:
         if i == ' ':
