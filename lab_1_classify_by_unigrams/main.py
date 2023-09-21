@@ -137,11 +137,11 @@ def detect_language(
     if mse_1 and (not mse_2 or mse_1 < mse_2) and \
             isinstance(profile_1['name'], str):
         return profile_1['name']
-    if mse_1 and mse_2:
-        alphabetical_order = [profile_1['name'], profile_2['name']]
-        alphabetical_order.sort()
-        return alphabetical_order[0]
-    return None
+    if not mse_1 and not mse_2:
+        return None
+    alphabetical_order = [profile_1['name'], profile_2['name']]
+    alphabetical_order.sort()
+    return alphabetical_order[0]
 
 
 def load_profile(path_to_file: str) -> dict | None:
@@ -155,9 +155,7 @@ def load_profile(path_to_file: str) -> dict | None:
 
     with open(path_to_file, 'r', encoding='utf-8') as file:
         profile = json.load(file)
-        if profile:
-            return profile
-        return None
+        return profile
 
 
 def preprocess_profile(profile: dict) -> dict[str, str | dict] | None:

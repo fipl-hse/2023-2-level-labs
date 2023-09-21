@@ -34,17 +34,18 @@ def main() -> None:
     de_profile = create_language_profile('de', de_text)
     unk_profile = create_language_profile('unk', unknown_text)
 
-    result = detect_language_advanced(unk_profile, [en_profile, de_profile])
-    if result:
-        print('The distances to English and German languages:')
-        print_report(result)
+    if en_profile and de_profile and unk_profile:
+        result = detect_language_advanced(unk_profile, [en_profile, de_profile])
+        if result:
+            print('The distances to English and German languages:')
+            print_report(result)
+    if unk_profile:
+        result = detect_language_advanced(unk_profile, language_profiles)
+        if result:
+            print('The distances to En, Fr, It, Ru, Es and Tr languages:')
+            print_report(result)
 
-    result = detect_language_advanced(unk_profile, language_profiles)
-    if result:
-        print('The distances to En, Fr, It, Ru, Es and Tr languages:')
-        print_report(result)
-
-    assert result, "Detection result is None"
+        assert result, "Detection result is None"
 
 
 if __name__ == "__main__":
