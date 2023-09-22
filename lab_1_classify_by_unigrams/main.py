@@ -11,9 +11,10 @@ def tokenize(text: str) -> list[str] | None:
     :param text: a text
     :return: a list of lower-cased tokens without punctuation
     """
-    result = ""
     if not isinstance(text, str):
         return None
+    text = text.lower().replace(" ", "")
+    result = []
     for i in range(len(text)):
         if text[i] not in "!#$%&'()*+,-./:;<=>?@[?\]^_`{|}~1234567890":
             result += text[i]
