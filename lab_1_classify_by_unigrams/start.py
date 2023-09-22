@@ -1,7 +1,7 @@
 """
 Language detection starter
 """
-from lab_1_classify_by_unigrams.main import create_language_profile
+from lab_1_classify_by_unigrams.main import create_language_profile, detect_language
 
 
 def main() -> None:
@@ -19,6 +19,7 @@ def main() -> None:
         unk_profile = create_language_profile("unk", unk_text)
     result = None
     assert result, "Detection result is None"
+    print(detect_language(unk_profile, en_profile, de_profile))
 
 
 if __name__ == "__main__":

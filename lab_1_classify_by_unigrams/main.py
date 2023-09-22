@@ -57,6 +57,13 @@ def calculate_mse(predicted: list, actual: list) -> float | None:
     :param actual: a list of actual values
     :return: the score
     """
+    number = 0
+    total = 0
+    for i, value in enumerate(actual):
+        total += (value - predicted[i])**2
+        number += 1
+    score = total/number
+    return score
 
 
 def compare_profiles(
@@ -69,6 +76,10 @@ def compare_profiles(
     :param profile_to_compare: a dictionary of a profile to compare the unknown profile to
     :return: the distance between the profiles
     """
+    values_unk = list(unknown_profile.values())
+    values_comp = list(profile_to_compare.values())
+    profile_distance = calculate_mse(values_comp, values_unk)
+    return profile_distance
 
 
 def detect_language(
@@ -83,6 +94,18 @@ def detect_language(
     :param profile_2: a dictionary of a known profile
     :return: a language
     """
+    profile_distance_1 = compare_profiles(unknown_profile, profile_1)
+    profile_distance_2 = compare_profiles(unknown_profile, profile_2)
+    if profile_distance_1 < profile_distance_2:
+        return profile_1["name"]
+    elif profile_distance_2 < profile_distance_1:
+        return profile_2["name"]
+    elif profile_distance_1 == profile_distance_2:
+        language_list = []
+        language_list.append(profile_1["name"])
+        language_list.append(profile_2["name"])
+        language_list = language_list.sort()
+        return language_list[0]
 
 
 def load_profile(path_to_file: str) -> dict | None:
