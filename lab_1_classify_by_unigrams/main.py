@@ -110,7 +110,7 @@ def detect_language_advanced(unknown_profile: dict[str, str or dict[str, float]]
     """
 
 
-def print_report(detections: list[list[str or float]]) -> None:
+def print_report(detections: list[tuple[str, float]]) -> None:
     """
     Prints report for detection of language
     :param detections: a list with distances for each available language
