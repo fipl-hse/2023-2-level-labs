@@ -141,7 +141,7 @@ def detect_language(
         return None
     alphabetical_order = [profile_1['name'], profile_2['name']]
     alphabetical_order.sort()
-    return alphabetical_order[0]
+    return str(alphabetical_order[0])
 
 
 def load_profile(path_to_file: str) -> dict | None:
@@ -155,7 +155,8 @@ def load_profile(path_to_file: str) -> dict | None:
 
     with open(path_to_file, 'r', encoding='utf-8') as file:
         profile = json.load(file)
-        return profile
+        if isinstance(profile, dict):
+            return profile
 
 
 def preprocess_profile(profile: dict) -> dict[str, str | dict] | None:

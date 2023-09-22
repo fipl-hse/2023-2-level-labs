@@ -1,9 +1,6 @@
 """Language detection starter"""
-from lab_1_classify_by_unigrams.main import load_profile
-from lab_1_classify_by_unigrams.main import preprocess_profile
-from lab_1_classify_by_unigrams.main import create_language_profile
-from lab_1_classify_by_unigrams.main import detect_language_advanced
-from lab_1_classify_by_unigrams.main import print_report
+from lab_1_classify_by_unigrams.main import create_language_profile, detect_language_advanced, \
+    load_profile, preprocess_profile,  print_report
 
 
 def main() -> None:
