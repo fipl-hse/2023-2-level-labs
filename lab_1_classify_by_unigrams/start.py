@@ -7,7 +7,9 @@ from lab_1_classify_by_unigrams.main import (create_language_profile, detect_lan
 
 
 def main() -> None:
-    """Launches an implementation"""
+    """
+    Launches an implementation
+    """
     profiles_paths = ['assets/profiles/en.json',
                       'assets/profiles/es.json',
                       'assets/profiles/fr.json',
