@@ -3,27 +3,21 @@ Lab 1
 Language detection
 """
 
-text = input().lower()
-
 
 def tokenize(text: str) -> list[str] | None:
-    global the_final_result
-    result = ""
-    if isinstance(text, str):
-        for i in range(len(text)):
-            if text[i] not in "!#$%&'()*+,-./:;<=>?@[?\]^_`{|}~1234567890":
-                result += text[i]
-                the_final_result = list(result)
-        return the_final_result
-    else:
-        return None
-
     """
     Splits a text into tokens, converts the tokens into lowercase,
     removes punctuation, digits and other symbols
     :param text: a text
     :return: a list of lower-cased tokens without punctuation
     """
+    result = ""
+    if not isinstance(text, str):
+        return None
+    for i in range(len(text)):
+        if text[i] not in "!#$%&'()*+,-./:;<=>?@[?\]^_`{|}~1234567890":
+            result += text[i]
+    return result
 
 
 def calculate_frequencies(tokens: list[str] | None) -> dict[str, float] | None:
