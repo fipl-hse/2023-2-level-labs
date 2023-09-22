@@ -56,7 +56,7 @@ def cleanup_code(source_code_path: Path) -> str:
     with source_code_path.open(encoding='utf-8') as file:
         data_2 = ast_comments.parse(file.read(), source_code_path.name)
 
-    accepted_modules: dict[str, list[str]] = {'typing': ['*']}
+    accepted_modules: dict[str, list[str]] = {'typing': ['*'], 'pathlib': ['Path']}
 
     new_decl: list[stmt] = []
 
@@ -91,8 +91,17 @@ def cleanup_code(source_code_path: Path) -> str:
                 decl = []  # type: ignore
             else:
                 for class_decl in decl.body:
-                    if isinstance(class_decl, ast.FunctionDef) and \
-                            'Note: remove' in ast.get_docstring(class_decl):  # type: ignore
+                    if not isinstance(class_decl, ast.FunctionDef):
+                        continue
+
+                    docstring = ast.get_docstring(class_decl)
+                    if docstring is None:
+                        raise ValueError(
+                            f'{source_code_path.parent.name}.{source_code_path.stem}.'
+                            f'{decl.name}.{class_decl.name} does not have a docstring!'
+                        )
+
+                    if 'Note: remove' in ast.get_docstring(class_decl):  # type: ignore
                         decl.body[decl.body.index(class_decl)] = []  # type: ignore
 
         if isinstance(decl, ast.ClassDef) and decl.bases:
