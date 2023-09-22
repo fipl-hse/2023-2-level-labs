@@ -1,4 +1,7 @@
-"""Language detection starter"""
+"""
+Language detection starter
+"""
+
 from lab_1_classify_by_unigrams.main import create_language_profile, detect_language_advanced, \
     load_profile, preprocess_profile,  print_report
 

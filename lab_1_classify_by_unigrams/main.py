@@ -157,8 +157,7 @@ def load_profile(path_to_file: str) -> dict | None:
         profile = json.load(file)
         if isinstance(profile, dict):
             return profile
-        else:
-            return None
+        return None
 
 
 def preprocess_profile(profile: dict) -> dict[str, str | dict] | None:
