@@ -5,7 +5,13 @@ Language detection
 
 
 def tokenize(text: str) -> list[str] | None:
-    if type(text) != str:
+    """
+        Splits a text into tokens, converts the tokens into lowercase,
+        removes punctuation, digits and other symbols
+        :param text: a text
+        :return: a list of lower-cased tokens without punctuation
+        """
+    if not isinstance(text, str):
         return None
     tokens = []
     for symbol in text:
@@ -13,31 +19,23 @@ def tokenize(text: str) -> list[str] | None:
             tokens += symbol.lower()
     return tokens
 
-    """
-    Splits a text into tokens, converts the tokens into lowercase,
-    removes punctuation, digits and other symbols
-    :param text: a text
-    :return: a list of lower-cased tokens without punctuation
-    """
-
 
 def calculate_frequencies(tokens: list[str] | None) -> dict[str, float] | None:
-    if type(tokens) != list or tokens == [] or not all(isinstance(element, str) for element in tokens):
+    """
+        Calculates frequencies of given tokens
+        :param tokens: a list of tokens
+        :return: a dictionary with frequencies
+        """
+    if not isinstance(tokens, list) or not tokens or not all(isinstance(element, str) for element in tokens):
         return None
     frequencies = {}
-    unit = 1/len(tokens)
+    unit = 1 / len(tokens)
     for letter in tokens:
         if letter in frequencies:
             frequencies[letter] += unit
         else:
             frequencies[letter] = unit
     return frequencies
-
-    """
-    Calculates frequencies of given tokens
-    :param tokens: a list of tokens
-    :return: a dictionary with frequencies
-    """
 
 
 def create_language_profile(language: str, text: str) -> dict[str, str | dict[str, float]] | None:
