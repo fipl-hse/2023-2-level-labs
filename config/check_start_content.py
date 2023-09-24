@@ -11,7 +11,8 @@ def check_assert_line(content: str) -> bool:
     main check
     """
     expected = 'assert result'
-    return expected in content
+    expected_alternative = 'assert RESULT'
+    return expected in content or expected_alternative in content
 
 
 if __name__ == "__main__":
