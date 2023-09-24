@@ -78,9 +78,11 @@ def compare_profiles(
         :return: the distance between the profiles
         """
     if (not isinstance(unknown_profile, dict)
-            or not isinstance(profile_to_compare, dict))\
-            or unknown_profile.keys() != ['name', 'freq']\
-            or profile_to_compare.keys() != ['name', 'freq']: # problematic check
+            or not isinstance(profile_to_compare, dict)\
+            or not 'name' in unknown_profile.keys() \
+            or not 'name' in profile_to_compare.keys()
+            or not 'freq' in unknown_profile.keys()
+            or not 'freq' in profile_to_compare.keys()):
         return None
     new_freq = {a: 0 for a in set(list(unknown_profile['freq']) + list(profile_to_compare['freq']))}
     freq_to_compare = new_freq.copy()
