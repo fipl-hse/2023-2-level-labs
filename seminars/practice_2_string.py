@@ -141,9 +141,8 @@ print(reverse_word("This is another test"))
 # "This is rehtona test")
 
 
-
 # Task 6
-def generate_hashtag(input_string: str):
+def generate_hashtag(input_string: str) -> str | False:
     """
     The marketing team is spending way too much time typing in hashtags.
     Let's help them with our own Hashtag Generator!
@@ -171,19 +170,19 @@ def generate_hashtag(input_string: str):
 
 
 print(generate_hashtag(" Hello there thanks for trying my quiz"))
-print(generate_hashtag("    Hello     World   " ))
+print(generate_hashtag("    Hello     World   "))
 print(generate_hashtag(""))
 
+
 # Task 7:
-def combo_string(first_string: str, second_string: str):
+def combo_string(first_string: str, second_string: str) -> str:
     """
     Given two strings, concatenate like the following: shorter+longer+shorter
     """
     # student realisation goes here
     if len(first_string) > len(second_string):
         return second_string + first_string + second_string
-    else:
-        return first_string + second_string + first_string
+    return first_string + second_string + first_string
 
 
 print(combo_string('Hello', 'hi'))
@@ -210,6 +209,7 @@ def string_splosion(input_string: str) -> str:
     for i in range(len(input_string)):
         plosion += input_string[:i+1]
     return plosion
+
 
 print(string_splosion('Code'))
 print(string_splosion('abc'))
