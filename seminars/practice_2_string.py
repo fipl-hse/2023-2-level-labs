@@ -53,6 +53,8 @@ def multiply_string(input_string: str, how_many: int) -> str:
     display the given string the number of times given in the `how_many`.
     """
     # student realisation goes here
+    format_string = input_string * how_many
+    print(format_string)
 
 
 # Function calls with expected result:
@@ -69,8 +71,14 @@ def front_times(input_string: str, how_many: int) -> str:
     and display them that many times as in `how_many`.
     """
     # student realisation goes here
+    if len(input_string) >= 3:
+        first_characters = input_string[:4]
+    else:
+        first_characters = input_string[:]
+    print(first_characters * how_many)
 
 
+front_times('Chocolate', 3)
 # Function calls with expected result:
 # front_times('Chocolate', 2) → 'ChoCho'
 # front_times('Chocolate', 3) → 'ChoChoCho'
@@ -86,8 +94,10 @@ def extra_end(input_string: str) -> str:
     Given the string, take its two last characters and display them three times.
     """
     # student realisation goes here
+    print(input_string[-2:] * 3)
 
 
+extra_end('Hello')
 # Function calls with expected result:
 # extra_end('Hello') → 'lololo'
 # extra_end('ab') → 'ababab'
@@ -101,8 +111,13 @@ def make_abba(first_string: str, second_string: str) -> str:
     Given two strings, concatenate them as a reflection.
     """
     # student realisation goes here
+    string_common = first_string + second_string
+    common_string = second_string + first_string
+    print(string_common + common_string)
+    return string_common + common_string
 
 
+make_abba('Hi', 'Bye')
 # make_abba('Hi', 'Bye') → 'HiByeByeHi'
 # make_abba('Yo', 'Alice') → 'YoAliceAliceYo'
 # make_abba('What', 'Up') → 'WhatUpUpWhat'
@@ -119,8 +134,18 @@ def reverse_word(sentence: str) -> str:
     Spaces will be included only when more than one word is present.
     """
     # student realisation goes here
+    sentence = sentence.split()
+    new_sentence = []
+    for word in sentence:
+        if len(word) < 5:
+            new_sentence.append(word)
+        else:
+            new_sentence.append(word[::-1])
+    print(' '.join(new_sentence))
+    return ' '.join(new_sentence)
 
 
+reverse_word('Hey fellow warriors')
 # reverse_word("Hey fellow warriors") == "Hey wollef sroirraw"
 #
 # reverse_word("This is a test") == "This is a test"
@@ -146,16 +171,33 @@ def generate_hashtag(input_string: str) -> str:
     ""                                        =>  false
     """
     # student realisation goes here
+    if len(input_string) == 0:
+        return 'false'
+    hashtag_list = input_string.split()
+    new_hashtag = ['#']
+    for word in hashtag_list:
+        new_hashtag.append(word.title())
+    new_hashtag = ''.join(new_hashtag)
+    if len(new_hashtag) > 140:
+        return 'false'
+    print(new_hashtag)
+    return new_hashtag
 
 
+generate_hashtag('Hello there thanks for trying my quiz')
 # Task 7:
 def combo_string(first_string: str, second_string: str) -> str:
     """
     Given two strings, concatenate like the following: shorter+longer+shorter
     """
     # student realisation goes here
+    string_list = [first_string, second_string]
+    string_list = sorted(string_list, key=len)
+    print(string_list[0] + string_list[1] + string_list[0])
+    return string_list[0] + string_list[1] + string_list[0]
 
 
+combo_string('Hello', 'Hi')
 # combo_string('Hello', 'hi') → 'hiHellohi'
 # combo_string('hi', 'Hello') → 'hiHellohi'
 # combo_string('aaa', 'b') → 'baaab'
@@ -170,8 +212,16 @@ def string_splosion(input_string: str) -> str:
     Given the string, format it like in the example.
     """
     # student realisation goes here
+    new_string = []
+    n = 0
+    while n < len(input_string):
+        new_string.append(input_string[:n + 1])
+        n += 1
+    print(''.join(new_string))
+    return ''.join(new_string)
 
 
+string_splosion('Code')
 # Function calls with expected result:
 # string_splosion('Code') → 'CCoCodCode'
 # string_splosion('abc') → 'aababc'
@@ -187,7 +237,22 @@ def string_match(first_string: str, second_string: str) -> int:
     is found at the same position in both strings.
     """
     # student realisation goes here
+    substring_list1 = []
+    n = 0
+    while n < len(first_string) - 1:
+        substring_list1.append(first_string[n:n + 2])
+        n += 1
+    substring_list2 = []
+    n = 0
+    while n < len(first_string) - 1:
+        substring_list2.append(second_string[n:n + 2])
+        n += 1
+    substring_common = set(substring_list2).intersection(set(substring_list1))
+    print(len(substring_common))
+    return len(substring_common)
 
+
+string_match('xxcaazz', 'xxbaaz')
 # Function calls with expected result:
 # string_match('xxcaazz', 'xxbaaz') → 3
 # NOTE: «xx», «aa» and «az» are found at the same position in both strings
