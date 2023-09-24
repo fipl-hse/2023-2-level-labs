@@ -53,13 +53,14 @@ def multiply_string(input_string: str, how_many: int) -> str:
     display the given string the number of times given in the `how_many`.
     """
     # student realisation goes here
+    return input_string * how_many
 
 
 # Function calls with expected result:
-# multiply_string('Hi', 2) → 'HiHi'
-# multiply_string('Hi', 3) → 'HiHiHi'
-# multiply_string('Hi', 1) → 'Hi'
-# multiply_string('Hi', 0) → ''
+# multiply_string('Hi', 2)
+# multiply_string('Hi', 3)
+# multiply_string('Hi', 1)
+# multiply_string('Hi', 0)
 
 
 # Task 2:
@@ -69,6 +70,7 @@ def front_times(input_string: str, how_many: int) -> str:
     and display them that many times as in `how_many`.
     """
     # student realisation goes here
+    return input_string[:3] * how_many
 
 
 # Function calls with expected result:
@@ -86,6 +88,7 @@ def extra_end(input_string: str) -> str:
     Given the string, take its two last characters and display them three times.
     """
     # student realisation goes here
+    return input_string[-2:] * 3
 
 
 # Function calls with expected result:
@@ -101,6 +104,7 @@ def make_abba(first_string: str, second_string: str) -> str:
     Given two strings, concatenate them as a reflection.
     """
     # student realisation goes here
+    return first_string + second_string * 2 + first_string
 
 
 # make_abba('Hi', 'Bye') → 'HiByeByeHi'
@@ -119,17 +123,27 @@ def reverse_word(sentence: str) -> str:
     Spaces will be included only when more than one word is present.
     """
     # student realisation goes here
+    cypher = []
+    words = sentence.split()
+    for each in words:
+        if len(each) >= 5:
+            cypher.append(each[::-1])
+        else:
+            cypher.append(each)
+    return ' '.join(cypher)
 
 
-# reverse_word("Hey fellow warriors") == "Hey wollef sroirraw"
-#
-# reverse_word("This is a test") == "This is a test"
-#
-# reverse_word("This is another test") == "This is rehtona test"
+print(reverse_word("Hey fellow warriors"))
+# "Hey wollef sroirraw"
+print(reverse_word("This is a test"))
+# "This is a test"
+print(reverse_word("This is another test"))
+# "This is rehtona test")
+
 
 
 # Task 6
-def generate_hashtag(input_string: str) -> str:
+def generate_hashtag(input_string: str):
     """
     The marketing team is spending way too much time typing in hashtags.
     Let's help them with our own Hashtag Generator!
@@ -146,22 +160,44 @@ def generate_hashtag(input_string: str) -> str:
     ""                                        =>  false
     """
     # student realisation goes here
+    if not input_string:
+        return False
+    hashtag = '#'
+    for word in input_string.split():
+        hashtag += word.capitalize()
+    if not hashtag or len(hashtag) > 140:
+        return False
+    return hashtag
 
+
+print(generate_hashtag(" Hello there thanks for trying my quiz"))
+print(generate_hashtag("    Hello     World   " ))
+print(generate_hashtag(""))
 
 # Task 7:
-def combo_string(first_string: str, second_string: str) -> str:
+def combo_string(first_string: str, second_string: str):
     """
     Given two strings, concatenate like the following: shorter+longer+shorter
     """
     # student realisation goes here
+    if len(first_string) > len(second_string):
+        return second_string + first_string + second_string
+    else:
+        return first_string + second_string + first_string
 
 
-# combo_string('Hello', 'hi') → 'hiHellohi'
-# combo_string('hi', 'Hello') → 'hiHellohi'
-# combo_string('aaa', 'b') → 'baaab'
-# combo_string('', 'bb') → 'bb'
-# combo_string('aaa', '1234') → 'aaa1234aaa'
-# combo_string('bb', 'a') → 'abba'
+print(combo_string('Hello', 'hi'))
+print(combo_string('hi', 'Hello'))
+print(combo_string('aaa', 'b'))
+print(combo_string('', 'bb'))
+print(combo_string('aaa', '1234'))
+print(combo_string('bb', 'a'))
+# → 'hiHellohi'
+# → 'hiHellohi'
+# → 'baaab'
+# → 'bb'
+# → 'aaa1234aaa'
+# → 'abba'
 
 
 # Task 1: advanced
@@ -170,14 +206,22 @@ def string_splosion(input_string: str) -> str:
     Given the string, format it like in the example.
     """
     # student realisation goes here
+    plosion = ''
+    for i in range(len(input_string)):
+        plosion += input_string[:i+1]
+    return plosion
 
-
+print(string_splosion('Code'))
+print(string_splosion('abc'))
+print(string_splosion('ab'))
+print(string_splosion('Kitten'))
+print(string_splosion('x'))
 # Function calls with expected result:
-# string_splosion('Code') → 'CCoCodCode'
-# string_splosion('abc') → 'aababc'
-# string_splosion('ab') → 'aab'
-# string_splosion('Kitten') → 'KKiKitKittKitteKitten'
-# string_splosion('x') → 'x'
+#  → 'CCoCodCode'
+#  → 'aababc'
+#  → 'aab'
+#  → 'KKiKitKittKitteKitten'
+#  → 'x'
 
 
 # Task 2: advanced
@@ -187,14 +231,28 @@ def string_match(first_string: str, second_string: str) -> int:
     is found at the same position in both strings.
     """
     # student realisation goes here
+    counter = 0
+    for i in range(min(len(first_string), len(second_string)) - 1):
+        if first_string[i:i+2] == second_string[i:i+2]:
+            counter += 1
+    return counter
 
+
+print(string_match('xxcaazz', 'xxbaaz'))
+print(string_match('abc', 'abc'))
+print(string_match('abc', 'axc'))
+print(string_match('he', 'hello'))
+print(string_match('h', 'hello'))
+print(string_match('aabbccdd', 'abbbxxd'))
+print(string_match('aaxxaaxx', 'iaxxai'))
+print(string_match('iaxxai', 'aaxxaaxx'))
 # Function calls with expected result:
-# string_match('xxcaazz', 'xxbaaz') → 3
+#  → 3
 # NOTE: «xx», «aa» and «az» are found at the same position in both strings
-# string_match('abc', 'abc') → 2
-# string_match('abc', 'axc') → 0
-# string_match('he', 'hello') → 1
-# string_match('h', 'hello') → 0
-# string_match('aabbccdd', 'abbbxxd') → 1
-# string_match('aaxxaaxx', 'iaxxai') → 3
-# string_match('iaxxai', 'aaxxaaxx') → 3
+#  → 2
+#  → 0
+#  → 1
+#  → 0
+#  → 1
+#  → 3
+#  → 3
