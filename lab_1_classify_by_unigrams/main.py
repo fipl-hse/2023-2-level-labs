@@ -4,13 +4,15 @@ Language detection
 """
 
 
-def tokenize(text) -> list[str]:
+def tokenize(text: str) -> list[str]:
     """
         Splits a text into tokens, converts the tokens into lowercase,
         removes punctuation, digits and other symbols
         :param text: a text
         :return: a list of lower-cased tokens without punctuation
         """
+    if type(text) != str:
+        return None
     text = text.lower()
     for i in text:
         if not i.isalpha() and i != ' ':
@@ -18,29 +20,30 @@ def tokenize(text) -> list[str]:
     for i in text:
         if i == ' ':
             text = text.replace(' ','')
-    text = list(text)
-    return text
-tokens = tokenize(text)
+    tokens = list(text)
+    return tokens
 
 
 
-
-
-
-def calculate_frequencies(tokens):
+def calculate_frequencies(tokens : list[str] | None) -> dict[str, float] | None:
     """
        Calculates frequencies of given tokens
        :param tokens: a list of tokens
        :return: a dictionary with frequencies
        """
+    if type(tokens) != list:
+        return None
+    for i in tokens:
+        if type(i) != str:
+            return None
     dictionary = {}
-    explanation = {}
     length = len(tokens)
     for i in tokens:
         if i in dictionary:
             dictionary[i] += 1/length
         else:
             dictionary[i] = 1/length
+    return dictionary
 
 
 
@@ -54,6 +57,13 @@ def create_language_profile(language: str, text: str) -> dict[str, str | dict[st
       :param text: a text
       :return: a dictionary with two keys – name, freq
       """
+    if type(language) != str or type(text) != str:
+        return None
+    new_dictionary = {}
+    text = tokenize(text)
+    freq = calculate_frequencies(text)
+    new_dictionary[language] = freq
+    return new_dictionary
 
 def calculate_mse(predicted: list, actual: list) -> float | None:
     """
@@ -62,6 +72,9 @@ def calculate_mse(predicted: list, actual: list) -> float | None:
        :param actual: a list of actual values
        :return: the score
        """
+    if type(predicted) != list or type(actual) != list or len(predicted) != len(actual):
+        return None
+
 
 
 def compare_profiles(
