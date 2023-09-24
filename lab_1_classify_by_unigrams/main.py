@@ -26,7 +26,9 @@ def calculate_frequencies(tokens: list[str] | None) -> dict[str, float] | None:
         :param tokens: a list of tokens
         :return: a dictionary with frequencies
         """
-    if not isinstance(tokens, list) or not tokens or not all(isinstance(element, str) for element in tokens):
+    if (not isinstance(tokens, list)
+            or not tokens
+            or not all(isinstance(element, str) for element in tokens)):
         return None
     frequencies = {}
     unit = 1 / len(tokens)
@@ -58,12 +60,14 @@ def calculate_mse(predicted: list, actual: list) -> float | None:
         :param actual: a list of actual values
         :return: the score
         """
-    if not isinstance(predicted, list) or not isinstance(actual, list) or len(predicted) != len(actual):
+    if (not isinstance(predicted, list)
+            or not isinstance(actual, list)
+            or len(predicted) != len(actual)):
         return None
     total = len(predicted)
     score = 0
-    for n in range(total):
-        score += (actual[n] - predicted[n]) ** 2 / total
+    for i in range(total):
+        score += (actual[i] - predicted[i]) ** 2 / total
     return score
 
 
