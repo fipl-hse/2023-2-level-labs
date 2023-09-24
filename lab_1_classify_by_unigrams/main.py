@@ -40,20 +40,31 @@ def calculate_frequencies(tokens: list[str] | None) -> dict[str, float] | None:
 
 def create_language_profile(language: str, text: str) -> dict[str, str | dict[str, float]] | None:
     """
-    Creates a language profile
-    :param language: a language
-    :param text: a text
-    :return: a dictionary with two keys – name, freq
-    """
+        Creates a language profile
+        :param language: a language
+        :param text: a text
+        :return: a dictionary with two keys – name, freq
+        """
+    if not isinstance(language, str) or not isinstance(text, str):
+        return None
+    profile = {'name': language, 'freq': calculate_frequencies(tokenize(text))}
+    return profile
 
 
 def calculate_mse(predicted: list, actual: list) -> float | None:
     """
-    Calculates mean squared error between predicted and actual values
-    :param predicted: a list of predicted values
-    :param actual: a list of actual values
-    :return: the score
-    """
+        Calculates mean squared error between predicted and actual values
+        :param predicted: a list of predicted values
+        :param actual: a list of actual values
+        :return: the score
+        """
+    if not isinstance(predicted, list) or not isinstance(actual, list) or len(predicted) != len(actual):
+        return None
+    total = len(predicted)
+    score = 0
+    for n in range(total):
+        score += (actual[n] - predicted[n]) ** 2 / total
+    return score
 
 
 def compare_profiles(
@@ -61,11 +72,22 @@ def compare_profiles(
         profile_to_compare: dict[str, str | dict[str, float]]
 ) -> float | None:
     """
-    Compares profiles and calculates the distance using symbols
-    :param unknown_profile: a dictionary of an unknown profile
-    :param profile_to_compare: a dictionary of a profile to compare the unknown profile to
-    :return: the distance between the profiles
-    """
+        Compares profiles and calculates the distance using symbols
+        :param unknown_profile: a dictionary of an unknown profile
+        :param profile_to_compare: a dictionary of a profile to compare the unknown profile to
+        :return: the distance between the profiles
+        """
+    if (not isinstance(unknown_profile, dict)
+            or not isinstance(profile_to_compare, dict))\
+            or unknown_profile.keys() != ['name', 'freq']\
+            or profile_to_compare.keys() != ['name', 'freq']: # problematic check
+        return None
+    new_freq = {a: 0 for a in set(list(unknown_profile['freq']) + list(profile_to_compare['freq']))}
+    freq_to_compare = new_freq.copy()
+    new_freq.update(unknown_profile['freq'])
+    freq_to_compare.update(profile_to_compare['freq'])
+    distance = calculate_mse(list(new_freq.values()), list(freq_to_compare.values()))
+    return distance
 
 
 def detect_language(
