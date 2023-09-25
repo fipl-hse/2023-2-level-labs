@@ -55,6 +55,7 @@ def multiply_string(input_string: str, how_many: int) -> str:
     # student realisation goes here
     format_string = input_string * how_many
     print(format_string)
+    return format_string
 
 
 # Function calls with expected result:
@@ -76,6 +77,7 @@ def front_times(input_string: str, how_many: int) -> str:
     else:
         first_characters = input_string[:]
     print(first_characters * how_many)
+    return first_characters * how_many
 
 
 front_times('Chocolate', 3)
@@ -95,6 +97,7 @@ def extra_end(input_string: str) -> str:
     """
     # student realisation goes here
     print(input_string[-2:] * 3)
+    return input_string[-2] * 3
 
 
 extra_end('Hello')
@@ -141,8 +144,9 @@ def reverse_word(sentence: str) -> str:
             new_sentence.append(word)
         else:
             new_sentence.append(word[::-1])
-    print(' '.join(new_sentence))
-    return ' '.join(new_sentence)
+    new_sentence = ' '.join(new_sentence)
+    print(new_sentence)
+    return new_sentence
 
 
 reverse_word('Hey fellow warriors')
@@ -184,7 +188,9 @@ def generate_hashtag(input_string: str) -> str:
     return new_hashtag
 
 
-generate_hashtag('Hello there thanks for trying my quiz')
+generate_hashtag('   Hello there thanks    for trying my quiz   ')
+
+
 # Task 7:
 def combo_string(first_string: str, second_string: str) -> str:
     """
