@@ -106,6 +106,15 @@ def detect_language(
     :param profile_2: a dictionary of a known profile
     :return: a language
     """
+    if not all(isinstance(given, dict) for given in (unknown_profile, profile_1, profile_2)):
+        return None
+    distance_1 = (compare_profiles(unknown_profile, profile_1), profile_1['name'])
+    distance_2 = (compare_profiles(unknown_profile, profile_2), profile_2['name'])
+    if distance_1[0] < distance_2[0]:
+        return distance_1[1]
+    if distance_1[0] > distance_2[0]:
+        return distance_2[1]
+    return min(distance_1[1], distance_2[1])
 
 
 def load_profile(path_to_file: str) -> dict | None:
