@@ -142,7 +142,7 @@ print(reverse_word("This is another test"))
 
 
 # Task 6
-def generate_hashtag(input_string: str) -> str | False:
+def generate_hashtag(input_string: str) -> str | bool:
     """
     The marketing team is spending way too much time typing in hashtags.
     Let's help them with our own Hashtag Generator!
