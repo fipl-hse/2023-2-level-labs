@@ -137,16 +137,16 @@ def reverse_word(sentence: str) -> str:
     Spaces will be included only when more than one word is present.
     """
     # student realisation goes here
-    sentence = sentence.split()
+    sentence_list = sentence.split()
     new_sentence = []
-    for word in sentence:
+    for word in sentence_list:
         if len(word) < 5:
             new_sentence.append(word)
         else:
             new_sentence.append(word[::-1])
-    new_sentence = ' '.join(new_sentence)
-    print(new_sentence)
-    return new_sentence
+    new_sentence_str = ' '.join(new_sentence)
+    print(new_sentence_str)
+    return new_sentence_str
 
 
 reverse_word('Hey fellow warriors')
@@ -181,11 +181,11 @@ def generate_hashtag(input_string: str) -> str:
     new_hashtag = ['#']
     for word in hashtag_list:
         new_hashtag.append(word.title())
-    new_hashtag = ''.join(new_hashtag)
-    if len(new_hashtag) > 140:
+    new_hashtag_str = ''.join(new_hashtag)
+    if len(new_hashtag_str) > 140:
         return 'false'
-    print(new_hashtag)
-    return new_hashtag
+    print(new_hashtag_str)
+    return new_hashtag_str
 
 
 generate_hashtag('   Hello there thanks    for trying my quiz   ')
