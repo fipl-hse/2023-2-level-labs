@@ -90,7 +90,10 @@ def compare_profiles(
     """
     if (type(unknown_profile) != dict or
         type(profile_to_compare) != dict or
-            ("name" or "freq") not in (unknown_profile or profile_to_compare)):
+        "name" not in unknown_profile or
+        "freq" not in unknown_profile or
+        "name" not in profile_to_compare or
+        "freq" not in profile_to_compare):
         return None
     list_p1 = []
     list_p2 = []
@@ -107,7 +110,7 @@ def compare_profiles(
         if symbol not in dict_p1:
             list_p1.append(0)
             list_p2.append(dict_p2.get(symbol))
-    calculate_mse(list_p1, list_p2)
+    return calculate_mse(list_p1, list_p2)
 
 
 
@@ -123,7 +126,20 @@ def detect_language(
     :param profile_2: a dictionary of a known profile
     :return: a language
     """
-
+    if (type(unknown_profile) != dict or
+        type(profile_1) != dict or
+        type(profile_2)) != dict:
+        return None
+    mse_1 = compare_profiles(unknown_profile, profile_1)
+    mse_2 = compare_profiles(unknown_profile, profile_2)
+    if mse_1 < mse_2:
+        return profile_1.get("name")
+    elif mse_1 == mse_2:
+        alph = [profile_1.get("name"), profile_2.get("name")]
+        alph = sorted(alph)
+        return alph[0]
+    else:
+        return profile_2.get("name")
 
 def load_profile(path_to_file: str) -> dict | None:
     """
