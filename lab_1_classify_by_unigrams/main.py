@@ -160,9 +160,11 @@ def preprocess_profile(profile: dict) -> dict[str, str | dict] | None:
     preprocessed_profile = {'name': profile['name'], 'freq': {}}
     unigrams = profile['n_words'][0]
     for token in profile['freq']:
-        token_strip = token.strip()
-        if len(token_strip) == 1 and token_strip.isalpha():
-            token_lower = (token_strip.lower())
+        if token.lower() in preprocessed_profile['freq']:
+            preprocessed_profile['freq'][token.lower()] += \
+                profile['freq'][token] / profile['n_words'][0]
+        elif len(token) == 1:
+            token_lower = (token.lower())
             preprocessed_profile['freq'][token_lower] = profile['freq'][token] / unigrams
 
     return preprocessed_profile
