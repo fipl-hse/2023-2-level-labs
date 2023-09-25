@@ -3,7 +3,6 @@ Lab 1
 Language detection
 """
 import json
-from typing import Any
 
 
 def tokenize(text: str) -> list[str] | None:
