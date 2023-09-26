@@ -1,8 +1,3 @@
-"""
-Language detection starter
-"""
-
-
 from lab_1_classify_by_unigrams.main import (
     detect_language,
     create_language_profile
