@@ -13,13 +13,14 @@ def tokenize(text: str) -> list[str] | None:
     """
     if not isinstance(text, str):
         return None
-    tokens = ''
+    #tokens = ''
     punc = ''''1234567890!"#$%&'()’*º+,-./:;<=>?@[\\]^_`{|}~'''
     text = text.replace(' ', '')
     text = text.replace('\n', '')
-    for token in text:
-        if token not in punc:
-            tokens += token.lower()
+    #for token in text:
+        #if token not in punc:
+            #tokens += token.lower()
+    tokens = [token.lower() for token in text if token not in punc]
     return [*tokens]
 
 
@@ -35,7 +36,7 @@ def calculate_frequencies(tokens: list[str] | None) -> dict[str, float] | None:
     for token in tokens:
         if not isinstance(token, str):
             return None
-    my_dict = {token: tokens.count(token)/len(tokens) for token in tokens}
+    my_dict = {token: tokens.count(token) / len(tokens) for token in tokens}
     return my_dict
 
 
@@ -61,6 +62,7 @@ def calculate_mse(predicted: list, actual: list) -> float | None:
     :param actual: a list of actual values
     :return: the score
     """
+
 
 
 def compare_profiles(
