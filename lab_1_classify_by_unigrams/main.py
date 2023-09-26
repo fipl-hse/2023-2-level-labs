@@ -11,7 +11,7 @@ def tokenize(text: str) -> list[str] | None:
     :param text: a text
     :return: a list of lower-cased tokens without punctuation
     """
-    if text is str == False:
+    if isinstance(text, str) == False:
         return None
     else:
         list_of_tokens = ""
