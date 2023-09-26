@@ -11,7 +11,16 @@ def tokenize(text: str) -> list[str] | None:
     :param text: a text
     :return: a list of lower-cased tokens without punctuation
     """
-
+    if text is str == False:
+        return None
+    else:
+        list_of_tokens = ""
+        for token in text:
+            if token.isalpha():
+                new_token = token.lower()
+                list_of_tokens += new_token
+        tokens = list(list_of_tokens)
+        return(tokens)
 
 def calculate_frequencies(tokens: list[str] | None) -> dict[str, float] | None:
     """
