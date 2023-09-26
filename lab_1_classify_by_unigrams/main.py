@@ -62,7 +62,7 @@ def calculate_mse(predicted: list, actual: list) -> float | None:
     for i, value in enumerate(actual):
         total += (value - predicted[i])**2
         number += 1
-    score = total/number
+    score = round(total/number, 3)
     return score
 
 
@@ -76,9 +76,19 @@ def compare_profiles(
     :param profile_to_compare: a dictionary of a profile to compare the unknown profile to
     :return: the distance between the profiles
     """
-    values_unk = list(unknown_profile.values())
-    values_comp = list(profile_to_compare.values())
-    profile_distance = calculate_mse(values_comp, values_unk)
+    values_unk = unknown_profile["freq"]
+    values_comp = profile_to_compare["freq"]
+    for k in values_unk:
+        if k not in values_comp:
+            values_comp[k] = 0
+    for k in values_comp:
+        if k not in values_unk:
+            values_unk[k] = 0
+    sorted_values_unk = dict(sorted(values_unk.items()))
+    sorted_values_comp = dict(sorted(values_comp.items()))
+    values_list_unk = list(sorted_values_unk.values())
+    values_list_comp = list(sorted_values_comp.values())
+    profile_distance = calculate_mse(values_list_comp, values_list_unk)
     return profile_distance
 
 
