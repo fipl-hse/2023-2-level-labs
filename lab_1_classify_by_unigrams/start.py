@@ -1,7 +1,11 @@
 from lab_1_classify_by_unigrams.main import (
-    detect_language,
-    create_language_profile
+    create_language_profile,
+    detect_language
 )
+
+"""
+Language detection starter
+"""
 
 
 def main() -> None:
