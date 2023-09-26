@@ -13,16 +13,11 @@ def tokenize(text: str) -> list[str] | None:
     """
     if not isinstance(text, str):
         return None
-    #tokens = ''
     punc = ''''1234567890!"#$%&'()’*º+,-./:;<=>?@[\\]^_`{|}~'''
     text = text.replace(' ', '')
     text = text.replace('\n', '')
-    #for token in text:
-        #if token not in punc:
-            #tokens += token.lower()
     tokens = [token.lower() for token in text if token not in punc]
     return [*tokens]
-
 
 
 def calculate_frequencies(tokens: list[str] | None) -> dict[str, float] | None:
@@ -62,7 +57,14 @@ def calculate_mse(predicted: list, actual: list) -> float | None:
     :param actual: a list of actual values
     :return: the score
     """
-
+    if not (isinstance(predicted, list)
+            and isinstance(actual, list)
+            and len(predicted) == len(actual)):
+        return None
+    mse_calculation = 0
+    for num, act in enumerate(actual):
+        mse_calculation += (act - predicted[num])**2
+    return float(mse_calculation / len(actual))
 
 
 def compare_profiles(
@@ -75,6 +77,29 @@ def compare_profiles(
     :param profile_to_compare: a dictionary of a profile to compare the unknown profile to
     :return: the distance between the profiles
     """
+    if not (isinstance(unknown_profile, dict)
+            and isinstance(profile_to_compare, dict)
+            and 'name' in unknown_profile
+            and 'freq' in unknown_profile
+            and 'name' in profile_to_compare
+            and 'freq' in profile_to_compare):
+        return None
+    unknown_tokens = set(unknown_profile.get('freq').keys())
+    compare_tokens = set(profile_to_compare.get('freq').keys())
+    all_tokens = list(unknown_tokens.union(compare_tokens))
+    list_actual = []
+    list_predicted = []
+    for token in all_tokens:
+        if token not in unknown_profile["freq"]:
+            list_actual.append(float(0))
+            list_predicted.append(float(profile_to_compare['freq'][token]))
+        elif token not in profile_to_compare['freq']:
+            list_actual.append(float(unknown_profile["freq"][token]))
+            list_predicted.append(float(0))
+        else:
+            list_actual.append(float(unknown_profile["freq"][token]))
+            list_predicted.append(float(profile_to_compare['freq'][token]))
+    return calculate_mse(list_predicted, list_actual)
 
 
 def detect_language(
@@ -89,6 +114,18 @@ def detect_language(
     :param profile_2: a dictionary of a known profile
     :return: a language
     """
+    if not (isinstance(unknown_profile, dict)
+            and isinstance(profile_1, dict)
+            and isinstance(profile_2, dict)):
+        return None
+    unknown_and_1 = compare_profiles(unknown_profile, profile_1)
+    unknown_and_2 = compare_profiles(unknown_profile, profile_2)
+    if unknown_and_1 < unknown_and_2:
+        return profile_1['name']
+    elif unknown_and_2 < unknown_and_1:
+        return profile_2['name']
+    else:
+        return [profile_1['name'], profile_2['name']].sort()[0]
 
 
 def load_profile(path_to_file: str) -> dict | None:
