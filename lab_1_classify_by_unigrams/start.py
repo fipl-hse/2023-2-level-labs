@@ -1,8 +1,7 @@
-from main import (create_language_profile, detect_language)
-
 """
 Language detection starter
 """
+from main import (create_language_profile, detect_language)
 
 
 def main() -> None:
