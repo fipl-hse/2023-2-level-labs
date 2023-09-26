@@ -122,7 +122,7 @@ def detect_language(
     unknown_and_2 = compare_profiles(unknown_profile, profile_2)
     if unknown_and_1 < unknown_and_2:
         return profile_1['name']
-    elif unknown_and_2 < unknown_and_1:
+    if unknown_and_2 < unknown_and_1:
         return profile_2['name']
     else:
         return [profile_1['name'], profile_2['name']].sort()[0]
