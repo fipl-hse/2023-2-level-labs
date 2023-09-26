@@ -2,6 +2,14 @@
 Language detection starter
 """
 
+from main import (
+    tokenize,
+    calculate_frequencies,
+    create_language_profile,
+    calculate_mse,
+    compare_profiles
+)
+
 
 def main() -> None:
     """
@@ -16,6 +24,18 @@ def main() -> None:
     result = None
     assert result, "Detection result is None"
 
+    en_tokens = tokenize(en_text)
+    de_tokens = tokenize(de_text)
+    unknown_tokens = tokenize(unknown_text)
+    en_profile = create_language_profile(calculate_frequencies(en_tokens))
+    de_profile = create_language_profile(calculate_frequencies(de_tokens))
+    unknown_profile = create_language_profile(calculate_frequencies(unknown_tokens))
+    distance = compare_profiles(unknown_profile, en_profile, de_profile)
+
+
 
 if __name__ == "__main__":
     main()
+
+
+
