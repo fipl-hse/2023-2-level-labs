@@ -124,8 +124,7 @@ def detect_language(
         return profile_1['name']
     if unknown_and_2 < unknown_and_1:
         return profile_2['name']
-    else:
-        return [profile_1['name'], profile_2['name']].sort()[0]
+    return [profile_1['name'], profile_2['name']].sort()[0]
 
 
 def load_profile(path_to_file: str) -> dict | None:
