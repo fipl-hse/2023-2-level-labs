@@ -64,7 +64,7 @@ def calculate_mse(predicted: list, actual: list) -> float | None:
             or len(predicted) != len(actual):
         return None
     len_of_actual_numbers = len(actual)
-    difference_squared = sum([(i - j) ** 2 for i, j in zip(actual, predicted)])
+    difference_squared = sum([(i - k) ** 2 for i, k in zip(actual, predicted)])
     mse = difference_squared / len_of_actual_numbers
     return mse
 
