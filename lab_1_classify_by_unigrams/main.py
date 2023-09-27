@@ -91,13 +91,13 @@ def compare_profiles(
     for token in all_tokens:
         if token not in unknown_profile["freq"]:
             list_actual.append(float(0))
-            list_predicted.append(profile_to_compare['freq'][token])
+            list_predicted.append(float(profile_to_compare['freq'][token]))
         elif token not in profile_to_compare['freq']:
-            list_actual.append(unknown_profile["freq"][token])
+            list_actual.append(float(unknown_profile["freq"][token]))
             list_predicted.append(float(0))
         else:
-            list_actual.append(unknown_profile["freq"][token])
-            list_predicted.append(profile_to_compare['freq'][token])
+            list_actual.append(float(unknown_profile["freq"][token]))
+            list_predicted.append(float(profile_to_compare['freq'][token]))
     return calculate_mse(list_predicted, list_actual)
 
 
@@ -119,9 +119,9 @@ def detect_language(
         return None
     unknown_and_1 = compare_profiles(unknown_profile, profile_1)
     unknown_and_2 = compare_profiles(unknown_profile, profile_2)
-    if unknown_and_1 < unknown_and_2:
+    if float(unknown_and_1) < float(unknown_and_2):
         return profile_1['name']
-    if unknown_and_2 < unknown_and_1:
+    if float(unknown_and_2) < float(unknown_and_1):
         return profile_2['name']
     detected = sorted([profile_1['name'], profile_2['name']])[0]
     return detected
