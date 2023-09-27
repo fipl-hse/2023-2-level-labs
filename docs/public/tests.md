@@ -8,7 +8,6 @@ To configure tests locally you need to perform several steps:
    `.\venv\Scripts\activate`):
    ```bash
    python -m pip install -r requirements_qa.txt
-   ```
 
 2. Create a new configuration (this and all next steps should be performed in PyCharm):
    ![](../images/pycharm_create_configuration.jpg)
