@@ -5,24 +5,21 @@ Language detection
 
 
 def tokenize(text: str) -> list[str] | None:
-    if isinstance(text, str):
-        punc="!#$%&'()*+,-./:;<=>?@[\]^_`{|}~1234567890"
-        tokens = "".join(text.split()).lower()
-        for el in tokens:
-            if el in punc:
-                tokens = tokens.replace(el, '')
-        tokens = list(tokens)
-        return tokens
-    else:
-        return None
-
-
     """
     Splits a text into tokens, converts the tokens into lowercase,
     removes punctuation, digits and other symbols
     :param text: a text
     :return: a list of lower-cased tokens without punctuation
     """
+    if not isinstance(text, str):
+        return None
+    punc = "!#$%&'()*+,-./:;<=>?@[\]^_`{|}~1234567890"
+    tokens = "".join(text.split()).lower()
+    for el in tokens:
+        if el in punc:
+            tokens = tokens.replace(el, '')
+    tokens = list(tokens)
+    return tokens
 
 
 def calculate_frequencies(tokens: list[str] | None) -> dict[str, float] | None:
@@ -31,6 +28,14 @@ def calculate_frequencies(tokens: list[str] | None) -> dict[str, float] | None:
     :param tokens: a list of tokens
     :return: a dictionary with frequencies
     """
+    if not isinstance(tokens, list):
+        return None
+    dictionary = {}
+    for i in tokens:
+        if not isinstance(i, str):
+            return None
+        dictionary.update({i: tokens.count(i)/len(tokens)})
+    return dictionary
 
 
 def create_language_profile(language: str, text: str) -> dict[str, str | dict[str, float]] | None:
@@ -40,6 +45,11 @@ def create_language_profile(language: str, text: str) -> dict[str, str | dict[st
     :param text: a text
     :return: a dictionary with two keys – name, freq
     """
+    if not isinstance(language, str) or not isinstance(text, str):
+        return None
+    tokens = tokenize(text)
+    language_profile = {'name': language, 'freq': calculate_frequencies(tokens)}
+    return language_profile
 
 
 def calculate_mse(predicted: list, actual: list) -> float | None:
