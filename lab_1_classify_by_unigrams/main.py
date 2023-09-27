@@ -42,11 +42,9 @@ def create_language_profile(language: str, text: str) -> dict[str, str | dict[st
     :param text: a text
     :return: a dictionary with two keys – name, freq
     """
-    if not (isinstance(language, str) and isinstance(text, str)):
+    if not isinstance(language, str) and not isinstance(text, str):
         return None
-    text_for_freq = tokenize(text)
-    prof_dict = calculate_frequencies(text_for_freq)
-    lang_profile = {"name": language, "freq": prof_dict}
+    lang_profile = {"name": language, "freq": calculate_frequencies(tokenize(text))}
     return lang_profile
 
 
@@ -86,7 +84,7 @@ def compare_profiles(
         return None
     unknown_tokens = set(unknown_profile.get('freq').keys())
     compare_tokens = set(profile_to_compare.get('freq').keys())
-    all_tokens = list(unknown_tokens.union(compare_tokens))
+    all_tokens = list(unknown_tokens | compare_tokens)
     list_actual = []
     list_predicted = []
     for token in all_tokens:
@@ -114,9 +112,7 @@ def detect_language(
     :param profile_2: a dictionary of a known profile
     :return: a language
     """
-    if not (isinstance(unknown_profile, dict)
-            and isinstance(profile_1, dict)
-            and isinstance(profile_2, dict)):
+    if not isinstance(unknown_profile, dict) and not isinstance(profile_1, dict) and not isinstance(profile_2, dict):
         return None
     unknown_and_1 = compare_profiles(unknown_profile, profile_1)
     unknown_and_2 = compare_profiles(unknown_profile, profile_2)
@@ -124,7 +120,8 @@ def detect_language(
         return profile_1['name']
     if unknown_and_2 < unknown_and_1:
         return profile_2['name']
-    return sorted([profile_1['name'], profile_2['name']])[0]
+    detected = sorted([profile_1['name'], profile_2['name']])[0]
+    return detected
 
 
 def load_profile(path_to_file: str) -> dict | None:

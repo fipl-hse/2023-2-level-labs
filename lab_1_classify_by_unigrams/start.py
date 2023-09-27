@@ -22,6 +22,7 @@ def main() -> None:
 
     result = detect_language(unknown, english, deutsch)
     print(result)
+    print(english)
     assert result, "Detection result is None"
 
 
