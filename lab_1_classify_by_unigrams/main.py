@@ -4,18 +4,18 @@ Language detection
 """
 
 
-def tokenize(langtext: str) -> list[str] | None:
+def tokenize(text: str) -> list[str] | None:
     """
        Splits a text into tokens, converts the tokens into lowercase,
        removes punctuation, digits and other symbols
        :param text: a text
        :return: a list of lower-cased tokens without punctuation
        """
-    if type(langtext) != str:
+    if type(text) != str:
         return None
-    langtext = langtext.lower()
+    text = text.lower()
     tokens = []
-    for token in langtext:
+    for token in text:
         if token.isalpha() and token != 'º':
             tokens.append(token)
     return tokens
@@ -50,11 +50,8 @@ def create_language_profile(language: str, text: str) -> dict[str, str | dict[st
     :param text: a text
     :return: a dictionary with two keys – name, freq
     """
-    if type(language) != str:
+    if type(language) != str and type(text) != str:
         return None
-    if type(text) != str:
-        return None
-   # text = tokenize(text)
     text = calculate_frequencies(tokenize(text))
     language_profile = {'name': language, 'freq': text}
     return language_profile
@@ -68,6 +65,16 @@ def calculate_mse(predicted: list, actual: list) -> float | None:
     :param actual: a list of actual values
     :return: the score
     """
+    if len(predicted) != len(actual):
+        return None
+    if type(predicted) != list or type(actual) != list:
+        return None
+    mse_sum = 0
+    for index, element in enumerate(predicted):
+        mse_sum += (element - actual[index]) ** 2
+    mse = mse_sum / len(predicted)
+    return mse
+
 
 
 def compare_profiles(
