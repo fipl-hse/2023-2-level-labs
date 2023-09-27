@@ -10,8 +10,9 @@ def check_assert_line(content: str) -> bool:
     """
     main check
     """
-    expected = 'assert RESULT'
-    return expected in content
+    expected = 'assert result'
+    expected_alternative = 'assert RESULT'
+    return expected in content or expected_alternative in content
 
 
 if __name__ == "__main__":
@@ -22,7 +23,7 @@ if __name__ == "__main__":
     if check_assert_line(args.start_py_content):
         print('Passed')
         sys.exit(0)
-    print('Make sure you made assert RESULT in start.py file')
+    print('Make sure you made assert result in start.py file')
     sys.exit(1)
 
 # Test: a) assert RESULT is in file
