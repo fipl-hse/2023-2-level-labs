@@ -50,7 +50,7 @@ def create_language_profile(language: str, text: str) -> dict[str, str | dict[st
     :param text: a text
     :return: a dictionary with two keys – name, freq
     """
-    if type(language) != str and type(text) != str:
+    if type(language) != str or type(text) != str:
         return None
     text = calculate_frequencies(tokenize(text))
     language_profile = {'name': language, 'freq': text}
