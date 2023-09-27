@@ -42,7 +42,7 @@ def create_language_profile(language: str, text: str) -> dict[str, str | dict[st
     :param text: a text
     :return: a dictionary with two keys – name, freq
     """
-    if not isinstance(language, str) and not isinstance(text, str):
+    if not (isinstance(language, str) and isinstance(text, str)):
         return None
     lang_profile = {"name": language, "freq": calculate_frequencies(tokenize(text))}
     return lang_profile
@@ -112,7 +112,9 @@ def detect_language(
     :param profile_2: a dictionary of a known profile
     :return: a language
     """
-    if not isinstance(unknown_profile, dict) and not isinstance(profile_1, dict) and not isinstance(profile_2, dict):
+    if not (isinstance(unknown_profile, dict)
+            and isinstance(profile_1, dict)
+            and isinstance(profile_2, dict)):
         return None
     unknown_and_1 = compare_profiles(unknown_profile, profile_1)
     unknown_and_2 = compare_profiles(unknown_profile, profile_2)
