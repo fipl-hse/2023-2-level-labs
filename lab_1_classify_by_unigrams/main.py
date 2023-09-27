@@ -26,15 +26,13 @@ def calculate_frequencies(tokens: list[str] | None) -> dict[str, float] | None:
     :param tokens: a list of tokens
     :return: a dictionary with frequencies
     """
-    freq_dict = {}
     if not isinstance(tokens, list):
         return None
 
     for i in tokens:
-        if isinstance(i, str):
-            freq_dict[i] = tokens.count(i) / len(tokens)
-        else:
+        if not isinstance(i, str):
             return None
+    freq_dict = {i: tokens.count(i) / len(tokens) for i in tokens}
     return freq_dict
 
 
@@ -126,10 +124,10 @@ def detect_language(
 
     if distance1 > distance2:
         return str(profile_2['name'])
+    if distance1 < distance2:
+        return str(profile_1['name'])
     if distance1 == distance2:
         return [profile_1['name'], profile_2['name']].sort()
-    else:
-        return str(profile_1['name'])
 
 
 def load_profile(path_to_file: str) -> dict | None:
