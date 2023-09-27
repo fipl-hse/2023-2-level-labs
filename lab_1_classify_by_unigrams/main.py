@@ -123,7 +123,7 @@ def detect_language(
         return profile_1['name']
     if float(unknown_and_2) < float(unknown_and_1):
         return profile_2['name']
-    detected = sorted([profile_1['name'], profile_2['name']])[0]
+    detected = sorted(str([profile_1.get('name'), profile_2.get('name')]))[0]
     return detected
 
 
