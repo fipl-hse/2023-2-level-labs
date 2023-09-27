@@ -113,7 +113,6 @@ def detect_language(
     :param profile_1: a dictionary of a known profile
     :param profile_2: a dictionary of a known profile
     :return: a language
-    #не проверяла (что ретернить)
     """
     if not (
             isinstance(unknown_profile, dict)
@@ -124,11 +123,12 @@ def detect_language(
     else:
         profile_1_metric = compare_profiles(unknown_profile, profile_1)
         profile_2_metric = compare_profiles(unknown_profile, profile_2)
-        metrics = {profile_1['name']: profile_1_metric, profile_2['name']: profile_2_metric}
-
-        if metrics[profile_1['name']] == metrics[profile_2['name']]:
-            return sorted(metrics)[0]
-        return min(metrics)
+        if profile_1_metric > profile_2_metric:
+            return profile_2['name']
+        elif profile_1_metric == profile_2_metric:
+            return [profile_1['name'], profile_2['name']].sort()
+        else:
+            return profile_1['name']
 
 
 def load_profile(path_to_file: str) -> dict | None:
