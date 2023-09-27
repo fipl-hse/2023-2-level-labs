@@ -4,20 +4,22 @@ Language detection
 """
 
 
-def tokenize(text: str) -> list[str] or None:
-    if isinstance(text, str):
+def tokenize(text: str) -> list[str] | None:
+    if not isinstance(text, str):
+        return None
+    else:
         tokens = []
         text = text.lower()
         for symbol in text:
             if symbol.isalpha():
                 tokens.append(symbol)
         return tokens
-    else:
+
+
+def calculate_frequencies(tokens: list[str] | None) -> dict[str, float] | None:
+    if not isinstance(tokens, list) or not all(isinstance(el, str) for el in tokens):
         return None
-
-
-def calculate_frequencies(tokens: list[str] or None) -> dict[str, float] or None:
-    if isinstance(tokens, list) and all(isinstance(el, str) for el in tokens):
+    else:
         freqs = {}
         for token in tokens:
             if token in freqs:
@@ -27,20 +29,18 @@ def calculate_frequencies(tokens: list[str] or None) -> dict[str, float] or None
         for k, v in freqs.items():
             freqs[k] = v / len(tokens)
         return freqs
-    else:
+
+
+def create_language_profile(language: str, text: str) -> dict[str, str | dict[str, float]] | None:
+    if not isinstance(language, str) or not isinstance(text, str):
         return None
-
-
-def create_language_profile(language: str, text: str) -> dict[str, str or dict[str, float]] or None:
-    if isinstance(language, str) and isinstance(text, str):
+    else:
         freqs = calculate_frequencies(tokenize(text))
         profile = {"name": language, "freq": freqs}
         return profile
-    else:
-        return None
 
 
-def calculate_mse(predicted: list, actual: list) -> float or None:
+def calculate_mse(predicted: list, actual: list) -> float | None:
     """
     Calculates mean squared error between predicted and actual values
     :param predicted: a list of predicted values
@@ -50,9 +50,9 @@ def calculate_mse(predicted: list, actual: list) -> float or None:
 
 
 def compare_profiles(
-        unknown_profile: dict[str, str or dict[str, float]],
-        profile_to_compare: dict[str, str or dict[str, float]]
-) -> float or None:
+        unknown_profile: dict[str, str | dict[str, float]],
+        profile_to_compare: dict[str, str | dict[str, float]]
+) -> float | None:
     """
     Compares profiles and calculates the distance using symbols
     :param unknown_profile: a dictionary of an unknown profile
@@ -62,10 +62,10 @@ def compare_profiles(
 
 
 def detect_language(
-        unknown_profile: dict[str, str or dict[str, float]],
-        profile_1: dict[str, str or dict[str, float]],
-        profile_2: dict[str, str or dict[str, float]],
-) -> str or None:
+        unknown_profile: dict[str, str | dict[str, float]],
+        profile_1: dict[str, str | dict[str, float]],
+        profile_2: dict[str, str | dict[str, float]],
+) -> str | None:
     """
     Detects the language of an unknown profile
     :param unknown_profile: a dictionary of a profile to determine the language of
@@ -75,7 +75,7 @@ def detect_language(
     """
 
 
-def load_profile(path_to_file: str) -> dict or None:
+def load_profile(path_to_file: str) -> dict | None:
     """
     Loads a language profile
     :param path_to_file: a path to the language profile
@@ -83,7 +83,7 @@ def load_profile(path_to_file: str) -> dict or None:
     """
 
 
-def preprocess_profile(profile: dict) -> dict[str, str or dict] or None:
+def preprocess_profile(profile: dict) -> dict[str, str | dict] | None:
     """
     Preprocesses profile for a loaded language
     :param profile: a loaded profile
@@ -92,7 +92,7 @@ def preprocess_profile(profile: dict) -> dict[str, str or dict] or None:
     """
 
 
-def collect_profiles(paths_to_profiles: list) -> list[dict[str, str or dict[str, float]]] or None:
+def collect_profiles(paths_to_profiles: list) -> list[dict[str, str | dict[str, float]]] | None:
     """
     Collects profiles for a given path
     :paths_to_profiles: a list of strings to the profiles
@@ -100,8 +100,8 @@ def collect_profiles(paths_to_profiles: list) -> list[dict[str, str or dict[str,
     """
 
 
-def detect_language_advanced(unknown_profile: dict[str, str or dict[str, float]],
-                             known_profiles: list) -> list or None:
+def detect_language_advanced(unknown_profile: dict[str, str | dict[str, float]],
+                             known_profiles: list) -> list | None:
     """
     Detects the language of an unknown profile
     :param unknown_profile: a dictionary of a profile to determine the language of
@@ -110,7 +110,7 @@ def detect_language_advanced(unknown_profile: dict[str, str or dict[str, float]]
     """
 
 
-def print_report(detections: list[tuple[str, float]]) -> None:
+def print_report(detections: list[list[str | float]]) -> None:
     """
     Prints report for detection of language
     :param detections: a list with distances for each available language
