@@ -26,10 +26,10 @@ def calculate_frequencies(tokens: list[str] | None) -> dict[str, float] | None:
     """
     if not isinstance(tokens, list):
         return None
-    for el in tokens:
-        if not isinstance(el, str):
+    for token in tokens:
+        if not isinstance(token, str):
             return None
-    frequency = {el: tokens.count(el) / len(tokens) for el in tokens}
+    frequency = {token: tokens.count(token) / len(tokens) for token in tokens}
     return frequency
 
 
@@ -54,7 +54,8 @@ def calculate_mse(predicted: list, actual: list) -> float | None:
     :param actual: a list of actual values
     :return: the score
     """
-    if not isinstance(predicted, list) or not isinstance(actual, list) or len(predicted) != len(actual):
+    if not isinstance(predicted, list) or not isinstance(actual, list) \
+            or len(predicted) != len(actual):
         return None
     zipped_values = zip(predicted, actual)
     zipped_list = list(zipped_values)
@@ -101,19 +102,15 @@ def detect_language(
     :param profile_2: a dictionary of a known profile
     :return: a language
     """
-    if not isinstance(unknown_profile, dict) or not isinstance(profile_1, dict) or not isinstance(profile_2, dict):
+    if not isinstance(unknown_profile, dict) or not isinstance(profile_1, dict) \
+            or not isinstance(profile_2, dict):
         return None
     mse_1 = compare_profiles(unknown_profile, profile_1)
     mse_2 = compare_profiles(unknown_profile, profile_2)
-    if mse_1 > mse_2:
-        return profile_2['name']
-    elif mse_2 > mse_1:
-        return profile_1['name']
-    else:
-        if profile_1['name'][0] > profile_2['name'][0]:
-            return profile_2['name']
-        else:
-            return profile_1['name']
+    mse_profiles = {profile_1['name']: mse_1, profile_2['name']: mse_2}
+    if mse_1 == mse_2:
+        return min(profile_1['name'], profile_2['name'])
+    return min(mse_profiles, key=mse_profiles.get)
 
 
 def load_profile(path_to_file: str) -> dict | None:
