@@ -65,14 +65,14 @@ def calculate_mse(predicted: list, actual: list) -> float | None:
     :return: the score
     """
     if not (
-            isinstance(predicted, list) and isinstance(actual, list) and len(predicted) != len(actual)
+            isinstance(predicted, list) and isinstance(actual, list) and len(predicted) == len(actual)
     ):
          return None
 
     else:
         sum_diff = 0
         for i, value in enumerate(predicted):
-            sum_diff += value - actual[i] ** 2
+            sum_diff += (value - actual[i]) ** 2
         mse = sum_diff / len(predicted)
         return mse
 
