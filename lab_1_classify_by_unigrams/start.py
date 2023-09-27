@@ -20,10 +20,12 @@ def main() -> None:
     english = create_language_profile('en', en_text)
     deutsch = create_language_profile('de', de_text)
 
-    result = detect_language(unknown, english, deutsch)
-    print(result)
-    print(english)
-    assert result, "Detection result is None"
+    if (isinstance(unknown, dict)
+            and isinstance(english, dict)
+            and isinstance(deutsch, dict)):
+        result = detect_language(unknown, english, deutsch)
+        print(result)
+        assert result, "Detection result is None"
 
 
 if __name__ == "__main__":
