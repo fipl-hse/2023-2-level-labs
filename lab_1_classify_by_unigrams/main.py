@@ -11,6 +11,10 @@ def tokenize(text: str) -> list[str] | None:
     :param text: a text
     :return: a list of lower-cased tokens without punctuation
     """
+    text = text.lower()
+    trans_table = str.maketrans({'.': None, ',': None, "'": None, ':': None, '?': None, '!': None, ' ': None, '1': None, '2': None, "3": None, "4": None, "5": None, "6": None, "7": None, "8": None, "9": None, "0": None})
+    text = text.translate(trans_table)
+    return list(text)
 
 
 def calculate_frequencies(tokens: list[str] | None) -> dict[str, float] | None:
@@ -19,7 +23,10 @@ def calculate_frequencies(tokens: list[str] | None) -> dict[str, float] | None:
     :param tokens: a list of tokens
     :return: a dictionary with frequencies
     """
-
+    frequency = {}
+    for i in tokens:
+        frequency[i] = round(tokens.count(i) / len(tokens), 3)
+    return frequency
 
 def create_language_profile(language: str, text: str) -> dict[str, str | dict[str, float]] | None:
     """
@@ -28,6 +35,10 @@ def create_language_profile(language: str, text: str) -> dict[str, str | dict[st
     :param text: a text
     :return: a dictionary with two keys – name, freq
     """
+    step1 = tokenize(text)
+    step2 = calculate_frequencies(step1)
+    profile = dict({"name": language, "freq": step2})
+    return profile
 
 
 def calculate_mse(predicted: list, actual: list) -> float | None:
@@ -37,6 +48,13 @@ def calculate_mse(predicted: list, actual: list) -> float | None:
     :param actual: a list of actual values
     :return: the score
     """
+    results = 0
+    for i in range(len(predicted)):
+        diff = predicted[i] - actual[i]
+        square = diff**2
+        results += square
+    mse = results/len(predicted)
+    return float(mse)
 
 
 def compare_profiles(
@@ -49,6 +67,22 @@ def compare_profiles(
     :param profile_to_compare: a dictionary of a profile to compare the unknown profile to
     :return: the distance between the profiles
     """
+    stats1 = unknown_profile.get('freq')  # собираем из обоих яз.профилей статистику частотности
+    stats2 = profile_to_compare.get('freq')
+    union = set(stats1) | set(
+        stats2)  # объединение множества токенов в первом языке с множеством токенов во втором языке
+    for i in union:  # найти встречаемость каждого элемента из union в stats1 и stats2
+        if i not in stats1:
+            stats1[i] = 0
+    for i in union:
+        if i not in stats2:
+            stats2[i] = 0
+    stats1_sorted = dict(sorted(stats1.items()))  # сортируем по алфавиту
+    stats2_sorted = dict(sorted(stats2.items()))
+    frequency1 = list(stats1_sorted.values())
+    frequency2 = list(stats2_sorted.values())
+    mse = (calculate_mse(frequency1, frequency2))
+    return float(mse)
 
 
 def detect_language(
@@ -63,6 +97,20 @@ def detect_language(
     :param profile_2: a dictionary of a known profile
     :return: a language
     """
+    res1 = compare_profiles(profile_1, unknown_profile)
+    res2 = compare_profiles(profile_2, unknown_profile)
+    if res1 > res2:
+        lang = profile_1.get('name')
+    elif res1 == res2:
+        res1_name = profile_1.get('name')
+        res2_name = profile_2.get('name')
+        if res1_name > res2_name:
+            lang = res1_name
+        else:
+            lang = res2_name
+    else:
+        lang = profile_2.get('name')
+    return lang
 
 
 def load_profile(path_to_file: str) -> dict | None:
