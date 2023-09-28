@@ -1,0 +1,8 @@
+{
+    "python.testing.pytestArgs": [
+        "lab_1_classify_by_unigrams/tests",
+        "-k mark8"
+    ],
+    "python.testing.unittestEnabled": false,
+    "python.testing.pytestEnabled": true
+}
