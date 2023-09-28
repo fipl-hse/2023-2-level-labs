@@ -6,8 +6,7 @@ import sys
 from pathlib import Path
 from typing import Iterable, Mapping, Optional
 
-from config.collect_coverage.run_coverage import (CoverageCreateReportError,
-                                                  CoverageRunError,
+from config.collect_coverage.run_coverage import (CoverageCreateReportError, CoverageRunError,
                                                   run_coverage_collection)
 from config.constants import PROJECT_CONFIG_PATH, PROJECT_ROOT
 from config.project_config import ProjectConfig
