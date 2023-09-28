@@ -15,9 +15,7 @@ def tokenize(text: str) -> list[str] | None:
     if not isinstance(text, str):
         return None
 
-    tokens = [character for character in text.lower() if character.isalpha()]
-
-    return tokens
+    return [character for character in text.lower() if character.isalpha()]
 
 
 def calculate_frequencies(tokens: list[str] | None) -> dict[str, float] | None:
@@ -93,19 +91,18 @@ def compare_profiles(
     unknown_freq = unknown_profile['freq']
     compare_freq = profile_to_compare['freq']
     mutual_characters = [[], []]
-    if isinstance(unknown_freq, dict) and \
-            isinstance(compare_freq, dict):
-        for character in (unknown_freq | compare_freq):
-            if character in unknown_freq:
-                mutual_characters[0].append(unknown_freq[character])
-            else:
-                mutual_characters[0].append(0.)
-            if character in compare_freq:
-                mutual_characters[1].append(compare_freq[character])
-            else:
-                mutual_characters[1].append(0.)
-    else:
+    if not isinstance(unknown_freq, dict) or \
+            not isinstance(compare_freq, dict):
         return None
+    for character in (unknown_freq | compare_freq):
+        if character in unknown_freq:
+            mutual_characters[0].append(unknown_freq[character])
+        else:
+            mutual_characters[0].append(0.)
+        if character in compare_freq:
+            mutual_characters[1].append(compare_freq[character])
+        else:
+            mutual_characters[1].append(0.)
 
     if len(mutual_characters[0]) == len(mutual_characters[1]) == 0:
         return 1.
@@ -155,9 +152,10 @@ def load_profile(path_to_file: str) -> dict | None:
 
     with open(path_to_file, 'r', encoding='utf-8') as file:
         profile = json.load(file)
-        if isinstance(profile, dict):
-            return profile
-        return None
+
+    if isinstance(profile, dict):
+        return profile
+    return None
 
 
 def preprocess_profile(profile: dict) -> dict[str, str | dict] | None:
