@@ -35,13 +35,12 @@ warn_unused_ignores = true
 disable_error_code = [
     'var-annotated',
     'union-attr',
-
     # needed for seminars, to this moment not fixed: https://github.com/python/mypy/issues/9440
     'attr-defined'
 ]
 
 [[tool.mypy.overrides]]
-module = ['memory_profiler', 'ghapi.all', 'ast_comments', 'pydantic']
+module = ['memory_profiler', 'ghapi.all', 'ast_comments', 'pydantic', 'transformers']
 ignore_missing_imports = true
 
 [[tool.mypy.overrides]]
@@ -50,6 +49,22 @@ disable_error_code = [
     'empty-body'
 ]
 
+[[tool.mypy.overrides]]
+module = ['*.nmt_demo.*', ]
+disable_error_code = [
+    'no-any-unimported',
+    'no-any-return'
+]
+
 [tool.black]
-line-length = 120
-target-version = ['py39']
+line-length = 100
+target-version = ['py310']
+
+[tool.isort]
+py_version = '310'
+skip_gitignore = true
+line_length = 100
+order_by_type = true
+remove_redundant_aliases = true
+group_by_package = true
+force_alphabetical_sort_within_sections = true
