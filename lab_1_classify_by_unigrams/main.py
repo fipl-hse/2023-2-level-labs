@@ -109,7 +109,7 @@ def compare_profiles(
         else:
             list2.append(float(0))
     mse = calculate_mse(list1, list2)
-    return mse
+    return round(mse, 3)
 
 
 
