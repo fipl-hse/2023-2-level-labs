@@ -1,6 +1,6 @@
 """
 Lab 1
-Language detection
+Language detection turi ip ip
 """
 
 
