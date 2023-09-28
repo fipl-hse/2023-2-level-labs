@@ -4,7 +4,7 @@ Language detection
 """
 
 
-def tokenize(text: str) -> list[str]:
+def tokenize(text: str) -> list[str] | None:
     """
         Splits a text into tokens, converts the tokens into lowercase,
         removes punctuation, digits and other symbols
@@ -13,19 +13,14 @@ def tokenize(text: str) -> list[str]:
         """
     if type(text) != str:
         return None
+    tokens = []
     text = text.lower()
     for i in text:
-        if not i.isalpha() and i != ' ':
-            text = text.replace(i, '')
-    for i in text:
-        if i == ' ':
-            text = text.replace(' ','')
-    tokens = list(text)
+        if i.isalpha():
+            tokens += i
     return tokens
 
-
-
-def calculate_frequencies(tokens : list[str] | None) -> dict[str, float] | None:
+def calculate_frequencies(tokens: list[str] | None) -> dict[str, float] | None:
     """
        Calculates frequencies of given tokens
        :param tokens: a list of tokens
@@ -44,11 +39,6 @@ def calculate_frequencies(tokens : list[str] | None) -> dict[str, float] | None:
         else:
             dictionary[i] = 1/length
     return dictionary
-
-
-
-
-
 
 def create_language_profile(language: str, text: str) -> dict[str, str | dict[str, float]] | None:
     """
