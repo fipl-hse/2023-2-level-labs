@@ -132,7 +132,7 @@ def detect_language(
         return profile_2['name']
     if profile_1_metric == profile_2_metric:
         return [profile_1['name'], profile_2['name']].sort()
-    else:
+    if profile_1_metric < profile_2_metric:
         return profile_1['name']
 
 
