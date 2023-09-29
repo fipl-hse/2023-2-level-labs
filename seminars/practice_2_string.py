@@ -63,13 +63,15 @@ def multiply_string(input_string: str, how_many: int) -> str:
 
 
 # Task 2:
-def front_times(input_string: str, how_many: int) -> str:
+def front_times(newstring : str, how_many : int, slicenumber : int = 3):
     """
     Given the string, take its three leading characters
     and display them that many times as in `how_many`.
     """
     # student realisation goes here
-
+    newstring = newstring[:slicenumber] * how_many
+    print(newstring)
+front_times('string', 4)
 
 # Function calls with expected result:
 # front_times('Chocolate', 2) → 'ChoCho'
@@ -81,11 +83,17 @@ def front_times(input_string: str, how_many: int) -> str:
 
 
 # Task 3:
-def extra_end(input_string: str) -> str:
+def extra_end(input_string: str, multiply: int, start : int, reversing_word : bool) -> str:
     """
     Given the string, take its two last characters and display them three times.
     """
     # student realisation goes here
+    start = -start
+    a = input_string[start::] * multiply
+    if reversing_word:
+        print(a[::-1])
+    else:
+        print(a)
 
 
 # Function calls with expected result:
@@ -101,6 +109,9 @@ def make_abba(first_string: str, second_string: str) -> str:
     Given two strings, concatenate them as a reflection.
     """
     # student realisation goes here
+
+
+
 
 
 # make_abba('Hi', 'Bye') → 'HiByeByeHi'
@@ -119,8 +130,14 @@ def reverse_word(sentence: str) -> str:
     Spaces will be included only when more than one word is present.
     """
     # student realisation goes here
-
-
+    listword = sentence.split(' ')
+    for i, word in enumerate(listword):
+        if len(word) >= 5:
+            correctword = word[::-1]
+            listword[i] = correctword
+        correctsentence = ' '.join(listword)
+    print(correctsentence)
+reverse_word('Hey fellow warriors')
 # reverse_word("Hey fellow warriors") == "Hey wollef sroirraw"
 #
 # reverse_word("This is a test") == "This is a test"
@@ -146,6 +163,8 @@ def generate_hashtag(input_string: str) -> str:
     ""                                        =>  false
     """
     # student realisation goes here
+    string_list = input_string.split(' ')
+
 
 
 # Task 7:
@@ -154,7 +173,10 @@ def combo_string(first_string: str, second_string: str) -> str:
     Given two strings, concatenate like the following: shorter+longer+shorter
     """
     # student realisation goes here
-
+    if len(first_string) > len(second_string):
+        print(second_string + first_string + second_string)
+    else:
+        print(first_string + second_string + first_string)
 
 # combo_string('Hello', 'hi') → 'hiHellohi'
 # combo_string('hi', 'Hello') → 'hiHellohi'
