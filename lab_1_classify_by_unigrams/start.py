@@ -1,6 +1,12 @@
 """
 Language detection starter
 """
+from lab_1_classify_by_unigrams.main import (tokenize,
+                                             calculate_frequencies,
+                                             create_language_profile,
+                                             calculate_mse,
+                                             compare_profiles,
+                                             detect_language)
 
 
 def main() -> None:
