@@ -16,7 +16,151 @@ Data Type: String
 
 # Create a string
 example = 'Hello'  # or "Hello"
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 print(example)
+
 
 # String concatenation
 greeting = example + ' there!'
@@ -53,7 +197,7 @@ def multiply_string(input_string: str, how_many: int) -> str:
     display the given string the number of times given in the `how_many`.
     """
     # student realisation goes here
-
+    pass
 
 # Function calls with expected result:
 # multiply_string('Hi', 2) → 'HiHi'
@@ -69,7 +213,7 @@ def front_times(input_string: str, how_many: int) -> str:
     and display them that many times as in `how_many`.
     """
     # student realisation goes here
-
+    pass
 
 # Function calls with expected result:
 # front_times('Chocolate', 2) → 'ChoCho'
@@ -86,7 +230,7 @@ def extra_end(input_string: str) -> str:
     Given the string, take its two last characters and display them three times.
     """
     # student realisation goes here
-
+    pass
 
 # Function calls with expected result:
 # extra_end('Hello') → 'lololo'
@@ -100,7 +244,7 @@ def make_abba(first_string: str, second_string: str) -> str:
     """
     Given two strings, concatenate them as a reflection.
     """
-    # student realisation goes here
+    print(first_string+second_string+second_string+first_string)
 
 
 # make_abba('Hi', 'Bye') → 'HiByeByeHi'
@@ -119,7 +263,7 @@ def reverse_word(sentence: str) -> str:
     Spaces will be included only when more than one word is present.
     """
     # student realisation goes here
-
+    pass
 
 # reverse_word("Hey fellow warriors") == "Hey wollef sroirraw"
 #
@@ -146,7 +290,7 @@ def generate_hashtag(input_string: str) -> str:
     ""                                        =>  false
     """
     # student realisation goes here
-
+    pass
 
 # Task 7:
 def combo_string(first_string: str, second_string: str) -> str:
@@ -154,6 +298,7 @@ def combo_string(first_string: str, second_string: str) -> str:
     Given two strings, concatenate like the following: shorter+longer+shorter
     """
     # student realisation goes here
+    pass
 
 
 # combo_string('Hello', 'hi') → 'hiHellohi'
@@ -170,6 +315,7 @@ def string_splosion(input_string: str) -> str:
     Given the string, format it like in the example.
     """
     # student realisation goes here
+    pass
 
 
 # Function calls with expected result:
@@ -182,6 +328,8 @@ def string_splosion(input_string: str) -> str:
 
 # Task 2: advanced
 def string_match(first_string: str, second_string: str) -> int:
+    pass
+
     """
     Given two strings, find the number of times an arbitrary substring (with length of 2)
     is found at the same position in both strings.
