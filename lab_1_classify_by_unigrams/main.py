@@ -30,14 +30,14 @@ def calculate_frequencies(tokens: list[str] | None) -> dict[str, float] | None:
     for i in tokens:
         if type(i) != str:
             return None
-    dict = {}
+    dictionary = {}
     for i in tokens:
-        if i not in dict.keys():
-            dict[i] = 0
-        dict[i] += 1
-    for i in dict.keys():
-        dict[i] /= len(tokens)
-    return dict
+        if i not in dictionary.keys():
+            dictionary[i] = 0
+        dictionary[i] += 1
+    for i in dictionary.keys():
+        dictionary[i] /= len(tokens)
+    return dictionary
 
 
 def create_language_profile(language: str, text: str) -> dict[str, str | dict[str, float]] | None:
