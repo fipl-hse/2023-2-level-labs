@@ -62,9 +62,11 @@ def calculate_mse(predicted: list, actual: list) -> float | None:
     :return: the score
     """
     if not (
-            isinstance(predicted, list) and isinstance(actual, list) and len(predicted) == len(actual)
+            isinstance(predicted, list)
+            and isinstance(actual, list)
+            and len(predicted) == len(actual)
     ):
-         return None
+        return None
 
     sum_diff = 0
     for i, value in enumerate(predicted):
@@ -83,8 +85,12 @@ def compare_profiles(
     :return: the distance between the profiles
     """
     if not (
-            isinstance(unknown_profile, dict) and isinstance(profile_to_compare, dict) and 'name' in unknown_profile
-            and 'freq' in unknown_profile and 'name' in profile_to_compare and 'freq' in profile_to_compare
+            isinstance(unknown_profile, dict)
+            and isinstance(profile_to_compare, dict)
+            and 'name' in unknown_profile
+            and 'freq' in unknown_profile
+            and 'name' in profile_to_compare
+            and 'freq' in profile_to_compare
     ):
         return None
 
@@ -115,7 +121,8 @@ def detect_language(
     """
     if not (
             isinstance(unknown_profile, dict)
-            and isinstance(profile_1, dict) and isinstance(profile_2, dict)
+            and isinstance(profile_1, dict)
+            and isinstance(profile_2, dict)
     ):
         return None
 
