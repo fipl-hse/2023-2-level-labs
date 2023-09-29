@@ -5,39 +5,53 @@ Language detection
 
 
 def tokenize(text: str) -> list[str] | None:
+    """
+    Splits a text into tokens, converts the tokens into lowercase,
+    removes punctuation, digits and other symbols
+    :param text: a text
+    :return: a list of lower-cased tokens without punctuation
+    """
     if not isinstance(text, str):
         return None
-    else:
-        tokens = []
-        text = text.lower()
-        for symbol in text:
-            if symbol.isalpha():
-                tokens.append(symbol)
-        return tokens
+    tokens = []
+    text = text.lower()
+    for symbol in text:
+        if symbol.isalpha():
+            tokens.append(symbol)
+    return tokens
 
 
 def calculate_frequencies(tokens: list[str] | None) -> dict[str, float] | None:
+    """
+    Calculates frequencies of given tokens
+    :param tokens: a list of tokens
+    :return: a dictionary with frequencies
+    """
     if not isinstance(tokens, list) or not all(isinstance(el, str) for el in tokens):
         return None
-    else:
-        freqs = {}
-        for token in tokens:
-            if token in freqs:
-                freqs[token] += 1
-            else:
-                freqs[token] = 1
-        for k, v in freqs.items():
-            freqs[k] = v / len(tokens)
-        return freqs
+    freqs = {}
+    for token in tokens:
+        if token in freqs:
+            freqs[token] += 1
+        else:
+            freqs[token] = 1
+    for k, v in freqs.items():
+        freqs[k] = v / len(tokens)
+    return freqs
 
 
 def create_language_profile(language: str, text: str) -> dict[str, str | dict[str, float]] | None:
+    """
+    Creates a language profile
+    :param language: a language
+    :param text: a text
+    :return: a dictionary with two keys – name, freq
+    """
     if not isinstance(language, str) or not isinstance(text, str):
         return None
-    else:
-        freqs = calculate_frequencies(tokenize(text))
-        profile = {"name": language, "freq": freqs}
-        return profile
+    freqs = calculate_frequencies(tokenize(text))
+    profile = {"name": language, "freq": freqs}
+    return profile
 
 
 def calculate_mse(predicted: list, actual: list) -> float | None:
@@ -110,7 +124,7 @@ def detect_language_advanced(unknown_profile: dict[str, str | dict[str, float]],
     """
 
 
-def print_report(detections: list[list[str | float]]) -> None:
+def print_report(detections: list[tuple[str, float]]) -> None:
     """
     Prints report for detection of language
     :param detections: a list with distances for each available language
