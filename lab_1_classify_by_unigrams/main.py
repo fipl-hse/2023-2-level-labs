@@ -4,24 +4,13 @@ Language detection
 """
 
 
-def tokenize(text):
-        if text == str(text):
-            for i in text:
-                if i in '".,:;!?-/0123456789':
-                    text = text.replace(i, '')
-                text = text.lower()
-                tokens = list(text)
-        else:
-            return None
+def tokenize(text: str):
+    if not isinstance(text, str):
+        return None
+    if i in '".,:;!?-/0123456789':
 
-
-
-    """
-    Splits a text into tokens, converts the tokens into lowercase,
-    removes punctuation, digits and other symbols
-    :param text: a text
-    :return: a list of lower-cased tokens without punctuation
-    """
+    tokens = list(text.lower())
+    return tokens
 
 
 def calculate_frequencies(tokens: list[str] | None) -> dict[str, float] | None:
