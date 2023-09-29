@@ -78,7 +78,6 @@ def compare_profiles(
         unknown_profile: dict[str, str | dict[str, float]],
         profile_to_compare: dict[str, str | dict[str, float]]
 ) -> float | None:
-
     """
     Compares profiles and calculates the distance using symbols
     :param unknown_profile: a dictionary of an unknown profile
@@ -131,7 +130,7 @@ def load_profile(path_to_file: str) -> dict | None:
     Loads a language profile
     :param path_to_file: a path to the language profile
     :return: a dictionary with at least two keys – name, freq
-     """
+    """
 
 
 def preprocess_profile(profile: dict) -> dict[str, str | dict] | None:

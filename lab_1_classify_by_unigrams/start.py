@@ -2,7 +2,6 @@
 Language detection starter
 """
 
-
 def main() -> None:
     """
     Launches an implementation
