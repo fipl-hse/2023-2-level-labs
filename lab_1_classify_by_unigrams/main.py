@@ -11,7 +11,7 @@ def tokenize(text: str) -> list[str] | None:
     :param text: a text
     :return: a list of lower-cased tokens without punctuation
     """
-    if type(text) != str:
+    if not isinstance(text, str):
         return None
     tokens = []
     text = text.lower()
@@ -26,10 +26,10 @@ def calculate_frequencies(tokens: list[str] | None) -> dict[str, float] | None:
     :param tokens: a list of tokens
     :return: a dictionary with frequencies
     """
-    if type(tokens) != list:
+    if not isinstance(tokens, list):
         return None
     for i in tokens:
-        if type(i) != str:
+        if not isinstance(i, str):
             return None
     dictionary = {}
     length = len(tokens)
@@ -47,7 +47,7 @@ def create_language_profile(language: str, text: str) -> dict[str, str | dict[st
     :param text: a text
     :return: a dictionary with two keys – name, freq
     """
-    if type(language) != str or type(text) != str:
+    if not isinstance(language, str) or not isinstance(text, str):
         return None
     new_dictionary = {}
     text = tokenize(text)
@@ -63,7 +63,7 @@ def calculate_mse(predicted: list, actual: list) -> float | None:
     :param actual: a list of actual values
     :return: the score
     """
-    if type(predicted) != list or type(actual) != list or len(predicted) != len(actual):
+    if not isinstance(predicted, list) or not isinstance(actual, list) != list or len(predicted) != len(actual):
         return None
     cubs = 0
     n = len(actual)
@@ -85,7 +85,7 @@ def compare_profiles(
     :param profile_to_compare: a dictionary of a profile to compare the unknown profile to
     :return: the distance between the profiles
     """
-    if type(unknown_profile) != dict or type(profile_to_compare) != dict:
+    if not isinstance(unknown_profile, dict) or not isinstance(profile_to_compare, dict):
         return None
     key1 = 'name'
     key2 = 'freq'
@@ -118,7 +118,7 @@ def detect_language(
     :param profile_2: a dictionary of a known profile
     :return: a language
     """
-    if type(unknown_profile) != dict or type(profile_1) != dict or type(profile_2) != dict:
+    if not isinstance(unknown_profile, dict) or not isinstance(profile_1, dict) or not isinstance(profile_2, dict):
         return None
     if compare_profiles(unknown_profile, profile_1) < compare_profiles(unknown_profile, profile_2):
         return profile_1['name']
