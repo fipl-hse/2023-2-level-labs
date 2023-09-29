@@ -91,9 +91,11 @@ def compare_profiles(
     unknown_freq = unknown_profile['freq']
     compare_freq = profile_to_compare['freq']
     mutual_characters = [[], []]
+
     if not isinstance(unknown_freq, dict) or \
             not isinstance(compare_freq, dict):
         return None
+
     for character in (unknown_freq | compare_freq):
         if character in unknown_freq:
             mutual_characters[0].append(unknown_freq[character])
