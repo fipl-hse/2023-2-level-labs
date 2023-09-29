@@ -129,12 +129,15 @@ def detect_language(
     profile_1_metric = compare_profiles(unknown_profile, profile_1)
     profile_2_metric = compare_profiles(unknown_profile, profile_2)
 
-    if profile_1_metric > profile_2_metric:
-        return profile_2['name']
-    elif profile_1_metric < profile_2_metric:
-        return profile_1['name']
-    else:
-        return sorted([profile_1['name'], profile_2['name']])
+    if (isinstance(profile_1_metric, float)
+            and isinstance(profile_2_metric, float)
+    ):
+        if profile_1_metric > profile_2_metric:
+            return profile_2['name']
+        elif profile_1_metric < profile_2_metric:
+            return profile_1['name']
+
+    return sorted([profile_1['name'], profile_2['name']])
 
 
 def load_profile(path_to_file: str) -> dict | None:
