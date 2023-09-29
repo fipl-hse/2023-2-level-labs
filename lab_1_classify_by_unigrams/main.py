@@ -51,6 +51,9 @@ def create_language_profile(language: str, text: str) -> dict[str, str | dict[st
     tokens = tokenize(text)
     frequency_dict = calculate_frequencies(tokens)
     language_profile = {'name': language, 'freq': frequency_dict}
+
+    if not isinstance(language_profile, dict):
+        return None
     return language_profile
 
 
@@ -137,7 +140,7 @@ def detect_language(
         elif profile_1_metric < profile_2_metric:
             return profile_1['name']
 
-    return sorted([profile_1['name'], profile_2['name']])
+    return [profile_1['name'], profile_2['name']].sort()
 
 
 def load_profile(path_to_file: str) -> dict | None:
