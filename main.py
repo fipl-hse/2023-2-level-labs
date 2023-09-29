@@ -1,1 +1,1 @@
-print('Hello, World!')
+def tokenize(text: str) -> list[str] | None:
