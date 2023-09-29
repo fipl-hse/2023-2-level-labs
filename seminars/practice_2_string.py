@@ -63,15 +63,13 @@ def multiply_string(input_string: str, how_many: int) -> str:
 
 
 # Task 2:
-def front_times(newstring :str, how_many : int, slicenumber :int = 3) -> str:
+def front_times(input_string: str, how_many: int) -> str:
     """
     Given the string, take its three leading characters
     and display them that many times as in `how_many`.
     """
     # student realisation goes here
-    newstring = newstring[:slicenumber] * how_many
-    print(newstring)
-front_times('string',4)
+
 
 # Function calls with expected result:
 # front_times('Chocolate', 2) → 'ChoCho'
@@ -83,25 +81,19 @@ front_times('string',4)
 
 
 # Task 3:
-def extra_end(input_string: str, how_many : int, start :int, reversing) -> str:
+def extra_end(input_string: str) -> str:
     """
     Given the string, take its two last characters and display them three times.
     """
     # student realisation goes here
-    start = -start
-    a = input_string[start::] * how_many
 
-    if reversing:
-        print(a[::-1])
-    else:
-        print(a)
 
 # Function calls with expected result:
 # extra_end('Hello') → 'lololo'
 # extra_end('ab') → 'ababab'
 # extra_end('Hi') → 'HiHiHi'
 # extra_end('Code') → 'dedede'
-extra_end('hello',5,2, True)
+
 
 # Task 4:
 def make_abba(first_string: str, second_string: str) -> str:
@@ -109,15 +101,13 @@ def make_abba(first_string: str, second_string: str) -> str:
     Given two strings, concatenate them as a reflection.
     """
     # student realisation goes here
-    new_string = first_string + second_string + second_string + first_string
-    print(new_string)
 
 
 # make_abba('Hi', 'Bye') → 'HiByeByeHi'
 # make_abba('Yo', 'Alice') → 'YoAliceAliceYo'
 # make_abba('What', 'Up') → 'WhatUpUpWhat'
 # make_abba('', 'y') → 'yy'
-make_abba('Hi', 'Bye')
+
 
 # Task 5
 def reverse_word(sentence: str) -> str:
@@ -129,13 +119,6 @@ def reverse_word(sentence: str) -> str:
     Spaces will be included only when more than one word is present.
     """
     # student realisation goes here
-    list_of_words = sentence.split(' ')
-    for i,word in enumerate(list_of_words):
-        if len(word) >= 5:
-            contrword = word[::-1]
-            list_of_words[i] = contrword
-        new_sentence = ' '.join(list_of_words)
-    print(new_sentence)
 
 
 # reverse_word("Hey fellow warriors") == "Hey wollef sroirraw"
@@ -143,7 +126,7 @@ def reverse_word(sentence: str) -> str:
 # reverse_word("This is a test") == "This is a test"
 #
 # reverse_word("This is another test") == "This is rehtona test"
-reverse_word('Hey fellow warriors')
+
 
 # Task 6
 def generate_hashtag(input_string: str) -> str:
@@ -164,18 +147,13 @@ def generate_hashtag(input_string: str) -> str:
     """
     # student realisation goes here
 
+
 # Task 7:
 def combo_string(first_string: str, second_string: str) -> str:
     """
     Given two strings, concatenate like the following: shorter+longer+shorter
     """
     # student realisation goes here
-    short_string = ''
-    long_string = ''
-
-    if len(first_string) > len(second_string):
-        print(second_string + first_string + second_string)
-
 
 
 # combo_string('Hello', 'hi') → 'hiHellohi'
@@ -184,7 +162,7 @@ def combo_string(first_string: str, second_string: str) -> str:
 # combo_string('', 'bb') → 'bb'
 # combo_string('aaa', '1234') → 'aaa1234aaa'
 # combo_string('bb', 'a') → 'abba'
-combo_string('Hello','hi')
+
 
 # Task 1: advanced
 def string_splosion(input_string: str) -> str:
@@ -192,11 +170,6 @@ def string_splosion(input_string: str) -> str:
     Given the string, format it like in the example.
     """
     # student realisation goes here
-    new_string = ''
-    for i in range(len(input_string) + 1):
-        new_string += input_string[:i]
-    print(new_string)
-string_splosion('Kitten')
 
 
 # Function calls with expected result:
