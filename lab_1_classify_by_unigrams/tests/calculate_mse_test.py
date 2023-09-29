@@ -15,7 +15,6 @@ class CalculateMSETest(unittest.TestCase):
     """
 
     @pytest.mark.lab_1_classify_by_unigrams
-    @pytest.mark.mark6
     @pytest.mark.mark8
     @pytest.mark.mark10
     def test_calculate_mse_ideal(self):
@@ -33,7 +32,6 @@ class CalculateMSETest(unittest.TestCase):
         self.assertAlmostEqual(expected, actual, delta=1e-4)
 
     @pytest.mark.lab_1_classify_by_unigrams
-    @pytest.mark.mark6
     @pytest.mark.mark8
     @pytest.mark.mark10
     def test_calculate_mse_bad_input_length(self):
@@ -51,7 +49,6 @@ class CalculateMSETest(unittest.TestCase):
         self.assertEqual(expected, actual)
 
     @pytest.mark.lab_1_classify_by_unigrams
-    @pytest.mark.mark6
     @pytest.mark.mark8
     @pytest.mark.mark10
     def test_calculate_mse_bad_input_predicted(self):
@@ -68,7 +65,6 @@ class CalculateMSETest(unittest.TestCase):
         self.assertEqual(expected, actual)
 
     @pytest.mark.lab_1_classify_by_unigrams
-    @pytest.mark.mark6
     @pytest.mark.mark8
     @pytest.mark.mark10
     def test_calculate_mse_bad_input_actual(self):

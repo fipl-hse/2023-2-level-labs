@@ -15,7 +15,6 @@ class CompareProfilesTest(unittest.TestCase):
     """
 
     @pytest.mark.lab_1_classify_by_unigrams
-    @pytest.mark.mark6
     @pytest.mark.mark8
     @pytest.mark.mark10
     def test_compare_profiles_ideal(self):
@@ -44,7 +43,6 @@ class CompareProfilesTest(unittest.TestCase):
         self.assertAlmostEqual(expected, actual, delta=1e-4)
 
     @pytest.mark.lab_1_classify_by_unigrams
-    @pytest.mark.mark6
     @pytest.mark.mark8
     @pytest.mark.mark10
     def test_compare_profiles_no_intersections_ideal(self):
@@ -70,7 +68,6 @@ class CompareProfilesTest(unittest.TestCase):
         self.assertEqual(expected, actual)
 
     @pytest.mark.lab_1_classify_by_unigrams
-    @pytest.mark.mark6
     @pytest.mark.mark8
     @pytest.mark.mark10
     def test_compare_profiles_identical(self):
@@ -98,7 +95,6 @@ class CompareProfilesTest(unittest.TestCase):
         self.assertEqual(expected, actual)
 
     @pytest.mark.lab_1_classify_by_unigrams
-    @pytest.mark.mark6
     @pytest.mark.mark8
     @pytest.mark.mark10
     def test_compare_profiles_bad_input_type(self):
@@ -118,7 +114,6 @@ class CompareProfilesTest(unittest.TestCase):
         self.assertEqual(expected, actual)
 
     @pytest.mark.lab_1_classify_by_unigrams
-    @pytest.mark.mark6
     @pytest.mark.mark8
     @pytest.mark.mark10
     def test_compare_profiles_bad_input_profile(self):
