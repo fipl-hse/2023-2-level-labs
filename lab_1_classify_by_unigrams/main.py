@@ -14,7 +14,6 @@ def tokenize(text: str) -> list[str] | None:
     if isinstance(text, str) == False:
         return None
     tokens = [t for t in text.lower() if (t.isalpha() and t != 'º')]
-    tokens.sort()
     return tokens
 
 def calculate_frequencies(tokens: list[str] | None) -> dict[str, float] | None:
@@ -23,23 +22,22 @@ def calculate_frequencies(tokens: list[str] | None) -> dict[str, float] | None:
     :param tokens: a list of tokens
     :return: a dictionary with frequencies
     """
-    if isinstance(tokens, list) == True:
-        for token in tokens:
-            if isinstance(token, str) == False:
-                return None
-        dict_tokens = {}
-        all_tokens = 0
-        for token in tokens:
-            all_tokens += 1
-            num_token = tokens.count(token)
-            dict_tokens[token] = num_token
-        dict_freq = {}
-        for key, value in dict_tokens.items():
-            freq = value/all_tokens
-            dict_freq[key] = freq
-        return dict_freq
-    else:
+    if isinstance(tokens, list) == False:
         return None
+    for token in tokens:
+        if isinstance(token, str) == False:
+            return None
+    dict_tokens = {}
+    all_tokens = 0
+    for token in tokens:
+        all_tokens += 1
+        num_token = tokens.count(token)
+        dict_tokens[token] = num_token
+    dict_freq = {}
+    for key, value in dict_tokens.items():
+        freq = value/all_tokens
+        dict_freq[key] = freq
+    return dict_freq
 
 
 def create_language_profile(language: str, text: str) -> dict[str, str | dict[str, float]] | None:
@@ -49,6 +47,8 @@ def create_language_profile(language: str, text: str) -> dict[str, str | dict[st
     :param text: a text
     :return: a dictionary with two keys – name, freq
     """
+    if isinstance(language, str) == False or isinstance(text, str) == False:
+        return None
     lang_profile = {}
     lang_profile['name'] = language
     lang_profile['freq'] = calculate_frequencies(tokenize(text))
@@ -62,14 +62,13 @@ def calculate_mse(predicted: list, actual: list) -> float | None:
     :param actual: a list of actual values
     :return: the score
     """
-    if isinstance(predicted, list) and isinstance(actual, list) == True and len(predicted) == len(actual):
-        sum_diff = 0
-        for i in range(0, len(predicted)):
-            sum_diff += (actual[i] - predicted[i]) ** 2
-        mse = sum_diff / len (predicted)
-        return mse
-    else:
+    if isinstance(predicted, list) == False or isinstance(actual, list) == False or len(predicted) != len(actual):
         return None
+    sum_diff = 0
+    for i in range(0, len(predicted)):
+        sum_diff += (actual[i] - predicted[i]) ** 2
+    mse = sum_diff / len (predicted)
+    return mse
 
 
 def compare_profiles(
@@ -82,36 +81,39 @@ def compare_profiles(
     :param profile_to_compare: a dictionary of a profile to compare the unknown profile to
     :return: the distance between the profiles
     """
-    if isinstance(unknown_profile, dict) and isinstance(profile_to_compare, dict) == True:
-        if ('name' and 'freq' in unknown_profile) and ('name' and 'freq' in profile_to_compare) == True:
-
-            predicted_tokens = profile_to_compare.get('freq')
-            actual_tokens = unknown_profile.get('freq')
-
-            for key in predicted_tokens.keys():
-                if key in actual_tokens == False:
-                    actual_tokens[key] = 0
-
-            for key in actual_tokens.keys():
-                if key in predicted_tokens == False:
-                    predicted_tokens[key] = 0
-
-            predicted = []
-            for value in predicted_tokens.values():
-                predicted.append(value)
-            predicted.sort()
-
-            actual = []
-            for value in actual_tokens.values():
-                actual.append(value)
-            actual.sort()
-
-            mse = calculate_mse(predicted, actual)
-            return mse
-        else:
-            return None
-    else:
+    if isinstance(unknown_profile, dict) == False or isinstance(profile_to_compare, dict) == False:
         return None
+    if ('name' or 'freq' not in unknown_profile) or ('name' or 'freq' not in profile_to_compare):
+        return None
+    #if len(unknown_profile) != len(profile_to_compare):
+        #return None
+
+    sorted_profile_to_compare = dict(sorted(profile_to_compare.items()))
+    sorted_unknown_profile = dict(sorted(unknown_profile.items()))
+
+    predicted_tokens = sorted_profile_to_compare.get('freq')
+    actual_tokens = sorted_unknown_profile.get('freq')
+
+    for key in predicted_tokens.keys():
+        if key not in actual_tokens:
+            actual_tokens[key] = 0
+
+    for key in actual_tokens.keys():
+        if key not in predicted_tokens:
+            predicted_tokens[key] = 0
+
+    predicted = []
+    for value in predicted_tokens.values():
+        predicted.append(value)
+
+    actual = []
+    for value in actual_tokens.values():
+        actual.append(value)
+
+    mse = calculate_mse(predicted, actual)
+    mse = round(mse, 3)
+    return mse
+
 
 
 
