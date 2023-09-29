@@ -52,7 +52,8 @@ def create_language_profile(language: str, text: str) -> dict[str, str | dict[st
     new_dictionary = {}
     text = tokenize(text)
     freq = calculate_frequencies(text)
-    new_dictionary[language] = freq
+    new_dictionary['name'] = language
+    new_dictionary['freq'] = freq
     return new_dictionary
 
 def calculate_mse(predicted: list, actual: list) -> float | None:
@@ -77,8 +78,9 @@ def compare_profiles(
         unknown_profile: dict[str, str | dict[str, float]],
         profile_to_compare: dict[str, str | dict[str, float]]
 ) -> float | None:
+
     """
-     Compares profiles and calculates the distance using symbols
+    Compares profiles and calculates the distance using symbols
     :param unknown_profile: a dictionary of an unknown profile
     :param profile_to_compare: a dictionary of a profile to compare the unknown profile to
     :return: the distance between the profiles
@@ -89,27 +91,18 @@ def compare_profiles(
     key2 = 'freq'
     if key1 not in unknown_profile or key2 not in unknown_profile or key1 not in profile_to_compare or key2 not in profile_to_compare:
         return None
-    new_list = []
-    list1 = []
-    list2 = []
+    unknown_list = []
+    compare_list = []
     unknown_freq = unknown_profile['freq']
     compare_freq = profile_to_compare['freq']
-    unknown_list = list(unknown_freq.values())
-    compare_list = list(compare_freq.values())
-    new_list = unknown_list + compare_list
-    new = list(set(new_list))
-    for i in range(len(new)):
-        if new[i] in unknown_freq.keys():
-            list1.append(unknown_freq[new[i]])
-        else:
-            list1.append(float(0))
-    for i in range(len(new)):
-        if new[i] in compare_freq.keys():
-            list2.append(compare_freq[new[i]])
-        else:
-            list2.append(float(0))
-    mse = calculate_mse(list1, list2)
-    return round(mse, 3)
+    unknown = list(unknown_freq.keys())
+    compare = list(compare_freq.keys())
+    all_freq = list(set(unknown + compare))
+    for i in all_freq:
+        unknown_list.append(unknown_freq.get(i, 0))
+        compare_list.append(compare_freq.get(i, 0))
+    mse = calculate_mse(unknown_list, compare_list)
+    return mse
 
 
 
