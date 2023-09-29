@@ -1,10 +1,11 @@
 """
 Language detection starter
 """
+from main import create_language_profile
+from main import detect_language
 
 
 def main():
-    from main import create_language_profile
     """
     Launches an implementation
     """
@@ -16,7 +17,10 @@ def main():
         unknown_text = file_to_read_unk.read()
     #result = None
     #assert result, "Detection result is None"
-    print(create_language_profile('en', en_text))
+    en_text_profile = create_language_profile('en', en_text)
+    de_text_profile = create_language_profile('de', de_text)
+    unknown_text_profile = create_language_profile('unknown', unknown_text)
+    print(detect_language(unknown_text_profile, en_text_profile, de_text_profile))
 
 
 
