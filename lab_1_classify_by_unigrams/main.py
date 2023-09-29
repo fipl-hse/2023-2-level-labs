@@ -13,13 +13,12 @@ def tokenize(text: str) -> list[str] | None:
     if not isinstance(text, str):
         return None
 
-    else:
-        tokens = []
-        text = text.lower()
-        for i in text:
-            if i.isalpha():
-                tokens.append(i)
-        return tokens
+    tokens = []
+    text = text.lower()
+    for i in text:
+        if i.isalpha():
+            tokens.append(i)
+    return tokens
 
 
 def calculate_frequencies(tokens: list[str] | None) -> dict[str, float] | None:
@@ -33,9 +32,8 @@ def calculate_frequencies(tokens: list[str] | None) -> dict[str, float] | None:
     ):
         return None
 
-    else:
-        frequency_dict = {el: (tokens.count(el) / len(tokens)) for el in tokens}
-        return frequency_dict
+    frequency_dict = {el: (tokens.count(el) / len(tokens)) for el in tokens}
+    return frequency_dict
 
 
 def create_language_profile(language: str, text: str) -> dict[str, str | dict[str, float]] | None:
@@ -50,11 +48,10 @@ def create_language_profile(language: str, text: str) -> dict[str, str | dict[st
     ):
         return None
 
-    else:
-        tokens = tokenize(text)
-        frequency_dict = calculate_frequencies(tokens)
-        language_profile = {'name': language, 'freq': frequency_dict}
-        return language_profile
+    tokens = tokenize(text)
+    frequency_dict = calculate_frequencies(tokens)
+    language_profile = {'name': language, 'freq': frequency_dict}
+    return language_profile
 
 
 def calculate_mse(predicted: list, actual: list) -> float | None:
@@ -69,12 +66,11 @@ def calculate_mse(predicted: list, actual: list) -> float | None:
     ):
          return None
 
-    else:
-        sum_diff = 0
-        for i, value in enumerate(predicted):
-            sum_diff += (value - actual[i]) ** 2
-        mse = sum_diff / len(predicted)
-        return mse
+    sum_diff = 0
+    for i, value in enumerate(predicted):
+        sum_diff += (value - actual[i]) ** 2
+    mse = sum_diff / len(predicted)
+    return mse
 
 def compare_profiles(
         unknown_profile: dict[str, str | dict[str, float]],
@@ -92,14 +88,17 @@ def compare_profiles(
     ):
         return None
 
-    else:
-        unknown_profile_freq = unknown_profile['freq']
-        profile_to_compare_freq = profile_to_compare['freq']
-        actual = list(unknown_profile_freq.values())
-        predicted = list(profile_to_compare_freq.values())
-        mse = calculate_mse(predicted, actual)
-        rounded_mse = round(mse, 3)
-        return rounded_mse
+    unknown_tokens = set(unknown_profile.get('freq').keys())
+    compare_tokens = set(profile_to_compare.get('freq').keys())
+    all_tokens = unknown_tokens | compare_tokens
+    unknown_freq = []
+    compare_freq = []
+    for token in all_tokens:
+        unknown_freq.append(unknown_profile['freq'].get(token, 0))
+        compare_freq.append(profile_to_compare['freq'].get(token, 0))
+
+    calculated_mse = calculate_mse(unknown_freq, compare_freq)
+    return calculated_mse
 
 
 def detect_language(
@@ -120,15 +119,14 @@ def detect_language(
     ):
         return None
 
+    profile_1_metric = compare_profiles(unknown_profile, profile_1)
+    profile_2_metric = compare_profiles(unknown_profile, profile_2)
+    if profile_1_metric > profile_2_metric:
+        return profile_2['name']
+    elif profile_1_metric == profile_2_metric:
+        return [profile_1['name'], profile_2['name']].sort()
     else:
-        profile_1_metric = compare_profiles(unknown_profile, profile_1)
-        profile_2_metric = compare_profiles(unknown_profile, profile_2)
-        if profile_1_metric > profile_2_metric:
-            return profile_2['name']
-        elif profile_1_metric == profile_2_metric:
-            return [profile_1['name'], profile_2['name']].sort()
-        else:
-            return profile_1['name']
+        return profile_1['name']
 
 
 def load_profile(path_to_file: str) -> dict | None:
