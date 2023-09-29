@@ -16,8 +16,7 @@ def tokenize(text: str) -> list[str] | None:
         return None
 
     split_text = list(text.lower())
-    tokens = [i for i in split_text if i.isalpha()]
-    return tokens
+    return [i for i in split_text if i.isalpha()]
 
 
 def calculate_frequencies(tokens: list[str] | None) -> dict[str, float] | None:
@@ -32,8 +31,7 @@ def calculate_frequencies(tokens: list[str] | None) -> dict[str, float] | None:
     for i in tokens:
         if not isinstance(i, str):
             return None
-    freq_dict = {i: tokens.count(i) / len(tokens) for i in tokens}
-    return freq_dict
+    return {i: tokens.count(i) / len(tokens) for i in tokens}
 
 
 def create_language_profile(language: str, text: str) -> dict[str, str | dict[str, float]] | None:
@@ -48,11 +46,10 @@ def create_language_profile(language: str, text: str) -> dict[str, str | dict[st
         return None
 
     tokens = tokenize(text)
-    profile = {
+    return {
         "name": language,
         "freq": calculate_frequencies(tokens)
     }
-    return profile
 
 
 def calculate_mse(predicted: list, actual: list) -> float | None:
@@ -68,9 +65,7 @@ def calculate_mse(predicted: list, actual: list) -> float | None:
             or len(predicted) != len(actual)
     ):
         return None
-
-    mse = sum([(i - j) ** 2 for i, j in zip(actual, predicted)]) / len(actual)
-    return mse
+    return sum([(i - j) ** 2 for i, j in zip(actual, predicted)]) / len(actual)
 
 
 def compare_profiles(
@@ -94,8 +89,7 @@ def compare_profiles(
     all_tokens = set(unknown_profile['freq'].keys()) | set(profile_to_compare['freq'].keys())
     language1 = [unknown_profile['freq'].get(token, 0) for token in all_tokens]
     language2 = [profile_to_compare['freq'].get(token, 0) for token in all_tokens]
-    distance = calculate_mse(language1, language2)
-    return distance
+    return calculate_mse(language1, language2)
 
 
 def detect_language(
@@ -127,7 +121,7 @@ def detect_language(
     if distance1 < distance2:
         language_detected = str(profile_1['name'])
     if distance1 == distance2:
-        language_detected = [profile_1['name'], profile_2['name']].sort()
+        language_detected = [profile_1['name'], profile_2['name']].sorted()
     return language_detected
 
 
