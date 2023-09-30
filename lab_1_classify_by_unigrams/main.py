@@ -137,8 +137,11 @@ def detect_language(
                 sorted_names = sorted(names)
                 sorted_name = sorted_names[0]
                 return sorted_name
+
     if isinstance(profile_2['name'], str):
         return profile_2['name']
+    return None
+
 
 
 def load_profile(path_to_file: str) -> dict | None:
