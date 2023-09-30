@@ -1,8 +1,8 @@
 """
 Language detection starter
 """
-from lab_1_classify_by_unigrams.main import tokenize
-from lab_1_classify_by_unigrams.main import create_language_profile
+
+from lab_1_classify_by_unigrams.main import tokenize, create_language_profile
 
 
 def main() -> None:
@@ -16,9 +16,10 @@ def main() -> None:
     with open("assets/texts/unknown.txt", "r", encoding="utf-8") as file_to_read_unk:
         unknown_text = file_to_read_unk.read()
     result = None
-    assert result, "Detection result is None"
     print(tokenize(en_text))
     print(create_language_profile('en', en_text))
+    assert result, "Detection result is None"
+
 
 
 
