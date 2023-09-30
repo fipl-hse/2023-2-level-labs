@@ -69,8 +69,8 @@ def calculate_mse(predicted: list, actual: list) -> float | None:
         return None
     cubs = 0
     length = len(actual)
-    for i, letter in enumerate(actual):
-        cubs += (actual[i] - predicted[i]) ** 2
+    for i, letter in enumerate(predicted):
+        cubs += (letter - actual[i]) ** 2
     mse = cubs / length
     return mse
 
