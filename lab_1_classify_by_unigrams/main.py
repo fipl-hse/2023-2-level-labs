@@ -16,7 +16,7 @@ def tokenize(text: str) -> list[str] | None:
     text = text.lower()
     tokens = []
     for token in text:
-        if token.isalpha() and token != 'º':
+        if token.isalpha():
             tokens.append(token)
     return tokens
 
@@ -69,8 +69,6 @@ def calculate_mse(predicted: list, actual: list) -> float | None:
     if not isinstance(predicted, list) or not isinstance(actual, list):
         return None
     mse_sum = 0
-    predicted.pop(0)
-    actual.pop(0)
     for index, element in enumerate(predicted):
         mse_sum += (element - actual[index]) ** 2
     mse = mse_sum / len(predicted)
@@ -95,18 +93,18 @@ def compare_profiles(
     all_tokens = []
     unk_prof_freq = []
     prof_comp_freq = []
-    for letter in unknown_profile:
+    for letter in unknown_profile['freq']:
         all_tokens.append(letter)
-    for letter in profile_to_compare:
+    for letter in profile_to_compare['freq']:
         if letter not in all_tokens:
             all_tokens.append(letter)
     for token in all_tokens:
-        if token in unknown_profile:
-            unk_prof_freq.append(unknown_profile[token])
+        if token in unknown_profile['freq']:
+            unk_prof_freq.append(unknown_profile['freq'][token])
         else:
             unk_prof_freq.append(0)
-        if token in profile_to_compare:
-            prof_comp_freq.append(profile_to_compare[token])
+        if token in profile_to_compare['freq']:
+            prof_comp_freq.append(profile_to_compare['freq'][token])
         else:
             prof_comp_freq.append(0)
     return calculate_mse(unk_prof_freq, prof_comp_freq)
@@ -131,11 +129,11 @@ def detect_language(
     mse1 = compare_profiles(unknown_profile, profile_1)
     mse2 = compare_profiles(unknown_profile, profile_2)
     if mse1 > mse2:
-        return profile_2.keys()
+        return profile_2['name']
     elif mse1 < mse2:
-        return profile_1.keys()
+        return profile_1['name']
     else:
-        both_keys = [profile_1.keys(), profile_2.keys()]
+        both_keys = [profile_1['name'], profile_2['name']]
         both_keys.sort()
         return both_keys[0]
 

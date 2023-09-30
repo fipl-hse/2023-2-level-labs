@@ -4,7 +4,6 @@ Language detection starter
 from main import create_language_profile
 from main import detect_language
 
-
 def main():
     """
     Launches an implementation
