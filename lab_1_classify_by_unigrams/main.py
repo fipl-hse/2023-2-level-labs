@@ -49,12 +49,11 @@ def create_language_profile(language: str, text: str) -> dict[str, str | dict[st
     """
     if not isinstance(language, str) or not isinstance(text, str):
         return None
-    new_dictionary = {}
-    text = tokenize(text)
-    freq = calculate_frequencies(text)
-    new_dictionary['name'] = language
-    new_dictionary['freq'] = freq
-    return new_dictionary
+    tokens = tokenize(text)
+    freq_of_tokens = calculate_frequencies(tokens)
+    if isinstance(freq_of_tokens, dict):
+        return {'name': language, 'freq': freq_of_tokens}
+    return None
 
 def calculate_mse(predicted: list, actual: list) -> float | None:
     """
@@ -126,13 +125,20 @@ def detect_language(
             not isinstance(profile_1, dict) or\
             not isinstance(profile_2, dict):
         return None
-    if compare_profiles(unknown_profile, profile_1) < compare_profiles(unknown_profile, profile_2):
-        return profile_1['name']
-    if compare_profiles(unknown_profile, profile_1) == compare_profiles(unknown_profile, profile_2):
-        names = list(profile_1['name'] + profile_2['name'])
-        sorted_names = sorted(names)
-        return sorted_names[0]
-    return profile_2['name']
+    comparison_1 = compare_profiles(unknown_profile, profile_1)
+    comparison_2 = compare_profiles(unknown_profile, profile_2)
+    if isinstance(comparison_1, float) and isinstance(comparison_2, float):
+        if comparison_1 < comparison_2:
+            if isinstance(profile_1['name'], str):
+                return profile_1['name']
+        if comparison_1 == comparison_2:
+            if isinstance(profile_1['name'], str) and isinstance(profile_2['name'], str):
+                names = list(profile_1['name'] + profile_2['name'])
+                sorted_names = sorted(names)
+                sorted_name = sorted_names[0]
+                return sorted_name
+    if isinstance(profile_2['name'], str):
+        return profile_2['name']
 
 
 def load_profile(path_to_file: str) -> dict | None:
