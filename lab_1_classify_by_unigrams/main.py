@@ -88,7 +88,7 @@ def compare_profiles(
     """
     if not isinstance(unknown_profile, dict) or not isinstance(profile_to_compare, dict):
         return None
-    if 'name' and 'freq' not in unknown_profile and profile_to_compare:
+    if ('name' or 'freq') not in (unknown_profile or profile_to_compare):
         return None
     all_tokens = []
     unk_prof_freq = []
@@ -122,9 +122,9 @@ def detect_language(
     :param profile_2: a dictionary of a known profile
     :return: a language
     """
-    if not (isinstance(unknown_profile, dict)
-            or isinstance(profile_1, dict)
-            or isinstance(profile_2, dict)):
+    if (not isinstance(unknown_profile, dict)
+            or not isinstance(profile_1, dict)
+            or not isinstance(profile_2, dict)):
         return None
     mse1 = compare_profiles(unknown_profile, profile_1)
     mse2 = compare_profiles(unknown_profile, profile_2)
