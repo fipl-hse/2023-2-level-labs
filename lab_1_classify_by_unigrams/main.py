@@ -35,7 +35,7 @@ def calculate_frequencies(tokens: list[str] | None) -> dict[str, float] | None:
     frequency_dict = {}
     tokens_number = len(tokens)
     for token in tokens:
-        if type(token) != str:
+        if not isinstance(token, str):
             return None
         token_frequency = tokens.count(token)
         frequency_dict[token] = token_frequency / tokens_number
@@ -110,6 +110,7 @@ def compare_profiles(
     return calculate_mse(unk_prof_freq, prof_comp_freq)
 
 
+
 def detect_language(
         unknown_profile: dict[str, str | dict[str, float]],
         profile_1: dict[str, str | dict[str, float]],
@@ -130,12 +131,13 @@ def detect_language(
     mse2 = compare_profiles(unknown_profile, profile_2)
     if mse1 > mse2:
         return profile_2['name']
-    elif mse1 < mse2:
+    if mse1 < mse2:
         return profile_1['name']
-    else:
+    if mse1 == mse2:
         both_keys = [profile_1['name'], profile_2['name']]
         both_keys.sort()
         return both_keys[0]
+
 
 
 def load_profile(path_to_file: str) -> dict | None:
