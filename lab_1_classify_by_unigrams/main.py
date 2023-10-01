@@ -46,10 +46,14 @@ def create_language_profile(language: str, text: str) -> dict[str, str | dict[st
         return None
 
     tokens = tokenize(text)
-    return {
+    freq_dict = {
         "name": language,
         "freq": calculate_frequencies(tokens)
     }
+    if not isinstance(freq_dict, dict):
+        return None
+
+    return freq_dict
 
 
 def calculate_mse(predicted: list, actual: list) -> float | None:
@@ -112,10 +116,6 @@ def detect_language(
 
     distance1 = compare_profiles(unknown_profile, profile_1)
     distance2 = compare_profiles(unknown_profile, profile_2)
-
-    if not (isinstance(distance1, float)
-            and isinstance(distance2, float)):
-        return None
 
     if distance1 > distance2:
         language_detected = str(profile_2['name'])
