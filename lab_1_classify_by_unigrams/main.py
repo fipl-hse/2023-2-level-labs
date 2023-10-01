@@ -148,11 +148,7 @@ def load_profile(path_to_file: str) -> dict | None:
     :param path_to_file: a path to the language profile
     :return: a dictionary with at least two keys – name, freq
     """
-    if type(path_to_file) != str:
-        return None
-    import json
-    profile = json.loads(path_to_file)
-    return profile
+
 
 
 def preprocess_profile(profile: dict) -> dict[str, str | dict] | None:
