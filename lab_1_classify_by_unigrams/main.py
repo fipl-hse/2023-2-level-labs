@@ -117,13 +117,16 @@ def detect_language(
     distance1 = compare_profiles(unknown_profile, profile_1)
     distance2 = compare_profiles(unknown_profile, profile_2)
 
-    if distance1 > distance2:
-        language_detected = str(profile_2['name'])
-    if distance1 < distance2:
-        language_detected = str(profile_1['name'])
-    if distance1 == distance2:
-        language_detected = [profile_1['name'], profile_2['name']].sort()
-    return language_detected
+    if (
+            isinstance(distance1, float)
+            and isinstance(distance2, float)
+    ):
+
+        if distance1 > distance2:
+            return str(profile_2['name'])
+        if distance1 < distance2:
+            return str(profile_1['name'])
+    return [profile_1['name'], profile_2['name']].sort()
 
 
 def load_profile(path_to_file: str) -> dict | None:
