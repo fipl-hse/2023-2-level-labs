@@ -51,9 +51,10 @@ def create_language_profile(language: str, text: str) -> dict[str, str | dict[st
     """
     if not isinstance(language, str) or not isinstance(text, str):
         return None
-    text = calculate_frequencies(tokenize(text))
-    language_profile = {'name': language, 'freq': text}
-    return language_profile
+    frequencies = calculate_frequencies(tokenize(text))
+    if isinstance(frequencies, dict):
+        return {'name': language, 'freq': frequencies}
+    return None
 
 
 
@@ -93,18 +94,18 @@ def compare_profiles(
     all_tokens = []
     unk_prof_freq = []
     prof_comp_freq = []
-    for letter in unknown_profile['freq']:
+    for letter in unknown_profile.get('freq'):
         all_tokens.append(letter)
-    for letter in profile_to_compare['freq']:
+    for letter in profile_to_compare.get('freq'):
         if letter not in all_tokens:
             all_tokens.append(letter)
     for token in all_tokens:
         if token in unknown_profile['freq']:
-            unk_prof_freq.append(unknown_profile['freq'][token])
+            unk_prof_freq.append(unknown_profile['freq'].get(token))
         else:
             unk_prof_freq.append(0)
         if token in profile_to_compare['freq']:
-            prof_comp_freq.append(profile_to_compare['freq'][token])
+            prof_comp_freq.append(profile_to_compare['freq'].get(token))
         else:
             prof_comp_freq.append(0)
     return calculate_mse(unk_prof_freq, prof_comp_freq)
@@ -129,14 +130,18 @@ def detect_language(
         return None
     mse1 = compare_profiles(unknown_profile, profile_1)
     mse2 = compare_profiles(unknown_profile, profile_2)
-    if mse1 > mse2:
-        return profile_2['name']
-    if mse1 < mse2:
-        return profile_1['name']
-    if mse1 == mse2:
-        both_keys = [profile_1['name'], profile_2['name']]
-        both_keys.sort()
-        return both_keys[0]
+    name_1 = str(profile_1['name'])
+    name_2 = str(profile_2['name'])
+    if isinstance(mse1, float) and isinstance(mse2, float):
+        if mse1 > mse2:
+            return name_2
+        if mse1 < mse2:
+            return name_1
+        if mse1 == mse2:
+            both_keys = [name_1, name_2]
+            both_keys.sort()
+            return both_keys[0]
+    return None
 
 
 
