@@ -2,6 +2,7 @@
 Language detection starter
 """
 from main import tokenize, calculate_frequencies, create_language_profile
+
 def main() -> None:
     """
     Launches an implementation
