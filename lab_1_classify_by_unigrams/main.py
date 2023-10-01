@@ -69,8 +69,12 @@ def calculate_mse(predicted: list, actual: list) -> float | None:
             or len(predicted) != len(actual)
     ):
         return None
-    difference = [(i - j) ** 2 for i, j in zip(actual, predicted)]
-    return sum(difference) / len(actual)
+
+    total = 0
+    for i, j in zip(actual, predicted):
+        total += (i - j) ** 2
+
+    return total / len(actual)
 
 
 def compare_profiles(
