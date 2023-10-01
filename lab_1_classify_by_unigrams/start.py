@@ -16,7 +16,7 @@ def main() -> None:
         unknown_text = file_to_read_unk.read()
     print(tokenize(en_text))
     print(calculate_frequencies(tokenize(en_text)))
-    print(create_language_profile('en',en_text))
+    print(create_language_profile('en', en_text))
     result = None
     #assert result, "Detection result is None"
 
