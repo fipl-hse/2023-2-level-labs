@@ -1,6 +1,7 @@
 """
 Language detection starter
 """
+#from lab_1_classify_by_unigrams.main import create_language_profile
 import lab_1_classify_by_unigrams.main
 
 def main() -> None:
@@ -15,7 +16,9 @@ def main() -> None:
         unknown_text = file_to_read_unk.read()
     #print(tokenize(en_text))
     #print(calculate_frequencies(tokenize(en_text)))
-    print(create_language_profile('en', en_text))
+    #print(create_language_profile('en', en_text))
+    en_tokens = lab_1_classify_by_unigrams.main.tokenize(en_text)
+    print(en_tokens)
     result = None
     #assert result, "Detection result is None"
 
