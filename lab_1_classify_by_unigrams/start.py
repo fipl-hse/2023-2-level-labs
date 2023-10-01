@@ -2,7 +2,7 @@
 Language detection starter
 """
 
-from main import tokenize, calculate_frequencies
+from main import tokenize, calculate_frequencies, create_language_profile
 
 def main() -> None:
     """
@@ -14,9 +14,11 @@ def main() -> None:
         de_text = file_to_read_de.read()
     with open("assets/texts/unknown.txt", "r", encoding="utf-8") as file_to_read_unk:
         unknown_text = file_to_read_unk.read()
+
+    print(tokenize(en_text))
     print(calculate_frequencies(tokenize(en_text)))
-    #print(calculate_frequencies([None]))
-    #print(calculate_frequencies(tokens))
+    print(create_language_profile('en',en_text))
+
     result = None
     #assert result, "Detection result is None"
 
