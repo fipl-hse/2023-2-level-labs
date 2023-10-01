@@ -19,6 +19,7 @@ def main() -> None:
     de_text_profile = create_language_profile('de', de_text)
     unknown_text_profile = create_language_profile('unknown', unknown_text)
     print(detect_language(unknown_text_profile, en_text_profile, de_text_profile))
+    return None
 
 
 
