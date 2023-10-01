@@ -31,7 +31,7 @@ def calculate_frequencies(tokens: list[str] | None) -> dict[str, float] | None:
         return None
     count = 0
     for symbol in tokens:
-        if type(symbol) != str:
+        if isinstance(symbol, str) is False:
             count += 1
     if count != 0:
         return None
