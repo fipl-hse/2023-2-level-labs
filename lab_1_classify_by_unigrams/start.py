@@ -19,7 +19,6 @@ def main() -> None:
     de_profile = create_language_profile('de', de_text)
     unknown_profile = create_language_profile('unknown', unknown_text)
     result = detect_language(unknown_profile, en_profile, de_profile)
-    print(result)
     assert result, "Detection result is None"
 
 
