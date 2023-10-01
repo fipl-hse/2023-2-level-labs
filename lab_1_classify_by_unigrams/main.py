@@ -50,11 +50,11 @@ def create_language_profile(language: str, text: str) -> dict[str, str | dict[st
 
     tokens = tokenize(text)
     frequency_dict = calculate_frequencies(tokens)
-    language_profile = {'name': language, 'freq': frequency_dict}
 
-    if not isinstance(language_profile, dict):
+    if not isinstance(frequency_dict, dict):
         return None
-    return language_profile
+
+    return {'name': language, 'freq': frequency_dict}
 
 
 def calculate_mse(predicted: list, actual: list) -> float | None:
@@ -132,15 +132,17 @@ def detect_language(
     profile_1_metric = compare_profiles(unknown_profile, profile_1)
     profile_2_metric = compare_profiles(unknown_profile, profile_2)
 
-    if (isinstance(profile_1_metric, float)
+    if not (isinstance(profile_1_metric, float)
             and isinstance(profile_2_metric, float)
     ):
-        if profile_1_metric > profile_2_metric:
-            return profile_2['name']
-        elif profile_1_metric < profile_2_metric:
-            return profile_1['name']
+        return None
 
-    return [profile_1['name'], profile_2['name']].sort()
+    if profile_1_metric > profile_2_metric:
+        return str(profile_2['name'])
+    elif profile_1_metric < profile_2_metric:
+        return str(profile_1['name'])
+    else:
+        return [profile_1['name'], profile_2['name']].sort()
 
 
 def load_profile(path_to_file: str) -> dict | None:
