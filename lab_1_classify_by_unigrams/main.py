@@ -65,7 +65,8 @@ def calculate_mse(predicted: list, actual: list) -> float | None:
             or len(predicted) != len(actual)
     ):
         return None
-    return sum([(i - j) ** 2 for i, j in zip(actual, predicted)]) / len(actual)
+    difference = [(i - j) ** 2 for i, j in zip(actual, predicted)]
+    return sum(difference) / len(actual)
 
 
 def compare_profiles(
@@ -121,7 +122,7 @@ def detect_language(
     if distance1 < distance2:
         language_detected = str(profile_1['name'])
     if distance1 == distance2:
-        language_detected = [profile_1['name'], profile_2['name']].sorted()
+        language_detected = [profile_1['name'], profile_2['name']].sort()
     return language_detected
 
 
