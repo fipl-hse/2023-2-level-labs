@@ -87,8 +87,6 @@ def compare_profiles(
         return None
     if 'name' not in profile_to_compare or 'freq' not in profile_to_compare:
         return None
-    #if len(unknown_profile) != len(profile_to_compare):
-        #return None
 
     sorted_profile_to_compare = dict(sorted(profile_to_compare.items()))
     sorted_unknown_profile = dict(sorted(unknown_profile.items()))
