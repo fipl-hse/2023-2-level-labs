@@ -61,6 +61,13 @@ def calculate_mse(predicted: list, actual: list) -> float | None:
     :param actual: a list of actual values
     :return: the score
     """
+    if not isinstance(predicted, list) or not isinstance(actual, list) or (len(predicted) != len(actual)):
+        return None
+    dif = []
+    for i in range(len(actual)):
+        dif.append((actual[i] - predicted[i]) ** 2)
+    mse = sum(dif) / len(dif)
+    return mse
 
 
 def compare_profiles(
@@ -73,6 +80,24 @@ def compare_profiles(
     :param profile_to_compare: a dictionary of a profile to compare the unknown profile to
     :return: the distance between the profiles
     """
+    if not isinstance(unknown_profile, dict) or not isinstance(profile_to_compare, dict) \
+            or ("name" not in unknown_profile.keys()) or ("freq" not in unknown_profile.keys()) \
+            or ("name" not in profile_to_compare.keys()) or ("freq" not in profile_to_compare.keys()):
+        return None
+    all_symbols = set(unknown_profile.get("freq").keys()).union(set(profile_to_compare.get("freq").keys()))
+    unknown_freq = []
+    compare_freq = []
+    for symbol in all_symbols:
+        if symbol in unknown_profile.get("freq").keys():
+            unknown_freq.append(unknown_profile.get("freq").get(symbol))
+        else:
+            unknown_freq.append(0)
+        if symbol in profile_to_compare.get("freq").keys():
+            compare_freq.append(profile_to_compare.get("freq").get(symbol))
+        else:
+            compare_freq.append(0)
+    mse = calculate_mse(unknown_freq, compare_freq)
+    return mse
 
 
 def detect_language(
@@ -87,6 +112,19 @@ def detect_language(
     :param profile_2: a dictionary of a known profile
     :return: a language
     """
+    if not isinstance(unknown_profile, dict) or not isinstance(profile_1, dict) \
+            or not isinstance(profile_2, dict):
+        return None
+    mse_1 = compare_profiles(unknown_profile, profile_1)
+    mse_2 = compare_profiles(unknown_profile, profile_2)
+    if mse_1 == mse_2:
+        profs_to_sort = [profile_1.get("name"), profile_2.get("name")]
+        profs_to_sort.sort()
+        return profs_to_sort[0]
+    elif mse_1 < mse_2:
+        return profile_1.get("name")
+    else:
+        return profile_2.get("name")
 
 
 def load_profile(path_to_file: str) -> dict | None:
