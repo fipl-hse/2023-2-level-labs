@@ -142,11 +142,12 @@ def detect_language(
         names.append(profile_1['name'])
         names.append(profile_2['name'])
         names.sort()
-        return names[0]
+        language =  names[0]
     elif mse_1 < mse_2:
-        return profile_1['name']
+        language = profile_1['name']
     else:
-        return profile_2['name']
+        language = profile_2['name']
+    return language
 
 
 def load_profile(path_to_file: str) -> dict | None:
