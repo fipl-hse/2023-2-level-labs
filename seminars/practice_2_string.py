@@ -15,24 +15,24 @@ Data Type: String
 # strings are case-sensitive
 
 # Create a string
-# example = 'Hello'  # or "Hello"
-# print(example)
-#
-# # String concatenation
-# greeting = example + ' there!'
-# print(greeting)
-#
-# # String multiplication
-# several_hellos = example * 5
-# print(several_hellos)
-#
-# # String formatting
-# # .format() method
-# example = '{} there!'.format(example)  # pylint: disable=consider-using-f-string
-# print(example)
-# # f-strings
-# example = f'{greeting} - this is the "greeting" variable.'
-# print(example)
+example = 'Hello'  # or "Hello"
+print(example)
+
+# String concatenation
+greeting = example + ' there!'
+print(greeting)
+
+# String multiplication
+several_hellos = example * 5
+print(several_hellos)
+
+# String formatting
+# .format() method
+example = '{} there!'.format(example)  # pylint: disable=consider-using-f-string
+print(example)
+# f-strings
+example = f'{greeting} - this is the "greeting" variable.'
+print(example)
 
 
 # String methods (some of them)
@@ -53,15 +53,13 @@ def multiply_string(input_string: str, how_many: int) -> str:
     display the given string the number of times given in the `how_many`.
     """
     # student realisation goes here
-    new_string = input_string * how_many
-    print(new_string)
 
 
 # Function calls with expected result:
-# multiply_string('Hi', 2)
-# multiply_string('Hi', 3)
-# multiply_string('Hi', 1)
-# multiply_string('Hi', 0)
+# multiply_string('Hi', 2) → 'HiHi'
+# multiply_string('Hi', 3) → 'HiHiHi'
+# multiply_string('Hi', 1) → 'Hi'
+# multiply_string('Hi', 0) → ''
 
 
 # Task 2:
@@ -71,8 +69,6 @@ def front_times(input_string: str, how_many: int) -> str:
     and display them that many times as in `how_many`.
     """
     # student realisation goes here
-    new_string = input_string[0:3] * how_many
-    print(new_string)
 
 
 # Function calls with expected result:
@@ -90,9 +86,6 @@ def extra_end(input_string: str) -> str:
     Given the string, take its two last characters and display them three times.
     """
     # student realisation goes here
-    new_string = input_string[-1:-3:-1]
-    new_string = new_string[::-1] * 3
-    print(new_string)
 
 
 # Function calls with expected result:
@@ -100,10 +93,6 @@ def extra_end(input_string: str) -> str:
 # extra_end('ab') → 'ababab'
 # extra_end('Hi') → 'HiHiHi'
 # extra_end('Code') → 'dedede'
-# extra_end('Hello')
-# extra_end('ab')
-# extra_end('Hi')
-# extra_end('Code')
 
 
 # Task 4:
@@ -112,19 +101,12 @@ def make_abba(first_string: str, second_string: str) -> str:
     Given two strings, concatenate them as a reflection.
     """
     # student realisation goes here
-    new_string = first_string + second_string
-    new_string += second_string + first_string
-    print(new_string)
 
 
 # make_abba('Hi', 'Bye') → 'HiByeByeHi'
 # make_abba('Yo', 'Alice') → 'YoAliceAliceYo'
 # make_abba('What', 'Up') → 'WhatUpUpWhat'
 # make_abba('', 'y') → 'yy'
-# make_abba('Hi', 'Bye')
-# make_abba('Yo', 'Alice')
-# make_abba('What', 'Up')
-# make_abba('', 'y')
 
 
 # Task 5
@@ -137,15 +119,6 @@ def reverse_word(sentence: str) -> str:
     Spaces will be included only when more than one word is present.
     """
     # student realisation goes here
-    word_list = sentence.split(" ")
-    new_word_list = []
-    for word in word_list:
-        if len(word) >= 5:
-            temp = word[::-1]
-            new_word_list.append(temp)
-        else:
-            new_word_list.append(word)
-    print(" ".join(new_word_list))
 
 
 # reverse_word("Hey fellow warriors") == "Hey wollef sroirraw"
@@ -153,11 +126,6 @@ def reverse_word(sentence: str) -> str:
 # reverse_word("This is a test") == "This is a test"
 #
 # reverse_word("This is another test") == "This is rehtona test"
-# reverse_word("Hey fellow warriors")
-#
-# reverse_word("This is a test")
-#
-# reverse_word("This is another test")
 
 
 # Task 6
@@ -179,11 +147,6 @@ def generate_hashtag(input_string: str) -> str:
     """
     # student realisation goes here
 
-
-    print(new_string)
-
-
-generate_hashtag(" Hello there thanks for trying my quiz")
 
 # Task 7:
 def combo_string(first_string: str, second_string: str) -> str:
