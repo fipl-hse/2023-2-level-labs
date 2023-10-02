@@ -16,6 +16,14 @@ def main() -> None:
     with open("assets/texts/unknown.txt", "r", encoding="utf-8") as file_to_read_unk:
         unknown_text = file_to_read_unk.read()
 
+    json_paths = ['assets/profiles/de.json',
+                  'assets/profiles/en.json',
+                  'assets/profiles/es.json',
+                  'assets/profiles/fr.json',
+                  'assets/profiles/it.json',
+                  'assets/profiles/ru.json',
+                  'assets/profiles/tr.json']
+
     unknown = create_language_profile('unknown', unknown_text)
     english = create_language_profile('en', en_text)
     deutsch = create_language_profile('de', de_text)

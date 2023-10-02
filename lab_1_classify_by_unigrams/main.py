@@ -2,6 +2,7 @@
 Lab 1
 Language detection
 """
+import json
 
 
 def tokenize(text: str) -> list[str] | None:
@@ -135,6 +136,13 @@ def load_profile(path_to_file: str) -> dict | None:
     :param path_to_file: a path to the language profile
     :return: a dictionary with at least two keys – name, freq
     """
+    if not isinstance(path_to_file, str):
+        return None
+    with open(path_to_file, 'r', encoding='utf-8') as json_to_read:
+        json_file = json.load(json_to_read)
+    if not isinstance(json_file, dict):
+        return None
+    return json_file
 
 
 def preprocess_profile(profile: dict) -> dict[str, str | dict] | None:
@@ -144,6 +152,18 @@ def preprocess_profile(profile: dict) -> dict[str, str | dict] | None:
     :return: a dict with a lower-cased loaded profile
     with relative frequencies without unnecessary ngrams
     """
+    if not (isinstance(profile, dict)
+            and 'name' in profile
+            and 'freq' in profile
+            and 'n_words' in profile):
+        return None
+    freq_dict = {}
+    for unigram in profile['freq']:
+        if unigram.lower() in freq_dict:
+            freq_dict[unigram.lower()] += int(profile['freq'][unigram]) / int(profile['n_words'][0])
+        elif len(unigram) == 1:
+            freq_dict[unigram.lower()] = int(profile['freq'][unigram]) / int(profile['n_words'][0])
+    return {'name': profile['name'], 'freq': freq_dict}
 
 
 def collect_profiles(paths_to_profiles: list) -> list[dict[str, str | dict[str, float]]] | None:
