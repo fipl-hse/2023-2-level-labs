@@ -18,8 +18,7 @@ def tokenize(text: str) -> list[str] | None:
     for el in tokens:
         if el in punc:
             tokens = tokens.replace(el, '')
-    tokens = list(tokens)
-    return tokens
+    return list(tokens)
 
 
 def calculate_frequencies(tokens: list[str] | None) -> dict[str, float] | None:
@@ -48,8 +47,7 @@ def create_language_profile(language: str, text: str) -> dict[str, str | dict[st
     if not isinstance(language, str) or not isinstance(text, str):
         return None
     tokens = tokenize(text)
-    language_profile = {'name': language, 'freq': calculate_frequencies(tokens)}
-    return language_profile
+    return {'name': language, 'freq': calculate_frequencies(tokens)}
 
 
 def calculate_mse(predicted: list, actual: list) -> float | None:
