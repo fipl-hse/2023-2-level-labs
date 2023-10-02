@@ -33,8 +33,8 @@ def calculate_frequencies(tokens: list[str] | None) -> dict[str, float] | None:
             freqs[token] += 1
         else:
             freqs[token] = 1
-    for k, v in freqs.items():
-        freqs[k] = v / len(tokens)
+    for key, value in freqs.items():
+        freqs[key] = value / len(tokens)
     return freqs
 
 
@@ -59,10 +59,11 @@ def calculate_mse(predicted: list, actual: list) -> float | None:
     :param actual: a list of actual values
     :return: the score
     """
-    if not isinstance(predicted, list) or not isinstance(actual, list) or (len(predicted) != len(actual)):
+    if not isinstance(predicted, list) or not isinstance(actual, list) \
+            or (len(predicted) != len(actual)):
         return None
     dif = []
-    for i in range(len(actual)):
+    for i, value in enumerate(actual):
         dif.append((actual[i] - predicted[i]) ** 2)
     mse = sum(dif) / len(dif)
     return mse
@@ -119,7 +120,7 @@ def detect_language(
         profs_to_sort = [profile_1.get("name"), profile_2.get("name")]
         profs_to_sort.sort()
         return profs_to_sort[0]
-    elif mse_1 < mse_2:
+    if mse_1 < mse_2:
         return profile_1.get("name")
     else:
         return profile_2.get("name")
@@ -164,7 +165,14 @@ def collect_profiles(paths_to_profiles: list) -> list[dict[str, str | dict[str, 
     :paths_to_profiles: a list of strings to the profiles
     :return: a list of loaded profiles
     """
-
+    if not isinstance(paths_to_profiles, list):
+        return None
+    profiles = []
+    for path in paths_to_profiles:
+        loaded_profile = load_profile(path)
+        preprocessed_profile = preprocess_profile(loaded_profile)
+        profiles.append(preprocessed_profile)
+    return profiles
 
 
 def detect_language_advanced(unknown_profile: dict[str, str | dict[str, float]],
@@ -175,6 +183,12 @@ def detect_language_advanced(unknown_profile: dict[str, str | dict[str, float]],
     :param known_profiles: a list of known profiles
     :return: a sorted list of tuples containing a language and a distance
     """
+    if not isinstance(unknown_profile, dict) or not isinstance(known_profiles, list):
+        return None
+    mse_list = []
+    for i in range(len(known_profiles)):
+        mse_list.append((f"{known_profiles[i].get('name')}", compare_profiles(unknown_profile, known_profiles[i])))
+    return sorted(mse_list, key=lambda x: (x[1], x[0]))
 
 
 def print_report(detections: list[tuple[str, float]]) -> None:
@@ -182,3 +196,5 @@ def print_report(detections: list[tuple[str, float]]) -> None:
     Prints report for detection of language
     :param detections: a list with distances for each available language
     """
+    for detection in detections:
+        print(f"{detection[0]}: MSE {detection[1]:.5f}")
