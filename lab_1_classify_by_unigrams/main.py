@@ -64,7 +64,7 @@ def calculate_mse(predicted: list, actual: list) -> float | None:
         return None
     dif = []
     for i, value in enumerate(actual):
-        dif.append((actual[i] - predicted[i]) ** 2)
+        dif.append((value - predicted[i]) ** 2)
     mse = sum(dif) / len(dif)
     return mse
 
@@ -80,8 +80,10 @@ def compare_profiles(
     :return: the distance between the profiles
     """
     if not isinstance(unknown_profile, dict) or not isinstance(profile_to_compare, dict) \
-            or ("name" not in unknown_profile.keys()) or ("freq" not in unknown_profile.keys()) \
-            or ("name" not in profile_to_compare.keys()) or ("freq" not in profile_to_compare.keys()):
+            or ("name" not in unknown_profile.keys()) \
+            or ("freq" not in unknown_profile.keys()) \
+            or ("name" not in profile_to_compare.keys()) \
+            or ("freq" not in profile_to_compare.keys()):
         return None
     all_symbols = set(unknown_profile.get("freq").keys()).union(set(profile_to_compare.get("freq").keys()))
     unknown_freq = []
@@ -122,8 +124,7 @@ def detect_language(
         return profs_to_sort[0]
     if mse_1 < mse_2:
         return profile_1.get("name")
-    else:
-        return profile_2.get("name")
+    return profile_2.get("name")
 
 
 def load_profile(path_to_file: str) -> dict | None:
@@ -186,8 +187,8 @@ def detect_language_advanced(unknown_profile: dict[str, str | dict[str, float]],
     if not isinstance(unknown_profile, dict) or not isinstance(known_profiles, list):
         return None
     mse_list = []
-    for i in range(len(known_profiles)):
-        mse_list.append((f"{known_profiles[i].get('name')}", compare_profiles(unknown_profile, known_profiles[i])))
+    for i, profile in enumerate(known_profiles):
+        mse_list.append((f"{profile.get('name')}", compare_profiles(unknown_profile, profile)))
     return sorted(mse_list, key=lambda x: (x[1], x[0]))
 
 

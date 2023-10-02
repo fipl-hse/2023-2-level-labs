@@ -1,8 +1,10 @@
 """
 Language detection starter
 """
-import json
-from lab_1_classify_by_unigrams.main import collect_profiles, detect_language_advanced, print_report, \
+
+
+from lab_1_classify_by_unigrams.main import collect_profiles, \
+    detect_language_advanced, print_report, \
     create_language_profile
 
 
@@ -20,8 +22,8 @@ def main() -> None:
     paths = [f"assets/profiles/{langs[i]}.json" for i in range(7)]
     profiles = collect_profiles(paths)
     unknown_profile = create_language_profile("unknown", unknown_text)
-    print_report(detect_language_advanced(unknown_profile, profiles))
-    result = None
+    result = detect_language_advanced(unknown_profile, profiles)
+    print_report(result)
     assert result, "Detection result is None"
 
 
