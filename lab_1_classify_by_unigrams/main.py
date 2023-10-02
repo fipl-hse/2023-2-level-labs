@@ -15,9 +15,7 @@ def tokenize(text: str) -> list[str] | None:
     if not isinstance(text, str):
         return None
 
-    tokens = [symbol.lower() for symbol in text if symbol.isalpha()]
-
-    return tokens
+    return [symbol.lower() for symbol in text if symbol.isalpha()]
 
 
 def calculate_frequencies(tokens: list[str] | None) -> dict[str, float] | None:
@@ -32,9 +30,7 @@ def calculate_frequencies(tokens: list[str] | None) -> dict[str, float] | None:
     if not all(isinstance(token, str) for token in tokens):
         return None
 
-    frequency = {token: tokens.count(token) / len(tokens) for token in tokens}
-
-    return frequency
+    return {token: tokens.count(token) / len(tokens) for token in tokens}
 
 
 def create_language_profile(language: str, text: str) -> dict[str, str | dict[str, float]] | None:
@@ -47,9 +43,7 @@ def create_language_profile(language: str, text: str) -> dict[str, str | dict[st
     if not isinstance(language, str) or not isinstance(text, str):
         return None
 
-    language_profile = {'name': language, 'freq': calculate_frequencies(tokenize(text))}
-
-    return language_profile
+    return {'name': language, 'freq': calculate_frequencies(tokenize(text))}
 
 
 def calculate_mse(predicted: list, actual: list) -> float | None:
@@ -68,14 +62,13 @@ def calculate_mse(predicted: list, actual: list) -> float | None:
     sum_difference = 0
     for freq_value in zip(predicted, actual):
         sum_difference += (freq_value[0] - freq_value[1]) ** 2
-    mse = sum_difference / len(predicted)
 
-    return mse
+    return sum_difference / len(predicted)
 
 
 def compare_profiles(
-    unknown_profile: dict[str, str | dict[str, float]],
-    profile_to_compare: dict[str, str | dict[str, float]]
+        unknown_profile: dict[str, str | dict[str, float]],
+        profile_to_compare: dict[str, str | dict[str, float]]
 ) -> float | None:
     """
     Compares profiles and calculates the distance using symbols
