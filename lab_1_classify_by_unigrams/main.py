@@ -14,8 +14,7 @@ def tokenize(text: str) -> list[str] | None:
     if not isinstance(text, str):
         return None
     punctuation = '''!()-[]{};:'",<>./?@#$%^&*_~0123456789\\ '''
-    tokenized = [el for el in text.lower() if el not in punctuation]
-    return tokenized
+    return [el for el in text.lower() if el not in punctuation]
 
 
 def calculate_frequencies(tokens: list[str] | None) -> dict[str, float] | None:
@@ -26,10 +25,11 @@ def calculate_frequencies(tokens: list[str] | None) -> dict[str, float] | None:
     """
     if not isinstance(tokens, list):
         return None
+    frequency = {}
     for token in tokens:
         if not isinstance(token, str):
             return None
-    frequency = {token: tokens.count(token) / len(tokens) for token in tokens}
+        frequency[token] = tokens.count(token) / len(tokens)
     return frequency
 
 
@@ -42,9 +42,10 @@ def create_language_profile(language: str, text: str) -> dict[str, str | dict[st
     """
     if not isinstance(language, str) or not isinstance(text, str):
         return None
-    tokens = tokenize(text)
-    profile = {'name': language, 'freq': calculate_frequencies(tokens)}
-    return profile
+    frequencies = calculate_frequencies(tokenize(text))
+    if not isinstance(frequencies, dict):
+        return None
+    return {'name': language, 'freq': frequencies}
 
 
 def calculate_mse(predicted: list, actual: list) -> float | None:
@@ -62,9 +63,7 @@ def calculate_mse(predicted: list, actual: list) -> float | None:
     summation = 0
     for i in zipped_list:
         summation += (i[1] - i[0]) ** 2
-    number = len(predicted)
-    mse = summation / number
-    return mse
+    return summation / len(predicted)
 
 
 def compare_profiles(
@@ -87,7 +86,7 @@ def compare_profiles(
     for i in tokens:
         lang_to_compare.append(profile_to_compare['freq'].get(i, 0))
         unknown_lang.append(unknown_profile['freq'].get(i, 0))
-    return round(calculate_mse(lang_to_compare, unknown_lang), 3)
+    return calculate_mse(lang_to_compare, unknown_lang)
 
 
 def detect_language(
@@ -105,12 +104,16 @@ def detect_language(
     if not isinstance(unknown_profile, dict) or not isinstance(profile_1, dict) \
             or not isinstance(profile_2, dict):
         return None
+
     mse_1 = compare_profiles(unknown_profile, profile_1)
     mse_2 = compare_profiles(unknown_profile, profile_2)
-    mse_profiles = {profile_1['name']: mse_1, profile_2['name']: mse_2}
-    if mse_1 == mse_2:
-        return min(profile_1['name'], profile_2['name'])
-    return min(mse_profiles, key=mse_profiles.get)
+
+    if isinstance(mse_1, float) and isinstance(mse_2, float):
+        if mse_1 < mse_2:
+            return str(profile_1['name'])
+        if mse_1 > mse_2:
+            return str(profile_2['name'])
+    return (sorted([str(profile_1['name']), str(profile_2['name'])]))[0]
 
 
 def load_profile(path_to_file: str) -> dict | None:
