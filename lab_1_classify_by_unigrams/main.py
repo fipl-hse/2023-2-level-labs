@@ -27,9 +27,8 @@ def calculate_frequencies(tokens: list[str] | None) -> dict[str, float] | None:
     if not isinstance(tokens, list):
         return None
 
-    for token in tokens:
-        if not isinstance(token, str):
-            return None
+    if not all(isinstance(token, str) for token in tokens):
+        return None
 
     return {token: tokens.count(token) / len(tokens) for token in tokens}
 
@@ -44,7 +43,11 @@ def create_language_profile(language: str, text: str) -> dict[str, str | dict[st
     if not isinstance(language, str) or not isinstance(text, str):
         return None
 
-    return {'name': language, 'freq': calculate_frequencies(tokenize(text))}
+    frequencies = calculate_frequencies(tokenize(text))
+    if not isinstance(frequencies, dict):
+        return None
+
+    return {'name': language, 'freq': frequencies}
 
 
 def calculate_mse(predicted: list, actual: list) -> float | None:
@@ -116,6 +119,9 @@ def detect_language(
         profile_2['name']: compare_profiles(unknown_profile, profile_2),
     }
 
+    if not all(isinstance(metric, float) for metric in metrics.values()):
+        return None
+
     if metrics[profile_1['name']] == metrics[profile_2['name']]:
         return str(sorted(metrics)[0])
 
@@ -171,10 +177,12 @@ def collect_profiles(paths_to_profiles: list) -> list[dict[str, str | dict[str, 
     """
     if not isinstance(paths_to_profiles, list):
         return None
+    if not all(isinstance(path, str) for path in paths_to_profiles):
+        return None
 
     preprocess_profiles_list = []
     for path in paths_to_profiles:
-        preprocess_profiles_list.append(preprocess_profile(dict(load_profile(path))))
+        preprocess_profiles_list.append(preprocess_profile(load_profile(path)))
 
     if isinstance(preprocess_profiles_list, list):
         return preprocess_profiles_list
