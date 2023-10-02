@@ -43,7 +43,10 @@ def create_language_profile(language: str, text: str) -> dict[str, str | dict[st
     if not isinstance(language, str) or not isinstance(text, str):
         return None
 
-    return {'name': language, 'freq': calculate_frequencies(tokenize(text))}
+    lang_profile = {'name': language, 'freq': calculate_frequencies(tokenize(text))}
+    if isinstance(lang_profile, dict):
+        return lang_profile
+    return None
 
 
 def calculate_mse(predicted: list, actual: list) -> float | None:
@@ -116,9 +119,9 @@ def detect_language(
     }
 
     if metrics[profile_1['name']] == metrics[profile_2['name']]:
-        return sorted(metrics)[0]
+        return str(sorted(metrics)[0])
 
-    return min(metrics, key=metrics.get)
+    return str(min(metrics, key=metrics.get))
 
 
 def load_profile(path_to_file: str) -> dict | None:
@@ -173,9 +176,12 @@ def collect_profiles(paths_to_profiles: list) -> list[dict[str, str | dict[str, 
 
     preprocess_profiles_list = []
     for path in paths_to_profiles:
-        preprocess_profiles_list.append(preprocess_profile(load_profile(path)))
+        preprocess_profiles_list.append(preprocess_profile(dict(load_profile(path))))
 
-    return preprocess_profiles_list
+    if isinstance(preprocess_profiles_list, list):
+        return preprocess_profiles_list
+
+    return None
 
 
 def detect_language_advanced(
@@ -202,7 +208,10 @@ def detect_language_advanced(
         score_list.append((profile["name"], calculate_mse(unknown_freq, known_freq)))
     score_list = sorted(score_list, key=lambda score: (score[1], score[0]))
 
-    return score_list
+    if isinstance(score_list, list):
+        return score_list
+
+    return None
 
 
 def print_report(detections: list[tuple[str, float]]) -> None:
