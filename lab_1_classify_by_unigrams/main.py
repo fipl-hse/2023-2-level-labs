@@ -3,6 +3,8 @@ Lab 1
 Language detection
 """
 
+from string import punctuation
+
 
 def tokenize(text: str) -> list[str] | None:
     """
@@ -13,11 +15,11 @@ def tokenize(text: str) -> list[str] | None:
     """
     if not isinstance(text, str):
         return None
-    text = text.lower().replace(" ", "")
+    text = ''.join(symbol for symbol in text if symbol.isalnum()).lower()
     result = []
-    for i in range(len(text)):
-        if text[i] not in "!#$%&'()*+,-./:;<=>?@[?\]^_`{|}~1234567890":
-            result += text[i]
+    for i in text:
+        if i not in punctuation:
+            result += i
     return result
 
 
@@ -36,7 +38,6 @@ def calculate_frequencies(tokens: list[str] | None) -> dict[str, float] | None:
     return frequency_counter
 
 
-
 def create_language_profile(language: str, text: str) -> dict[str, str | dict[str, float]] | None:
     """
     Creates a language profile
@@ -49,8 +50,6 @@ def create_language_profile(language: str, text: str) -> dict[str, str | dict[st
     symbols = tokenize(text)
     dictionary = dict({"name": language, "freq": calculate_frequencies(symbols)})
     return dictionary
-
-
 
 
 def calculate_mse(predicted: list, actual: list) -> float | None:
