@@ -67,6 +67,17 @@ def calculate_mse(predicted: list, actual: list) -> float | None:
     :param actual: a list of actual values
     :return: the score
     """
+    if (len(predicted) != len(actual) or
+        not isinstance(predicted, list) or
+        not isinstance(actual, list)):
+        return None
+
+    sum_mse = 0
+    for i in range(len(actual)):
+        sum_mse += (actual[i]-predicted[i]) ** 2
+    mse = sum_mse/len(actual)
+
+    return mse
 
 
 def compare_profiles(
@@ -79,6 +90,14 @@ def compare_profiles(
     :param profile_to_compare: a dictionary of a profile to compare the unknown profile to
     :return: the distance between the profiles
     """
+    if (not isinstance(unknown_profile, dict) or
+        not isinstance(profile_to_compare, dict)):
+        return None
+    if ('name' not in unknown_profile or
+        'freq' not in unknown_profile or
+            'name' not in profile_to_compare or
+            'freq' not in profile_to_compare):
+        return None
 
 
 def detect_language(
