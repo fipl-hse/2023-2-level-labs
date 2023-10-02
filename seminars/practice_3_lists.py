@@ -12,30 +12,30 @@ Data Type: Lists
 # lists are iterable
 
 # Create a list
-example = [1, 2, 3]
-print(example)
-
-# List concatenation, the original list doesn't change
-first_list = example + [2, 3, 4]
-print(example)
-print(first_list)
-
-# List changes
-example.append(2)
-example.extend([2, 3, 4])
-print(example)
-
-# List copy
-# import copy
-
-
-first_test = [1, 2, 3, [1, 2, 3]]
-test_copy = first_test.copy()
-print(first_test, test_copy)
-test_copy[3].append(4)
-print(first_test, test_copy)
-
-first_test = [1, 2, 3, [1, 2, 3]]
+# example = [1, 2, 3]
+# print(example)
+#
+# # List concatenation, the original list doesn't change
+# first_list = example + [2, 3, 4]
+# print(example)
+# print(first_list)
+#
+# # List changes
+# example.append(2)
+# example.extend([2, 3, 4])
+# print(example)
+#
+# # List copy
+# # import copy
+#
+#
+# first_test = [1, 2, 3, [1, 2, 3]]
+# test_copy = first_test.copy()
+# print(first_test, test_copy)
+# test_copy[3].append(4)
+# print(first_test, test_copy)
+#
+# first_test = [1, 2, 3, [1, 2, 3]]
 # test_deepcopy = copy.deepcopy(first_test)
 # test_deepcopy[3].append(4)
 # print(first_test, test_deepcopy)
@@ -59,8 +59,16 @@ def count_evens(nums: list) -> int:
     Return the number of even ints in the given array.
     """
     # student realization goes here
+    cnt = 0
+    for num in nums:
+        if num % 2 == 0:
+            cnt += 1
+    return cnt
 
 
+# print(count_evens([2, 1, 2, 3, 4]))
+# print(count_evens([2, 2, 0]))
+# print(count_evens([1, 3, 5]))
 # Function calls with expected result:
 # count_evens([2, 1, 2, 3, 4]) → 3
 # count_evens([2, 2, 0]) → 3
@@ -76,7 +84,24 @@ def sum13(nums: list) -> int:
     also do not count.
     """
     # student realization goes here
+    if len(nums) == 0:
+        return 0
+    if 13 in nums:
+        ind = nums.index(13)
+        return sum(nums[:ind])
+    return sum(nums)
+    # summ = 0
+    # for num in nums:
+    #     if num == 13:
+    #         break
+    #     summ += num
+    # return summ
 
+
+# print(sum13([1, 2, 2, 1]))
+# print(sum13([1, 1]))
+# print(sum13([1, 2, 2, 1, 13]))
+# print(sum13([1, 2, 2, 1, 13, 5, 6]))
 # Function calls with expected result:
 # sum13([1, 2, 2, 1]) → 6
 # sum13([1, 1]) → 2
@@ -94,7 +119,16 @@ def sum67(nums: list) -> int:
     Return 0 for no numbers.
     """
     # student realization goes here
+    if 6 in nums:
+        ind_6 = nums.index(6)
+        ind_7 = nums.index(7)
+        return sum(nums[:ind_6] + nums[ind_7+1:])
+    return sum(nums)
 
+
+# print(sum67([1, 2, 2]))
+# print(sum67([1, 2, 2, 6, 99, 99, 7]))
+# print(sum67([1, 1, 6, 7, 2]))
 # Function calls with expected result:
 # sum67([1, 2, 2]) → 5
 # sum67([1, 2, 2, 6, 99, 99, 7]) → 5
@@ -109,7 +143,12 @@ def create_phone_number(nums: list) -> str:
     that returns a string of those numbers in the form of a phone number.
     """
     # student realization goes here
+    num_str = ''.join(str(a) for a in nums)
+    phone_num = f"({num_str[:3]}) {num_str[3:6]}-{num_str[6:]}"
+    return phone_num
 
+
+# print(create_phone_number([1,2,3,4,5,6,7,8,9,0]))
 # Function calls with expected result:
 # create_phone_number([1, 2, 3, 4, 5, 6, 7, 8, 9, 0])
 # => returns "(123) 456-7890"
@@ -130,7 +169,23 @@ def check_exam(correct_answers: list, student_answers: list) -> int:
     If the score < 0, return 0.
     """
     # student realization goes here
+    score = 0
+    for i in range(len(correct_answers)):
+        if student_answers[i] == "":
+            score += 0
+        elif correct_answers[i] == student_answers[i]:
+            score += 4
+        else:
+            score -= 1
+    if score < 0:
+        return 0
+    return score
 
+
+print(check_exam(["a", "a", "b", "b"], ["a", "c", "b", "d"]))
+print(check_exam(["a", "a", "c", "b"], ["a", "a", "b",  ""]))
+print(check_exam(["a", "a", "b", "c"], ["a", "a", "b", "c"]))
+print(check_exam(["b", "c", "b", "a"], ["",  "a", "a", "c"]))
 # Function calls with expected result:
 # check_exam(["a", "a", "b", "b"], ["a", "c", "b", "d"]) → 6
 # check_exam(["a", "a", "c", "b"], ["a", "a", "b",  ""]) → 7

@@ -133,9 +133,9 @@ def load_profile(path_to_file: str) -> dict | None:
     """
     if not isinstance(path_to_file, str):
         return None
-    with open(f"{path_to_file}", "r", encoding="utf-8") as file_to_read:
-        text = json.load(file_to_read)
-    return text
+    with open(path_to_file, "r", encoding="utf-8") as file_to_read:
+        profile = json.load(file_to_read)
+    return profile
 
 
 def preprocess_profile(profile: dict) -> dict[str, str | dict] | None:
@@ -145,6 +145,17 @@ def preprocess_profile(profile: dict) -> dict[str, str | dict] | None:
     :return: a dict with a lower-cased loaded profile
     with relative frequencies without unnecessary ngrams
     """
+    if not isinstance(profile, dict) or "freq" not in profile.keys() \
+            or "name" not in profile.keys() or "n_words" not in profile.keys():
+        return None
+    profile_new = {"name": profile.get("name"), "freq": {}}
+    for token, freq in profile.get("freq").items():
+        if len(token) == 1 and token.isalpha():
+            if token.lower() in profile_new["freq"]:
+                profile_new["freq"][token.lower()] += freq / profile["n_words"][0]
+            else:
+                profile_new["freq"].update({token.lower(): freq / profile["n_words"][0]})
+    return profile_new
 
 
 def collect_profiles(paths_to_profiles: list) -> list[dict[str, str | dict[str, float]]] | None:
@@ -153,6 +164,7 @@ def collect_profiles(paths_to_profiles: list) -> list[dict[str, str | dict[str, 
     :paths_to_profiles: a list of strings to the profiles
     :return: a list of loaded profiles
     """
+
 
 
 def detect_language_advanced(unknown_profile: dict[str, str | dict[str, float]],
