@@ -40,7 +40,7 @@ def calculate_frequencies(tokens: list[str] | None) -> dict[str, float] | None:
     return frequencies
 
 
-def create_language_profile(language: str, text: str) -> dict[str, str | dict[str, float]] | None:
+def create_language_profile(language: str, text: str):
     """
         Creates a language profile
         :param language: a language
