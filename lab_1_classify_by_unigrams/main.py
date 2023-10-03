@@ -2,8 +2,6 @@
 Lab 1
 Language detection
 """
-alphabet = 'abcdefghijklmnopqrstuvwxyz'
-
 
 
 def tokenize(text: str) -> list[str] | None:
@@ -13,8 +11,8 @@ def tokenize(text: str) -> list[str] | None:
     :param text: a text
     :return: a list of lower-cased tokens without punctuation
     """
-    partly_tokenized_text = list(text.lower())
-    tokens = [element for element in partly_tokenized_text if element in alphabet]
+    text.lower()
+    tokens = [token for token in text if token in 'abcdefghijklmnopqrstuvwxyz']
     return tokens
 
 
@@ -24,13 +22,20 @@ def calculate_frequencies(tokens: list[str] | None) -> dict[str, float] | None:
     :param tokens: a list of tokens
     :return: a dictionary with frequencies
     """
-    occurrence_of_every_token = {letter: 0 for letter in alphabet}
-    for letter in occurrence_of_every_token:
-        for token in tokens:
-            if token == letter:
-                occurrence_of_every_token[letter] += 1
-        occurrence_of_every_token[letter] /= len(tokens)
-    return occurrence_of_every_token
+    if type(tokens) == list:
+        for element in tokens:
+            if type(element) != str:
+                return None
+        set_of_tokens = set(tokens)
+        occurrence_of_every_token = {}
+        for key_of_tokens in set_of_tokens:
+            occurrence_of_every_token[key_of_tokens] = 0
+        for i in tokens:
+            occurrence_of_every_token[i] += 1
+        for i in occurrence_of_every_token.keys():
+            occurrence_of_every_token[i] /= len(tokens)
+        return occurrence_of_every_token
+    return None
 
 
 def create_language_profile(language: str, text: str) -> dict[str, str | dict[str, float]] | None:
@@ -51,6 +56,7 @@ def calculate_mse(predicted: list, actual: list) -> float | None:
     :param actual: a list of actual values
     :return: the score
     """
+
 
 
 def compare_profiles(
