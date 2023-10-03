@@ -127,15 +127,11 @@ def detect_language(
             name_2: metric_2,
         }
 
-        if (
-                all(isinstance(metric, float) for metric in metrics.values())
-                and all(isinstance(lang, str) for lang in metrics)
-        ):
-            if metrics[name_1] == metrics[name_2]:
-                return min(metrics.keys())
+        if metrics[name_1] == metrics[name_2]:
+            return min(metrics.keys())
 
-            min_metric = min(metrics, key=metrics.get)
-            return min_metric
+        min_metric = min(metrics, key=lambda x: metrics.get(x, float('inf')))
+        return min_metric
 
     return None
 
