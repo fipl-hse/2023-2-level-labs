@@ -2,8 +2,8 @@
 Lab 1
 Language detection
 """
-
 import json
+
 
 def tokenize(text: str) -> list[str] | None:
     """
@@ -15,9 +15,7 @@ def tokenize(text: str) -> list[str] | None:
 
     if not isinstance(text, str):
         return None
-
-    split_text = list(text.lower())
-    return [i for i in split_text if i.isalpha()]
+    return [i.lower() for i in text if i.isalpha()]
 
 
 def calculate_frequencies(tokens: list[str] | None) -> dict[str, float] | None:
@@ -152,6 +150,7 @@ def load_profile(path_to_file: str) -> dict | None:
 
     return profile
 
+
 def preprocess_profile(profile: dict) -> dict[str, str | dict] | None:
     """
     Preprocesses profile for a loaded language
@@ -159,6 +158,29 @@ def preprocess_profile(profile: dict) -> dict[str, str | dict] | None:
     :return: a dict with a lower-cased loaded profile
     with relative frequencies without unnecessary ngrams
     """
+    if (
+            not isinstance(profile, dict)
+            or 'freq' not in profile.keys()
+            or 'name' not in profile.keys()
+            or 'n_words' not in profile.keys()
+    ):
+        return None
+
+    preprocessed_profile = {
+        'name': profile['name'],
+        'freq': {}
+    }
+
+    for token in profile['freq']:
+        if token.lower() in preprocessed_profile['freq']:
+            preprocessed_profile['freq'][token.lower()] += profile['freq'][token] / profile['n_words'][0]
+        elif len(token) == 1:
+            preprocessed_profile['freq'][token.lower()] = profile['freq'][token] / profile['n_words'][0]
+
+    return preprocessed_profile
+
+
+
 
 
 def collect_profiles(paths_to_profiles: list) -> list[dict[str, str | dict[str, float]]] | None:
