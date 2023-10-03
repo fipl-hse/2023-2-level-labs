@@ -135,7 +135,7 @@ def detect_language(
     mse_2 = compare_profiles(unknown_profile, profile_2)
     if mse_1 < mse_2:
         return profile_1.get("name")
-    elif mse_1 == mse_2:
+    if mse_1 == mse_2:
         alph = [profile_1.get("name"), profile_2.get("name")]
         alph = sorted(alph)
         return alph[0]
