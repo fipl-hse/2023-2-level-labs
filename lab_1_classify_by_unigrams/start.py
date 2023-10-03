@@ -37,8 +37,13 @@ def main() -> None:
     ]
 
     preprocessed_profiles = collect_profiles(path_to_profiles)
-    result = detect_language_advanced(unknown_profile, preprocessed_profiles)
-    print_report(result)
+    if (
+        isinstance(unknown_profile, dict)
+        and all(isinstance(profile, dict) for profile in preprocessed_profiles)
+    ):
+        result = detect_language_advanced(unknown_profile, preprocessed_profiles)
+    if result:
+        print_report(result)
 
     assert result, "Detection result is None"
 
