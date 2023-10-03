@@ -141,8 +141,8 @@ def detect_language(
             return str(profile_2['name'])
         if profile_1_metric < profile_2_metric:
             return str(profile_1['name'])
-    equal_length_case = [profile_1['name'], profile_2['name']].sort()
-    return equal_length_case
+
+    return [profile_1['name'], profile_2['name']].sort()
 
 
 def load_profile(path_to_file: str) -> dict | None:
@@ -228,7 +228,8 @@ def detect_language_advanced(unknown_profile: dict[str, str | dict[str, float]],
     ):
         return None
 
-    detected_language = [(profile['name'], compare_profiles(profile, unknown_profile)) for profile in known_profiles]
+    detected_language = [(profile['name'], compare_profiles(profile, unknown_profile))
+                         for profile in known_profiles]
     detected_language = sorted(detected_language, key=lambda x: (x[1], x[0]))
 
     if not isinstance(detected_language, list):
@@ -243,7 +244,5 @@ def print_report(detections: list[tuple[str, float]]) -> None:
     :param detections: a list with distances for each available language
     """
     if not isinstance(detections, list):
-        return None
-
-    for detection in detections:
-        print(f'{detection[0]}: MSE {detection[1]:.5f}')
+        for detection in detections:
+            print(f'{detection[0]}: MSE {detection[1]:.5f}')
