@@ -17,7 +17,7 @@ def tokenize(text: str) -> list[str] | None:
     text = text.lower()
     for i in text:
         if i.isalpha():
-            tokens += i
+            tokens.append(i)
     return tokens
 
 def calculate_frequencies(tokens: list[str] | None) -> dict[str, float] | None:
@@ -34,11 +34,11 @@ def calculate_frequencies(tokens: list[str] | None) -> dict[str, float] | None:
     dictionary = {}
     length = len(tokens)
     for i in tokens:
-        if i in dictionary:
-            dictionary[i] += 1/length
-        else:
-            dictionary[i] = 1/length
+        if i not in dictionary:
+            dictionary[i] = 0
+        dictionary[i] += 1/length
     return dictionary
+
 
 def create_language_profile(language: str, text: str) -> dict[str, str | dict[str, float]] | None:
     """
@@ -63,7 +63,7 @@ def calculate_mse(predicted: list, actual: list) -> float | None:
     :return: the score
     """
     if not isinstance(predicted, list) or\
-            not isinstance(actual, list) != list or\
+            not isinstance(actual, list) or\
             len(predicted) != len(actual):
         return None
     cubs = 0
