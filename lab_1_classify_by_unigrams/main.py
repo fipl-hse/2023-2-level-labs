@@ -217,13 +217,11 @@ def detect_language_advanced(unknown_profile: dict[str, str | dict[str, float]],
     ):
         return None
 
-    detected_language = [(profile['name'],
-                          compare_profiles(profile, unknown_profile))
-                         for profile in known_profiles]
+    detected_language = []
+    for profile in known_profiles:
+        detected_language.append((profile['name'], compare_profiles(profile, unknown_profile)))
     detected_language = sorted(detected_language, key=lambda x: (x[1], x[0]))
-
-    if isinstance(detected_language, list):
-        return detected_language
+    return detected_language
 
 
 def print_report(detections: list[tuple[str, float]]) -> None:
