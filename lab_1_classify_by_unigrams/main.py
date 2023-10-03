@@ -25,18 +25,12 @@ def calculate_frequencies(tokens: list[str] | None) -> dict[str, float] | None:
     return calc
 
 
-calculate_frequencies(tokenize("Hey! How are you?"))
-
-
 def create_language_profile(language: str, text: str) -> dict[str, str | dict[str, float]] | None:
     if not isinstance(language, str) or not isinstance(text, str):
         return None
     freq_dict = calculate_frequencies(tokenize(text))
     lang_prof = {"name": language, "freq": freq_dict}
     return lang_prof
-
-
-# create_language_profile('eng', "Hey! How are you?")
 
 
 def calculate_mse(predicted: list, actual: list) -> float | None:
@@ -49,7 +43,19 @@ def calculate_mse(predicted: list, actual: list) -> float | None:
     for i in range(p):
         difference_square.append((actual[i] - predicted[i]) ** 2)
     mse = sum(difference_square) / p
-    print(mse)
+    return mse
 
 
-calculate_mse([34, 37, 44, 47, 48, 48, 46, 43, 32, 27, 26, 24], [37, 40, 46, 44, 46, 50, 45, 44, 34, 30, 22, 23])
+def compare_profiles(
+        unknown_profile: dict[str, str | dict[str, float]],
+        profile_to_compare: dict[str, str | dict[str, float]]
+) -> float | None:
+    if not isinstance(unknown_profile, dict) or not isinstance(profile_to_compare, dict):
+        return None
+    if not ('name' and 'freq') in unknown_profile or not ('name' and 'freq') in profile_to_compare:
+        return None
+    unknown_freq = list(unknown_profile['freq'].values())
+    to_compare_freq = list(profile_to_compare['freq'].values())
+    mse_to_compare = calculate_mse(unknown_freq, to_compare_freq)
+    return mse_to_compare
+
