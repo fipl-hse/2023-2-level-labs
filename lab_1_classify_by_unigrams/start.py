@@ -3,7 +3,7 @@ Language detection starter
 """
 
 from lab_1_classify_by_unigrams.main import (
-    create_language_profile, collect_profiles, detect_language_advanced, print_report
+    create_language_profile, collect_profiles, detect_language, detect_language_advanced, print_report
 )
 
 
@@ -18,6 +18,17 @@ def main() -> None:
     with open("assets/texts/unknown.txt", "r", encoding="utf-8") as file_to_read_unk:
         unknown_text = file_to_read_unk.read()
 
+    unknown_profile = create_language_profile('unknown', unknown_text)
+    en_profile = create_language_profile('en', en_text)
+    de_profile = create_language_profile('de', de_text)
+
+    if (
+            isinstance(en_profile, dict)
+        and isinstance(de_profile, dict)
+        and isinstance(unknown_profile, dict)
+):
+        detect_language(unknown_profile, en_profile, de_profile)
+
     paths_to_profiles = [
         "assets/profiles/de.json",
         "assets/profiles/en.json",
@@ -28,15 +39,11 @@ def main() -> None:
         "assets/profiles/tr.json"
     ]
 
-    unknown_profile = create_language_profile('unknown', unknown_text)
     known_profiles = collect_profiles(paths_to_profiles)
-
-    if (
-            isinstance(unknown_profile, dict)
-            and isinstance(known_profiles, list)
-    ):
-        result = detect_language_advanced(unknown_profile, known_profiles)
-    print_report(result)
+    result = detect_language_advanced(unknown_profile, known_profiles)
+    for result in result:
+        if isinstance(result, tuple):
+            print_report(result)
 
     assert result, "Detection result is None"
 
