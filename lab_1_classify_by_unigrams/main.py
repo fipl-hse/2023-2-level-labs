@@ -173,9 +173,11 @@ def preprocess_profile(profile: dict) -> dict[str, str | dict] | None:
 
     for token in profile['freq']:
         if token.lower() in preprocessed_profile['freq']:
-            preprocessed_profile['freq'][token.lower()] += profile['freq'][token] / profile['n_words'][0]
+            preprocessed_profile['freq'][token.lower()] \
+                += profile['freq'][token] / profile['n_words'][0]
         elif len(token) == 1:
-            preprocessed_profile['freq'][token.lower()] = profile['freq'][token] / profile['n_words'][0]
+            preprocessed_profile['freq'][token.lower()] \
+                = profile['freq'][token] / profile['n_words'][0]
 
     return preprocessed_profile
 
