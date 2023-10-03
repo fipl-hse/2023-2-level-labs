@@ -183,9 +183,9 @@ def preprocess_profile(profile: dict) -> dict[str, str | dict] | None:
             continue
     for letter, freq in big_letters.items():
         if letter in profile['freq']:
-            profile['freq'][letter] += big_letters[letter]
+            profile['freq'][letter] += freq
         else:
-            profile['freq'][letter] = big_letters[letter]
+            profile['freq'][letter] = freq
     for letter in profile['freq']:
         profile['freq'][letter] = profile['freq'][letter] / profile['n_words'][0]
     profile.pop('n_words')
