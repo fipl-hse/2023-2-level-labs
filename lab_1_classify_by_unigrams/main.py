@@ -187,12 +187,10 @@ def collect_profiles(paths_to_profiles: list) -> list[dict[str, str | dict[str, 
         profile = load_profile(path)
         if isinstance(profile, dict):
             preprocessed_profile = preprocess_profile(profile)
-            preprocess_profiles_list.append(preprocessed_profile)
+            if isinstance(preprocessed_profile, dict):
+                preprocess_profiles_list.append(preprocessed_profile)
 
-    if (
-            isinstance(preprocess_profiles_list, list)
-            and all(isinstance(profile, dict) for profile in preprocess_profiles_list)
-    ):
+    if isinstance(preprocess_profiles_list, list):
         return preprocess_profiles_list
 
     return None
