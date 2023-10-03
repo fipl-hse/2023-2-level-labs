@@ -1,7 +1,7 @@
 """
 Language detection starter
 """
-#from lab_1_classify_by_unigrams.main import create_language_profile
+
 import lab_1_classify_by_unigrams.main
 
 
