@@ -174,7 +174,7 @@ def preprocess_profile(profile: dict) -> dict[str, str | dict] | None:
     if 'name' not in profile or 'freq' not in profile or 'n_words' not in profile:
         return None
     big_letters = {}
-    for n_gram in profile.get('freq').copy():
+    for n_gram in profile['freq'].copy():
         if len(n_gram) != 1:
             profile['freq'].pop(n_gram)
         elif n_gram.isupper():
@@ -244,4 +244,3 @@ def print_report(detections: list[tuple[str, float]]) -> None:
             language = profile[0]
             score = profile[1]
             print(f'{language}: MSE {score:.5f}')
-
