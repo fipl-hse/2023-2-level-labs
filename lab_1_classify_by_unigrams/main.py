@@ -181,7 +181,7 @@ def preprocess_profile(profile: dict) -> dict[str, str | dict] | None:
             big_letters[n_gram.lower()] = profile['freq'].pop(n_gram)
         else:
             continue
-    for letter in big_letters:
+    for letter, freq in big_letters.items():
         if letter in profile['freq']:
             profile['freq'][letter] += big_letters[letter]
         else:
