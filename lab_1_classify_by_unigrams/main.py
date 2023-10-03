@@ -49,9 +49,9 @@ def create_language_profile(language: str, text: str) -> dict[str, str | dict[st
     tokens = tokenize(text)
     text_freq = calculate_frequencies(tokens)
 
-    if isinstance(text_freq, dict):
-        return {'name': language, 'freq': text_freq}
-    return None
+    if not isinstance(text_freq, dict):
+        return None
+    return {'name': language, 'freq': text_freq}
 
 
 def calculate_mse(predicted: list, actual: list) -> float | None:
@@ -84,8 +84,7 @@ def compare_profiles(
     :return: the distance between the profiles
     """
     if not isinstance(unknown_profile, dict) or not isinstance(profile_to_compare, dict) \
-            or ('name' or 'freq') not in unknown_profile \
-            or ('name' or 'freq') not in profile_to_compare:
+            or ('name' or 'freq') not in (unknown_profile or profile_to_compare):
         return None
 
     unknown_freq = unknown_profile['freq']
@@ -130,14 +129,14 @@ def detect_language(
     mse_1 = compare_profiles(unknown_profile, profile_1)
     mse_2 = compare_profiles(unknown_profile, profile_2)
 
+    if not mse_1 and not mse_2:
+        return None
     if mse_2 and (not mse_1 or mse_1 > mse_2) and \
             isinstance(profile_2['name'], str):
         return profile_2['name']
     if mse_1 and (not mse_2 or mse_1 < mse_2) and \
             isinstance(profile_1['name'], str):
         return profile_1['name']
-    if not mse_1 and not mse_2:
-        return None
     alphabetical_order = [profile_1['name'], profile_2['name']]
     alphabetical_order.sort()
     return str(alphabetical_order[0])
@@ -155,9 +154,9 @@ def load_profile(path_to_file: str) -> dict | None:
     with open(path_to_file, 'r', encoding='utf-8') as file:
         profile = json.load(file)
 
-    if isinstance(profile, dict):
-        return profile
-    return None
+    if not isinstance(profile, dict):
+        return None
+    return profile
 
 
 def preprocess_profile(profile: dict) -> dict[str, str | dict] | None:
