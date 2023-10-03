@@ -114,21 +114,26 @@ def detect_language(
     ):
         return None
 
-    metrics = {
-        profile_1['name']: compare_profiles(unknown_profile, profile_1),
-        profile_2['name']: compare_profiles(unknown_profile, profile_2),
-    }
-
+    name_1 = profile_1['name']
+    name_2 = profile_2['name']
     if (
-            isinstance(metrics, dict)
-            and all(isinstance(metric, float) for metric in metrics.values())
-            and all(isinstance(lang, str) for lang in metrics)
+        isinstance(name_1, str)
+        and isinstance(name_2, str)
     ):
-        if metrics.get(profile_1['name']) == metrics.get(profile_2['name']):
-            metrics_lang = sorted(metrics.keys())
-            return metrics_lang[0]
-        min_metric = min(metrics, key=metrics.get)
-        return min_metric
+        metrics = {
+            name_1: compare_profiles(unknown_profile, profile_1),
+            name_2: compare_profiles(unknown_profile, profile_2),
+        }
+
+        if (
+                all(isinstance(metric, float) for metric in metrics.values())
+                and all(isinstance(lang, str) for lang in metrics)
+        ):
+            if metrics[name_1] == metrics[name_2]:
+                return min(metrics.keys())
+
+            min_metric = min(metrics, key=metrics.get)
+            return min_metric
 
     return None
 
