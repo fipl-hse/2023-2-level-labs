@@ -2,13 +2,9 @@
 Language detection starter
 """
 
-from lab_1_classify_by_unigrams.main import (
-    collect_profiles,
-    create_language_profile,
-    detect_language,
-    detect_language_advanced,
-    print_report
-)
+from lab_1_classify_by_unigrams.main import (collect_profiles, create_language_profile,
+                                             detect_language, detect_language_advanced,
+                                             print_report)
 
 
 def main() -> None:
@@ -28,9 +24,9 @@ def main() -> None:
 
     if (
             isinstance(en_profile, dict)
-        and isinstance(de_profile, dict)
-        and isinstance(unknown_profile, dict)
-):
+            and isinstance(de_profile, dict)
+            and isinstance(unknown_profile, dict)
+    ):
         detect_language(unknown_profile, en_profile, de_profile)
 
     paths_to_profiles = [
