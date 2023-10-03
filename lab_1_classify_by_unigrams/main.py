@@ -46,16 +46,16 @@ def calculate_mse(predicted: list, actual: list) -> float | None:
     return mse
 
 
-def compare_profiles(
-        unknown_profile: dict[str, str | dict[str, float]],
-        profile_to_compare: dict[str, str | dict[str, float]]
-) -> float | None:
-    if not isinstance(unknown_profile, dict) or not isinstance(profile_to_compare, dict):
-        return None
-    if not ('name' and 'freq') in unknown_profile or not ('name' and 'freq') in profile_to_compare:
-        return None
-    unknown_freq = list(unknown_profile['freq'].values())
-    to_compare_freq = list(profile_to_compare['freq'].values())
-    mse_to_compare = calculate_mse(unknown_freq, to_compare_freq)
-    return mse_to_compare
+# def compare_profiles(
+#         unknown_profile: dict[str, str | dict[str, float]],
+#         profile_to_compare: dict[str, str | dict[str, float]]
+# ) -> float | None:
+#     if not isinstance(unknown_profile, dict) or not isinstance(profile_to_compare, dict):
+#         return None
+#     if not ('name' and 'freq') in unknown_profile or not ('name' and 'freq') in profile_to_compare:
+#         return None
+#     unknown_freq = list(unknown_profile['freq'].values())
+#     to_compare_freq = list(profile_to_compare['freq'].values())
+#     mse_to_compare = calculate_mse(unknown_freq, to_compare_freq)
+#     return mse_to_compare
 
