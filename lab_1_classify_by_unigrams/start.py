@@ -22,6 +22,7 @@ def main() -> None:
         isinstance(de_profile, dict) and\
         isinstance(unknown_profile, dict):
         result = detect_language(unknown_profile, en_profile, de_profile)
+        print(result)
         assert result, "Detection result is None"
 
 
