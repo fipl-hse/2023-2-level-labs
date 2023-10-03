@@ -127,7 +127,8 @@ def detect_language(
 
     if isinstance(metrics, dict):
         if metrics[profile_1['name']] == metrics[profile_2['name']]:
-            return sorted(metrics.keys())[0]
+            if sorted(metrics.keys())[0]:
+                return sorted(metrics.keys())[0]
         return min(metrics, key=metrics.get)
 
     return None
