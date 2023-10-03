@@ -96,7 +96,11 @@ def compare_profiles(
     return calculate_mse(lang1_freq, lang2_freq)
 
 
-def detect_language(unknown_profile: dict[str, str | dict[str, float]], profile_1: dict[str, str | dict[str, float]], profile_2: dict[str, str | dict[str, float]],) -> str | None:
+def detect_language(
+        unknown_profile: dict[str, str | dict[str, float]],
+        profile_1: dict[str, str | dict[str, float]],
+        profile_2: dict[str, str | dict[str, float]]
+) -> str | None:
     """
     Detects the language of an unknown profile
     :param unknown_profile: a dictionary of a profile to determine the language of
@@ -194,7 +198,10 @@ def collect_profiles(paths_to_profiles: list) -> list[dict[str, str | dict[str, 
     return None
 
 
-def detect_language_advanced(unknown_profile: dict[str, str | dict[str, float]], known_profiles: list) -> list | None:
+def detect_language_advanced(
+        unknown_profile: dict[str, str | dict[str, float]],
+        known_profiles: list
+) -> list | None:
     """
     Detects the language of an unknown profile
     :param unknown_profile: a dictionary of a profile to determine the language of
