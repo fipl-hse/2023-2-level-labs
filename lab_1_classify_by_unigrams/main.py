@@ -40,7 +40,7 @@ def calculate_frequencies(tokens: list[str] | None) -> dict[str, float] | None:
     return frequencies
 
 
-def create_language_profile(language: str, text: str):
+def create_language_profile(language: str, text: str) -> dict[str, str | dict[str, float]] | None:
     """
         Creates a language profile
         :param language: a language
@@ -49,10 +49,10 @@ def create_language_profile(language: str, text: str):
         """
     if not isinstance(language, str) or not isinstance(text, str):
         return None
-    profile = {'name': language, 'freq': calculate_frequencies(tokenize(text))}
-    if not profile['freq']:
+    freq_dict = calculate_frequencies(tokenize(text))
+    if not freq_dict:
         return None
-    return profile
+    return {'name': language, 'freq': freq_dict}
 
 
 def calculate_mse(predicted: list, actual: list) -> float | None:
@@ -88,9 +88,15 @@ def compare_profiles(
             or not isinstance(profile_to_compare, dict)
             or len(target_set & set(unknown_profile) & set(profile_to_compare)) != len(target_set)):
         return None
-    new_freq = {a: 0 for a in set(list(unknown_profile['freq']) + list(profile_to_compare['freq']))}
+    new_freq = {a: .0 for a in set(list(unknown_profile['freq']) + list(profile_to_compare['freq']))}
     freq_to_compare = new_freq.copy()
+    '''for key in unknown_profile['freq']:
+        new_freq[key] = unknown_profile['freq'][key]
+    for key in profile_to_compare['freq']:
+        freq_to_compare[key] = profile_to_compare['freq'][key]'''
+    assert isinstance(unknown_profile['freq'], dict)
     new_freq.update(unknown_profile['freq'])
+    assert isinstance(profile_to_compare['freq'], dict)
     freq_to_compare.update(profile_to_compare['freq'])
     distance = calculate_mse(list(new_freq.values()), list(freq_to_compare.values()))
     return distance
@@ -99,7 +105,7 @@ def compare_profiles(
 def detect_language(
         unknown_profile: dict[str, str | dict[str, float]],
         profile_1: dict[str, str | dict[str, float]],
-        profile_2: dict[str, str | dict[str, float]],
+        profile_2: dict[str, str | dict[str, float]]
 ) -> str | None:
     """
     Detects the language of an unknown profile
@@ -110,6 +116,8 @@ def detect_language(
     """
     if not all(isinstance(given, dict) for given in (unknown_profile, profile_1, profile_2)):
         return None
+    assert isinstance(profile_1['name'], str)
+    assert isinstance(profile_2['name'], str)
     distance_1 = (compare_profiles(unknown_profile, profile_1), profile_1['name'])
     distance_2 = (compare_profiles(unknown_profile, profile_2), profile_2['name'])
     if not distance_1[0] or not distance_2[0]:
