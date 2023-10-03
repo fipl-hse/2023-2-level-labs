@@ -40,6 +40,7 @@ def main() -> None:
     if (
         isinstance(unknown_profile, dict)
         and all(isinstance(profile, dict) for profile in preprocessed_profiles)
+        and isinstance(preprocessed_profiles, list)
     ):
         result = detect_language_advanced(unknown_profile, preprocessed_profiles)
     if result:
