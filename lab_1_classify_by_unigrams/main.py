@@ -2,6 +2,8 @@
 Lab 1
 Language detection
 """
+import json
+
 
 def tokenize(text: str) -> list[str] | None:
     """
@@ -54,7 +56,7 @@ def create_language_profile(language: str, text: str) -> dict[str, str | dict[st
     if not frequency_dict:
         return None
 
-    return {"name": language, "freq": frequency_dict}
+    return {'name': language, 'freq': frequency_dict}
 
 
 def calculate_mse(predicted: list, actual: list) -> float | None:
@@ -139,8 +141,8 @@ def detect_language(
             return str(profile_2['name'])
         if profile_1_metric < profile_2_metric:
             return str(profile_1['name'])
-
-    return [profile_1['name'], profile_2['name']].sort()
+    equal_length_case = [profile_1['name'], profile_2['name']].sort()
+    return equal_length_case
 
 
 def load_profile(path_to_file: str) -> dict | None:
@@ -149,7 +151,16 @@ def load_profile(path_to_file: str) -> dict | None:
     :param path_to_file: a path to the language profile
     :return: a dictionary with at least two keys – name, freq
     """
+    if not isinstance(path_to_file, str):
+        return None
 
+    with open(path_to_file, 'r', encoding='utf-8') as f:
+        profile = json.load(f)
+
+    if not isinstance(profile, dict):
+        return None
+
+    return profile
 
 def preprocess_profile(profile: dict) -> dict[str, str | dict] | None:
     """
@@ -158,6 +169,21 @@ def preprocess_profile(profile: dict) -> dict[str, str | dict] | None:
     :return: a dict with a lower-cased loaded profile
     with relative frequencies without unnecessary ngrams
     """
+    if not (isinstance(profile, dict)
+        and 'name' in profile
+        and 'freq' in profile
+        and 'n_words' in profile
+    ):
+        return None
+
+    unigram_profile = {'name': profile['name'], 'freq': {}}
+    for token in profile['freq']:
+        if token.lower() in unigram_profile['freq']:
+            unigram_profile['freq'][token.lower()] += profile['freq'][token] / profile['n_words'][0]
+        elif len(token) == 1:
+            unigram_profile['freq'][token.lower()] = profile['freq'][token] / profile['n_words'][0]
+
+    return unigram_profile
 
 
 def collect_profiles(paths_to_profiles: list) -> list[dict[str, str | dict[str, float]]] | None:
@@ -166,6 +192,27 @@ def collect_profiles(paths_to_profiles: list) -> list[dict[str, str | dict[str, 
     :paths_to_profiles: a list of strings to the profiles
     :return: a list of loaded profiles
     """
+    if not isinstance(paths_to_profiles, list):
+        return None
+
+    if not all(isinstance(path, str) for path in paths_to_profiles):
+        return None
+
+    profiles = []
+    for path in paths_to_profiles:
+        loaded_profile = load_profile(path)
+        if not loaded_profile:
+            return None
+
+        preprocessed_profile = preprocess_profile(loaded_profile)
+        if not preprocessed_profile:
+            return None
+
+        profiles.append(preprocessed_profile)
+        if not preprocessed_profile:
+            return None
+
+    return profiles
 
 
 def detect_language_advanced(unknown_profile: dict[str, str | dict[str, float]],
@@ -176,6 +223,18 @@ def detect_language_advanced(unknown_profile: dict[str, str | dict[str, float]],
     :param known_profiles: a list of known profiles
     :return: a sorted list of tuples containing a language and a distance
     """
+    if not (isinstance(unknown_profile, dict)
+            and isinstance(known_profiles, list)
+    ):
+        return None
+
+    detected_language = [(profile['name'], compare_profiles(profile, unknown_profile)) for profile in known_profiles]
+    detected_language = sorted(detected_language, key=lambda x: (x[1], x[0]))
+
+    if not isinstance(detected_language, list):
+        return None
+
+    return detected_language
 
 
 def print_report(detections: list[tuple[str, float]]) -> None:
@@ -183,3 +242,8 @@ def print_report(detections: list[tuple[str, float]]) -> None:
     Prints report for detection of language
     :param detections: a list with distances for each available language
     """
+    if not isinstance(detections, list):
+        return None
+
+    for detection in detections:
+        print(f'{detection[0]}: MSE {detection[1]:.5f}')
