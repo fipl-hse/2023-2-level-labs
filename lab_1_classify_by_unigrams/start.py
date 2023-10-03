@@ -3,7 +3,11 @@ Language detection starter
 """
 
 from lab_1_classify_by_unigrams.main import (
-    create_language_profile, collect_profiles, detect_language, detect_language_advanced, print_report
+    collect_profiles,
+    create_language_profile,
+    detect_language,
+    detect_language_advanced,
+    print_report
 )
 
 
@@ -40,10 +44,10 @@ def main() -> None:
     ]
 
     known_profiles = collect_profiles(paths_to_profiles)
-    result = detect_language_advanced(unknown_profile, known_profiles)
-    for result in result:
-        if isinstance(result, tuple):
-            print_report(result)
+    if isinstance(unknown_profile, dict) and isinstance(known_profiles, list):
+        result = detect_language_advanced(unknown_profile, known_profiles)
+    if result:
+        print_report(result)
 
     assert result, "Detection result is None"
 
