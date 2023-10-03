@@ -96,14 +96,12 @@ def compare_profiles(
         return None
     unknown_list = []
     compare_list = []
-    unknown_freq = unknown_profile['freq']
-    compare_freq = profile_to_compare['freq']
-    unknown = list(unknown_freq.keys())
-    compare = list(compare_freq.keys())
-    all_freq = list(set(unknown + compare))
+    unknown_keys = list(unknown_profile['freq'].keys())
+    compare_keys = list(profile_to_compare['freq'].keys())
+    all_freq = list(set(unknown_keys + compare_keys))
     for i in all_freq:
-        unknown_list.append(unknown_freq.get(i, 0))
-        compare_list.append(compare_freq.get(i, 0))
+        unknown_list.append(unknown_profile['freq'].get(i, 0))
+        compare_list.append(profile_to_compare['freq'].get(i, 0))
     mse = calculate_mse(unknown_list, compare_list)
     return mse
 
