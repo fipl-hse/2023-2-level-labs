@@ -17,8 +17,7 @@ def tokenize(text: str) -> list[str] | None:
     list_of_tokens = ""
     for token in text:
         if token.isalpha():
-            new_token = token.lower()
-            list_of_tokens += new_token
+            list_of_tokens += token.lower()
     tokens = list(list_of_tokens)
 
     return tokens
@@ -29,7 +28,7 @@ def calculate_frequencies(tokens: list[str] | None) -> dict[str, float] | None:
     :param tokens: a list of tokens
     :return: a dictionary with frequencies
     """
-    if not isinstance(tokens, list) or not all(isinstance(letter, str) for letter in tokens):
+    if not isinstance(tokens, list) or not all(isinstance(token, str) for token in tokens):
         return None
 
     list_of_tokens = ""
@@ -53,9 +52,7 @@ def create_language_profile(language: str, text: str) -> dict[str, str | dict[st
     if not isinstance(language, str) or not isinstance(text, str):
         return None
 
-    tokens = tokenize(text)
-    frequency = calculate_frequencies(tokens)
-    lang_profile = {'name': language, 'freq': frequency}
+    lang_profile = {'name': language, 'freq': calculate_frequencies(tokenize(text))}
 
     return lang_profile
 
@@ -73,11 +70,10 @@ def calculate_mse(predicted: list, actual: list) -> float | None:
         return None
 
     sum_mse = 0
-    for i in range(len(actual)):
-        sum_mse += (actual[i]-predicted[i]) ** 2
-    mse = sum_mse/len(actual)
+    for i, act_value in enumerate(actual):
+        sum_mse += (act_value-predicted[i]) ** 2
 
-    return mse
+    return sum_mse/len(actual)
 
 
 def compare_profiles(
