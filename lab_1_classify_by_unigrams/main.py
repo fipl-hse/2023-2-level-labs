@@ -13,8 +13,8 @@ def tokenize(text: str) -> list[str] | None:
     """
     if not isinstance(text, str):
         return None
-    punc = "!#$%&'()*+,-./:;<=>?@[\]^_`{|}~1234567890"
-    tokens = "".join(text.split()).lower()
+    punc = " !#$%&'\'()*+,-./:;<=>?@[\\]^_`{|}~1234567890"
+    tokens = text.lower()
     for el in tokens:
         if el in punc:
             tokens = tokens.replace(el, '')
