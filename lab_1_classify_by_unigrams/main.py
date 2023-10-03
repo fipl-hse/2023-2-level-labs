@@ -196,9 +196,11 @@ def collect_profiles(paths_to_profiles: list) -> list[dict[str, str | dict[str, 
         profile = load_profile(path)
         if isinstance(profile, dict):
             processed_profile = preprocess_profile(profile)
+        if isinstance(processed_profile, dict):
             preprocessed_profiles.append(processed_profile)
 
     return preprocessed_profiles
+
 
 def detect_language_advanced(unknown_profile: dict[str, str | dict[str, float]],
                              known_profiles: list) -> list | None:
@@ -209,9 +211,28 @@ def detect_language_advanced(unknown_profile: dict[str, str | dict[str, float]],
     :return: a sorted list of tuples containing a language and a distance
     """
 
+    if not (
+            isinstance(unknown_profile, dict)
+            and isinstance(known_profiles, list)
+    ):
+        return None
+
+    detected_language = [(profile['name'], compare_profiles(profile, unknown_profile)) for profile in known_profiles]
+    detected_language = sorted(detected_language, key=lambda x: (x[1], x[0]))
+
+    if isinstance(detected_language, list):
+        return detected_language
+
 
 def print_report(detections: list[tuple[str, float]]) -> None:
     """
     Prints report for detection of language
     :param detections: a list with distances for each available language
     """
+    if not isinstance(detections, list):
+        return None
+
+    for detection in detections:
+        name = detection[0]
+        score = detection[1]
+        print(f'{name}: MSE {score:.5f}')
