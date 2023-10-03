@@ -41,7 +41,8 @@ def remove_implementation_from_function(original_declaration: ast.stmt,
                 opening_files.append(decl)
 
         if isinstance(decl, ast.Assert):
-            opening_files.append(decl)  # type: ignore
+            add_none = ast.parse("result = None")
+            opening_files.extend([add_none, decl])  # type: ignore
     original_declaration.body[1:] = opening_files
 
 
