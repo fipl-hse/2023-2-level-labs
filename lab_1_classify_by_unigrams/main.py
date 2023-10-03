@@ -3,6 +3,7 @@ Lab 1
 Language detection
 """
 
+import json
 
 def tokenize(text: str) -> list[str] | None:
     """
@@ -140,7 +141,16 @@ def load_profile(path_to_file: str) -> dict | None:
     :param path_to_file: a path to the language profile
     :return: a dictionary with at least two keys – name, freq
     """
+    if not isinstance(path_to_file, str):
+        return None
 
+    with open(path_to_file, "r", encoding="utf-8") as file_to_read:
+        profile = json.load(file_to_read)
+
+    if not isinstance(profile, dict):
+        return None
+
+    return profile
 
 def preprocess_profile(profile: dict) -> dict[str, str | dict] | None:
     """
