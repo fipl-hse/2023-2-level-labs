@@ -1,9 +1,8 @@
 """
 Language detection starter
 """
-from lab_1_classify_by_unigrams.main import create_language_profile
-from lab_1_classify_by_unigrams.main import detect_language
-from lab_1_classify_by_unigrams.main import tokenize
+from lab_1_classify_by_unigrams.main import create_language_profile, detect_language
+
 
 def main() -> None:
     """
@@ -15,13 +14,14 @@ def main() -> None:
         de_text = file_to_read_de.read()
     with open("assets/texts/unknown.txt", "r", encoding="utf-8") as file_to_read_unk:
         unknown_text = file_to_read_unk.read()
-    en_tokens = tokenize(en_text)
-    print(en_tokens)
     eng_pr = create_language_profile('English', en_text)
-    print(eng_pr)
-    unk_pr = create_language_profile('Unknown', unknown_text)
     de_pr = create_language_profile('Deutsch', de_text)
+    unk_pr = create_language_profile('Unknown', unknown_text)
+    assert eng_pr
+    assert de_pr
+    assert unk_pr
     result = detect_language(unk_pr, eng_pr, de_pr)
+    assert result
     print('Detection result is ' + str(result))
 
 
