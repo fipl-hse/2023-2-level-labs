@@ -62,7 +62,9 @@ def calculate_mse(predicted: list, actual: list) -> float | None:
     :param actual: a list of actual values
     :return: the score
     """
-    if not isinstance(actual, list) or not isinstance(predicted, list) or len(actual) != len(predicted):
+    if (not isinstance(actual, list) or
+            not isinstance(predicted, list) or
+            len(actual) != len(predicted)):
         return None
     summ_values = 0
     for i, predicted_value in enumerate(predicted):
@@ -120,14 +122,15 @@ def detect_language(
         return None
     mse_profile_1 = compare_profiles(unknown_profile, profile_1)
     mse_profile_2 = compare_profiles(unknown_profile, profile_2)
-    if mse_profile_1 < mse_profile_2:
-        return profile_1['name']
-    if mse_profile_2 < mse_profile_1:
-        return profile_2['name']
-    else:
-        str_name_language = sorted(profile_1['name'] + profile_2['name'])
-        first_name = str_name_language[0]
-        return first_name
+    if (isinstance(mse_profile_1, float)
+            and isinstance(mse_profile_2, float)):
+        if mse_profile_1 < mse_profile_2:
+            return profile_1['name']
+        if mse_profile_2 < mse_profile_1:
+            return profile_2['name']
+    str_name_language = sorted(profile_1['name'] + profile_2['name'])
+    first_name = str_name_language[0]
+    return first_name
 
 
 def load_profile(path_to_file: str) -> dict | None:
