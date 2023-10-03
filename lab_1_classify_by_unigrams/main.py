@@ -11,13 +11,10 @@ def tokenize(text: str) -> list[str] | None:
     :param text: a text
     :return: a list of lower-cased tokens without punctuation
     """
-    tokens_list = []
     if isinstance(text, str) is False:
         return None
     text = text.lower()
-    for i in text:
-        if i.isalpha():
-            tokens_list.append(i)
+    tokens_list = [i for i in text if i.isalpha()]
     return tokens_list
 
 
@@ -27,13 +24,9 @@ def calculate_frequencies(tokens: list[str] | None) -> dict[str, float] | None:
     :param tokens: a list of tokens
     :return: a dictionary with frequencies
     """
-    if isinstance(tokens, list) is False or tokens == []:
-        return None
-    count = 0
-    for symbol in tokens:
-        if isinstance(symbol, str) is False:
-            count += 1
-    if count != 0:
+    if (isinstance(tokens, list) is False
+        or tokens == []
+        or not all(isinstance(symbol, str) for symbol in tokens)):
         return None
     freq_dict = {}
     for symbol in tokens:
@@ -71,10 +64,9 @@ def calculate_mse(predicted: list, actual: list) -> float | None:
             isinstance(actual, list) is False or
             len(predicted) != len(actual)):
         return None
-    mse_sum = 0
+    mse = 0
     for i in range(len(predicted)):
-        mse_sum += (predicted[i] - actual[i])**2
-    mse = mse_sum / len(predicted)
+        mse += (predicted[i] - actual[i])**2 / len(predicted)
     return mse
 
 
