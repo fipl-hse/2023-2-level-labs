@@ -114,15 +114,17 @@ def detect_language(
     ):
         return None
 
-    name_1 = profile_1['name']
-    name_2 = profile_2['name']
+    name_1, name_2 = profile_1['name'], profile_2['name']
+    metric_1 = compare_profiles(unknown_profile, profile_1)
+    metric_2 = compare_profiles(unknown_profile, profile_2)
+
     if (
-        isinstance(name_1, str)
-        and isinstance(name_2, str)
+        isinstance(name_1, str) and isinstance(name_2, str)
+        and isinstance(metric_1, float) and isinstance(metric_2, float)
     ):
         metrics = {
-            name_1: compare_profiles(unknown_profile, profile_1),
-            name_2: compare_profiles(unknown_profile, profile_2),
+            name_1: metric_1,
+            name_2: metric_2,
         }
 
         if (
