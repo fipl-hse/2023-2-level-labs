@@ -14,9 +14,9 @@ def tokenize(text: str) -> list[str] | None:
     """
     if not isinstance(text, str):
         return None
-    punc = ''''1234567890!"#$%&'()’*º+,-./:;<=>?@[\\]^_`{|}~'''
-    text = text.replace(' ', '')
-    text = text.replace('\n', '')
+    punc = ''''1234567890!"#$%&'()’*º+,-./:;<=>?@[\\]^_\' \'`{\\\n|}~'''
+    #text = text.replace(' ', '')
+    #text = text.replace('\n', '')
     return [token.lower() for token in text if token not in punc]
 
 
@@ -126,8 +126,7 @@ def detect_language(
             return str(profile_1['name'])
         if unknown_and_2 < unknown_and_1:
             return str(profile_2['name'])
-    detected = sorted([str(profile_1.get('name')), str(profile_2.get('name'))])[0]
-    return detected
+    return sorted([str(profile_1.get('name')), str(profile_2.get('name'))])[0]
 
 
 def load_profile(path_to_file: str) -> dict | None:
@@ -174,7 +173,18 @@ def collect_profiles(paths_to_profiles: list) -> list[dict[str, str | dict[str, 
     """
     if not isinstance(paths_to_profiles, list):
         return None
-    return [preprocess_profile(load_profile(prof)) for prof in paths_to_profiles]
+    collect_profs = []
+    for prof in paths_to_profiles:
+        if not load_profile(prof):
+            return None
+        load_prof = load_profile(prof)
+        if load_prof:
+            if not preprocess_profile(load_prof):
+                return None
+            prep_prof = preprocess_profile(load_prof)
+            if prep_prof:
+                collect_profs.append(prep_prof)
+    return collect_profs
 
 
 def detect_language_advanced(unknown_profile: dict[str, str | dict[str, float]],
@@ -188,8 +198,11 @@ def detect_language_advanced(unknown_profile: dict[str, str | dict[str, float]],
     if not (isinstance(unknown_profile, dict)
             and isinstance(known_profiles, list)):
         return None
-    det_lang = [(known_prof['name'], compare_profiles(unknown_profile, known_prof)) for known_prof in known_profiles]
-    return sorted(det_lang, key=lambda tpl: tpl[1], reverse=True)
+    det_lang = []
+    for known_prof in known_profiles:
+        det_lang.append((str(known_prof['name']), compare_profiles(known_prof, unknown_profile)))
+    det_lang = sorted(det_lang, key=lambda tpl: (tpl[1], tpl[0]))
+    return det_lang
 
 
 
