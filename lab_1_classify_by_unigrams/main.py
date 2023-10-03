@@ -88,12 +88,9 @@ def compare_profiles(
             or not isinstance(profile_to_compare, dict)
             or len(target_set & set(unknown_profile) & set(profile_to_compare)) != len(target_set)):
         return None
-    new_freq = {a: .0 for a in set(list(unknown_profile['freq']) + list(profile_to_compare['freq']))}
+    new_freq = {a: .0 for a in set(list(unknown_profile['freq']) +
+                                   list(profile_to_compare['freq']))}
     freq_to_compare = new_freq.copy()
-    '''for key in unknown_profile['freq']:
-        new_freq[key] = unknown_profile['freq'][key]
-    for key in profile_to_compare['freq']:
-        freq_to_compare[key] = profile_to_compare['freq'][key]'''
     assert isinstance(unknown_profile['freq'], dict)
     new_freq.update(unknown_profile['freq'])
     assert isinstance(profile_to_compare['freq'], dict)
