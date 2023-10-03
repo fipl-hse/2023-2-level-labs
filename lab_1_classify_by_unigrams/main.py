@@ -182,16 +182,21 @@ def preprocess_profile(profile: dict) -> dict[str, str | dict] | None:
     return preprocessed_profile
 
 
-
-
-
 def collect_profiles(paths_to_profiles: list) -> list[dict[str, str | dict[str, float]]] | None:
     """
     Collects profiles for a given path
     :paths_to_profiles: a list of strings to the profiles
     :return: a list of loaded profiles
     """
+    if not isinstance(paths_to_profiles, list):
+        return None
 
+    preprocessed_profiles = []
+    for path in paths_to_profiles:
+        path = preprocess_profile(load_profile(path))
+        preprocessed_profiles.append(path)
+
+    return preprocessed_profiles
 
 def detect_language_advanced(unknown_profile: dict[str, str | dict[str, float]],
                              known_profiles: list) -> list | None:
