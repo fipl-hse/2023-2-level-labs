@@ -112,6 +112,8 @@ def detect_language(
         return None
     distance_1 = (compare_profiles(unknown_profile, profile_1), profile_1['name'])
     distance_2 = (compare_profiles(unknown_profile, profile_2), profile_2['name'])
+    if not distance_1[0] or not distance_2[0]:
+        return None
     if distance_1[0] < distance_2[0]:
         return distance_1[1]
     if distance_1[0] > distance_2[0]:
