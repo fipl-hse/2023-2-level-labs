@@ -20,7 +20,11 @@ def main() -> None:
     en_profile = create_language_profile('en', en_text)
     de_profile = create_language_profile('de', de_text)
     unknown_profile = create_language_profile('unknown', unknown_text)
-    detect_language(unknown_profile, en_profile, de_profile)
+    if (
+        isinstance(unknown_profile, dict) and isinstance(en_profile, dict)
+        and isinstance(de_profile, dict)
+    ):
+        detect_language(unknown_profile, en_profile, de_profile)
 
     path_to_profiles = [
         "assets/profiles/de.json",

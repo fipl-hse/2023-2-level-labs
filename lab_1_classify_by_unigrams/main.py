@@ -122,10 +122,12 @@ def detect_language(
     if not all(isinstance(metric, float) for metric in metrics.values()):
         return None
 
-    if metrics[profile_1['name']] == metrics[profile_2['name']]:
-        return str(sorted(metrics.keys())[0])
+    if isinstance(metrics, dict):
+        if metrics[profile_1['name']] == metrics[profile_2['name']]:
+            return sorted(metrics.keys())[0]
+        return min(metrics, key=metrics.get)
 
-    return min(metrics, key=metrics.get)
+    return None
 
 
 def load_profile(path_to_file: str) -> dict | None:
@@ -187,7 +189,10 @@ def collect_profiles(paths_to_profiles: list) -> list[dict[str, str | dict[str, 
             preprocessed_profile = preprocess_profile(profile)
             preprocess_profiles_list.append(preprocessed_profile)
 
-    if isinstance(preprocess_profiles_list, list):
+    if (
+            isinstance(preprocess_profiles_list, list)
+            and all(isinstance(profile, dict) for profile in preprocess_profiles_list)
+    ):
         return preprocess_profiles_list
 
     return None
