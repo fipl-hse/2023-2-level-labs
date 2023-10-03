@@ -124,7 +124,7 @@ def detect_language(
             and all(isinstance(metric, float) for metric in metrics.values())
             and all(isinstance(lang, str) for lang in metrics)
     ):
-        if metrics[profile_1['name']] == metrics[profile_2['name']]:
+        if metrics.get(profile_1['name']) == metrics.get(profile_2['name']):
             metrics_lang = sorted(metrics.keys())
             return metrics_lang[0]
         min_metric = min(metrics, key=metrics.get)
