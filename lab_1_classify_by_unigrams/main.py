@@ -15,8 +15,6 @@ def tokenize(text: str) -> list[str] | None:
     if not isinstance(text, str):
         return None
     punc = ''''1234567890!"#$%&'()’*º+,-./:;<=>?@[\\]^_\' \'`{\\\n|}~'''
-    #text = text.replace(' ', '')
-    #text = text.replace('\n', '')
     return [token.lower() for token in text if token not in punc]
 
 
@@ -205,9 +203,11 @@ def detect_language_advanced(unknown_profile: dict[str, str | dict[str, float]],
     return det_lang
 
 
-
 def print_report(detections: list[tuple[str, float]]) -> None:
     """
     Prints report for detection of language
     :param detections: a list with distances for each available language
     """
+    if isinstance(detections, list):
+        for tpl in detections:
+            print(f'{tpl[0]}: MSE {tpl[1]:.5f}')
