@@ -193,9 +193,10 @@ def collect_profiles(paths_to_profiles: list) -> list[dict[str, str | dict[str, 
 
     preprocessed_profiles = []
     for path in paths_to_profiles:
-        if isinstance(load_profile(path), dict):
-            path = preprocess_profile(load_profile(path))
-            preprocessed_profiles.append(path)
+        profile = load_profile(path)
+        if isinstance(profile, dict):
+            processed_profile = preprocess_profile(profile)
+            preprocessed_profiles.append(processed_profile)
 
     return preprocessed_profiles
 
