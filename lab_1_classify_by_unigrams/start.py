@@ -2,7 +2,9 @@
 Language detection starter
 """
 
-from lab_1_classify_by_unigrams.main import create_language_profile, collect_profiles, detect_language_advanced, print_report
+from lab_1_classify_by_unigrams.main import (
+    create_language_profile, collect_profiles, detect_language_advanced, print_report
+)
 
 
 def main() -> None:
