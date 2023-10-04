@@ -2,6 +2,7 @@
 Lab 1
 Language detection
 """
+import json
 
 
 def tokenize(text: str) -> list[str] | None:
@@ -59,9 +60,8 @@ def calculate_mse(predicted: list, actual: list) -> float | None:
             or len(predicted) != len(actual):
         return None
     zipped_values = zip(predicted, actual)
-    zipped_list = list(zipped_values)
     summation = 0
-    for i in zipped_list:
+    for i in zipped_values:
         summation += (i[1] - i[0]) ** 2
     return summation / len(predicted)
 
@@ -122,6 +122,11 @@ def load_profile(path_to_file: str) -> dict | None:
     :param path_to_file: a path to the language profile
     :return: a dictionary with at least two keys – name, freq
     """
+    if not isinstance(path_to_file, str):
+        return None
+    with open(path_to_file, "r", encoding='utf-8') as read_file:
+        data = json.load(read_file)
+    return dict(data)
 
 
 def preprocess_profile(profile: dict) -> dict[str, str | dict] | None:
@@ -131,6 +136,15 @@ def preprocess_profile(profile: dict) -> dict[str, str | dict] | None:
     :return: a dict with a lower-cased loaded profile
     with relative frequencies without unnecessary ngrams
     """
+    if not isinstance(profile, dict) or not ('freq' or 'name' or 'n_words') in profile:
+        return None
+    edited_profile = {'name': profile['name'], 'freq': {}}
+    for token in profile['freq']:
+        if token.lower() in edited_profile['freq']:
+            edited_profile['freq'][token.lower()] += profile['freq'][token]/profile['n_words'][0]
+        elif len(token) == 1:
+            edited_profile['freq'][token.lower()] = profile['freq'][token]/profile['n_words'][0]
+    return edited_profile
 
 
 def collect_profiles(paths_to_profiles: list) -> list[dict[str, str | dict[str, float]]] | None:
@@ -139,6 +153,17 @@ def collect_profiles(paths_to_profiles: list) -> list[dict[str, str | dict[str, 
     :paths_to_profiles: a list of strings to the profiles
     :return: a list of loaded profiles
     """
+    if not isinstance(paths_to_profiles, list):
+        return None
+    collected_profiles = []
+    for path in paths_to_profiles:
+        profile = load_profile(path)
+        if isinstance(profile, dict) and isinstance(path, str):
+            data = preprocess_profile(profile)
+            if isinstance(data, dict):
+                collected_profiles.append(data)
+    if isinstance(collected_profiles, list):
+        return collected_profiles
 
 
 def detect_language_advanced(unknown_profile: dict[str, str | dict[str, float]],
@@ -149,6 +174,20 @@ def detect_language_advanced(unknown_profile: dict[str, str | dict[str, float]],
     :param known_profiles: a list of known profiles
     :return: a sorted list of tuples containing a language and a distance
     """
+    if not isinstance(unknown_profile, dict) or not isinstance(known_profiles, list):
+        return None
+    detection = []
+    for profile in known_profiles:
+        tokens = set(unknown_profile['freq'].keys()) | set(profile['freq'].keys())
+        unknown_lang = []
+        known_lang = []
+        for token in tokens:
+            unknown_lang.append(unknown_profile['freq'].get(token, 0))
+            known_lang.append(profile['freq'].get(token, 0))
+        mse = calculate_mse(known_lang, unknown_lang)
+        lang_mse = (profile['name'], mse)
+        detection.append(lang_mse)
+    return sorted(detection, key=lambda i: (i[1], i[0]))
 
 
 def print_report(detections: list[tuple[str, float]]) -> None:
@@ -156,3 +195,5 @@ def print_report(detections: list[tuple[str, float]]) -> None:
     Prints report for detection of language
     :param detections: a list with distances for each available language
     """
+    for language in detections:
+        print(f'{language[0]}: MSE {language[1]:.5f}')
