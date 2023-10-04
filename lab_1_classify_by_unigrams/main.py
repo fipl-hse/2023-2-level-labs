@@ -122,3 +122,44 @@ def detect_language(unknown_profile: dict[str, str | dict[str, float]],
     else:
         return [profile_1['name'], profile_2['name']].sort()
 
+
+def load_profile(path_to_file: str) -> dict | None:
+    """
+    Loads a language profile
+    :param path_to_file: a path to the language profile
+    :return: a dictionary with at least two keys – name, freq
+    """
+
+
+def preprocess_profile(profile: dict) -> dict[str, str | dict] | None:
+    """
+    Preprocesses profile for a loaded language
+    :param profile: a loaded profile
+    :return: a dict with a lower-cased loaded profile
+    with relative frequencies without unnecessary ngrams
+    """
+
+
+def collect_profiles(paths_to_profiles: list) -> list[dict[str, str | dict[str, float]]] | None:
+    """
+    Collects profiles for a given path
+    :paths_to_profiles: a list of strings to the profiles
+    :return: a list of loaded profiles
+    """
+
+
+def detect_language_advanced(unknown_profile: dict[str, str | dict[str, float]],
+                             known_profiles: list) -> list | None:
+    """
+    Detects the language of an unknown profile
+    :param unknown_profile: a dictionary of a profile to determine the language of
+    :param known_profiles: a list of known profiles
+    :return: a sorted list of tuples containing a language and a distance
+    """
+
+
+def print_report(detections: list[tuple[str, float]]) -> None:
+    """
+    Prints report for detection of language
+    :param detections: a list with distances for each available language
+    """
