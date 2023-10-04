@@ -196,7 +196,7 @@ def detect_language_advanced(unknown_profile: dict[str, str | dict[str, float]],
     if not (isinstance(unknown_profile, dict)
             and isinstance(known_profiles, list)):
         return None
-    det_lang = [(str(kn_prf['name']), compare_profiles(kn_prf, unknown_profile)) for kn_prf in known_profiles]
+    det_lang = [(str(kp['name']), compare_profiles(kp, unknown_profile)) for kp in known_profiles]
     det_lang = sorted(det_lang, key=lambda tpl: (tpl[1], tpl[0]))
     return det_lang
 
