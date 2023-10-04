@@ -152,7 +152,7 @@ def preprocess_profile(profile: dict) -> dict[str, str | dict] | None:
     profile_new = {"name": profile["name"], "freq": {}}
     for token, freq in profile.get("freq").items():
         if len(token) == 1:
-            if token.lower() in profile_new["freq"].keys():
+            if token.lower() in profile_new["freq"]:
                 profile_new["freq"][token.lower()] += freq / profile["n_words"][0]
             else:
                 profile_new["freq"].update({token.lower(): freq / profile["n_words"][0]})
