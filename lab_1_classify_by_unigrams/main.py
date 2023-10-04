@@ -70,6 +70,7 @@ def calculate_mse(predicted: list, actual: list) -> float | None:
     for index, value in enumerate(predicted):
         sum_diff += (actual[index] - value) ** 2
     mse = sum_diff / len(predicted)
+    mse = round(mse, 4)
     return mse
 
 
@@ -90,11 +91,15 @@ def compare_profiles(
     if 'name' not in profile_to_compare or 'freq' not in profile_to_compare:
         return None
 
-    sorted_profile_to_compare = dict(sorted(profile_to_compare.items()))
-    sorted_unknown_profile = dict(sorted(unknown_profile.items()))
+    #sorted_profile_to_compare
+    #predicted_tokens = dict(sorted(profile_to_compare['freq'].items()))
+    #sorted_unknown_profile
+    #actual_tokens = dict(sorted(unknown_profile['freq'].items()))
+    #sorted_profile_to_compare = tuple(sorted(profile_to_compare.items()))
+    #sorted_unknown_profile = tuple(sorted(unknown_profile.items()))
 
-    predicted_tokens = sorted_profile_to_compare.get('freq')
-    actual_tokens = sorted_unknown_profile.get('freq')
+    predicted_tokens = profile_to_compare.get('freq')
+    actual_tokens = unknown_profile.get('freq')
 
     for key in predicted_tokens.keys():
         if key not in actual_tokens:
@@ -104,16 +109,14 @@ def compare_profiles(
         if key not in predicted_tokens:
             predicted_tokens[key] = 0
 
-    predicted = list(predicted_tokens.values())
-    #for value in predicted_tokens.values():
-        #predicted.append(value)
+    sorted_predicted_tokens = dict(sorted(predicted_tokens.items()))
+    sorted_actual_tokens = dict(sorted(actual_tokens.items()))
 
-    actual = list(actual_tokens.values())
-    #for value in actual_tokens.values():
-        #actual.append(value)
+    predicted = list(sorted_predicted_tokens.values())
+
+    actual = list(sorted_actual_tokens.values())
 
     mse = calculate_mse(predicted, actual)
-    mse = round(mse, 3)
     return mse
 
 
@@ -140,7 +143,7 @@ def detect_language(
     if mse_1 == mse_2:
         names = [profile_1['name'], profile_2['name']]
         names.sort()
-        language =  names[0]
+        language = names[0]
     elif mse_1 < mse_2:
         language = profile_1['name']
     else:
