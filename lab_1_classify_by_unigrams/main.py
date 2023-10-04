@@ -72,7 +72,7 @@ def calculate_mse(predicted: list, actual: list) -> float | None:
     if len(predicted) != len(actual):
         return None
     difference_square = []
-    for i in range(len(predicted)):
+    for i, j in enumerate(predicted):
         difference_square.append((actual[i] - predicted[i]) ** 2)
     mse = sum(difference_square) / len(predicted)
     return mse
@@ -106,9 +106,9 @@ def compare_profiles(
 
 
 def detect_language(
-            unknown_profile: dict[str, str | dict[str, float]],
-            profile_1: dict[str, str | dict[str, float]],
-            profile_2: dict[str, str | dict[str, float]]
+        unknown_profile: dict[str, str | dict[str, float]],
+        profile_1: dict[str, str | dict[str, float]],
+        profile_2: dict[str, str | dict[str, float]]
 ) -> str | None:
     """
     Detects the language of an unknown profile
@@ -118,7 +118,8 @@ def detect_language(
     :return: a language
     """
 
-    if not isinstance(unknown_profile, dict) or not isinstance(profile_1, dict) or not isinstance(profile_2, dict):
+    if not isinstance(unknown_profile, dict) or not isinstance(profile_1, dict
+                                                               ) or not isinstance(profile_2, dict):
         return None
     mse_1 = compare_profiles(unknown_profile, profile_1)
     mse_2 = compare_profiles(unknown_profile, profile_2)
@@ -128,5 +129,5 @@ def detect_language(
         return str(profile_1['name'])
     if mse_2 < mse_1:
         return str(profile_2['name'])
-    else:
+    if mse_1 == mse_2:
         return [profile_1['name'], profile_2['name']].sort()
