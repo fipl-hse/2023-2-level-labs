@@ -11,15 +11,11 @@ def tokenize(text: str) -> list[str] | None:
     :param text: a text
     :return: a list of lower-cased tokens without punctuation
     """
-    if isinstance(text, str):
-        text = text.lower()
-        tokens = []
-        for symbol in text:
-            if symbol.isalpha():
-                tokens += symbol
-        return tokens
-    else:
+    if not isinstance(text, str):
         return None
+    else:
+        tokens = [symbol.lower() for symbol in text if symbol.isalpha()]
+        return tokens
 
 
 def calculate_frequencies(tokens: list[str] | None) -> dict[str, float] | None:
@@ -39,6 +35,7 @@ def calculate_frequencies(tokens: list[str] | None) -> dict[str, float] | None:
     return freq_dict
 
 
+
 def create_language_profile(language: str, text: str) -> dict[str, str | dict[str, float]] | None:
     """
     Creates a language profile
@@ -48,6 +45,9 @@ def create_language_profile(language: str, text: str) -> dict[str, str | dict[st
     """
     if not isinstance(language, str) or not isinstance(text, str):
         return None
+    dict_of_freq = calculate_frequencies(tokenize(text))
+    lang_prof = {'name': language, 'freq': dict_of_freq}
+    return lang_prof
 
 
 
