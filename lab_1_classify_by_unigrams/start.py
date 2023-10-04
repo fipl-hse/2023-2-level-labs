@@ -1,9 +1,9 @@
-from lab_1_classify_by_unigrams.main import create_language_profile
-from lab_1_classify_by_unigrams.main import detect_language
-
 """
 Language detection starter
 """
+from lab_1_classify_by_unigrams.main import create_language_profile
+from lab_1_classify_by_unigrams.main import detect_language
+
 
 def main() -> None:
     """
@@ -20,8 +20,8 @@ def main() -> None:
         unknown_profile = create_language_profile('unknown', unknown_text)
     result = None
     assert result, "Detection result is None"
-    detection_result = detect_language(unknown_profile, en_profile, de_profile)
-    return detection_result
+    result = detect_language(unknown_profile, en_profile, de_profile)
+    return result
 
 if __name__ == "__main__":
     main()
