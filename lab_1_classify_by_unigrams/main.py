@@ -58,11 +58,11 @@ def create_language_profile(language: str, text: str) -> dict[str, str | dict[st
 
 def calculate_mse(predicted: list, actual: list) -> float | None:
     """
-   Calculates mean squared error between predicted and actual values
-   :param predicted: a list of predicted values
-   :param actual: a list of actual values
-   :return: the score
-   """
+    Calculates mean squared error between predicted and actual values
+    :param predicted: a list of predicted values
+    :param actual: a list of actual values
+    :return: the score
+    """
     if not isinstance(predicted, list) or not isinstance(actual, list):
         return None
     if len(predicted) != len(actual):
@@ -76,7 +76,8 @@ def calculate_mse(predicted: list, actual: list) -> float | None:
 
 def compare_profiles(
         unknown_profile: dict[str, str | dict[str, float]],
-        profile_to_compare: dict[str, str | dict[str, float]]) -> float | None:
+        profile_to_compare: dict[str, str | dict[str, float]]
+) -> float | None:
     """
     Compares profiles and calculates the distance using symbols
     :param unknown_profile: a dictionary of an unknown profile
@@ -99,9 +100,11 @@ def compare_profiles(
     return mse_to_compare
 
 
-def detect_language(unknown_profile: dict[str, str | dict[str, float]],
-                    profile_1: dict[str, str | dict[str, float]],
-                    profile_2: dict[str, str | dict[str, float]]) -> str | None:
+def detect_language(
+            unknown_profile: dict[str, str | dict[str, float]],
+            profile_1: dict[str, str | dict[str, float]],
+            profile_2: dict[str, str | dict[str, float]]
+) -> str | None:
     """
     Detects the language of an unknown profile
     :param unknown_profile: a dictionary of a profile to determine the language of
