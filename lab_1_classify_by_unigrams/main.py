@@ -11,6 +11,7 @@ def tokenize(text: str) -> list[str] | None:
     :param text: a text
     :return: a list of lower-cased tokens without punctuation
     """
+
     if not isinstance(text, str):
         return None
     text = text.lower()
@@ -28,6 +29,7 @@ def calculate_frequencies(tokens: list[str] | None) -> dict[str, float] | None:
     :param tokens: a list of tokens
     :return: a dictionary with frequencies
     """
+
     if not isinstance(tokens, list):
         return None
     for token in tokens:
@@ -49,6 +51,7 @@ def create_language_profile(language: str, text: str) -> dict[str, str | dict[st
     :param text: a text
     :return: a dictionary with two keys – name, freq
     """
+
     if not isinstance(language, str) or not isinstance(text, str):
         return None
     freq_dict = calculate_frequencies(tokenize(text))
@@ -63,6 +66,7 @@ def calculate_mse(predicted: list, actual: list) -> float | None:
     :param actual: a list of actual values
     :return: the score
     """
+
     if not isinstance(predicted, list) or not isinstance(actual, list):
         return None
     if len(predicted) != len(actual):
@@ -84,6 +88,7 @@ def compare_profiles(
     :param profile_to_compare: a dictionary of a profile to compare the unknown profile to
     :return: the distance between the profiles
     """
+
     if not isinstance(unknown_profile, dict) or not isinstance(profile_to_compare, dict):
         return None
     if not ('name' and 'freq') in unknown_profile or not ('name' and 'freq') in profile_to_compare:
@@ -112,6 +117,7 @@ def detect_language(
     :param profile_2: a dictionary of a known profile
     :return: a language
     """
+
     if not isinstance(unknown_profile, dict) or not isinstance(profile_1, dict) or not isinstance(profile_2, dict):
         return None
     mse_1 = compare_profiles(unknown_profile, profile_1)
