@@ -72,9 +72,10 @@ def calculate_mse(predicted: list, actual: list) -> float | None:
     if len(predicted) != len(actual):
         return None
     difference_square = []
-    for i, j in enumerate(predicted):
+    quantity_of_meanings = len(predicted)
+    for i in range(quantity_of_meanings):
         difference_square.append((actual[i] - predicted[i]) ** 2)
-    mse = sum(difference_square) / len(predicted)
+    mse = sum(difference_square) / quantity_of_meanings
     return mse
 
 
@@ -117,9 +118,7 @@ def detect_language(
     :param profile_2: a dictionary of a known profile
     :return: a language
     """
-
-    if not isinstance(unknown_profile, dict) or not isinstance(profile_1, dict
-                                                               ) or not isinstance(profile_2, dict):
+    if not isinstance(unknown_profile, dict) or not isinstance(profile_1, dict) or not isinstance(profile_2, dict):
         return None
     mse_1 = compare_profiles(unknown_profile, profile_1)
     mse_2 = compare_profiles(unknown_profile, profile_2)
