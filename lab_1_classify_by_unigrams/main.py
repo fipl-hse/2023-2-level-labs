@@ -65,7 +65,7 @@ def calculate_mse(predicted: list, actual: list) -> float | None:
             len(predicted) != len(actual)):
         return None
     mse = 0
-    for i in range(len(predicted)):
+    for i, j in enumerate(predicted):
         mse += (predicted[i] - actual[i])**2 / len(predicted)
     return mse
 
