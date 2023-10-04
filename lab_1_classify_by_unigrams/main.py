@@ -11,11 +11,9 @@ def tokenize(text: str) -> list[str] | None:
     :param text: a text
     :return: a list of lower-cased tokens without punctuation
     """
-    if type(text) != str:
+    if not isinstance(text, str):
         return None
-    f = filter(str.isalpha, text)
-    text1 = ''.join(f).lower()
-    text1 = list(text1)
+    text1 = list(''.join(filter(str.isalpha, text)).lower())
     return text1
 
 
@@ -25,10 +23,10 @@ def calculate_frequencies(tokens: list[str] | None) -> dict[str, float] | None:
     :param tokens: a list of tokens
     :return: a dictionary with frequencies
     """
-    if type(tokens) != list:
+    if not isinstance(tokens, list):
         return None
     for i in tokens:
-        if type(i) != str:
+        if not isinstance(i, str):
             return None
     dictionary = {}
     for i in tokens:
@@ -47,13 +45,13 @@ def create_language_profile(language: str, text: str) -> dict[str, str | dict[st
     :param text: a text
     :return: a dictionary with two keys – name, freq
     """
-    if type(language) != str or type(text) != str:
+    if not isinstance(language, str) or not isinstance(text, str):
         return None
-    dict = {
+    dictionary = {
     "name": language,
     "freq": calculate_frequencies(tokenize(text))
         }
-    return dict
+    return dictionary
 
 
 def calculate_mse(predicted: list, actual: list) -> float | None:
