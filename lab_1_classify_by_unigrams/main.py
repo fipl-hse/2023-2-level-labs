@@ -13,11 +13,7 @@ def tokenize(text: str) -> list[str] | None:
     """
     if not isinstance(text, str):
         return None
-    tokens = []
-    text = text.lower()
-    for i in text:
-        if i.isalpha():
-            tokens.append(i)
+    tokens = [i for i in text.lower() if i.isalpha()]
     return tokens
 
 def calculate_frequencies(tokens: list[str] | None) -> dict[str, float] | None:
@@ -51,9 +47,9 @@ def create_language_profile(language: str, text: str) -> dict[str, str | dict[st
         return None
     tokens = tokenize(text)
     freq_of_tokens = calculate_frequencies(tokens)
-    if isinstance(freq_of_tokens, dict):
-        return {'name': language, 'freq': freq_of_tokens}
-    return None
+    if not isinstance(freq_of_tokens, dict):
+        return None
+    return {'name': language, 'freq': freq_of_tokens}
 
 def calculate_mse(predicted: list, actual: list) -> float | None:
     """
@@ -125,20 +121,23 @@ def detect_language(
         return None
     comparison_1 = compare_profiles(unknown_profile, profile_1)
     comparison_2 = compare_profiles(unknown_profile, profile_2)
-    if isinstance(comparison_1, float) and isinstance(comparison_2, float):
-        if comparison_1 < comparison_2:
-            if isinstance(profile_1['name'], str):
-                return profile_1['name']
-        if comparison_1 == comparison_2:
-            if isinstance(profile_1['name'], str) and isinstance(profile_2['name'], str):
-                names = list(profile_1['name'] + profile_2['name'])
-                sorted_names = sorted(names)
-                sorted_name = sorted_names[0]
-                return sorted_name
-
+    if not isinstance(comparison_1, float) and not isinstance(comparison_2, float):
+        return None
+    if comparison_1 < comparison_2:
+        if isinstance(profile_1['name'], str):
+            return profile_1['name']
+    if comparison_1 == comparison_2 and\
+            isinstance(profile_1['name'], str) and\
+            isinstance(profile_2['name'], str):
+        names = list(profile_1['name'] + profile_2['name'])
+        sorted_names = sorted(names)
+        sorted_name = sorted_names[0]
+        return sorted_name
     if isinstance(profile_2['name'], str):
         return profile_2['name']
     return None
+
+
 
 
 
