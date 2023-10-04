@@ -83,10 +83,8 @@ def compare_profiles(
     """
     if (isinstance(unknown_profile, dict) is False or
         isinstance(profile_to_compare, dict) is False or
-        "name" not in unknown_profile or
-        "freq" not in unknown_profile or
-        "name" not in profile_to_compare or
-        "freq" not in profile_to_compare):
+        ("name" or "freq") not in unknown_profile or
+        ("name" or "freq") not in profile_to_compare):
         return None
     list_p1 = []
     list_p2 = []
