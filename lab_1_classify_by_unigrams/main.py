@@ -7,18 +7,15 @@ import json
 
 def tokenize(text: str) -> list[str] | None:
     """
-       Splits a text into tokens, converts the tokens into lowercase,
-       removes punctuation, digits and other symbols
-       :param text: a text
-       :return: a list of lower-cased tokens without punctuation
-       """
+    Splits a text into tokens, converts the tokens into lowercase,
+    removes punctuation, digits and other symbols
+    :param text: a text
+    :return: a list of lower-cased tokens without punctuation
+    """
     if not isinstance(text, str):
         return None
     text = text.lower()
-    tokens = []
-    for token in text:
-        if token.isalpha():
-            tokens.append(token)
+    tokens = [token for token in text if token.isalpha()]
     return tokens
 
 
@@ -35,7 +32,11 @@ def calculate_frequencies(tokens: list[str] | None) -> dict[str, float] | None:
         return None
     frequency_dict = {}
     tokens_number = len(tokens)
+    token_list = []
     for token in tokens:
+        if token not in token_list:
+            token_list.append(token)
+    for token in token_list:
         if not isinstance(token, str):
             return None
         token_frequency = tokens.count(token)
