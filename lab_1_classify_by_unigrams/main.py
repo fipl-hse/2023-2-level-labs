@@ -46,6 +46,8 @@ def create_language_profile(language: str, text: str) -> dict[str, str | dict[st
     if not isinstance(language, str) or not isinstance(text, str):
         return None
     freqs = calculate_frequencies(tokenize(text))
+    if not freqs:
+        return None
     return {"name": language, "freq": freqs}
 
 
@@ -62,7 +64,7 @@ def calculate_mse(predicted: list, actual: list) -> float | None:
     dif = []
     for i, value in enumerate(actual):
         dif.append((value - predicted[i]) ** 2)
-    return sum(dif) / len(dif)
+    return float(sum(dif) / len(dif))
 
 
 def compare_profiles(
@@ -111,13 +113,15 @@ def detect_language(
         return None
     mse_1 = compare_profiles(unknown_profile, profile_1)
     mse_2 = compare_profiles(unknown_profile, profile_2)
+    if not mse_1 or not mse_2:
+        return None
     if mse_1 == mse_2:
         profs_to_sort = [profile_1.get("name"), profile_2.get("name")]
         profs_to_sort.sort()
-        return profs_to_sort[0]
+        return str(profs_to_sort[0])
     if mse_1 < mse_2:
-        return profile_1.get("name")
-    return profile_2.get("name")
+        return str(profile_1.get("name"))
+    return str(profile_2.get("name"))
 
 
 def load_profile(path_to_file: str) -> dict | None:
@@ -130,6 +134,8 @@ def load_profile(path_to_file: str) -> dict | None:
         return None
     with open(path_to_file, "r", encoding="utf-8") as file_to_read:
         profile = json.load(file_to_read)
+    if not isinstance(profile, dict):
+        return None
     return profile
 
 
@@ -143,10 +149,10 @@ def preprocess_profile(profile: dict) -> dict[str, str | dict] | None:
     if not isinstance(profile, dict) or "freq" not in profile.keys() \
             or "name" not in profile.keys() or "n_words" not in profile.keys():
         return None
-    profile_new = {"name": profile.get("name"), "freq": {}}
+    profile_new = {"name": profile["name"], "freq": {}}
     for token, freq in profile.get("freq").items():
         if len(token) == 1:
-            if token.lower() in profile_new["freq"]:
+            if token.lower() in profile_new["freq"].keys():
                 profile_new["freq"][token.lower()] += freq / profile["n_words"][0]
             else:
                 profile_new["freq"].update({token.lower(): freq / profile["n_words"][0]})
@@ -164,7 +170,11 @@ def collect_profiles(paths_to_profiles: list) -> list[dict[str, str | dict[str, 
     profiles = []
     for path in paths_to_profiles:
         loaded_profile = load_profile(path)
+        if not loaded_profile:
+            return None
         preprocessed_profile = preprocess_profile(loaded_profile)
+        if not preprocessed_profile:
+            return None
         profiles.append(preprocessed_profile)
     return profiles
 
@@ -181,7 +191,10 @@ def detect_language_advanced(unknown_profile: dict[str, str | dict[str, float]],
         return None
     mse_list = []
     for i, profile in enumerate(known_profiles):
-        mse_list.append((f"{profile.get('name')}", compare_profiles(unknown_profile, profile)))
+        compare_prof_result = compare_profiles(unknown_profile, profile)
+        if not compare_prof_result:
+            return None
+        mse_list.append((f"{profile.get('name')}", compare_prof_result))
     return sorted(mse_list, key=lambda x: (x[1], x[0]))
 
 
