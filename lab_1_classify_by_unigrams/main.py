@@ -118,11 +118,10 @@ def detect_language(
     :param profile_2: a dictionary of a known profile
     :return: a language
     """
-    if not isinstance(
-            unknown_profile, dict) or not isinstance(profile_1, dict
-                                                     ) or not isinstance(profile_2, dict
-                                                                         ):
-        return None
+    if isinstance(
+            unknown_profile, dict) or isinstance(profile_1, dict
+                                                 ) or isinstance(profile_2, dict
+                                                                 ):
     mse_1 = compare_profiles(unknown_profile, profile_1)
     mse_2 = compare_profiles(unknown_profile, profile_2)
     if not isinstance(mse_1, float) or not isinstance(mse_2, float):
@@ -131,5 +130,4 @@ def detect_language(
         return str(profile_1['name'])
     if mse_2 < mse_1:
         return str(profile_2['name'])
-    if mse_1 == mse_2:
-        return str([profile_1['name'], profile_2['name']].sort())
+    return str([profile_1['name'], profile_2['name']].sort())
