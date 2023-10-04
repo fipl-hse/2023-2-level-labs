@@ -35,7 +35,6 @@ def calculate_frequencies(tokens: list[str] | None) -> dict[str, float] | None:
     return freq_dict
 
 
-
 def create_language_profile(language: str, text: str) -> dict[str, str | dict[str, float]] | None:
     """
     Creates a language profile
@@ -50,7 +49,6 @@ def create_language_profile(language: str, text: str) -> dict[str, str | dict[st
     return lang_prof
 
 
-
 def calculate_mse(predicted: list, actual: list) -> float | None:
     """
     Calculates mean squared error between predicted and actual values
@@ -58,6 +56,7 @@ def calculate_mse(predicted: list, actual: list) -> float | None:
     :param actual: a list of actual values
     :return: the score
     """
+
 
 
 def compare_profiles(
