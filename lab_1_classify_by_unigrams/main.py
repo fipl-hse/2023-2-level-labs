@@ -76,12 +76,10 @@ def compare_profiles(
     :return: the distance between the profiles
     """
     if not isinstance(unknown_profile, dict) or not isinstance(profile_to_compare, dict) \
-            or ("name" not in unknown_profile.keys()) \
-            or ("freq" not in unknown_profile.keys()) \
-            or ("name" not in profile_to_compare.keys()) \
-            or ("freq" not in profile_to_compare.keys()):
+            or (("name" or "freq") not in (unknown_profile.keys() or profile_to_compare.keys())):
         return None
-    all_symbols = set(unknown_profile.get("freq").keys()).union(set(profile_to_compare.get("freq").keys()))
+    all_symbols = set(unknown_profile.get("freq").keys())\
+        .union(set(profile_to_compare.get("freq").keys()))
     unknown_freq = []
     compare_freq = []
     for symbol in all_symbols:
