@@ -2,17 +2,14 @@
 Language detection starter
 """
 
-from lab_1_classify_by_unigrams.main import (create_language_profile,
-                                             load_profile,
-                                             preprocess_profile,
-                                             detect_language_advanced,
-                                             print_report)
+from lab_1_classify_by_unigrams.main import (create_language_profile, load_profile, preprocess_profile,
+                                             detect_language, detect_language_advanced, print_report)
+
 
 def main() -> None:
     """
     Launches an implementation
     """
-
     paths_to_files = ['assets/profiles/de.json',
                       'assets/profiles/en.json',
                       'assets/profiles/es.json',
@@ -21,9 +18,7 @@ def main() -> None:
                       'assets/profiles/ru.json',
                       'assets/profiles/tr.json'
                      ]
-    
     language_profiles = []
-
     for path in paths_to_files:
         language_profile = load_profile(path)
         if language_profile:
@@ -42,11 +37,12 @@ def main() -> None:
     de_profile = create_language_profile('de', de_text)
     unknown_profile = create_language_profile('unknown', unknown_text)
 
-    if unknown_profile and en_profile and de_profile:
-        result = detect_language_advanced(unknown_profile, [en_profile, de_profile])
-        if result:
-            print_report(result)
-    if unknown_profile:
+    if isinstance((en_profile, dict) 
+                  and isinstance(de_profile, dict) 
+                  and isinstance(unknown_profile, dict)):
+        detect_language(unknown_profile, en_profile, de_profile)
+
+    if isinstance(unknown_profile, dict) and isinstance(language_profiles, list):
         result = detect_language_advanced(unknown_profile, language_profiles)
         if result:
             print_report(result)
