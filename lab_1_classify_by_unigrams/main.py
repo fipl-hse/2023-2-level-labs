@@ -14,10 +14,10 @@ def tokenize(text: str) -> list[str] | None:
     if not isinstance(text, str):
         return None
 
+    tokens = text.lower()
     for symbol in text:
         if not symbol.isalpha():
             text = text.replace(symbol, "")
-    tokens = "".join(text.split()).lower()
     return list(tokens)
 
 
