@@ -150,15 +150,13 @@ def preprocess_profile(profile: dict) -> dict[str, str | dict] | None:
     if (not isinstance(profile, dict) or 'name' not in profile
             or 'freq' not in profile or 'n_words' not in profile):
         return None
-    n_words = profile.pop('n_words')
     new_freq = {}
     for key, value in profile['freq'].items():
-        if key.isalpha() and len(key) == 1:
-            if key.lower() not in new_freq:
-                new_freq[key.lower()] = value / n_words[0]
-            else:
-                new_freq[key.lower()] += value / n_words[0]
-    processed_profile = {'name': profile['name'], 'freq': new_freq}
+        if key.lower() in new_freq:
+            new_freq[key.lower()] += value / profile["n_words"][0]
+        elif len(key) == 1:
+            new_freq[key.lower()] = value / profile["n_words"][0]
+    processed_profile = {'name': profile.get("name"), 'freq': new_freq}
     return processed_profile
 
 
