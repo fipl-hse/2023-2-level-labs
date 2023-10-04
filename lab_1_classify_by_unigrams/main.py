@@ -164,6 +164,7 @@ def collect_profiles(paths_to_profiles: list) -> list[dict[str, str | dict[str, 
                 collected_profiles.append(data)
     if isinstance(collected_profiles, list):
         return collected_profiles
+    return None
 
 
 def detect_language_advanced(unknown_profile: dict[str, str | dict[str, float]],
