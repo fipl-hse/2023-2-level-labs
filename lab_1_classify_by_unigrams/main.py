@@ -122,6 +122,7 @@ def detect_language(
             unknown_profile, dict) or isinstance(profile_1, dict
                                                  ) or isinstance(profile_2, dict
                                                                  ):
+
     mse_1 = compare_profiles(unknown_profile, profile_1)
     mse_2 = compare_profiles(unknown_profile, profile_2)
     if not isinstance(mse_1, float) or not isinstance(mse_2, float):
@@ -130,4 +131,4 @@ def detect_language(
         return str(profile_1['name'])
     if mse_2 < mse_1:
         return str(profile_2['name'])
-    return str([profile_1['name'], profile_2['name']].sort())
+    return [profile_1['name'], profile_2['name']].sort()
