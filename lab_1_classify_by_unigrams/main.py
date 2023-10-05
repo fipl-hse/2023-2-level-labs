@@ -8,26 +8,22 @@ import json
 
 def tokenize(text: str) -> list[str] | None:
     """
-        Splits a text into tokens, converts the tokens into lowercase,
-        removes punctuation, digits and other symbols
-        :param text: a text
-        :return: a list of lower-cased tokens without punctuation
-        """
+    Splits a text into tokens, converts the tokens into lowercase,
+    removes punctuation, digits and other symbols
+    :param text: a text
+    :return: a list of lower-cased tokens without punctuation
+    """
     if not isinstance(text, str):
         return None
-    cleaned_text = []
-    for symbol in text:
-        if symbol.isalpha():
-            cleaned_text.append(symbol.lower())
-    return cleaned_text
+    return [symbol.lower() for symbol in text if symbol.isalpha()]
 
 
 def calculate_frequencies(tokens: list[str] | None) -> dict[str, float] | None:
     """
-       Calculates frequencies of given tokens
-       :param tokens: a list of tokens
-       :return: a dictionary with frequencies
-       """
+    Calculates frequencies of given tokens
+    :param tokens: a list of tokens
+    :return: a dictionary with frequencies
+    """
     if not isinstance(tokens, list):
         return None
     for token in tokens:
@@ -46,11 +42,11 @@ def calculate_frequencies(tokens: list[str] | None) -> dict[str, float] | None:
 
 def create_language_profile(language: str, text: str) -> dict[str, str | dict[str, float]] | None:
     """
-        Creates a language profile
-        :param language: a language
-        :param text: a text
-        :return: a dictionary with two keys – name, freq
-        """
+    Creates a language profile
+    :param language: a language
+    :param text: a text
+    :return: a dictionary with two keys – name, freq
+    """
     if not isinstance(language, str) or not isinstance(text, str):
         return None
     values_freq = calculate_frequencies(tokenize(text))
@@ -70,8 +66,10 @@ def calculate_mse(predicted: list, actual: list) -> float | None:
             len(actual) != len(predicted)):
         return None
     summ_values = 0
-    for i, predicted_value in enumerate(predicted):
-        summ_values += (actual[i] - predicted_value)**2
+    squared_difference = ([(actual_value - predicted_value)**2
+                           for actual_value, predicted_value in zip(actual, predicted)])
+    for value in squared_difference:
+        summ_values += value
     mse = round(summ_values / len(actual), 4)
     return mse
 
