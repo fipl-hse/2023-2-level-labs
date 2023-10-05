@@ -89,23 +89,20 @@ def compare_profiles(
     """
     if not isinstance(unknown_profile, dict) or not isinstance(profile_to_compare, dict):
         return None
-    if 'name' not in unknown_profile or 'freq' not in unknown_profile:
-        return None
-    if 'name' not in profile_to_compare or 'freq' not in profile_to_compare:
+    if ('name' not in unknown_profile or 'freq' not in unknown_profile or
+            'name' not in profile_to_compare or 'freq' not in profile_to_compare):
         return None
     if (not isinstance(unknown_profile['freq'], dict) or
             not isinstance(profile_to_compare['freq'], dict)):
         return None
-    for i in unknown_profile['freq']:
-        if i not in profile_to_compare['freq']:
-            profile_to_compare['freq'][i] = 0
-    for j in profile_to_compare['freq']:
-        if j not in unknown_profile['freq']:
-            unknown_profile['freq'][j] = 0
-    unknown_profile['freq'] = dict(sorted(unknown_profile['freq'].items()))
-    profile_to_compare['freq'] = dict(sorted(profile_to_compare['freq'].items()))
+    unknown_freq = []
+    compare_freq = []
+    union_tokens = set(unknown_profile['freq'].keys()) | set(profile_to_compare['freq'].keys())
+    for token in union_tokens:
+        unknown_freq += [unknown_profile['freq'].get(token, 0)]
+        compare_freq += [profile_to_compare['freq'].get(token, 0)]
 
-    return calculate_mse(list(unknown_profile['freq'].values()), list(profile_to_compare['freq'].values()))
+    return calculate_mse(unknown_freq, compare_freq)
 
 
 def detect_language(
