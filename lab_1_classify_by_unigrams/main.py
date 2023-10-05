@@ -119,9 +119,9 @@ def detect_language(
         names = str(sorted(names))
         return names
     if mse_2 > mse_1:
-        return profile_2.get('name')
-    if mse_1 > mse_2:
         return profile_1.get('name')
+    if mse_1 > mse_2:
+        return profile_2.get('name')
 
 
 def load_profile(path_to_file: str) -> dict | None:
