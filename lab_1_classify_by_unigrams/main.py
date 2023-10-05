@@ -28,10 +28,12 @@ def calculate_frequencies(tokens: list[str] | None) -> dict[str, float] | None:
         return None
 
     dict_of_freq = {}
+    quantity_of_tokens = len(tokens)
     for token in tokens:
-        quantity_of_token = tokens.count(token)
-        frequency = quantity_of_token / len(tokens)
-        dict_of_freq.update({token: frequency})
+        if token not in dict_of_freq:
+            occurence_of_token = tokens.count(token)
+            frequency = occurence_of_token / quantity_of_tokens
+            dict_of_freq.update({token: frequency})
 
     return dict_of_freq
 
@@ -225,6 +227,8 @@ def print_report(detections: list[tuple[str, float]]) -> None:
     Prints report for detection of language
     :param detections: a list with distances for each available language
     """
+    if not isinstance(detections, list):
+        return None
     for language in detections:
         print(f'{language[0]}: MSE {language[1]:.5f}')
    
