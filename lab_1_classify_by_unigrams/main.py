@@ -81,7 +81,7 @@ def compare_profiles(
     """
     if not (isinstance(unknown_profile, dict) and isinstance(profile_to_compare, dict)):
         return None
-    if ('name' and 'freq') not in unknown_profile and ('name' and 'freq') not in profile_to_compare:
+    if ('name' and 'freq') not in unknown_profile or ('name' and 'freq') not in profile_to_compare:
         return None
     keys = sorted(set(unknown_profile['freq'].keys()) | set(profile_to_compare['freq'].keys()))
     comparison_un = []
