@@ -163,7 +163,7 @@ def preprocess_profile(profile: dict) -> dict[str, str | dict] | None:
         uni_freq = profile['freq'][unigram]
         if low_uni in freq_dict:
             freq_dict[low_uni] += int(uni_freq) / int(all_uns)
-        elif len(unigram) == 1 or unigram == '²':
+        elif len(unigram) == 1 and (unigram.isalpha() or unigram == '²'):
             freq_dict[low_uni] = int(uni_freq) / int(all_uns)
     return {'name': profile['name'], 'freq': freq_dict}
 
