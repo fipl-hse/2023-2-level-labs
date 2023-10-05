@@ -65,9 +65,8 @@ def calculate_mse(predicted: list, actual: list) -> float | None:
     if not (isinstance(predicted, list) and isinstance(actual, list)):
         return None
     total = 0
-    for el1 in predicted:
-        for el2 in actual:
-            total += (el2 - el1) ** 2
+    for i in range(len(actual)):
+        total += (predicted[i] - actual[i]) ** 2
     return total / len(actual)
 
 
@@ -120,7 +119,7 @@ def detect_language(
             return str(profile_1['name'])
         if mse_1 > mse_2:
             return str(profile_2['name'])
-    return str(sorted([profile_1['name'], profile_2['name']]))
+    return str([profile_1['name'], profile_2['name']].sort())
 
 
 def load_profile(path_to_file: str) -> dict | None:
