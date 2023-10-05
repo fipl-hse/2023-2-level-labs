@@ -56,9 +56,6 @@ def create_language_profile(language: str, text: str) -> dict[str, str | dict[st
             return language_profile
 
 
-a = 'he is a happy man'
-create_language_profile('en', a)
-
 def calculate_mse(predicted: list, actual: list) -> float | None:
     """
     Calculates mean squared error between predicted and actual values
