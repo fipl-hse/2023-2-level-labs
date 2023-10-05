@@ -3,6 +3,7 @@ Lab 1
 Language detection
 """
 import json
+import re
 
 
 def tokenize(text: str) -> list[str] | None:
@@ -151,7 +152,7 @@ def preprocess_profile(profile: dict) -> dict[str, str | dict] | None:
         return None
     profile_new = {"name": profile["name"], "freq": {}}
     for token, freq in profile.get("freq").items():
-        if len(token) == 1:
+        if len(token) == 1 and re.search(r"\w", token):
             if token.lower() in profile_new["freq"]:
                 profile_new["freq"][token.lower()] += freq / profile["n_words"][0]
             else:
