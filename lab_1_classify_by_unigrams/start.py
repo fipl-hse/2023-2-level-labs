@@ -26,6 +26,5 @@ def main() -> None:
         result = detect_language(unknown_lang, en_lang, de_lang)
         assert result, "Detection result is None"
 
-
 if __name__ == "__main__":
     main()
