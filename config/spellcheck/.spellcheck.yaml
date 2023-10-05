@@ -6,6 +6,7 @@ matrix:
   dictionary:
     wordlists:
     - config/spellcheck/.wordlist.txt
+    - config/spellcheck/.wordlist_en.txt
     encoding: utf-8
     output: build/dictionary/dictionary.dic
   pipeline:

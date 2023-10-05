@@ -447,7 +447,7 @@ fr: MSE 0.0001
 Функция ничего не возвращает.
 
 ```py
-def print_report(detections: list[list[str | float]]) -> None:
+def print_report(detections: list[tuple[str, float]]) -> None:
     pass
 ```
 
