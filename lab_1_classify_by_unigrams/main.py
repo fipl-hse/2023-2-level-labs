@@ -190,6 +190,20 @@ def collect_profiles(paths_to_profiles: list) -> list[dict[str, str | dict[str, 
     :paths_to_profiles: a list of strings to the profiles
     :return: a list of loaded profiles
     """
+    if not isinstance(paths_to_profiles, list):
+        return None
+
+    collected_profiles = []
+
+    for path in paths_to_profiles:
+        language_profile = load_profile(path)
+        if isinstance(language_profile, dict):
+            processed_profile = preprocess_profile(language_profile)
+            if isinstance(processed_profile, dict):
+                collected_profiles.append(processed_profile)
+    if isinstance(collected_profiles, list):
+        return collected_profiles
+    return None
 
 
 def detect_language_advanced(unknown_profile: dict[str, str | dict[str, float]],
