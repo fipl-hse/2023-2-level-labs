@@ -1,8 +1,6 @@
 """
 Language detection starter
 """
-from typing import Dict
-
 from lab_1_classify_by_unigrams.main import create_language_profile, detect_language
 
 
@@ -20,12 +18,13 @@ def main() -> None:
     de_lang = create_language_profile('de', de_text)
     un_lang = create_language_profile('un', unknown_text)
     if (
-        isinstance(un_lang, dict) and
-        isinstance(en_lang, dict) and
-        isinstance(de_lang, dict)
+            isinstance(un_lang, dict) and
+            isinstance(en_lang, dict) and
+            isinstance(de_lang, dict)
     ):
         result = detect_language(un_lang, en_lang, de_lang)
         assert result, "Detection result is None"
+
 
 if __name__ == "__main__":
     main()
