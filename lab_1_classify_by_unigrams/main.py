@@ -6,26 +6,23 @@ Language detection
 
 def tokenize(text: str) -> list[str] | None:
     """
-        Splits a text into tokens, converts the tokens into lowercase,
-        removes punctuation, digits and other symbols
-        :param text: a text
-        :return: a list of lower-cased tokens without punctuation
-        """
+    Splits a text into tokens, converts the tokens into lowercase,
+    removes punctuation, digits and other symbols
+    :param text: a text
+    :return: a list of lower-cased tokens without punctuation
+    """
     if not isinstance(text, str):
         return None
-    tokens = []
-    for symbol in text:
-        if symbol.isalpha():
-            tokens += symbol.lower()
+    tokens = [symbol.lower() for symbol in text if symbol.isalpha()]
     return tokens
 
 
 def calculate_frequencies(tokens: list[str] | None) -> dict[str, float] | None:
     """
-        Calculates frequencies of given tokens
-        :param tokens: a list of tokens
-        :return: a dictionary with frequencies
-        """
+    Calculates frequencies of given tokens
+    :param tokens: a list of tokens
+    :return: a dictionary with frequencies
+    """
     if (not isinstance(tokens, list)
             or not tokens
             or not all(isinstance(element, str) for element in tokens)):
@@ -42,11 +39,11 @@ def calculate_frequencies(tokens: list[str] | None) -> dict[str, float] | None:
 
 def create_language_profile(language: str, text: str) -> dict[str, str | dict[str, float]] | None:
     """
-        Creates a language profile
-        :param language: a language
-        :param text: a text
-        :return: a dictionary with two keys – name, freq
-        """
+    Creates a language profile
+    :param language: a language
+    :param text: a text
+    :return: a dictionary with two keys – name, freq
+    """
     if not isinstance(language, str) or not isinstance(text, str):
         return None
     freq_dict = calculate_frequencies(tokenize(text))
@@ -57,11 +54,11 @@ def create_language_profile(language: str, text: str) -> dict[str, str | dict[st
 
 def calculate_mse(predicted: list, actual: list) -> float | None:
     """
-        Calculates mean squared error between predicted and actual values
-        :param predicted: a list of predicted values
-        :param actual: a list of actual values
-        :return: the score
-        """
+    Calculates mean squared error between predicted and actual values
+    :param predicted: a list of predicted values
+    :param actual: a list of actual values
+    :return: the score
+    """
     if (not isinstance(predicted, list)
             or not isinstance(actual, list)
             or len(predicted) != len(actual)):
@@ -78,25 +75,24 @@ def compare_profiles(
         profile_to_compare: dict[str, str | dict[str, float]]
 ) -> float | None:
     """
-        Compares profiles and calculates the distance using symbols
-        :param unknown_profile: a dictionary of an unknown profile
-        :param profile_to_compare: a dictionary of a profile to compare the unknown profile to
-        :return: the distance between the profiles
-        """
+    Compares profiles and calculates the distance using symbols
+    :param unknown_profile: a dictionary of an unknown profile
+    :param profile_to_compare: a dictionary of a profile to compare the unknown profile to
+    :return: the distance between the profiles
+    """
     target_set = {'freq', 'name'}
     if (not isinstance(unknown_profile, dict)
             or not isinstance(profile_to_compare, dict)
-            or len(target_set & set(unknown_profile) & set(profile_to_compare)) != len(target_set)):
+            or len(target_set & set(unknown_profile) & set(profile_to_compare)) != len(target_set)
+            or not isinstance(unknown_profile['freq'], dict)
+            or not isinstance(profile_to_compare['freq'], dict)):
         return None
     new_freq = {a: .0 for a in set(list(unknown_profile['freq']) +
                                    list(profile_to_compare['freq']))}
     freq_to_compare = new_freq.copy()
-    assert isinstance(unknown_profile['freq'], dict)
     new_freq.update(unknown_profile['freq'])
-    assert isinstance(profile_to_compare['freq'], dict)
     freq_to_compare.update(profile_to_compare['freq'])
-    distance = calculate_mse(list(new_freq.values()), list(freq_to_compare.values()))
-    return distance
+    return calculate_mse(list(new_freq.values()), list(freq_to_compare.values()))
 
 
 def detect_language(
