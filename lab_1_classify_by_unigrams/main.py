@@ -140,10 +140,13 @@ def preprocess_profile(profile: dict) -> dict[str, str | dict] | None:
         return None
     edited_profile = {'name': profile['name'], 'freq': {}}
     for token in profile['freq']:
-        if token.lower() in edited_profile['freq']:
-            edited_profile['freq'][token.lower()] += profile['freq'][token]/profile['n_words'][0]
+        lowered_token = token.lower()
+        frequency = profile['freq'][token]
+        number_of_unigrams = profile['n_words'][0]
+        if lowered_token in edited_profile['freq']:
+            edited_profile['freq'][lowered_token] += frequency/number_of_unigrams
         elif len(token) == 1:
-            edited_profile['freq'][token.lower()] = profile['freq'][token]/profile['n_words'][0]
+            edited_profile['freq'][lowered_token] = frequency/number_of_unigrams
     return edited_profile
 
 
