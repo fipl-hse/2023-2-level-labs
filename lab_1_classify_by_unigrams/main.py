@@ -11,9 +11,9 @@ def tokenize(text: str) -> list[str] | None:
     :param text: a text
     :return: a list of lower-cased tokens without punctuation
     """
-    text.lower()
-    tokens = [token for token in text if token in 'abcdefghijklmnopqrstuvwxyz']
-    return tokens
+    if type(text) == str:
+        tokens = [token for token in text.lower() if token in 'abcdefghijklmnopqrstuvwxyzäöüß']
+        return tokens
 
 
 def calculate_frequencies(tokens: list[str] | None) -> dict[str, float] | None:
@@ -22,20 +22,20 @@ def calculate_frequencies(tokens: list[str] | None) -> dict[str, float] | None:
     :param tokens: a list of tokens
     :return: a dictionary with frequencies
     """
-    if type(tokens) == list:
+    if not isinstance(tokens, list):
+        return None
+    else:
         for element in tokens:
-            if type(element) != str:
+            if not isinstance(element, str):
                 return None
-        set_of_tokens = set(tokens)
-        occurrence_of_every_token = {}
-        for key_of_tokens in set_of_tokens:
-            occurrence_of_every_token[key_of_tokens] = 0
-        for i in tokens:
-            occurrence_of_every_token[i] += 1
-        for i in occurrence_of_every_token.keys():
-            occurrence_of_every_token[i] /= len(tokens)
-        return occurrence_of_every_token
-    return None
+            else:
+                set_of_tokens = set(tokens)
+                frequency_of_every_token = dict.fromkeys(set_of_tokens, 0)
+                for element in tokens:
+                    frequency_of_every_token[element] += 1
+                for i in frequency_of_every_token.keys():
+                    frequency_of_every_token[i] /= len(tokens)
+        return frequency_of_every_token
 
 
 def create_language_profile(language: str, text: str) -> dict[str, str | dict[str, float]] | None:
@@ -45,8 +45,12 @@ def create_language_profile(language: str, text: str) -> dict[str, str | dict[st
     :param text: a text
     :return: a dictionary with two keys – name, freq
     """
-    language_profile = {'name': f'{language}', 'freq': f'{calculate_frequencies(tokenize(text))}'}
-    return language_profile
+    if not isinstance(language, str) or not isinstance(text, str):
+        return None
+    else:
+        language_profile = {'name': f'{language}',
+                            'freq': f'{calculate_frequencies(tokenize(text))}'}
+        return language_profile
 
 
 def calculate_mse(predicted: list, actual: list) -> float | None:
@@ -56,7 +60,6 @@ def calculate_mse(predicted: list, actual: list) -> float | None:
     :param actual: a list of actual values
     :return: the score
     """
-
 
 
 def compare_profiles(
