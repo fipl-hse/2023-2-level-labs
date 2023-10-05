@@ -184,7 +184,13 @@ def collect_profiles(paths_to_profiles: list) -> list[dict[str, str | dict[str, 
         return None
     collection = []
     for i in paths_to_profiles:
-        collection += [preprocess_profile(load_profile(i))]
+        profile = load_profile(i)
+        if isinstance(profile, dict):
+            preprocessed = preprocess_profile(profile)
+            if isinstance(preprocessed, dict):
+                collection += [preprocessed]
+    if not isinstance(collection, list):
+        return None
     return collection
 
 
@@ -214,3 +220,4 @@ def print_report(detections: list[tuple[str, float]]) -> None:
     if isinstance(detections, list):
         for i in detections:
             print(f'{i[0]} MSE {i[1]:.5f}')
+    return None
