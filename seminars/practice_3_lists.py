@@ -82,6 +82,14 @@ def sum13(nums: list) -> int:
 # sum13([1, 1]) → 2
 # sum13([1, 2, 2, 1, 13]) → 6
 # sum13([1, 2, 2, 1, 13, 5, 6]) → 6
+    su = []
+    for i in nums:
+        if i != 13:
+            su+=i
+        else:
+            break
+    print(su)
+    sum13(1, 2, 2, 1, 13, 5, 6)
 
 
 # Task 3
@@ -113,6 +121,10 @@ def create_phone_number(nums: list) -> str:
 # Function calls with expected result:
 # create_phone_number([1, 2, 3, 4, 5, 6, 7, 8, 9, 0])
 # => returns "(123) 456-7890"
+    digit = ''.join(str(i) for i in nums)
+    phone = f"({digit[0:3]}) {digit[3:6]}-{digit[6:]}"
+    print(phone)
+create_phone_number([1, 2, 3, 4, 5, 6, 7, 8, 9, 0])
 
 
 # Task 5
