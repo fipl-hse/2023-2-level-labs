@@ -22,8 +22,8 @@ def main() -> None:
     print(en_tokens)
     frequencies = lab_1_classify_by_unigrams.main.calculate_frequencies(en_tokens)
     print(frequencies)
-    #language_profile = lab_1_classify_by_unigrams.main.create_language_profile('en', en_text)
-    #print(language_profile)
+    language_profile = lab_1_classify_by_unigrams.main.create_language_profile('en', en_text)
+    print(language_profile)
 
 if __name__ == "__main__":
     main()
