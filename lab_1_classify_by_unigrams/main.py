@@ -31,7 +31,7 @@ def calculate_frequencies(tokens: list[str] | None) -> dict[str, float] | None:
     unit = 1 / len(tokens)
     for letter in tokens:
         if letter not in frequencies:
-            frequencies[letter] = 0
+            frequencies[letter] = .0
         frequencies[letter] += unit
     return frequencies
 
