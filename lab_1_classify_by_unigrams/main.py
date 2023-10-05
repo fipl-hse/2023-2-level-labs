@@ -139,9 +139,9 @@ def detect_language(
         names = [profile_1['name'], profile_2['name']]
         names.sort()
         return names[0]
-    if mse_1 < mse_2:
+    if mse_1 is not None and mse_2 is not None and mse_1 < mse_2:
         return profile_1['name']
-    if mse_1 > mse_2:
+    if mse_1 is not None and mse_2 is not None and mse_1 > mse_2:
         return profile_2['name']
     return None
 
