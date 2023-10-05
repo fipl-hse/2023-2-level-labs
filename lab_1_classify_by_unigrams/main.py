@@ -64,10 +64,11 @@ def calculate_mse(predicted: list, actual: list) -> float | None:
         return None
     if not (isinstance(predicted, list) and isinstance(actual, list)):
         return None
+    quantity = len(actual)
     total = 0
-    for i in range(len(actual)):
+    for i in range(quantity):
         total += (predicted[i] - actual[i]) ** 2
-    return total / len(actual)
+    return total / quantity
 
 
 def compare_profiles(
