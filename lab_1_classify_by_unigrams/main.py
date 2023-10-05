@@ -95,12 +95,12 @@ def compare_profiles(
     actual_tokens = unknown_profile.get('freq')
 
     for key in predicted_tokens.keys():
-        if actual_tokens is not None and key not in actual_tokens:
+        if actual_tokens is not None:
             value = actual_tokens.get(key, 0)
             actual_tokens[key] = value
 
     for key in actual_tokens.keys():
-        if predicted_tokens is not None and key not in predicted_tokens:
+        if predicted_tokens is not None:
             value = predicted_tokens.get(key, 0)
             predicted_tokens[key] = value
 
