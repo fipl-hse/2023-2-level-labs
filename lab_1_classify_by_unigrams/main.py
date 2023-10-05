@@ -69,8 +69,7 @@ def calculate_mse(predicted: list, actual: list) -> float | None:
     for index, pred_value in enumerate(predicted):
         mse += (pred_value - actual[index]) ** 2
 
-    mse /= len(predicted)
-    return mse
+    return mse / len(predicted)
 
 
 def compare_profiles(
