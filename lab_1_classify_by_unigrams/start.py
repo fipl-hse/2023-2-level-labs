@@ -16,13 +16,12 @@ def main() -> None:
     profiles = collect_profiles(paths)
     unknown_profile = create_language_profile("unknown", unknown_text)
     if not isinstance(profiles, list) or not isinstance(unknown_profile, dict):
-        return None
+        return
     result = detect_language_advanced(unknown_profile, profiles)
     if not result:
-        return None
+        return
     print_report(result)
     assert result, "Detection result is None"
-    return None
 
 
 if __name__ == "__main__":

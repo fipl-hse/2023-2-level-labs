@@ -28,10 +28,9 @@ def calculate_frequencies(tokens: list[str] | None) -> dict[str, float] | None:
         return None
     freqs = {}
     for token in tokens:
-        if token in freqs:
-            freqs[token] += 1
-        else:
-            freqs[token] = 1
+        if token not in freqs:
+            freqs[token] = 0
+        freqs[token] += 1
     for key, value in freqs.items():
         freqs[key] = value / len(tokens)
     return freqs
@@ -151,12 +150,14 @@ def preprocess_profile(profile: dict) -> dict[str, str | dict] | None:
             or "name" not in profile.keys() or "n_words" not in profile.keys():
         return None
     profile_new = {"name": profile["name"], "freq": {}}
+    num_unigrams = profile["n_words"][0]
     for token, freq in profile.get("freq").items():
         if len(token) == 1 and re.search(r"\w", token):
-            if token.lower() in profile_new["freq"]:
-                profile_new["freq"][token.lower()] += freq / profile["n_words"][0]
+            lower_token = token.lower()
+            if lower_token in profile_new["freq"]:
+                profile_new["freq"][lower_token] += freq / num_unigrams
             else:
-                profile_new["freq"].update({token.lower(): freq / profile["n_words"][0]})
+                profile_new["freq"].update({lower_token: freq / num_unigrams})
     return profile_new
 
 
