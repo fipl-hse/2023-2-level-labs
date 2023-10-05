@@ -70,8 +70,8 @@ def calculate_mse(predicted: list, actual: list) -> float | None:
     if actual == predicted:
         return 0.0
     numerator = 0
-    for i in range(len(actual)):
-        numerator += (actual[i] - predicted[i])**2
+    for i, e in enumerate(actual):
+        numerator += (e - predicted[i])**2
     if len(predicted) == 0:
         return 1.0
     return numerator/len(predicted)
@@ -163,7 +163,8 @@ def preprocess_profile(profile: dict) -> dict[str, str | dict] | None:
                 dictionary['freq'][i.lower()] = profile['freq'][i]/count_unigrams
 
             else:
-                dictionary['freq'][i.lower()] = dictionary['freq'][i.lower()] + profile['freq'][i] / count_unigrams
+                dictionary['freq'][i.lower()] = \
+                dictionary['freq'][i.lower()] + profile['freq'][i] / count_unigrams
 
     return dictionary
 
@@ -195,8 +196,7 @@ def detect_language_advanced(unknown_profile: dict[str, str | dict[str, float]],
     list_scores = []
     for profile in known_profiles:
         score = compare_profiles(unknown_profile, profile)
-        t = tuple([profile['name'], score, 4])
-        list_scores += [t]
+        list_scores += [tuple([profile['name'], score])]
 
     return sorted(list_scores, key=lambda a: a[1])
 
@@ -206,7 +206,6 @@ def print_report(detections: list[tuple[str, float]]) -> None:
     Prints report for detection of language
     :param detections: a list with distances for each available language
     """
-    if not isinstance(detections, list):
-        return None
-    for i in detections:
-        print(f'{i[0]} MSE {i[1]:.5f}')
+    if isinstance(detections, list):
+        for i in detections:
+            print(f'{i[0]} MSE {i[1]:.5f}')
