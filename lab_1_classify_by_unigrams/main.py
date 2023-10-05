@@ -96,11 +96,13 @@ def compare_profiles(
 
     for key in predicted_tokens.keys():
         if actual_tokens is not None and key not in actual_tokens:
-            actual_tokens[key] = 0
+            value = actual_tokens.get(key, 0)
+            actual_tokens[key] = value
 
     for key in actual_tokens.keys():
         if predicted_tokens is not None and key not in predicted_tokens:
-            predicted_tokens[key] = 0
+            value = predicted_tokens.get(key, 0)
+            predicted_tokens[key] = value
 
     sorted_predicted_tokens = (sorted(predicted_tokens.items()))
     sorted_actual_tokens = (sorted(actual_tokens.items()))
