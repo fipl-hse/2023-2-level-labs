@@ -29,6 +29,7 @@ def create_language_profile(language: str, text: str) -> dict[str, str | dict[st
     :param text: a text
     :return: a dictionary with two keys – name, freq
     """
+    print('hello world')
 
 
 def calculate_mse(predicted: list, actual: list) -> float | None:
@@ -38,6 +39,7 @@ def calculate_mse(predicted: list, actual: list) -> float | None:
     :param actual: a list of actual values
     :return: the score
     """
+    print('hello world')
 
 
 def compare_profiles(
@@ -50,6 +52,7 @@ def compare_profiles(
     :param profile_to_compare: a dictionary of a profile to compare the unknown profile to
     :return: the distance between the profiles
     """
+    print('hello world')
 
 
 def detect_language(
@@ -64,6 +67,7 @@ def detect_language(
     :param profile_2: a dictionary of a known profile
     :return: a language
     """
+    print('hello world')
 
 
 def load_profile(path_to_file: str) -> dict | None:
@@ -72,6 +76,7 @@ def load_profile(path_to_file: str) -> dict | None:
     :param path_to_file: a path to the language profile
     :return: a dictionary with at least two keys – name, freq
     """
+    print('hello world')
 
 
 def preprocess_profile(profile: dict) -> dict[str, str | dict] | None:
@@ -81,6 +86,7 @@ def preprocess_profile(profile: dict) -> dict[str, str | dict] | None:
     :return: a dict with a lower-cased loaded profile
     with relative frequencies without unnecessary ngrams
     """
+    print('hello world')
 
 
 def collect_profiles(paths_to_profiles: list) -> list[dict[str, str | dict[str, float]]] | None:
@@ -89,6 +95,7 @@ def collect_profiles(paths_to_profiles: list) -> list[dict[str, str | dict[str, 
     :paths_to_profiles: a list of strings to the profiles
     :return: a list of loaded profiles
     """
+    print('hello world')
 
 
 def detect_language_advanced(unknown_profile: dict[str, str | dict[str, float]],
@@ -99,6 +106,7 @@ def detect_language_advanced(unknown_profile: dict[str, str | dict[str, float]],
     :param known_profiles: a list of known profiles
     :return: a sorted list of tuples containing a language and a distance
     """
+    print('hello world')
 
 
 def print_report(detections: list[tuple[str, float]]) -> None:
@@ -106,3 +114,4 @@ def print_report(detections: list[tuple[str, float]]) -> None:
     Prints report for detection of language
     :param detections: a list with distances for each available language
     """
+    print('hello world')
