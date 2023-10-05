@@ -27,10 +27,12 @@ def calculate_frequencies(tokens: list[str] | None) -> dict[str, float] | None:
     if not isinstance(tokens, list):
         return None
 
+    frequency = {}
     for i in tokens:
         if not isinstance(i, str):
             return None
-    return {i: tokens.count(i) / len(tokens) for i in tokens}
+        frequency[i] = tokens.count(i) / len(tokens)
+    return frequency
 
 
 def create_language_profile(language: str, text: str) -> dict[str, str | dict[str, float]] | None:
@@ -96,8 +98,13 @@ def compare_profiles(
         return None
 
     all_tokens = set(unknown_profile['freq'].keys()) | set(profile_to_compare['freq'].keys())
-    language1 = [unknown_profile['freq'].get(token, 0) for token in all_tokens]
-    language2 = [profile_to_compare['freq'].get(token, 0) for token in all_tokens]
+
+    language1 = []
+    language2 = []
+
+    for token in all_tokens:
+        language1.append(unknown_profile['freq'].get(token, 0))
+        language2.append(profile_to_compare['freq'].get(token, 0))
     return calculate_mse(language1, language2)
 
 
@@ -130,7 +137,7 @@ def detect_language(
             return str(profile_2['name'])
         if distance1 < distance2:
             return str(profile_1['name'])
-    return [profile_1['name'], profile_2['name']].sort()
+    return sorted([profile_1['name'], profile_2['name']])[0]
 
 
 def load_profile(path_to_file: str) -> dict | None:
@@ -171,13 +178,17 @@ def preprocess_profile(profile: dict) -> dict[str, str | dict] | None:
         'freq': {}
     }
 
+    unigrams_number = profile['n_words'][0]
+
     for token in profile['freq']:
-        if token.lower() in preprocessed_profile['freq']:
-            preprocessed_profile['freq'][token.lower()] \
-                += profile['freq'][token] / profile['n_words'][0]
+        lower_token = token.lower()
+        frequency = profile['freq'][token]
+        if lower_token in preprocessed_profile['freq']:
+            preprocessed_profile['freq'][lower_token] \
+                += frequency / unigrams_number
         elif len(token) == 1:
-            preprocessed_profile['freq'][token.lower()] \
-                = profile['freq'][token] / profile['n_words'][0]
+            preprocessed_profile['freq'][lower_token] \
+                = frequency / unigrams_number
 
     return preprocessed_profile
 
