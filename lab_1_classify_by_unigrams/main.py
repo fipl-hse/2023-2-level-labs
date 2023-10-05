@@ -14,8 +14,7 @@ def tokenize(text: str) -> list[str] | None:
     if isinstance(text, str) is False:
         return None
     text = text.lower()
-    tokens_list = [i for i in text if i.isalpha()]
-    return tokens_list
+    return [i for i in text if i.isalpha()]
 
 
 def calculate_frequencies(tokens: list[str] | None) -> dict[str, float] | None:
@@ -28,12 +27,13 @@ def calculate_frequencies(tokens: list[str] | None) -> dict[str, float] | None:
         or tokens == []
         or not all(isinstance(symbol, str) for symbol in tokens)):
         return None
+    symbols = set(tokens)
     freq_dict = {}
+    for letter in symbols:
+        freq_dict[letter] = 0
     for symbol in tokens:
         if symbol in freq_dict:
             freq_dict[symbol] += 1 / len(tokens)
-        else:
-            freq_dict[symbol] = 1 / len(tokens)
     return freq_dict
 
 
@@ -46,11 +46,7 @@ def create_language_profile(language: str, text: str) -> dict[str, str | dict[st
     """
     if isinstance(language, str) is False or isinstance(text, str) is False:
         return None
-    language_profile = {"name": language,
-                        "freq": calculate_frequencies(tokenize(text))}
-    return language_profile
-
-
+    return {"name": language, "freq": calculate_frequencies(tokenize(text))}
 
 
 def calculate_mse(predicted: list, actual: list) -> float | None:
@@ -138,7 +134,6 @@ def load_profile(path_to_file: str) -> dict | None:
     :param path_to_file: a path to the language profile
     :return: a dictionary with at least two keys – name, freq
     """
-
 
 
 def preprocess_profile(profile: dict) -> dict[str, str | dict] | None:
