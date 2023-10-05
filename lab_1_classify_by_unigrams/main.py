@@ -14,14 +14,8 @@ def tokenize(text: str) -> list[str] | None:
     """
     if not isinstance(text, str):
         return None
-    text = text.lower()
-    tokens = []
 
-    for letter in text:
-        if letter.isalpha():
-            tokens.append(letter)
-
-    return tokens
+    return [token for token in text.lower() if token.isalpha()]
 
 
 def calculate_frequencies(tokens: list[str] | None) -> dict[str, float] | None:
