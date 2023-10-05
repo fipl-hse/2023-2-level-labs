@@ -133,8 +133,6 @@ def detect_language(
     return str(profile_1['name'])
 
 
-
-
 def load_profile(path_to_file: str) -> dict | None:
     """
     Loads a language profile
