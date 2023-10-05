@@ -162,7 +162,7 @@ def preprocess_profile(profile: dict) -> dict[str, str | dict] | None:
     dictionary = {'name': profile['name'], 'freq': {}}
     count_unigrams = profile['n_words'][0]
     for i in profile['freq']:
-        if len(i) == 1 and (i.isalpha() or i.isdigit()):
+        if len(i) == 1:
             if i.lower() not in dictionary['freq']:
                 dictionary['freq'][i.lower()] = profile['freq'][i]/count_unigrams
 
@@ -199,7 +199,7 @@ def detect_language_advanced(unknown_profile: dict[str, str | dict[str, float]],
     list_scores = []
     for profile in known_profiles:
         score = compare_profiles(unknown_profile, profile)
-        t = tuple([profile['name'], score])
+        t = tuple([profile['name'], score, 4])
         list_scores += [t]
 
     return sorted(list_scores, key=lambda a: a[1])

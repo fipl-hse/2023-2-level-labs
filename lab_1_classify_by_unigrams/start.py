@@ -24,13 +24,9 @@ def main() -> None:
                         'assets/profiles/it.json',
                         'assets/profiles/ru.json',
                         'assets/profiles/tr.json']
-    result = None
-    language_profiles = collect_profiles(path_to_profiles)
-    if (isinstance(unk_profile, dict)
-        and all(isinstance(profile, dict) for profile in language_profiles)
-            and isinstance(language_profiles, list)):
 
-        result = detect_language_advanced(unk_profile, language_profiles)
+    language_profiles = collect_profiles(path_to_profiles)
+    result = detect_language_advanced(unk_profile, language_profiles)
 
     if result:
         print(print_report(result))
