@@ -154,7 +154,7 @@ def preprocess_profile(profile: dict) -> dict[str, str | dict] | None:
             new_freq[key.lower()] += value / profile["n_words"][0]
         elif len(key) == 1:
             new_freq[key.lower()] = value / profile["n_words"][0]
-    processed_profile = {'name': profile.get("name"), 'freq': new_freq}
+    processed_profile = {'name': profile["name"], 'freq': new_freq}
     return processed_profile
 
 
