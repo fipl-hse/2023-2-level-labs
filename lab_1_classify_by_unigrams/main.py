@@ -26,10 +26,12 @@ def calculate_frequencies(tokens: list[str] | None) -> dict[str, float] | None:
     """
     if not isinstance(tokens, list):
         return None
+    freqs_dict = {}
     for token in tokens:
         if not isinstance(token, str):
             return None
-    return {token: tokens.count(token) / len(tokens) for token in tokens}
+        freqs_dict[token] = tokens.count(token) / len(tokens)
+    return freqs_dict
 
 
 def create_language_profile(language: str, text: str) -> dict[str, str | dict[str, float]] | None:
@@ -156,10 +158,13 @@ def preprocess_profile(profile: dict) -> dict[str, str | dict] | None:
         return None
     freq_dict = {}
     for unigram in profile['freq']:
-        if unigram.lower() in freq_dict:
-            freq_dict[unigram.lower()] += int(profile['freq'][unigram]) / int(profile['n_words'][0])
-        elif len(unigram) == 1:
-            freq_dict[unigram.lower()] = int(profile['freq'][unigram]) / int(profile['n_words'][0])
+        low_uni = unigram.lower()
+        all_uns = profile['n_words'][0]
+        uni_freq = profile['freq'][unigram]
+        if low_uni in freq_dict:
+            freq_dict[low_uni] += int(uni_freq) / int(all_uns)
+        elif len(unigram) == 1 or unigram == '²':
+            freq_dict[low_uni] = int(uni_freq) / int(all_uns)
     return {'name': profile['name'], 'freq': freq_dict}
 
 
@@ -172,16 +177,13 @@ def collect_profiles(paths_to_profiles: list) -> list[dict[str, str | dict[str, 
     if not isinstance(paths_to_profiles, list):
         return None
     collect_profs = []
-    for prof in paths_to_profiles:
-        if not load_profile(prof):
-            return None
-        load_prof = load_profile(prof)
-        if load_prof:
-            if not preprocess_profile(load_prof):
-                return None
-            prep_prof = preprocess_profile(load_prof)
-            if prep_prof:
-                collect_profs.append(prep_prof)
+    for path in paths_to_profiles:
+        if isinstance(path, str):
+            prof = load_profile(path)
+            if isinstance(prof, dict):
+                prep_prof = preprocess_profile(prof)
+                if isinstance(prep_prof, dict):
+                    collect_profs.append(prep_prof)
     return collect_profs
 
 
@@ -206,6 +208,7 @@ def print_report(detections: list[tuple[str, float]]) -> None:
     Prints report for detection of language
     :param detections: a list with distances for each available language
     """
-    if isinstance(detections, list):
-        for tpl in detections:
-            print(f'{tpl[0]}: MSE {tpl[1]:.5f}')
+    if not isinstance(detections, list):
+        return None
+    for tpl in detections:
+        print(f'{tpl[0]}: MSE {tpl[1]:.5f}')
