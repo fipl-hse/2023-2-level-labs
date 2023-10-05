@@ -92,7 +92,7 @@ jobs:
         uses: fipl-hse/setup-env-action@v0.9
       - name: Run tests
         run: |
-          bash config/run_tests.sh "$PR_NAME"
+          bash config/_stage_run_pytest.sh "$PR_NAME"
 
   start:
     name: Check start.py
