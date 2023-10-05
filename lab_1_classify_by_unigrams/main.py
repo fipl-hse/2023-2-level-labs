@@ -13,10 +13,7 @@ def tokenize(text: str) -> list[str] | None:
     """
     if not isinstance(text, str):
         return None
-    tokenized = []
-    for token in text:
-        if token.isalpha():
-            tokenized.append(token.lower())
+    tokenized = [token for token in text if token.isalpha()]
     return tokenized
 
 
@@ -28,7 +25,8 @@ def calculate_frequencies(tokens: list[str] | None) -> dict[str, float] | None:
     """
     if not (isinstance(tokens, list) and all(isinstance(token, str) for token in tokens)):
         return None
-    freq_dict = {token: (tokens.count(token) / len(tokens)) for token in tokens}
+    length = len(tokens)
+    freq_dict = {token: (tokens.count(token) / length) for token in tokens}
     return freq_dict
 
 
@@ -54,17 +52,8 @@ def calculate_mse(predicted: list, actual: list) -> float | None:
     """
     if not (isinstance(predicted, list) and isinstance(actual, list)):
         return None
-    list_sum = []
-    list_squared = []
-    n = 0
-    summa = 0
-    for i in predicted:
-        list_sum.append(i - actual[n])
-        n += 1
-    for i in list_sum:
-        list_squared.append(i ** 2)
-    for i in list_squared:
-        summa += i
+    n = len(predicted)
+    summa = sum((p - a) ** 2 for p, a in zip(predicted, actual))
     return summa / n
 
 
