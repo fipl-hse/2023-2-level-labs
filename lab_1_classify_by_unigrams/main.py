@@ -106,11 +106,9 @@ def detect_language(
     :param profile_2: a dictionary of a known profile
     :return: a language
     """
-    if (isinstance(unknown_profile, dict) and
+    if not (isinstance(unknown_profile, dict) and
             isinstance(profile_1, dict) and
             isinstance(profile_2, dict)):
-        pass
-    else:
         return None
     mse_1 = compare_profiles(unknown_profile, profile_1)
     mse_2 = compare_profiles(unknown_profile, profile_2)
