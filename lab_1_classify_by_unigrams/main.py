@@ -13,13 +13,12 @@ def tokenize(text: str) -> list[str] | None:
     """
     if not isinstance(text, str):
         return None
-    else:
-        text = text.lower()
-        tokens = []
-        for symbol in text:
-            if symbol.isalpha():
-                tokens.append(symbol)
-        return tokens
+    text = text.lower()
+    tokens = []
+    for symbol in text:
+        if symbol.isalpha():
+            tokens.append(symbol)
+    return tokens
 
 
 def calculate_frequencies(tokens: list[str] | None) -> dict[str, float] | None:
@@ -30,19 +29,18 @@ def calculate_frequencies(tokens: list[str] | None) -> dict[str, float] | None:
     """
     if not isinstance(tokens, list):
         return None
-    else:
-        for symb in tokens:
-            if not isinstance(symb, str):
-                return None
-        frequencies = {}
-        for symbol in tokens:
-            if symbol not in frequencies:
-                frequencies[symbol] = 1
-            else:
-                frequencies[symbol] += 1
-        for symbol, freq in frequencies.items():
-            frequencies[symbol] = freq / len(tokens)
-        return frequencies
+    for symb in tokens:
+        if not isinstance(symb, str):
+            return None
+    frequencies = {}
+    for symbol in tokens:
+        if symbol not in frequencies:
+            frequencies[symbol] = 1
+        else:
+            frequencies[symbol] += 1
+    for symbol, freq in frequencies.items():
+        frequencies[symbol] = freq / len(tokens)
+    return frequencies
 
 
 def create_language_profile(language: str, text: str) -> dict[str, str | dict[str, float]] | None:
@@ -54,13 +52,11 @@ def create_language_profile(language: str, text: str) -> dict[str, str | dict[st
     """
     if not isinstance(language, str) or not isinstance(text, str):
         return None
-    else:
-        freq = calculate_frequencies(tokenize(text))
-        if not isinstance(freq, dict):
-            return None
-        else:
-            language_profile = {"name": language, "freq": freq}
-            return language_profile
+    freq = calculate_frequencies(tokenize(text))
+    if not isinstance(freq, dict):
+        return None
+    language_profile = {"name": language, "freq": freq}
+    return language_profile
 
 
 def calculate_mse(predicted: list, actual: list) -> float | None:
@@ -70,16 +66,16 @@ def calculate_mse(predicted: list, actual: list) -> float | None:
     :param actual: a list of actual values
     :return: the score
     """
-    if (not isinstance(actual, list) or not isinstance(predicted, list) or len(actual) != len(predicted)):
+    if (not isinstance(actual, list) or not isinstance(predicted, list) or 
+        len(actual) != len(predicted)):
         return None
-    else:
-        number = 0
-        total = 0
-        for i, value in enumerate(actual):
-            total += (value - predicted[i])**2
-            number += 1
-        score = total/number, 3
-        return score
+    number = 0
+    total = 0
+    for i, value in enumerate(actual):
+        total += (value - predicted[i])**2
+        number += 1
+    score = total/number, 3
+    return score
 
 
 def compare_profiles(
@@ -92,18 +88,18 @@ def compare_profiles(
     :param profile_to_compare: a dictionary of a profile to compare the unknown profile to
     :return: the distance between the profiles
     """
-    if (not isinstance(unknown_profile, dict) or not isinstance(profile_to_compare, dict) or 'name' not in unknown_profile or 'name' not in profile_to_compare):
+    if (not isinstance(unknown_profile, dict) or not isinstance(profile_to_compare, dict) or 
+        'name' not in unknown_profile or 'name' not in profile_to_compare):
         return None
-    else:
-        words = set(profile_to_compare["freq"].keys())
-        words.update(unknown_profile["freq"].keys())
-        listed_unknown_profile = []
-        listed_profile_to_compare = []
-        for letter in words:
-            listed_profile_to_compare.append(profile_to_compare["freq"].get(letter, 0))
-            listed_unknown_profile.append(unknown_profile["freq"].get(letter, 0))
-        profile_distance = calculate_mse(listed_profile_to_compare, listed_unknown_profile)
-        return profile_distance
+    words = set(profile_to_compare["freq"].keys())
+    words.update(unknown_profile["freq"].keys())
+    listed_unknown_profile = []
+    listed_profile_to_compare = []
+    for letter in words:
+        listed_profile_to_compare.append(profile_to_compare["freq"].get(letter, 0))
+        listed_unknown_profile.append(unknown_profile["freq"].get(letter, 0))
+    profile_distance = calculate_mse(listed_profile_to_compare, listed_unknown_profile)
+    return profile_distance
 
 
 def detect_language(
@@ -118,18 +114,17 @@ def detect_language(
     :param profile_2: a dictionary of a known profile
     :return: a language
     """
-    if (not isinstance(unknown_profile, dict) or not isinstance(profile_1, dict) or not isinstance(profile_2, dict)):
+    if (not isinstance(unknown_profile, dict) or not isinstance(profile_1, dict) or not 
+        isinstance(profile_2, dict)):
         return None
-    else:
-        profile_distance_1 = compare_profiles(unknown_profile, profile_1)
-        profile_distance_2 = compare_profiles(unknown_profile, profile_2)
-        if profile_distance_1 < profile_distance_2:
-            return profile_1["name"]
-        elif profile_distance_2 < profile_distance_1:
-            return profile_2["name"]
-        elif profile_distance_1 == profile_distance_2:
-            language_list = sorted([str(profile_1["name"]), str(profile_2["name"])])
-            return language_list[0]
+    profile_distance_1 = compare_profiles(unknown_profile, profile_1)
+    profile_distance_2 = compare_profiles(unknown_profile, profile_2)
+    if profile_distance_1 < profile_distance_2:
+        return profile_1["name"]
+    elif profile_distance_2 < profile_distance_1:
+        return profile_2["name"]
+    language_list = sorted([str(profile_1["name"]), str(profile_2["name"])])
+    return language_list[0]
 
 def load_profile(path_to_file: str) -> dict | None:
     """
