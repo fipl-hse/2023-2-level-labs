@@ -13,7 +13,7 @@ def tokenize(text: str) -> list[str] | None:
     """
     if not isinstance(text, str):
         return None
-    tokens = [el.lower() for el in text if el.isalpha()]
+    tokens = [el for el in text.lower() if el.isalpha()]
     return tokens
 
 
@@ -26,7 +26,6 @@ def calculate_frequencies(tokens: list[str] | None) -> dict[str, float] | None:
     if not isinstance(tokens, list):
         return None
     frequency = {}
-    quantity = len(tokens)
     for token in tokens:
         frequency.setdefault(token, 0)
         if not isinstance(token, str):
@@ -34,7 +33,7 @@ def calculate_frequencies(tokens: list[str] | None) -> dict[str, float] | None:
         if token in frequency:
             frequency[token] += 1
     for keys, values in frequency.items():
-        frequency[keys] = values / quantity
+        frequency[keys] = values / len(tokens)
     return frequency
 
 
@@ -60,9 +59,8 @@ def calculate_mse(predicted: list, actual: list) -> float | None:
     :param actual: a list of actual values
     :return: the score
     """
-    if not len(predicted) == len(actual):
-        return None
-    if not (isinstance(predicted, list) and isinstance(actual, list)):
+    if not (isinstance(predicted, list) and isinstance(actual, list)) \
+            or len(predicted) != len(actual):
         return None
     quantity = len(actual)
     total = 0
@@ -86,12 +84,12 @@ def compare_profiles(
     if ('name' and 'freq') not in unknown_profile and ('name' and 'freq') not in profile_to_compare:
         return None
     keys = sorted(set(unknown_profile.keys()) | set(profile_to_compare.keys()))
-    compare_un = []
-    compare_pr = []
+    comparison_un = []
+    comparison_pr = []
     for key in keys:
-        compare_un.append(unknown_profile.get(key, 0))
-        compare_pr.append(profile_to_compare.get(key, 0))
-    mse_calc = calculate_mse(compare_un, compare_pr)
+        comparison_un.append(unknown_profile['freq'].get(key, 0))
+        comparison_pr.append(profile_to_compare['freq'].get(key, 0))
+    mse_calc = calculate_mse(comparison_un, comparison_pr)
     return mse_calc
 
 
