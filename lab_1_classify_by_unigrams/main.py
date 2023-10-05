@@ -65,11 +65,10 @@ def calculate_mse(predicted: list, actual: list) -> float | None:
             and len(predicted) == len(actual)
             ):
         return None
-    difference_square = 0
+    sum_difference_square = 0
     for el_predicted, el_actual in enumerate(predicted):
-        difference_square += (el_predicted - actual[el_actual])**2
-    mse = difference_square/len(predicted)
-    return mse
+        sum_difference_square += (el_predicted - actual[el_actual])**2
+    return sum_difference_square/len(predicted)
 
 
 def compare_profiles(
