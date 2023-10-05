@@ -13,10 +13,7 @@ def tokenize(text: str) -> list[str] | None:
     """
     if not isinstance(text, str):
         return None
-    for i in text:
-        if not i.isalpha():
-            text = text.replace(i, '')
-    tokens = list(text.lower())
+    tokens = [i.lower() for i in text if i.isalpha()]
     return tokens
 
 
@@ -26,19 +23,20 @@ def calculate_frequencies(tokens: list[str] | None) -> dict[str, float] | None:
     :param tokens: a list of tokens
     :return: a dictionary with frequencies
     """
+    global i
     if not isinstance(tokens, list):
         return None
     res = all(isinstance(i, str) for i in tokens)
     if not res:
-            return None
+        return None
     dictionary = {}
     for i in tokens:
         if i not in dictionary.keys():
             dictionary[i] = 0
         dictionary[i] += 1
+    length = len(tokens)
     for i in dictionary.keys():
-        dictionary[i] = dictionary[i] / len(tokens)
-
+        dictionary[i] /= length
     return dictionary
 
 
@@ -66,19 +64,15 @@ def calculate_mse(predicted: list, actual: list) -> float | None:
         return None
     if len(predicted) != len(actual):
         return None
-    if predicted == 0:
-        return 0
-    if predicted == actual:
-        return 1
     mse = 0
-    for i,j in enumerate(actual):
-        square = (j-predicted[i])**2
-        mse += square
-    return (mse/len(actual))
+    for i, j in enumerate(actual):
+        mse += (j-predicted[i])**2
+    return mse/len(actual)
 
 def compare_profiles(
         unknown_profile: dict[str, str | dict[str, float]],
-        profile_to_compare: dict[str, str | dict[str, float]]) -> float | None:
+        profile_to_compare: dict[str, str | dict[str, float]]
+) -> float | None:
     """
     Compares profiles and calculates the distance using symbols
     :param unknown_profile: a dictionary of an unknown profile
@@ -87,23 +81,23 @@ def compare_profiles(
     """
     if not isinstance(unknown_profile, dict) or not isinstance(profile_to_compare, dict):
         return None
-    if 'name' not in unknown_profile or 'name' not in profile_to_compare:
+    if 'name' not in unknown_profile.keys() or 'name' not in profile_to_compare.keys():
         return None
-    if 'freq' not in unknown_profile or 'freq' not in profile_to_compare:
+    if 'freq' not in unknown_profile.keys() or 'freq' not in profile_to_compare.keys():
         return None
     set1 = set(unknown_profile['freq'].keys())
     set2 = set(profile_to_compare['freq'].keys())
-    set3 = set1.union(set2)
-    for i in set3:
-        if i not in unknown_profile['freq']:
-                unknown_profile['freq'][i] = 0
-        if i not in profile_to_compare['freq']:
-                profile_to_compare['freq'][i] = 0
-    unknown_profile['freq'] = dict(sorted(unknown_profile['freq'].items()))
-    profile_to_compare['freq'] = dict(sorted(profile_to_compare['freq'].items()))
+    all_symbols = set1.union(set2)
+    unknown_profile_freq = []
+    profile_to_compare_freq = []
+    for i in all_symbols:
+        if i not in unknown_profile.get('freq').keys():
+            unknown_profile_freq.append(0)
+        if i not in profile_to_compare.get('freq').keys():
+            profile_to_compare_freq.append(0)
 
-    mse = round(calculate_mse(list(unknown_profile['freq']), list(profile_to_compare['freq'])), 3)
-    return mse
+    return calculate_mse(unknown_profile_freq, profile_to_compare_freq)
+
 
 def detect_language(
         unknown_profile: dict[str, str | dict[str, float]],
