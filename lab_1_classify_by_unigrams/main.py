@@ -28,7 +28,7 @@ def calculate_frequencies(tokens: list[str] | None) -> dict[str, float] | None:
     :param tokens: a list of tokens
     :return: a dictionary with frequencies
     """
-    if not isinstance(text, str):
+    if not isinstance(tokens, list):
         return None
     else:
         frequencies = {}
