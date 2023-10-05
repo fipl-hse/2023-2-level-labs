@@ -15,7 +15,7 @@ def tokenize(text: str) -> list[str] | None:
     """
     if not isinstance(text, str):
         return None
-    text = ''.join(symbol for symbol in text if symbol.isalnum()).lower()
+    text = ''.join(symbol for symbol in text if symbol.isalpha()).lower()
     result = []
     for i in text:
         if i not in punctuation:
@@ -78,6 +78,16 @@ def compare_profiles(
     :param profile_to_compare: a dictionary of a profile to compare the unknown profile to
     :return: the distance between the profiles
     """
+    if not isinstance(unknown_profile, dict) or not isinstance(profile_to_compare, dict):
+        return None
+    if not ("name" or "freq") in unknown_profile:
+        return None
+    unknown_profile_list = []
+    compare_profiles_list = []
+
+
+
+
 
 
 def detect_language(
