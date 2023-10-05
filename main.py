@@ -37,14 +37,14 @@ def calculate_frequencies(tokens: list[str] | None) -> dict[str, float] | None:
     return freq
 
 
-def create_language_profile(language: str, text: str, tokens=None) -> dict[str, str | dict[str, float]] | None:
+def create_language_profile(language: str, text: str) -> dict[str, str | dict[str, float]] | None:
     """
     Creates a language profile
     :param language: a language
     :param text: a text
     :return: a dictionary with two keys – name, freq
     """
-    if not isinstance(tokens, list):
+    if not isinstance(language, str) or not isinstance(text, str):
         return None
     frequencies = calculate_frequencies(tokenize(text))
     if isinstance(frequencies, dict):
