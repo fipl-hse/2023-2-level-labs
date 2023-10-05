@@ -171,8 +171,8 @@ def collect_profiles(paths_to_profiles: list) -> list[dict[str, str | dict[str, 
         language_profile = load_profile(paths)
         if isinstance(language_profile, dict):
             processed_profile = preprocess_profile(language_profile)
-        if isinstance(processed_profile, dict):
-            list_processed_profiles.append(processed_profile)
+            if isinstance(processed_profile, dict):
+                list_processed_profiles.append(processed_profile)
     return list_processed_profiles
 
 
