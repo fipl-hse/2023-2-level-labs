@@ -36,7 +36,7 @@ def calculate_frequencies(tokens: list[str] | None) -> dict[str, float] | None:
             dictionary[i] = 0
         dictionary[i] += 1
     for i in dictionary:
-        dictionary[i] = float(dictionary[i]) / length
+        dictionary[i] = float(dictionary[i] / length)
     return dictionary
 
 
