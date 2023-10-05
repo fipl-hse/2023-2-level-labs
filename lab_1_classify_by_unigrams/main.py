@@ -14,7 +14,6 @@ def tokenize(text: str) -> list[str] | None:
     """
     if not isinstance(text, str):
         return None
-    text = text.replace('\n', '')
     text = "".join(c for c in text if c.isalpha()).lower()
     return list(text)
 
