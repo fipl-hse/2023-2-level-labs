@@ -19,7 +19,7 @@ def tokenize(text: str) -> list[str] | None:
                 tokens.append(symbol)
         return tokens
     else:
-    return None
+        return None
 
 
 def calculate_frequencies(tokens: list[str] | None) -> dict[str, float] | None:
