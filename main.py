@@ -16,6 +16,7 @@ def tokenize(text: str) -> list[str] | None:
         tokens = list(tokens)
         return tokens
 
+
 def calculate_frequencies(tokens: list[str] | None) -> dict[str, float] | None:
     """
     Calculates frequencies of given tokens
@@ -34,7 +35,8 @@ def calculate_frequencies(tokens: list[str] | None) -> dict[str, float] | None:
         freq[token] /= len(tokens)
     return freq
 
-def create_language_profile(language: str, text: str) -> dict[str, str | dict[str, float]] | None:
+
+def create_language_profile(language: str, text: str, tokens=None) -> dict[str, str | dict[str, float]] | None:
     """
     Creates a language profile
     :param language: a language
