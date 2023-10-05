@@ -100,7 +100,6 @@ def compare_profiles(
     return calculate_mse(list_p1, list_p2)
 
 
-
 def detect_language(
         unknown_profile: dict[str, str | dict[str, float]],
         profile_1: dict[str, str | dict[str, float]],
@@ -125,7 +124,7 @@ def detect_language(
         alph = [profile_1.get("name"), profile_2.get("name")]
         alph = sorted(alph)
         return alph[0]
-    else:
+    if mse_1 > mse_2:
         return profile_2.get("name")
 
 def load_profile(path_to_file: str) -> dict | None:
