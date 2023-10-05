@@ -21,7 +21,7 @@ def main() -> None:
     print(frequencies)
     profile = create_language_profile("en", en_text)
     print(profile)
-    result = None
+    result = profile
     assert result, "Detection result is None"
 
 if __name__ == "__main__":
