@@ -165,11 +165,10 @@ def preprocess_profile(profile: dict) -> dict[str, str | dict] | None:
         if len(i) == 1 and i.isalpha():
             if i.lower() not in dictionary['freq']:
                 dictionary['freq'][i.lower()] = profile['freq'][i]/count_unigrams
-                print(i, profile['freq'][i]/count_unigrams)
+
             else:
                 dictionary['freq'][i.lower()] = dictionary['freq'][i.lower()] + profile['freq'][i] / count_unigrams
-                print(i, profile['freq'][i]/count_unigrams)
-    print(dictionary['freq'])
+
     return dictionary
 
 
@@ -202,9 +201,8 @@ def detect_language_advanced(unknown_profile: dict[str, str | dict[str, float]],
         score = compare_profiles(unknown_profile, profile)
         t = tuple([profile['name'], score])
         list_scores += [t]
-    print(list_scores)
 
-    return list_scores
+    return sorted(list_scores, key=lambda a: a[1])
 
 
 def print_report(detections: list[tuple[str, float]]) -> None:
