@@ -32,8 +32,9 @@ def calculate_frequencies(tokens: list[str] | None) -> dict[str, float] | None:
         frequencies = {}
         for symbol in tokens:
             if symbol not in frequencies:
-                frequencies[symbol] = 0
-            frequencies[symbol] += 1
+                frequencies[symbol] = 1
+            else:
+                frequencies[symbol] += 1
         for symbol, freq in frequencies:
             frequencies[symbol] = freq / len(tokens)
         return frequencies
