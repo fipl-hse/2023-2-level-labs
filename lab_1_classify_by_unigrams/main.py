@@ -52,9 +52,9 @@ def calculate_mse(predicted: list, actual: list) -> float | None:
     """
     if not (isinstance(predicted, list) and isinstance(actual, list)):
         return None
-    n = len(predicted)
+    number = len(predicted)
     summa = sum((p - a) ** 2 for p, a in zip(predicted, actual))
-    return summa / n
+    return summa / number
 
 
 def compare_profiles(
@@ -98,7 +98,11 @@ def detect_language(
     :param profile_2: a dictionary of a known profile
     :return: a language
     """
-    if not (isinstance(unknown_profile, dict) and isinstance(profile_1, dict) and isinstance(profile_2, dict)):
+    if not (
+            isinstance(unknown_profile, dict)
+            and isinstance(profile_1, dict)
+            and isinstance(profile_2, dict)
+    ):
         return None
     first_pair = compare_profiles(
         unknown_profile,
