@@ -1,10 +1,9 @@
 """
 Language detection starter
 """
-from lab_1_classify_by_unigrams.main import (load_profile, preprocess_profile,
-                                             create_language_profile,
-                                             detect_language, detect_language_advanced,
-                                             print_report)
+from lab_1_classify_by_unigrams.main import (create_language_profile, detect_language,
+                                             detect_language_advanced, load_profile,
+                                             preprocess_profile, print_report)                                             
 
 
 def main() -> None:

@@ -59,13 +59,11 @@ def create_language_profile(language: str, text: str) -> dict[str, str | dict[st
 
     tokens = tokenize(text)
     tokens_frequency_dict = calculate_frequencies(tokens)
-    profile = {
-        'name': language,
-        'freq': tokens_frequency_dict
-    }
 
-    if isinstance(tokens_frequency_dict, dict):
-        return profile
+    if not isinstance(tokens_frequency_dict, dict):
+        return None
+
+    return {'name': language, 'freq': tokens_frequency_dict}
 
 
 def calculate_mse(predicted: list, actual: list) -> float | None:
@@ -80,8 +78,9 @@ def calculate_mse(predicted: list, actual: list) -> float | None:
     if len(predicted) != len(actual):
         return None
 
+    mse = 0
     squared_differences = [(true - pred) ** 2 for true, pred in zip(actual, predicted)]
-    mse = sum(squared_differences) / len(predicted)
+    mse += sum(squared_differences) / len(predicted)
 
     return mse
 
@@ -157,6 +156,8 @@ def detect_language(
     if mse_lang_1 == mse_lang_2:
         return sorted([lang_1, lang_2])[0]
 
+    return None
+
 
 def load_profile(path_to_file: str) -> dict | None:
     """
@@ -191,19 +192,15 @@ def preprocess_profile(profile: dict) -> dict[str, str | dict] | None:
         or profile.get('n_words') is None):
         return None
 
-    freq = profile['freq']
-    unigrams = {}
-    total_count = profile['n_words'][0]
+    processed_profile = {'name': profile['name'], 'freq': {}}
+    freq_raw = profile['freq']
+    freq_processed = processed_profile['freq']
 
-    for token, count in freq.items():
-        if len(token) == 1:
-            unigram = token.lower()
-            unigrams[unigram] = unigrams.get(unigram, 0) + count
-
-    processed_profile = {
-        'name': profile['name'],
-        'freq': {unigram: count/total_count for unigram, count in unigrams.items()}
-    }
+    for token in freq_raw:
+        if token.lower() in freq_processed:
+            freq_processed[token.lower()] += freq_raw[token] / profile['n_words'][0]
+        elif len(token) == 1:
+            freq_processed[token.lower()] = freq_raw[token] / profile['n_words'][0]
 
     return processed_profile
 
