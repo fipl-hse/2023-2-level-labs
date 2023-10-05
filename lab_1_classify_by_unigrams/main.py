@@ -28,17 +28,14 @@ def calculate_frequencies(tokens: list[str] | None) -> dict[str, float] | None:
     :return: a dictionary with frequencies
     """
 
-    if not isinstance(tokens, list):
+    if not isinstance(tokens, list) or not all(isinstance(token, str) for token in tokens):
         return None
     calc = {}.fromkeys(tokens, 0)
     for token in tokens:
-        if not isinstance(token, str):
-            return None
-
         calc[token] += 1
     for key in calc:
-        return calc.update({key: calc[key]/len(tokens)})
-
+        calc.update({key: calc[key]/len(tokens)})
+    return calc
 
 
 def create_language_profile(language: str, text: str) -> dict[str, str | dict[str, float]] | None:
