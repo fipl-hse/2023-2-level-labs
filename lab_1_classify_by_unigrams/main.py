@@ -162,7 +162,7 @@ def preprocess_profile(profile: dict) -> dict[str, str | dict] | None:
     dictionary = {'name': profile['name'], 'freq': {}}
     count_unigrams = profile['n_words'][0]
     for i in profile['freq']:
-        if len(i) == 1 and i.isalpha():
+        if len(i) == 1 and (i.isalpha() or i.isdigit()):
             if i.lower() not in dictionary['freq']:
                 dictionary['freq'][i.lower()] = profile['freq'][i]/count_unigrams
 
