@@ -51,11 +51,8 @@ def create_language_profile(language: str, text: str) -> dict[str, str | dict[st
     freq = calculate_frequencies(tokenize(text))
     if not isinstance(freq, dict):
         return None
-    dictionary = {
-        "name": language,
-        "freq": freq
-    }
-    return dictionary
+
+    return {"name": language, "freq": freq}
 
 
 def calculate_mse(predicted: list, actual: list) -> float | None:
@@ -208,7 +205,8 @@ def detect_language_advanced(unknown_profile: dict[str, str | dict[str, float]],
     for profile in known_profiles:
         score = compare_profiles(unknown_profile, profile)
         list_scores += [tuple([profile['name'], score])]
-
+    if not isinstance(list_scores, list):
+        return None
     return sorted(list_scores, key=lambda a: a[1])
 
 
@@ -220,4 +218,3 @@ def print_report(detections: list[tuple[str, float]]) -> None:
     if isinstance(detections, list):
         for i in detections:
             print(f'{i[0]} MSE {i[1]:.5f}')
-    return None
