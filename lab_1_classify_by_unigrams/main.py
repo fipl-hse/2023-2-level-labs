@@ -13,8 +13,7 @@ def tokenize(text: str) -> list[str] | None:
     """
     if not isinstance(text, str):
         return None
-    text1 = list(''.join(filter(str.isalpha, text)).lower())
-    return text1
+    return list(''.join(filter(str.isalpha, text)).lower())
 
 
 def calculate_frequencies(tokens: list[str] | None) -> dict[str, float] | None:
@@ -47,11 +46,8 @@ def create_language_profile(language: str, text: str) -> dict[str, str | dict[st
     """
     if not isinstance(language, str) or not isinstance(text, str):
         return None
-    dictionary = {
-    "name": language,
-    "freq": calculate_frequencies(tokenize(text))
-        }
-    return dictionary
+    language_profile = {"name": language, "freq": calculate_frequencies(tokenize(text))}
+    return language_profile
 
 
 def calculate_mse(predicted: list, actual: list) -> float | None:
