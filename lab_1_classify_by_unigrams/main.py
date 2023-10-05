@@ -25,7 +25,7 @@ def calculate_frequencies(tokens: list[str] | None) -> dict[str, float] | None:
     """
     frequency = {}
     for i in tokens:
-        frequency[i] = round(tokens.count(i) / len(tokens), 3)
+        frequency[i] = tokens.count(i) / len(tokens)
     return frequency
 
 def create_language_profile(language: str, text: str) -> dict[str, str | dict[str, float]] | None:
@@ -35,9 +35,9 @@ def create_language_profile(language: str, text: str) -> dict[str, str | dict[st
     :param text: a text
     :return: a dictionary with two keys – name, freq
     """
-    step1 = tokenize(text)
-    step2 = calculate_frequencies(step1)
-    profile = dict({"name": language, "freq": step2})
+    tokenized = tokenize(text)
+    frequencies = calculate_frequencies(tokenized)
+    profile = dict({"name": language, "freq": frequencies})
     return profile
 
 
