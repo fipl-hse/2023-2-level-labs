@@ -67,7 +67,7 @@ def calculate_mse(predicted: list, actual: list) -> float | None:
     for i, act_value in enumerate(actual):
         sum_mse += (act_value-predicted[i]) ** 2
 
-    return sum_mse / len(actual)
+    return sum_mse/len(actual)
 
 
 def compare_profiles(
