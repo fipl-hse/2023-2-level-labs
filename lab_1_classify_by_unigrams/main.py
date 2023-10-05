@@ -45,13 +45,19 @@ def create_language_profile(language: str, text: str) -> dict[str, str | dict[st
     :param text: a text
     :return: a dictionary with two keys – name, freq
     """
-    if not isinstance(language, str) or not isinstance(text, str):
+    if not isinstance(language, str):
         return None
     else:
-        language_profile = {'name': f'{language}',
-                            'freq': f'{calculate_frequencies(tokenize(text))}'}
-        return language_profile
+        if not isinstance(text, str):
+            return None
+        else:
+            language_profile = {'name': language,
+                                'freq': calculate_frequencies(tokenize(text))}
+            return language_profile
 
+
+a = 'he is a happy man'
+create_language_profile('en', a)
 
 def calculate_mse(predicted: list, actual: list) -> float | None:
     """
