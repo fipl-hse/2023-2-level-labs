@@ -139,7 +139,7 @@ def detect_language(
         return names[0]
     if mse_1 < mse_2:
         return profile_1['name']
-    else:
+    if mse_1 > mse_2:
         return profile_2['name']
 
 
