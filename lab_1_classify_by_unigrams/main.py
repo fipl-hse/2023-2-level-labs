@@ -16,6 +16,7 @@ def tokenize(text: str) -> list[str] | None:
     tokens = [t for t in text.lower() if (t.isalpha() and t != 'º')]
     return tokens
 
+
 def calculate_frequencies(tokens: list[str] | None) -> dict[str, float] | None:
     """
     Calculates frequencies of given tokens
@@ -68,7 +69,6 @@ def calculate_mse(predicted: list, actual: list) -> float | None:
     for index, value in enumerate(predicted):
         sum_diff += (actual[index] - value) ** 2
     mse = sum_diff / len(predicted)
-    mse = round(mse, 4)
     return mse
 
 
@@ -89,13 +89,6 @@ def compare_profiles(
     if 'name' not in profile_to_compare or 'freq' not in profile_to_compare:
         return None
 
-    #sorted_profile_to_compare
-    #predicted_tokens = dict(sorted(profile_to_compare['freq'].items()))
-    #sorted_unknown_profile
-    #actual_tokens = dict(sorted(unknown_profile['freq'].items()))
-    #sorted_profile_to_compare = tuple(sorted(profile_to_compare.items()))
-    #sorted_unknown_profile = tuple(sorted(unknown_profile.items()))
-
     predicted_tokens = profile_to_compare.get('freq')
     actual_tokens = unknown_profile.get('freq')
 
@@ -107,17 +100,19 @@ def compare_profiles(
         if key not in predicted_tokens:
             predicted_tokens[key] = 0
 
-    sorted_predicted_tokens = dict(sorted(predicted_tokens.items()))
-    sorted_actual_tokens = dict(sorted(actual_tokens.items()))
+    sorted_predicted_tokens = (sorted(predicted_tokens.items()))
+    sorted_actual_tokens = (sorted(actual_tokens.items()))
 
-    predicted = list(sorted_predicted_tokens.values())
+    predicted = []
+    for item in sorted_predicted_tokens:
+        predicted.append(item[1])
 
-    actual = list(sorted_actual_tokens.values())
+    actual = []
+    for item in sorted_actual_tokens:
+        actual.append(item[1])
 
     mse = calculate_mse(predicted, actual)
     return mse
-
-
 
 
 def detect_language(
@@ -141,12 +136,11 @@ def detect_language(
     if mse_1 == mse_2:
         names = [profile_1['name'], profile_2['name']]
         names.sort()
-        language = names[0]
+        return names[0]
     elif mse_1 < mse_2:
-        language = profile_1['name']
+        return profile_1['name']
     else:
-        language = profile_2['name']
-    return language
+        return profile_2['name']
 
 
 def load_profile(path_to_file: str) -> dict | None:
