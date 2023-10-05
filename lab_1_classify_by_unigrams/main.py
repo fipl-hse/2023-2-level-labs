@@ -15,12 +15,7 @@ def tokenize(text: str) -> list[str] | None:
     if not isinstance(text, str):
         return None
 
-    tokens = []
-    text = text.lower()
-    for i in text:
-        if i.isalpha():
-            tokens.append(i)
-    return tokens
+    return [token.lower() for token in text if token.isalpha()]
 
 
 def calculate_frequencies(tokens: list[str] | None) -> dict[str, float] | None:
@@ -74,10 +69,11 @@ def calculate_mse(predicted: list, actual: list) -> float | None:
         return None
 
     sum_diff = 0
-    for i, value in enumerate(predicted):
-        sum_diff += (value - actual[i]) ** 2
+    for freq_value in zip(predicted, actual):
+        sum_diff += (freq_value[0] - freq_value[1]) ** 2
     mse = sum_diff / len(predicted)
     return mse
+
 
 def compare_profiles(
         unknown_profile: dict[str, str | dict[str, float]],
@@ -134,13 +130,15 @@ def detect_language(
     profile_1_metric = compare_profiles(unknown_profile, profile_1)
     profile_2_metric = compare_profiles(unknown_profile, profile_2)
 
-    if (isinstance(profile_1_metric, float)
+    if not (isinstance(profile_1_metric, float)
             and isinstance(profile_2_metric, float)
     ):
-        if profile_1_metric > profile_2_metric:
-            return str(profile_2['name'])
-        if profile_1_metric < profile_2_metric:
-            return str(profile_1['name'])
+        return None
+
+    if profile_1_metric > profile_2_metric:
+        return str(profile_2['name'])
+    if profile_1_metric < profile_2_metric:
+        return str(profile_1['name'])
 
     return [profile_1['name'], profile_2['name']].sort()
 
@@ -180,10 +178,13 @@ def preprocess_profile(profile: dict) -> dict[str, str | dict] | None:
     for token in profile['freq']:
         if token.lower() in unigram_profile['freq']:
             unigram_profile['freq'][token.lower()] += profile['freq'][token] / profile['n_words'][0]
-        elif len(token) == 1:
+        elif len(token) == 1 and (token.isalpha() or token == '²'):
             unigram_profile['freq'][token.lower()] = profile['freq'][token] / profile['n_words'][0]
 
     return unigram_profile
+
+
+
 
 
 def collect_profiles(paths_to_profiles: list) -> list[dict[str, str | dict[str, float]]] | None:
