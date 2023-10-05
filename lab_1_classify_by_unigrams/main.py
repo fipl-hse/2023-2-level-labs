@@ -2,7 +2,6 @@
 Lab 1
 Language detection
 """
-
 import json
 
 
@@ -70,7 +69,7 @@ def calculate_mse(predicted: list, actual: list) -> float | None:
                            for actual_value, predicted_value in zip(actual, predicted)])
     for value in squared_difference:
         summ_values += value
-    mse = round(summ_values / len(actual), 4)
+    mse = summ_values / len(actual)
     return mse
 
 
@@ -114,13 +113,14 @@ def detect_language(
         return None
     mse_profile_1 = compare_profiles(unknown_profile, profile_1)
     mse_profile_2 = compare_profiles(unknown_profile, profile_2)
-    if (isinstance(mse_profile_1, float)
-            and isinstance(mse_profile_2, float)):
-        if mse_profile_1 < mse_profile_2:
-            return str(profile_1['name'])
-        if mse_profile_2 < mse_profile_1:
-            return str(profile_2['name'])
-    return sorted([str(profile_1['name']), str(profile_2['name'])])[0]
+    if (not isinstance(mse_profile_1, float)
+            or not isinstance(mse_profile_2, float)):
+        return None
+    if mse_profile_1 < mse_profile_2:
+        return str(profile_1['name'])
+    if mse_profile_2 < mse_profile_1:
+        return str(profile_2['name'])
+    return sorted([profile_1['name'], profile_2['name']])[0]
 
 
 def load_profile(path_to_file: str) -> dict | None:
