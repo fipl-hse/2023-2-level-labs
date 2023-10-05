@@ -36,7 +36,7 @@ def calculate_frequencies(tokens: list[str] | None) -> dict[str, float] | None:
             dictionary[i] = 0
         dictionary[i] += 1
     for i in dictionary:
-        dictionary[i] = dictionary[i] / length
+        dictionary[i] = float(dictionary[i]) / length
     return dictionary
 
 
@@ -71,10 +71,10 @@ def calculate_mse(predicted: list, actual: list) -> float | None:
         return 0.0
     numerator = 0
     for i, e in enumerate(actual):
-        numerator += (e - predicted[i])**2
+        numerator += (e - predicted[i]) ** 2
     if len(predicted) == 0:
         return 1.0
-    return numerator/len(predicted)
+    return numerator / len(predicted)
 
 
 def compare_profiles(
@@ -118,7 +118,7 @@ def detect_language(
     :return: a language
     """
     if (not isinstance(unknown_profile, dict) or
-        not isinstance(profile_1, dict) or
+            not isinstance(profile_1, dict) or
             not isinstance(profile_2, dict)):
         return None
     mse1 = compare_profiles(unknown_profile, profile_1)
@@ -153,18 +153,18 @@ def preprocess_profile(profile: dict) -> dict[str, str | dict] | None:
     with relative frequencies without unnecessary ngrams
     """
     if (not isinstance(profile, dict) or 'name' not in profile or
-            'freq' not in profile or 'n_words'not in profile):
+            'freq' not in profile or 'n_words' not in profile):
         return None
     dictionary = {'name': profile['name'], 'freq': {}}
     count_unigrams = profile['n_words'][0]
     for i in profile['freq']:
         if len(i) == 1:
             if i.lower() not in dictionary['freq']:
-                dictionary['freq'][i.lower()] = profile['freq'][i]/count_unigrams
+                dictionary['freq'][i.lower()] = profile['freq'][i] / count_unigrams
 
             else:
                 dictionary['freq'][i.lower()] = \
-                dictionary['freq'][i.lower()] + profile['freq'][i] / count_unigrams
+                    dictionary['freq'][i.lower()] + profile['freq'][i] / count_unigrams
 
     return dictionary
 
