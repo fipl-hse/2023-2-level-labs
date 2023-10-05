@@ -41,6 +41,7 @@ def calculate_frequencies(tokens: list[str] | None) -> dict[str, float] | None:
         calc[token] += 1
     for key in calc:
         calc[key] /= all_tokens
+
     return calc
 
 
