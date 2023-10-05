@@ -91,7 +91,7 @@ def compare_profiles(
 
     if not isinstance(unknown_profile, dict) or not isinstance(profile_to_compare, dict):
         return None
-    if not ('name' and 'freq') in unknown_profile or not ('name' and 'freq') in profile_to_compare:
+    if not ('name' or 'freq') in unknown_profile or not ('name' or 'freq') in profile_to_compare:
         return None
     unknown = set(unknown_profile['freq'])
     comparable = set(profile_to_compare['freq'])
