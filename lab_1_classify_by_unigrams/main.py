@@ -140,9 +140,11 @@ def detect_language(
         names.sort()
         if isinstance(names[0], str):
             return names[0]
-    if mse_1 is not None and mse_2 is not None and mse_1 < mse_2 and isinstance(profile_1['name'], str):
+    if (mse_1 is not None and mse_2 is not None and mse_1 < mse_2 and
+            isinstance(profile_1['name'], str)):
         return profile_1['name']
-    if mse_1 is not None and mse_2 is not None and mse_1 > mse_2 and isinstance(profile_2['name'], str):
+    if (mse_1 is not None and mse_2 is not None and mse_1 > mse_2 and
+            isinstance(profile_2['name'], str)):
         return profile_2['name']
     return None
 
