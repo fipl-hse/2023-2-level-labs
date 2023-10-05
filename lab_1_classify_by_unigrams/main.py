@@ -13,9 +13,7 @@ def tokenize(text: str) -> list[str] | None:
     """
     if not isinstance(text, str):
         return None
-    else:
-        tokens = [symbol.lower() for symbol in text if symbol.isalpha()]
-        return tokens
+    return [symbol.lower() for symbol in text if symbol.isalpha()]
 
 
 def calculate_frequencies(tokens: list[str] | None) -> dict[str, float] | None:
@@ -26,12 +24,12 @@ def calculate_frequencies(tokens: list[str] | None) -> dict[str, float] | None:
     """
     if not isinstance(tokens, list):
         return None
+    freq_dict = {}
     for token in tokens:
         if not isinstance(token, str):
             return None
-    freq_dict = {}
-    for token in tokens:
-        freq_dict.update({token: (tokens.count(token) / len(tokens))})
+        else:
+            freq_dict.update({token: (tokens.count(token) / len(tokens))})
     return freq_dict
 
 
@@ -45,8 +43,7 @@ def create_language_profile(language: str, text: str) -> dict[str, str | dict[st
     if not isinstance(language, str) or not isinstance(text, str):
         return None
     dict_of_freq = calculate_frequencies(tokenize(text))
-    lang_prof = {'name': language, 'freq': dict_of_freq}
-    return lang_prof
+    return {'name': language, 'freq': dict_of_freq}
 
 
 def calculate_mse(predicted: list, actual: list) -> float | None:
@@ -56,7 +53,6 @@ def calculate_mse(predicted: list, actual: list) -> float | None:
     :param actual: a list of actual values
     :return: the score
     """
-
 
 
 def compare_profiles(
