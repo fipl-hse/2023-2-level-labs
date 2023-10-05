@@ -31,7 +31,7 @@ def calculate_frequencies(tokens: list[str] | None) -> dict[str, float] | None:
     for character in tokens:
         if character not in text_freq:
             text_freq[character] = 0.0
-        text_freq[character] += 1/len(tokens)
+        text_freq[character] += 1 / len(tokens)
 
     return text_freq
 
@@ -67,7 +67,7 @@ def calculate_mse(predicted: list, actual: list) -> float | None:
 
     mse = 0.0
     for index, pred_value in enumerate(predicted):
-        mse += (pred_value - actual[index])**2
+        mse += (pred_value - actual[index]) ** 2
 
     mse /= len(predicted)
     return mse
@@ -129,15 +129,18 @@ def detect_language(
     mse_1 = compare_profiles(unknown_profile, profile_1)
     mse_2 = compare_profiles(unknown_profile, profile_2)
 
+    prof_name_1 = profile_1['name']
+    prof_name_2 = profile_2['name']
+
     if not mse_1 and not mse_2:
         return None
     if mse_2 and (not mse_1 or mse_1 > mse_2) and \
-            isinstance(profile_2['name'], str):
-        return profile_2['name']
+            isinstance(prof_name_2, str):
+        return prof_name_2
     if mse_1 and (not mse_2 or mse_1 < mse_2) and \
-            isinstance(profile_1['name'], str):
-        return profile_1['name']
-    alphabetical_order = [profile_1['name'], profile_2['name']]
+            isinstance(prof_name_1, str):
+        return prof_name_1
+    alphabetical_order = [prof_name_1, prof_name_2]
     alphabetical_order.sort()
     return str(alphabetical_order[0])
 
@@ -172,14 +175,14 @@ def preprocess_profile(profile: dict) -> dict[str, str | dict] | None:
 
     perfect_profile = {'name': profile['name'],
                        'freq': {}}
+    unigrams_num = profile['n_words'][0]
 
     for sequence in profile['freq']:
+        frequency = profile['freq'][sequence]
         if sequence.lower() in perfect_profile['freq']:
-            perfect_profile['freq'][sequence.lower()] += \
-                profile['freq'][sequence] / profile['n_words'][0]
+            perfect_profile['freq'][sequence.lower()] += frequency / unigrams_num
         elif len(sequence) == 1:
-            perfect_profile['freq'][sequence.lower()] = \
-                profile['freq'][sequence] / profile['n_words'][0]
+            perfect_profile['freq'][sequence.lower()] = frequency / unigrams_num
 
     return perfect_profile
 
