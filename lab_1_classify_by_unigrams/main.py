@@ -146,9 +146,6 @@ def detect_language(
     lang_1 = str(profile_1['name'])
     lang_2 = str(profile_2['name'])
 
-    if not isinstance(mse_lang_1, float) or not isinstance(mse_lang_2, float):
-        return None
-
     if mse_lang_1 < mse_lang_2:
         return lang_1
     if mse_lang_1 > mse_lang_2:
