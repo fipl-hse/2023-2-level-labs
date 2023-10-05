@@ -205,9 +205,9 @@ def detect_language_advanced(unknown_profile: dict[str, str | dict[str, float]],
     for profile in known_profiles:
         score = compare_profiles(unknown_profile, profile)
         list_scores += [tuple([profile['name'], score])]
-    if not isinstance(list_scores, list):
-        return None
-    return sorted(list_scores, key=lambda a: a[1])
+    if isinstance(list_scores, list):
+        return sorted(list_scores, key=lambda a: (a[1], a[0]))
+    return None
 
 
 def print_report(detections: list[tuple[str, float]]) -> None:
