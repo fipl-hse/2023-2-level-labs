@@ -177,7 +177,7 @@ def preprocess_profile(profile: dict) -> dict[str, str | dict] | None:
     for token in profile['freq']:
         if token.lower() in profile_raw['freq']:
             profile_raw['freq'][token.lower()] += \
-            profile['freq'][token] / profile['n_words'][0]  
+            profile['freq'][token] / profile['n_words'][0]
         elif len(token) == 1:
             profile_raw['freq'][token.lower()] = \
             profile['freq'][token] / profile['n_words'][0]
@@ -214,6 +214,16 @@ def detect_language_advanced(unknown_profile: dict[str, str | dict[str, float]],
     :param known_profiles: a list of known profiles
     :return: a sorted list of tuples containing a language and a distance
     """
+    if not isinstance(unknown_profile, dict) or not isinstance(known_profiles, list):
+        return None
+    
+    detection = []
+    for profile in known_profiles:
+        result_of_comparison = compare_profiles(unknown_profile, profile)
+        detection.append(tuple(profile['name'], result_of_comparison))
+
+    detection.sort(key=lambda a: (a[1], a[0]))
+    return detection
 
 
 def print_report(detections: list[tuple[str, float]]) -> None:
@@ -221,3 +231,4 @@ def print_report(detections: list[tuple[str, float]]) -> None:
     Prints report for detection of language
     :param detections: a list with distances for each available language
     """
+   
