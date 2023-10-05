@@ -26,17 +26,16 @@ def calculate_frequencies(tokens: list[str] | None) -> dict[str, float] | None:
     """
     if not isinstance(tokens, list):
         return None
-    res = all(isinstance(i, str) for i in tokens)
-    if not res:
+    if not all(isinstance(i, str) for i in tokens):
         return None
     dictionary = {}
     length = len(tokens)
     for i in tokens:
         if i not in dictionary:
-            dictionary[i] = 0
+            dictionary[i] = 0.0
         dictionary[i] += 1
     for i in dictionary:
-        dictionary[i] = float(dictionary[i] / length)
+        dictionary[i] = dictionary[i] / length
     return dictionary
 
 
