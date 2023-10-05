@@ -1,13 +1,13 @@
-import string
 def tokenize(text):
-    if isinstance(text, str):
-        text = text.lower()
-        text1 = text.translate(str.maketrans('', '', string.punctuation))
-        text2 = text1.replace(" ", "")
-        tokens = list(text2)
-        return tokens
-    else:
+    if not isinstance(text, str):
         return None
+    else:
+        tokens = []
+        text = text.lower()
+        for i in text:
+            if i.isalpha():
+                tokens.append(i)
+        return tokens
 
 def calculate_frequencies(tokens: list[str] | None) -> dict[str, float] | None:
     if isinstance(tokens, list) and all(isinstance(el,str) for el in tokens):
