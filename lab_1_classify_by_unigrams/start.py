@@ -4,7 +4,6 @@ Language detection starter
 from lab_1_classify_by_unigrams.main import create_language_profile, detect_language
 
 
-
 def main() -> None:
     """
     Launches an implementation
