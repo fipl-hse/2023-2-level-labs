@@ -137,7 +137,7 @@ def detect_language(
             return str(profile_2['name'])
         if distance1 < distance2:
             return str(profile_1['name'])
-    return sorted([profile_1['name'], profile_2['name']])[0]
+    return (sorted([str(profile_1['name']), str(profile_2['name'])]))[0]
 
 
 def load_profile(path_to_file: str) -> dict | None:
