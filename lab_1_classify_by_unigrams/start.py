@@ -1,7 +1,7 @@
 """
 Language detection starter
 """
-from lab_1_classify_by_unigrams.main import tokenize, create_language_profile
+from lab_1_classify_by_unigrams.main import tokenize
 
 
 def main() -> None:
