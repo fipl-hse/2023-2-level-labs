@@ -11,15 +11,15 @@ def tokenize(text: str) -> list[str] | None:
     :param text: a text
     :return: a list of lower-cased tokens without punctuation
     """
-    try:
+    if isinstance(text, str):
         text = text.lower()
-    except TypeError:
-        print("Incorrect input.")
-    tokens = []
-    for symbol in text:
-        if symbol.isalpha():
-            tokens.append(symbol)
-    return tokens
+        tokens = []
+        for symbol in text:
+            if symbol.isalpha():
+                tokens.append(symbol)
+        return tokens
+    Esle:
+    return None
 
 
 def calculate_frequencies(tokens: list[str] | None) -> dict[str, float] | None:
@@ -28,15 +28,17 @@ def calculate_frequencies(tokens: list[str] | None) -> dict[str, float] | None:
     :param tokens: a list of tokens
     :return: a dictionary with frequencies
     """
-    frequencies = {}
-    for symbol in tokens:
-        if symbol not in frequencies:
-            frequencies[symbol] = 1
-        else:
+    if isinstance(tokens, list):    
+        frequencies = {}
+        for symbol in tokens:
+            if symbol not in frequencies:
+                frequencies[symbol] = 0
             frequencies[symbol] += 1
-    for symbol, freq in frequencies:
-        frequencies[symbol] = freq / len(tokens)
-    return frequencies
+        for symbol, freq in frequencies:
+            frequencies[symbol] = freq / len(tokens)
+        return frequencies
+    else:
+        return None
 
 
 def create_language_profile(language: str, text: str) -> dict[str, str | dict[str, float]] | None:
@@ -46,8 +48,11 @@ def create_language_profile(language: str, text: str) -> dict[str, str | dict[st
     :param text: a text
     :return: a dictionary with two keys – name, freq
     """
-    language_profile = {"name": language, "freq": calculate_frequencies(tokenize(text))}
-    return language_profile
+    if isinstance(language, str) and isinstance(text, str):
+        language_profile = {"name": language, "freq": calculate_frequencies(tokenize(text))}
+        return language_profile
+    else:
+        return None
 
 
 def calculate_mse(predicted: list, actual: list) -> float | None:
@@ -57,13 +62,17 @@ def calculate_mse(predicted: list, actual: list) -> float | None:
     :param actual: a list of actual values
     :return: the score
     """
-    number = 0
-    total = 0
-    for i, value in enumerate(actual):
-        total += (value - predicted[i])**2
-        number += 1
-    score = round(total/number, 3)
-    return score
+    if isinstance(predicted, list) and isinstance(actual, list):    
+        number = 0
+        total = 0
+        for i, value in enumerate(actual):
+            total += (value - predicted[i])**2
+            number += 1
+        score = total/number, 3
+        return score
+        return score
+    else:
+        return None
 
 
 def compare_profiles(
