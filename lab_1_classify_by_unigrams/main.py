@@ -14,13 +14,11 @@ def tokenize(text: str) -> list[str] | None:
 
     if not isinstance(text, str):
         return None
-    text = text.lower()
-    new_text = ""
-    for symbol in text:
+    new_text = []
+    for symbol in text.lower():
         if symbol.isalpha():
             new_text += symbol
-    tokens = list(new_text)
-    return tokens
+    return new_text
 
 
 def calculate_frequencies(tokens: list[str] | None) -> dict[str, float] | None:
@@ -36,10 +34,11 @@ def calculate_frequencies(tokens: list[str] | None) -> dict[str, float] | None:
     for token in tokens:
         if not isinstance(token, str):
             return None
+
         calc[token] += 1
     for key in calc:
-        calc.update({key: calc[key]/len(tokens)})
-    return calc
+        return calc.update({key: calc[key]/len(tokens)})
+
 
 
 def create_language_profile(language: str, text: str) -> dict[str, str | dict[str, float]] | None:
@@ -66,9 +65,10 @@ def calculate_mse(predicted: list, actual: list) -> float | None:
     :return: the score
     """
 
-    if not isinstance(predicted, list) or not isinstance(actual, list):
-        return None
-    if len(predicted) != len(actual):
+    if not (isinstance(predicted, list)
+            and isinstance(actual, list)
+            and len(predicted) == len(actual)
+            ):
         return None
     difference_square = []
     quantity_of_meanings = len(predicted)
