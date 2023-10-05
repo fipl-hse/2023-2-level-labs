@@ -50,7 +50,10 @@ def calculate_mse(predicted: list, actual: list) -> float | None:
     :param actual: a list of actual values
     :return: the score
     """
-    if not (isinstance(predicted, list) and isinstance(actual, list)):
+    if not (isinstance(predicted, list)
+            and isinstance(actual, list)
+            and len(predicted) == len(actual)
+    ):
         return None
     number = len(predicted)
     summa = sum((p - a) ** 2 for p, a in zip(predicted, actual))
@@ -76,14 +79,15 @@ def compare_profiles(
             and "freq" in profile_to_compare
     ):
         return None
-    alphabet = 'abcdefghijklmnopqrstuvwxyz'
-    unknown_profile_list = []
-    profile_to_compare_list = []
-    for i in alphabet:
-        if i in unknown_profile["freq"] and i in profile_to_compare["freq"]:
-            unknown_profile_list.append(unknown_profile["freq"][i])
-            profile_to_compare_list.append(profile_to_compare["freq"][i])
-    return calculate_mse(unknown_profile_list, profile_to_compare_list)
+    unknown_freq = unknown_profile['freq']
+    compare_freq = profile_to_compare['freq']
+    tokens = set(unknown_freq.keys()).union(compare_freq.keys())
+
+    unknown_freq_values = [unknown_freq.get(token, 0) for token in tokens]
+    compare_freq_values = [compare_freq.get(token, 0) for token in tokens]
+
+    calculated_mse = calculate_mse(unknown_freq_values, compare_freq_values)
+    return calculated_mse
 
 
 def detect_language(
