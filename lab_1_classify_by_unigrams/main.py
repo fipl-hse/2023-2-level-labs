@@ -63,13 +63,12 @@ def calculate_mse(predicted: list, actual: list) -> float | None:
     if not (isinstance(predicted, list)
             and isinstance(actual, list)
             and len(predicted) == len(actual)
-    ):
+            ):
         return None
-    difference_square = []
-    quantity_of_meanings = len(predicted)
-    for i in range(quantity_of_meanings):
-        difference_square.append((actual[i] - predicted[i]) ** 2)
-    mse = sum(difference_square)/quantity_of_meanings
+    difference_square = 0
+    for el_predicted, el_actual in enumerate(predicted):
+        difference_square += (el_predicted - actual[el_actual])**2
+    mse = difference_square/len(predicted)
     return mse
 
 
