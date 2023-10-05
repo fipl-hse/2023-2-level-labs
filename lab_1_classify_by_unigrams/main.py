@@ -3,7 +3,6 @@ Lab 1
 Language detection
 """
 
-
 def tokenize(text: str) -> list[str] | None:
     """
     Splits a text into tokens, converts the tokens into lowercase,
@@ -20,8 +19,6 @@ def tokenize(text: str) -> list[str] | None:
     tokens = list(new_text.lower())
     return tokens
 
-a = tokenize('Hey! How are you?')
-print(a)
 
 def calculate_frequencies(tokens: list[str] | None) -> dict[str, float] | None:
     """
@@ -42,8 +39,6 @@ def calculate_frequencies(tokens: list[str] | None) -> dict[str, float] | None:
             dictionary[i] = 1 / len(tokens)
     return dictionary
 
-b = calculate_frequencies(a)
-print (b)
 
 def create_language_profile(language: str, text: str) -> dict[str, str | dict[str, float]] | None:
     """
@@ -59,8 +54,7 @@ def create_language_profile(language: str, text: str) -> dict[str, str | dict[st
     lang_prof['freq'] = calculate_frequencies(tokenize(text))
     return lang_prof
 
-c = create_language_profile('en', 'Hey! How are you?')
-print(c)
+
 def calculate_mse(predicted: list, actual: list) -> float | None:
     """
     Calculates mean squared error between predicted and actual values
@@ -94,7 +88,6 @@ def compare_profiles(
         ('name' or 'freq') not in profile_to_compare
     ):
         return None
-
 
 
 def detect_language(
