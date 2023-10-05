@@ -31,10 +31,9 @@ def calculate_frequencies(tokens: list[str] | None) -> dict[str, float] | None:
             return None
     freqs = {}
     for token in tokens:
-        if token in freqs:
-            freqs[token] += 1
-        else:
-            freqs[token] = 1
+        if token not in freqs:
+            freqs[token] = 0
+        freqs[token] += 1
     for token, freq in freqs.items():
         freqs[token] = freq / len(tokens)
     return freqs
@@ -168,12 +167,11 @@ def collect_profiles(paths_to_profiles: list) -> list[dict[str, str | dict[str, 
         return None
     list_processed_profiles = []
     for paths in paths_to_profiles:
-        if isinstance(paths, str):
-            language_profile = load_profile(paths)
-            if isinstance(language_profile, dict):
-                processed_profile = preprocess_profile(language_profile)
-                if isinstance(processed_profile, dict):
-                    list_processed_profiles.append(processed_profile)
+        language_profile = load_profile(paths)
+        if isinstance(language_profile, dict):
+            processed_profile = preprocess_profile(language_profile)
+        if isinstance(processed_profile, dict):
+            list_processed_profiles.append(processed_profile)
     return list_processed_profiles
 
 
