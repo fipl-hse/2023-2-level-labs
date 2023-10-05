@@ -31,6 +31,9 @@ def calculate_frequencies(tokens: list[str] | None) -> dict[str, float] | None:
     if not isinstance(tokens, list):
         return None
     else:
+        for symb in tokens:
+            if not isinstance(symb, str):
+                return None
         frequencies = {}
         for symbol in tokens:
             if symbol not in frequencies:
