@@ -99,7 +99,7 @@ def compare_profiles(
 def detect_language(
         unknown_profile: dict[str, str | dict[str, float]],
         profile_1: dict[str, str | dict[str, float]],
-        profile_2: dict[str, str | dict[str, float]]
+        profile_2: dict[str, str | dict[str, float]],
 ) -> str | None:
     """
     Detects the language of an unknown profile
@@ -118,22 +118,21 @@ def detect_language(
     metric_1 = compare_profiles(unknown_profile, profile_1)
     metric_2 = compare_profiles(unknown_profile, profile_2)
 
-    if (
+    if not (
         isinstance(name_1, str) and isinstance(name_2, str)
         and isinstance(metric_1, float) and isinstance(metric_2, float)
     ):
-        metrics = {
-            name_1: metric_1,
-            name_2: metric_2,
-        }
+        return None
+    metrics = {
+        name_1: metric_1,
+        name_2: metric_2,
+    }
 
-        if metrics[name_1] == metrics[name_2]:
-            return min(metrics.keys())
+    if metrics[name_1] == metrics[name_2]:
+        return min(metrics.keys())
 
-        min_metric = min(metrics, key=lambda x: metrics.get(x, float('inf')))
-        return min_metric
-
-    return None
+    min_metric = min(metrics, key=lambda x: metrics.get(x, float('inf')))
+    return min_metric
 
 
 def load_profile(path_to_file: str) -> dict | None:
@@ -145,8 +144,8 @@ def load_profile(path_to_file: str) -> dict | None:
     if not isinstance(path_to_file, str):
         return None
 
-    with open(path_to_file, "r", encoding="utf-8") as file:
-        profile = json.load(file)
+    with open(path_to_file, "r", encoding="utf-8") as lang_file:
+        profile = json.load(lang_file)
 
     return dict(profile)
 
@@ -167,12 +166,13 @@ def preprocess_profile(profile: dict) -> dict[str, str | dict] | None:
     preprocessed_profile = {'name': profile['name'], 'freq': {}}
     unigrams = profile['n_words'][0]
     for token in profile['freq']:
-        if token.lower() in preprocessed_profile['freq']:
-            preprocessed_profile['freq'][token.lower()] += \
-                profile['freq'][token] / profile['n_words'][0]
-        elif len(token) == 1:
-            token_lower = (token.lower())
-            preprocessed_profile['freq'][token_lower] = profile['freq'][token] / unigrams
+        token_lower = (token.lower())
+        token_freq = profile['freq'][token]
+        if token_lower in preprocessed_profile['freq']:
+            preprocessed_profile['freq'][token_lower] += \
+                token_freq / unigrams
+        elif len(token) == 1 and (token.isalpha() or token == '²'):
+            preprocessed_profile['freq'][token_lower] = token_freq / unigrams
 
     return preprocessed_profile
 
@@ -196,10 +196,10 @@ def collect_profiles(paths_to_profiles: list) -> list[dict[str, str | dict[str, 
             if isinstance(preprocessed_profile, dict):
                 preprocess_profiles_list.append(preprocessed_profile)
 
-    if isinstance(preprocess_profiles_list, list):
-        return preprocess_profiles_list
+    if not isinstance(preprocess_profiles_list, list):
+        return None
 
-    return None
+    return preprocess_profiles_list
 
 
 def detect_language_advanced(
