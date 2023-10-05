@@ -91,29 +91,36 @@ def compare_profiles(
     if 'name' not in profile_to_compare or 'freq' not in profile_to_compare:
         return None
 
-    predicted_tokens = profile_to_compare.get('freq')
-    actual_tokens = unknown_profile.get('freq')
+    predicted_tokens = profile_to_compare.get('freq').keys()
+    actual_tokens = unknown_profile.get('freq').keys()
 
-    for key in predicted_tokens.keys():
-        if actual_tokens is not None and key not in actual_tokens:
-            value = actual_tokens.get(key, 0)
-            actual_tokens[key] = value
+    #for key in predicted_tokens.keys():
+        #if actual_tokens is not None and key not in actual_tokens:
+            #value = actual_tokens.get(key, 0)
+            #actual_tokens[key] = value
 
-    for key in actual_tokens.keys():
-        if predicted_tokens is not None and key not in  predicted_tokens:
-            value = predicted_tokens.get(key, 0)
-            predicted_tokens[key] = value
+    #for key in actual_tokens.keys():
+        #if predicted_tokens is not None and key not in predicted_tokens:
+            #value = predicted_tokens.get(key, 0)
+            #predicted_tokens[key] = value
 
-    sorted_predicted_tokens = (sorted(predicted_tokens.items()))
-    sorted_actual_tokens = (sorted(actual_tokens.items()))
-
+    tokens = set(actual_tokens).union(set(predicted_tokens))
     predicted = []
-    for item in sorted_predicted_tokens:
-        predicted.append(item[1])
-
     actual = []
-    for item in sorted_actual_tokens:
-        actual.append(item[1])
+    for token in tokens:
+        predicted.append(profile_to_compare.get('freq').get(token, 0))
+        actual.append(unknown_profile.get('freq').get(token, 0))
+
+    #sorted_predicted_tokens = (sorted(predicted_tokens.items()))
+    #sorted_actual_tokens = (sorted(actual_tokens.items()))
+
+    #predicted = []
+    #for item in sorted_predicted_tokens:
+        #predicted.append(item[1])
+
+    #actual = []
+    #for item in sorted_actual_tokens:
+        #actual.append(item[1])
 
     mse = calculate_mse(predicted, actual)
     return mse
