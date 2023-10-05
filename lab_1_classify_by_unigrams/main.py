@@ -85,20 +85,18 @@ def compare_profiles(
     :param profile_to_compare: a dictionary of a profile to compare the unknown profile to
     :return: the distance between the profiles
     """
-    values_unk = unknown_profile["freq"]
-    values_comp = profile_to_compare["freq"]
-    for k in values_unk:
-        if k not in values_comp:
-            values_comp[k] = 0
-    for k in values_comp:
-        if k not in values_unk:
-            values_unk[k] = 0
-    sorted_values_unk = dict(sorted(values_unk.items()))
-    sorted_values_comp = dict(sorted(values_comp.items()))
-    values_list_unk = list(sorted_values_unk.values())
-    values_list_comp = list(sorted_values_comp.values())
-    profile_distance = calculate_mse(values_list_comp, values_list_unk)
-    return profile_distance
+    if isinstance(unknown_profile, dict) and isinstance(profile_to_compare, dict) and 'name' in unknown_profile and 'name' in profile_to_compare:
+        words = set(profile_to_compare["freq"].keys())
+        words.update(unknown_profile["freq"].keys())
+        listed_unknown_profile = []
+        listed_profile_to_compare = []
+        for letter in words:
+            listed_profile_to_compare.append(profile_to_compare["freq"].get(letter, 0))
+            listed_unknown_profile.append(unknown_profile["freq"].get(letter, 0))
+        profile_distance = calculate_mse(listed_profile_to_compare, listed_unknown_profile)
+        return profile_distance
+    else:
+        return None
 
 
 def detect_language(
@@ -113,18 +111,18 @@ def detect_language(
     :param profile_2: a dictionary of a known profile
     :return: a language
     """
-    profile_distance_1 = compare_profiles(unknown_profile, profile_1)
-    profile_distance_2 = compare_profiles(unknown_profile, profile_2)
-    if profile_distance_1 < profile_distance_2:
-        return profile_1["name"]
-    elif profile_distance_2 < profile_distance_1:
-        return profile_2["name"]
-    elif profile_distance_1 == profile_distance_2:
-        language_list = []
-        language_list.append(profile_1["name"])
-        language_list.append(profile_2["name"])
-        language_list = language_list.sort()
-        return language_list[0]
+    if isinstance(unknown_profile, dict) and isinstance(profile_1, dict) and isinstance(profile_2, dict):
+        profile_distance_1 = compare_profiles(unknown_profile, profile_1)
+        profile_distance_2 = compare_profiles(unknown_profile, profile_2)
+        if profile_distance_1 < profile_distance_2:
+            return profile_1["name"]
+        elif profile_distance_2 < profile_distance_1:
+            return profile_2["name"]
+        elif profile_distance_1 == profile_distance_2:
+            language_list = sorted([str(profile_1["name"]), str(profile_2["name"])])
+            return language_list[0]
+    else:
+        return None
 
 
 def load_profile(path_to_file: str) -> dict | None:
