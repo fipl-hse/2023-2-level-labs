@@ -1,10 +1,10 @@
 """
 Language detection starter
 """
-from lab_1_classify_by_unigrams.main import (create_language_profile,
+from lab_1_classify_by_unigrams.main import (collect_profiles,
+                                             create_language_profile,
                                             detect_language_advanced,
-                                            print_report,
-                                            collect_profiles)
+                                            print_report)
 
 
 def main() -> None:
@@ -31,7 +31,7 @@ def main() -> None:
     #     result = detect_language(unknown_profile, en_profile, de_profile)
     # else:
     #     result = None
-    
+
     unknown_profile = create_language_profile('unknown language', unknown_text)
     known_profiles = collect_profiles(paths_to_profiles)
     if isinstance(unknown_profile, dict) and \
