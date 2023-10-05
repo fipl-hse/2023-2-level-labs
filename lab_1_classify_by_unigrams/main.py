@@ -121,25 +121,16 @@ def detect_language(
         return None
     comparison_1 = compare_profiles(unknown_profile, profile_1)
     comparison_2 = compare_profiles(unknown_profile, profile_2)
-    if not isinstance(profile_1['name'], str) and\
-            not isinstance(profile_2['name'], str):
+    if not isinstance(comparison_1, float) or\
+            not isinstance(comparison_2, float):
         return None
-    if isinstance(comparison_1, float) and isinstance(comparison_2, float):
-        if comparison_1 > comparison_2:
-            return str(profile_2['name'])
-        if comparison_1 == comparison_2:
-            names = list(str(profile_1['name']) + str(profile_2['name']))
-            sorted_names = sorted(names)
-            return str(sorted_names[0])
-        return str(profile_1['name'])
-    return None
-
-
-
-
-
-
-
+    if comparison_1 > comparison_2:
+        return str(profile_2['name'])
+    if comparison_1 == comparison_2:
+        names = list(str(profile_1['name']) + str(profile_2['name']))
+        sorted_names = sorted(names)
+        return str(sorted_names[0])
+    return str(profile_1['name'])
 
 
 
