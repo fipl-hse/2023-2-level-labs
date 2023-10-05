@@ -2,6 +2,7 @@
 Lab 1
 Language detection
 """
+import re
 
 
 def tokenize(text: str) -> list[str] | None:
@@ -13,13 +14,7 @@ def tokenize(text: str) -> list[str] | None:
     """
     if not isinstance(text, str):
         return None
-    else:
-        tokens = (text.lower())
-        punctuation = " !#$%&'\'()*+,-./:;<=>?@[\\]^_`{|}~1234567890"
-        for token in tokens:
-            if token in punctuation:
-                tokens = tokens.replace(token, '')
-        tokens = list(tokens)
+    tokens = [token.lower() for token in text if token.isalpha()]
     return tokens
 
 
@@ -35,7 +30,6 @@ def calculate_frequencies(tokens: list[str] | None) -> dict[str, float] | None:
     for token in tokens:
         if not isinstance(token, str):
             return None
-    for token in tokens:
         freq[token] = (1 if token not in freq else freq[token] + 1)
     for token in freq:
         freq[token] /= len(tokens)
