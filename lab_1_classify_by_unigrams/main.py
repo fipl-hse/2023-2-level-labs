@@ -12,8 +12,7 @@ def tokenize(text: str) -> list[str] | None:
     :return: a list of lower-cased tokens without punctuation
     """
     text = text.lower()
-    trans_table = str.maketrans({'.': None, ',': None, "'": None, ':': None, '?': None, '!': None, ' ': None, '1': None, '2': None, "3": None, "4": None, "5": None, "6": None, "7": None, "8": None, "9": None, "0": None})
-    text = text.translate(trans_table)
+    text = "".join(c for c in text if c.isalpha())
     return list(text)
 
 
@@ -27,6 +26,7 @@ def calculate_frequencies(tokens: list[str] | None) -> dict[str, float] | None:
     for i in tokens:
         frequency[i] = tokens.count(i) / len(tokens)
     return frequency
+
 
 def create_language_profile(language: str, text: str) -> dict[str, str | dict[str, float]] | None:
     """
@@ -67,17 +67,16 @@ def compare_profiles(
     :param profile_to_compare: a dictionary of a profile to compare the unknown profile to
     :return: the distance between the profiles
     """
-    stats1 = unknown_profile.get('freq')  # собираем из обоих яз.профилей статистику частотности
+    stats1 = unknown_profile.get('freq')
     stats2 = profile_to_compare.get('freq')
-    union = set(stats1) | set(
-        stats2)  # объединение множества токенов в первом языке с множеством токенов во втором языке
-    for i in union:  # найти встречаемость каждого элемента из union в stats1 и stats2
+    union = set(stats1) | set(stats2)
+    for i in union:
         if i not in stats1:
             stats1[i] = 0
     for i in union:
         if i not in stats2:
             stats2[i] = 0
-    stats1_sorted = dict(sorted(stats1.items()))  # сортируем по алфавиту
+    stats1_sorted = dict(sorted(stats1.items()))
     stats2_sorted = dict(sorted(stats2.items()))
     frequency1 = list(stats1_sorted.values())
     frequency2 = list(stats2_sorted.values())
@@ -111,45 +110,3 @@ def detect_language(
     else:
         lang = profile_2.get('name')
     return lang
-
-
-def load_profile(path_to_file: str) -> dict | None:
-    """
-    Loads a language profile
-    :param path_to_file: a path to the language profile
-    :return: a dictionary with at least two keys – name, freq
-    """
-
-
-def preprocess_profile(profile: dict) -> dict[str, str | dict] | None:
-    """
-    Preprocesses profile for a loaded language
-    :param profile: a loaded profile
-    :return: a dict with a lower-cased loaded profile
-    with relative frequencies without unnecessary ngrams
-    """
-
-
-def collect_profiles(paths_to_profiles: list) -> list[dict[str, str | dict[str, float]]] | None:
-    """
-    Collects profiles for a given path
-    :paths_to_profiles: a list of strings to the profiles
-    :return: a list of loaded profiles
-    """
-
-
-def detect_language_advanced(unknown_profile: dict[str, str | dict[str, float]],
-                             known_profiles: list) -> list | None:
-    """
-    Detects the language of an unknown profile
-    :param unknown_profile: a dictionary of a profile to determine the language of
-    :param known_profiles: a list of known profiles
-    :return: a sorted list of tuples containing a language and a distance
-    """
-
-
-def print_report(detections: list[tuple[str, float]]) -> None:
-    """
-    Prints report for detection of language
-    :param detections: a list with distances for each available language
-    """

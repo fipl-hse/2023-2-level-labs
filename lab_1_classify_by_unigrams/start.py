@@ -1,3 +1,4 @@
+from lab_1_classify_by_unigrams.main import tokenize, calculate_frequencies, create_language_profile
 """
 Language detection starter
 """
@@ -13,8 +14,11 @@ def main() -> None:
         de_text = file_to_read_de.read()
     with open("assets/texts/unknown.txt", "r", encoding="utf-8") as file_to_read_unk:
         unknown_text = file_to_read_unk.read()
-    result = None
-    assert result, "Detection result is None"
+    en_tokenized = tokenize(en_text)
+    print(en_tokenized)
+    en_freqs = calculate_frequencies(en_tokenized)
+    en_profile = create_language_profile("eng", en_text)
+    print(en_profile)
 
 
 if __name__ == "__main__":
