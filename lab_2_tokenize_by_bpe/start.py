@@ -8,8 +8,12 @@ def main() -> None:
     """
     Launches an implementation
     """
+    assets_path = Path(__file__).parent / 'assets'
+    with open(assets_path / 'text.txt', 'r', encoding='utf-8') as text_file:
+        text = text_file.read()
+
     result = None
-    assert result, "Mark 10 is not working"
+    assert result, "Encoding is not working"
 
 
 if __name__ == "__main__":
