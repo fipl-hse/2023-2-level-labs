@@ -121,6 +121,7 @@ def detect_language(
             return profile_2["name"]
         if profile_1["name"] < profile_2["name"]:
             return profile_1["name"]
+    return None
 
 
 def load_profile(path_to_file: str) -> dict | None:
