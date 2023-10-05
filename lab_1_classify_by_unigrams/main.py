@@ -212,3 +212,4 @@ def print_report(detections: list[tuple[str, float]]) -> None:
         return None
     for tpl in detections:
         print(f'{tpl[0]}: MSE {tpl[1]:.5f}')
+    return None
