@@ -66,7 +66,7 @@ def calculate_mse(predicted: list, actual: list) -> float | None:
     :param actual: a list of actual values
     :return: the score
     """
-    if (not isinstance(actual, list) or not isinstance(predicted, list) or 
+    if (not isinstance(actual, list) or not isinstance(predicted, list) or
         len(actual) != len(predicted)):
         return None
     number = 0
@@ -88,7 +88,7 @@ def compare_profiles(
     :param profile_to_compare: a dictionary of a profile to compare the unknown profile to
     :return: the distance between the profiles
     """
-    if (not isinstance(unknown_profile, dict) or not isinstance(profile_to_compare, dict) or 
+    if (not isinstance(unknown_profile, dict) or not isinstance(profile_to_compare, dict) or
         'name' not in unknown_profile or 'name' not in profile_to_compare):
         return None
     words = set(profile_to_compare["freq"].keys())
@@ -114,16 +114,17 @@ def detect_language(
     :param profile_2: a dictionary of a known profile
     :return: a language
     """
-    if (not isinstance(unknown_profile, dict) or not isinstance(profile_1, dict) or not 
+    if (not isinstance(unknown_profile, dict) or not isinstance(profile_1, dict) or not
         isinstance(profile_2, dict)):
         return None
     profile_distance_1 = compare_profiles(unknown_profile, profile_1)
     profile_distance_2 = compare_profiles(unknown_profile, profile_2)
     if profile_distance_1 < profile_distance_2:
         return profile_1["name"]
-    elif profile_distance_2 < profile_distance_1:
+    if profile_distance_2 < profile_distance_1:
         return profile_2["name"]
-    language_list = sorted([str(profile_1["name"]), str(profile_2["name"])])
+    if profile_distance_2 == profile_distance_1:
+        language_list = sorted([str(profile_1["name"]), str(profile_2["name"])])
     return language_list[0]
 
 def load_profile(path_to_file: str) -> dict | None:
