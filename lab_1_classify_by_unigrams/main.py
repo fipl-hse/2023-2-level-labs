@@ -18,7 +18,7 @@ def tokenize(text: str) -> list[str] | None:
             if symbol.isalpha():
                 tokens.append(symbol)
         return tokens
-    Esle:
+    else:
     return None
 
 
