@@ -83,7 +83,7 @@ def compare_profiles(
         return None
     if ('name' and 'freq') not in unknown_profile and ('name' and 'freq') not in profile_to_compare:
         return None
-    keys = sorted(set(unknown_profile.keys()) | set(profile_to_compare.keys()))
+    keys = sorted(set(unknown_profile['freq'].keys()) | set(profile_to_compare['freq'].keys()))
     comparison_un = []
     comparison_pr = []
     for key in keys:
