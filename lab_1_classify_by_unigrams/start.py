@@ -17,9 +17,8 @@ def main() -> None:
     with open("assets/texts/unknown.txt", "r", encoding="utf-8") as file_to_read_unk:
         unknown_text = file_to_read_unk.read()
         unk_profile = create_language_profile("unk", unk_text)
-    result = None
+    result = detect_language(unk_profile, en_profile, de_profile)
     assert result, "Detection result is None"
-    print(detect_language(unk_profile, en_profile, de_profile))
 
 
 if __name__ == "__main__":
