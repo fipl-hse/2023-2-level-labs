@@ -38,7 +38,7 @@ def calculate_frequencies(tokens: list[str] | None) -> dict[str, float] | None:
             return None
         calc[token] += 1
     for key in calc:
-        calc[key] /= len(tokens)
+        calc.update({key: calc[key]/len(tokens)})
     return calc
 
 
@@ -53,10 +53,9 @@ def create_language_profile(language: str, text: str) -> dict[str, str | dict[st
     if not isinstance(language, str) or not isinstance(text, str):
         return None
     freq_dict = calculate_frequencies(tokenize(text))
-    lang_prof = {"name": language, "freq": freq_dict}
-    if not isinstance(lang_prof, dict):
+    if not isinstance(freq_dict, dict):
         return None
-    return lang_prof
+    return {"name": language, "freq": freq_dict}
 
 
 def calculate_mse(predicted: list, actual: list) -> float | None:
@@ -75,7 +74,8 @@ def calculate_mse(predicted: list, actual: list) -> float | None:
     quantity_of_meanings = len(predicted)
     for i in range(quantity_of_meanings):
         difference_square.append((actual[i] - predicted[i]) ** 2)
-    return sum(difference_square) / quantity_of_meanings
+    mse = sum(difference_square) / quantity_of_meanings
+    return mse
 
 
 def compare_profiles(
