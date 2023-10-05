@@ -1,7 +1,7 @@
 """
 Language detection starter
 """
-from lab_1_classify_by_unigrams.main import create_language_profile, detect_language
+from lab_1_classify_by_unigrams/main.py import create_language_profile, detect_language
 
 
 def main() -> None:
@@ -15,7 +15,7 @@ def main() -> None:
         de_text = file_to_read_de.read()
         de_profile = create_language_profile("de", de_text)
     with open("assets/texts/unknown.txt", "r", encoding="utf-8") as file_to_read_unk:
-        unknown_text = file_to_read_unk.read()
+        unk_text = file_to_read_unk.read()
         unk_profile = create_language_profile("unk", unk_text)
     result = detect_language(unk_profile, en_profile, de_profile)
     assert result, "Detection result is None"
