@@ -27,14 +27,14 @@ def calculate_frequencies(tokens: list[str] | None) -> dict[str, float] | None:
         return None
     frequency = {}
     quantity = len(tokens)
-    for el in tokens:
-        frequency.setdefault(el, 0)
-        if not isinstance(el, str):
+    for token in tokens:
+        frequency.setdefault(token, 0)
+        if not isinstance(token, str):
             return None
-        elif el in frequency:
-            frequency[el] += 1
-    for k, v in frequency.items():
-        frequency[k] = v / quantity
+        if token in frequency:
+            frequency[token] += 1
+    for keys, values in frequency.items():
+        frequency[keys] = values / quantity
     return frequency
 
 
@@ -106,7 +106,9 @@ def detect_language(
     :param profile_2: a dictionary of a known profile
     :return: a language
     """
-    if isinstance(unknown_profile, dict) and isinstance(profile_1, dict) and isinstance(profile_2, dict):
+    if (isinstance(unknown_profile, dict) and
+            isinstance(profile_1, dict) and
+            isinstance(profile_2, dict)):
         pass
     else:
         return None
@@ -116,9 +118,9 @@ def detect_language(
         names = [profile_1.get('name'), profile_2.get('name')]
         names = str(sorted(names))
         return names
-    elif mse_2 > mse_1:
+    if mse_2 > mse_1:
         return profile_2.get('name')
-    else:
+    if mse_1 > mse_2:
         return profile_1.get('name')
 
 
@@ -162,7 +164,3 @@ def print_report(detections: list[tuple[str, float]]) -> None:
     Prints report for detection of language
     :param detections: a list with distances for each available language
     """
-
-
-
-
