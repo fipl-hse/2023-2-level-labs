@@ -3,6 +3,7 @@ Lab 1
 Language detection
 """
 
+from string import punctuation
 
 def tokenize(text: str) -> list[str] | None:
     """
@@ -11,7 +12,6 @@ def tokenize(text: str) -> list[str] | None:
     :param text: a text
     :return: a list of lower-cased tokens without punctuation
     """
-
 
 def calculate_frequencies(tokens: list[str] | None) -> dict[str, float] | None:
     """
