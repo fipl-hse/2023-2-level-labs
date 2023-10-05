@@ -28,7 +28,6 @@ def main() -> None:
                         'assets/profiles/it.json',
                         'assets/profiles/ru.json',
                         'assets/profiles/tr.json']
-
     assert result, "Detection result is None"
 
 

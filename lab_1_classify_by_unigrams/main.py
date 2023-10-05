@@ -203,6 +203,7 @@ def detect_language_advanced(unknown_profile: dict[str, str | dict[str, float]],
         t = tuple([profile['name'], score])
         list_scores += [t]
     print(list_scores)
+
     return list_scores
 
 
