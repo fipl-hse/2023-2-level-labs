@@ -5,7 +5,6 @@ from lab_1_classify_by_unigrams.main import (load_profile, preprocess_profile,
                                              create_language_profile,
                                              detect_language, detect_language_advanced,
                                              print_report)
-                                             
 
 
 def main() -> None:
@@ -39,8 +38,8 @@ def main() -> None:
     de_profile = create_language_profile('de', de_text)
     unknown_profile = create_language_profile('unknown', unknown_text)
 
-    if (isinstance(en_profile, dict) 
-                  and isinstance(de_profile, dict) 
+    if (isinstance(en_profile, dict)
+                  and isinstance(de_profile, dict)
                   and isinstance(unknown_profile, dict)):
         detect_language(unknown_profile, en_profile, de_profile)
 
