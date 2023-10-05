@@ -66,9 +66,10 @@ def calculate_mse(predicted: list, actual: list) -> float | None:
             ):
         return None
     sum_difference_square = 0
+    quantity_of_meanings = len(predicted)
     for el_predicted, el_actual in enumerate(predicted):
         sum_difference_square += (el_predicted - actual[el_actual])**2
-    return sum_difference_square/len(predicted)
+    return sum_difference_square/quantity_of_meanings
 
 
 def compare_profiles(
