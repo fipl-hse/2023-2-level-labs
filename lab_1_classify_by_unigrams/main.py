@@ -184,9 +184,6 @@ def preprocess_profile(profile: dict) -> dict[str, str | dict] | None:
     return unigram_profile
 
 
-
-
-
 def collect_profiles(paths_to_profiles: list) -> list[dict[str, str | dict[str, float]]] | None:
     """
     Collects profiles for a given path
