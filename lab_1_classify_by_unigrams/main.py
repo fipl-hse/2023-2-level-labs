@@ -13,8 +13,15 @@ def tokenize(text: str) -> list[str] | None:
     """
     if not isinstance(text, str):
         return None
-    text_output = list(re.sub(r'[\W\d_]+', '', text.lower()))
-    return text_output
+    new_text = ''
+    for i in text:
+        if i.isalpha():
+            new_text += i
+    tokens = list(new_text.lower())
+    return tokens
+
+a = tokenize('Hey! How are you?')
+print(a)
 
 def calculate_frequencies(tokens: list[str] | None) -> dict[str, float] | None:
     """
@@ -22,7 +29,21 @@ def calculate_frequencies(tokens: list[str] | None) -> dict[str, float] | None:
     :param tokens: a list of tokens
     :return: a dictionary with frequencies
     """
+    if not isinstance(tokens, list):
+        return None
+    for i in tokens:
+        if not isinstance(i, str):
+            return None
+    dictionary = {}
+    for i in tokens:
+        if i in dictionary:
+            dictionary[i] += 1 / len(tokens)
+        else:
+            dictionary[i] = 1 / len(tokens)
+    return dictionary
 
+b = calculate_frequencies(a)
+print (b)
 
 def create_language_profile(language: str, text: str) -> dict[str, str | dict[str, float]] | None:
     """
@@ -31,8 +52,15 @@ def create_language_profile(language: str, text: str) -> dict[str, str | dict[st
     :param text: a text
     :return: a dictionary with two keys – name, freq
     """
+    if not isinstance(language, str) or not isinstance(text, str):
+        return None
+    lang_prof = {}
+    lang_prof['name'] = language
+    lang_prof['freq'] = calculate_frequencies(tokenize(text))
+    return lang_prof
 
-
+c = create_language_profile('en', 'Hey! How are you?')
+print(c)
 def calculate_mse(predicted: list, actual: list) -> float | None:
     """
     Calculates mean squared error between predicted and actual values
@@ -40,6 +68,13 @@ def calculate_mse(predicted: list, actual: list) -> float | None:
     :param actual: a list of actual values
     :return: the score
     """
+    if not isinstance(predicted, list) or not isinstance(actual, list) or len(actual) != len(predicted):
+        return None
+    sum = 0
+    for i in range(len(actual)):
+        sum += (actual[i] - predicted[i]) ** 2
+    mse = sum / len(actual)
+    return mse
 
 
 def compare_profiles(
@@ -52,6 +87,14 @@ def compare_profiles(
     :param profile_to_compare: a dictionary of a profile to compare the unknown profile to
     :return: the distance between the profiles
     """
+    if (
+        not isinstance(unknown_profile, dict) or
+        not isinstance(profile_to_compare, dict) or
+        ('name' or 'freq') not in unknown_profile or
+        ('name' or 'freq') not in profile_to_compare
+    ):
+        return None
+
 
 
 def detect_language(
