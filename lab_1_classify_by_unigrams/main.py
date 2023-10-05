@@ -27,10 +27,11 @@ def calculate_frequencies(tokens: list[str] | None) -> dict[str, float] | None:
         or tokens == []
         or not all(isinstance(symbol, str) for symbol in tokens)):
         return None
+    assert isinstance(tokens, list)
     symbols = set(tokens)
     freq_dict = {}
     for letter in symbols:
-        freq_dict[letter] = 0
+        freq_dict[letter] = .0
     for symbol in tokens:
         if symbol in freq_dict:
             freq_dict[symbol] += 1 / len(tokens)
@@ -44,10 +45,11 @@ def create_language_profile(language: str, text: str) -> dict[str, str | dict[st
     :param text: a text
     :return: a dictionary with two keys – name, freq
     """
-    if isinstance(language, str) is False or isinstance(text, str) is False:
-        return None
-    return {"name": language, "freq": calculate_frequencies(tokenize(text))}
-
+    if isinstance(language, str) and isinstance(text, str):
+        language_profile = calculate_frequencies(tokenize(text))
+        assert isinstance(language_profile, dict)
+        return {"name": language, "freq": language_profile}
+    return None
 
 def calculate_mse(predicted: list, actual: list) -> float | None:
     """
@@ -62,7 +64,7 @@ def calculate_mse(predicted: list, actual: list) -> float | None:
         return None
     mse = 0
     for i, j in enumerate(predicted):
-        mse += (predicted[i] - actual[i])**2 / len(predicted)
+        mse += (j - actual[i])**2 / len(predicted)
     return mse
 
 
@@ -86,6 +88,8 @@ def compare_profiles(
     list_p2 = []
     dict_p1 = unknown_profile.get("freq")
     dict_p2 = profile_to_compare.get("freq")
+    assert isinstance(dict_p1, dict)
+    assert isinstance(dict_p2, dict)
     for symbol in dict_p1:
         if symbol in dict_p2:
             list_p1.append(dict_p1.get(symbol))
@@ -118,14 +122,15 @@ def detect_language(
         return None
     mse_1 = compare_profiles(unknown_profile, profile_1)
     mse_2 = compare_profiles(unknown_profile, profile_2)
+    assert isinstance(mse_1, float)
+    assert isinstance(mse_2, float)
+    assert isinstance(profile_1["name"], str)
+    assert isinstance(profile_2["name"], str)
     if mse_1 < mse_2:
-        return profile_1.get("name")
-    if mse_1 == mse_2:
-        alph = [profile_1.get("name"), profile_2.get("name")]
-        alph = sorted(alph)
-        return alph[0]
+        return profile_1["name"]
     if mse_1 > mse_2:
-        return profile_2.get("name")
+        return profile_2["name"]
+    return min(profile_1["name"], profile_2["name"])
 
 def load_profile(path_to_file: str) -> dict | None:
     """
