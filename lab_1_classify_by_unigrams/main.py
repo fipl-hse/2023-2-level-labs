@@ -2,6 +2,8 @@
 Lab 1
 Language detection
 """
+import json
+
 
 def tokenize(text: str) -> list[str] | None:
     """
@@ -74,7 +76,6 @@ def calculate_mse(predicted: list, actual: list) -> float | None:
 
     mse /= len(actual)
     return mse
-
 
 
 def compare_profiles(
@@ -150,6 +151,15 @@ def load_profile(path_to_file: str) -> dict | None:
     :param path_to_file: a path to the language profile
     :return: a dictionary with at least two keys – name, freq
     """
+    if not isinstance(path_to_file, str):
+        return None
+
+    with open(path_to_file, "r", encoding="utf-8") as file:
+        language_profile = json.load(file)
+
+    if isinstance (language_profile, dict):
+        return language_profile
+    return None
 
 
 def preprocess_profile(profile: dict) -> dict[str, str | dict] | None:
@@ -159,6 +169,19 @@ def preprocess_profile(profile: dict) -> dict[str, str | dict] | None:
     :return: a dict with a lower-cased loaded profile
     with relative frequencies without unnecessary ngrams
     """
+    if not isinstance(profile, dict) or not ('freq' or 'name' or 'n_words') in profile:
+        return None
+
+    profile_raw = {'name': profile['name'], 'freq': {}}
+
+    for token in profile['freq']:
+        if token.lower() in profile_raw['freq']:
+            profile_raw['freq'][token.lower()] += \
+            profile['freq'][token] / profile['n_words'][0]  
+        elif len(token) == 1:
+            profile_raw['freq'][token.lower()] = \
+            profile['freq'][token] / profile['n_words'][0]
+    return profile_raw
 
 
 def collect_profiles(paths_to_profiles: list) -> list[dict[str, str | dict[str, float]]] | None:

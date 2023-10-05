@@ -1,13 +1,18 @@
 """
 Language detection starter
 """
-from lab_1_classify_by_unigrams.main import create_language_profile, detect_language
+from lab_1_classify_by_unigrams.main import (create_language_profile, 
+                                             detect_language)
 
 
 def main() -> None:
     """
     Launches an implementation
     """
+    paths_to_profiles = ['assets/profiles/de.json', 'assets/profiles/es.json',
+                         'assets/profiles/fr.json','assets/profiles/it.json',
+                         'assets/profiles/ru.json','assets/profiles/tr.json']
+
     with open("assets/texts/en.txt", "r", encoding="utf-8") as file_to_read_en:
         en_text = file_to_read_en.read()
     with open("assets/texts/de.txt", "r", encoding="utf-8") as file_to_read_de:
