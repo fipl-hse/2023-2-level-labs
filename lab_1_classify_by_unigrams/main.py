@@ -65,11 +65,11 @@ def calculate_mse(predicted: list, actual: list) -> float | None:
             and len(predicted) == len(actual)
             ):
         return None
-    quantity = len(predicted)
-    total = 0
-    for count, value in enumerate(predicted):
-        total += (value - actual[count]) ** 2
-    return total / quantity
+    quantity_of_meanings = len(predicted)
+    sum_of_diff = 0
+    for predicted_el, actual_el in enumerate(predicted):
+        sum_of_diff += (actual_el - actual[predicted_el]) ** 2
+    return sum_of_diff / quantity_of_meanings
 
 
 def compare_profiles(
