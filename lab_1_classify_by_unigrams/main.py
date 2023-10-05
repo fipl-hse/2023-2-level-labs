@@ -216,11 +216,11 @@ def detect_language_advanced(unknown_profile: dict[str, str | dict[str, float]],
     """
     if not isinstance(unknown_profile, dict) or not isinstance(known_profiles, list):
         return None
-    
+
     detection = []
     for profile in known_profiles:
         result_of_comparison = compare_profiles(unknown_profile, profile)
-        detection.append(tuple(profile['name'], result_of_comparison))
+        detection.append((profile['name'], result_of_comparison))
 
     detection.sort(key=lambda a: (a[1], a[0]))
     return detection
@@ -231,4 +231,6 @@ def print_report(detections: list[tuple[str, float]]) -> None:
     Prints report for detection of language
     :param detections: a list with distances for each available language
     """
+    for language in detections:
+        print(f'{language[0]}: MSE {language[1]:.5f}')
    
