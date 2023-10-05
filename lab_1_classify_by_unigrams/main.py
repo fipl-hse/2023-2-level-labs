@@ -146,12 +146,13 @@ def detect_language(
     lang_1 = str(profile_1['name'])
     lang_2 = str(profile_2['name'])
 
-    if mse_lang_1 < mse_lang_2:
-        return lang_1
-    if mse_lang_1 > mse_lang_2:
-        return lang_2
-    if mse_lang_1 == mse_lang_2:
-        return sorted([lang_1, lang_2])[0]
+    if isinstance(mse_lang_1, float) and isinstance(mse_lang_2, float):
+        if mse_lang_1 < mse_lang_2:
+            return lang_1
+        if mse_lang_1 > mse_lang_2:
+            return lang_2
+        if mse_lang_1 == mse_lang_2:
+            return sorted([lang_1, lang_2])[0]
 
     return None
 
