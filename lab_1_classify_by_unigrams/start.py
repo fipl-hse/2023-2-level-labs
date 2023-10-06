@@ -23,6 +23,7 @@ def main() -> None:
     if not result:
         return None
     print(f'Detection result is {result}')
+    assert result, "Detection result is None"
 
 
 if __name__ == "__main__":
