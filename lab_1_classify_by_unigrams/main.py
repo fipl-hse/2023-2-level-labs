@@ -123,8 +123,7 @@ def detect_language(
             return str(profile_1['name'])
         if mse_2 < mse_1:
             return str(profile_2['name'])
-
-    return [profile_1['name'], profile_2['name']].sort()
+    return str([profile_1['name'], profile_2['name']].sort())
 
 
 def load_profile(path_to_file: str) -> dict | None:
