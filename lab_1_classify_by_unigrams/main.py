@@ -202,10 +202,8 @@ def collect_profiles(paths_to_profiles: list) -> list[dict[str, str | dict[str, 
     return preprocess_profiles_list
 
 
-def detect_language_advanced(
-        unknown_profile: dict[str, str | dict[str, float]],
-        known_profiles: list
-) -> list | None:
+def detect_language_advanced(unknown_profile: dict[str, str | dict[str, float]],
+                             known_profiles: list) -> list | None:
     """
     Detects the language of an unknown profile
     :param unknown_profile: a dictionary of a profile to determine the language of
