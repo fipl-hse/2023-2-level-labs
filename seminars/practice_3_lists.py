@@ -82,14 +82,14 @@ def sum13(nums: list) -> int:
 # sum13([1, 1]) → 2
 # sum13([1, 2, 2, 1, 13]) → 6
 # sum13([1, 2, 2, 1, 13, 5, 6]) → 6
-    su = []
+""""   su = []
     for i in nums:
         if i != 13:
             su+=i
         else:
             break
     print(su)
-    sum13(1, 2, 2, 1, 13, 5, 6)
+    sum13(1, 2, 2, 1, 13, 5, 6)"""""
 
 
 # Task 3
