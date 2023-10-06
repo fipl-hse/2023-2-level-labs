@@ -68,11 +68,12 @@ def calculate_mse(predicted: list, actual: list) -> float | None:
         return None
     if actual == predicted:
         return 0.0
+    if len(predicted) == 0:
+        return 1.0
     numerator = 0
     for i, e in enumerate(actual):
         numerator += (e - predicted[i]) ** 2
-    if len(predicted) == 0:
-        return 1.0
+
     return numerator / len(predicted)
 
 
@@ -160,13 +161,11 @@ def preprocess_profile(profile: dict) -> dict[str, str | dict] | None:
     dictionary = {'name': profile['name'], 'freq': {}}
     count_unigrams = profile['n_words'][0]
     for i in profile['freq']:
-        if len(i) == 1:
-            if i.lower() not in dictionary['freq']:
-                dictionary['freq'][i.lower()] = profile['freq'][i] / count_unigrams
-
-            else:
-                dictionary['freq'][i.lower()] = \
-                    dictionary['freq'][i.lower()] + profile['freq'][i] / count_unigrams
+        if len(i) == 1 and i.lower() not in dictionary['freq']:
+            dictionary['freq'][i.lower()] = profile['freq'][i] / count_unigrams
+        elif i.lower() in dictionary['freq']:
+            dictionary['freq'][i.lower()] = \
+                dictionary['freq'][i.lower()] + profile['freq'][i] / count_unigrams
 
     return dictionary
 
