@@ -137,10 +137,6 @@ def detect_language(
 
     languages = list(profile_1.keys())
 
-    if set(languages) != set(profile_2.keys()) or \
-       set(languages) != set(unknown_profile.keys()):
-        return None
-
     mse_lang_1 = compare_profiles(unknown_profile, profile_1)
     mse_lang_2 = compare_profiles(unknown_profile, profile_2)
     lang_1 = str(profile_1['name'])
