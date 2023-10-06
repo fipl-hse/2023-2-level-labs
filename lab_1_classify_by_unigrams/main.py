@@ -11,7 +11,10 @@ def tokenize(text: str) -> list[str] | None:
     :param text: a text
     :return: a list of lower-cased tokens without punctuation
     """
-    print('hello world')
+    if not isinstance(text, str):
+        return None
+    punctuation = '''!()-[]{};:'",<>./?@#$%^&*_~0123456789\\ '''
+    return [el for el in text.lower() if el not in punctuation]
 
 
 def calculate_frequencies(tokens: list[str] | None) -> dict[str, float] | None:
@@ -20,7 +23,18 @@ def calculate_frequencies(tokens: list[str] | None) -> dict[str, float] | None:
     :param tokens: a list of tokens
     :return: a dictionary with frequencies
     """
-    print('hello world')
+
+    if not isinstance(tokens, list):
+        return None
+    frequency = {}
+    number = len(tokens)
+    set_tokens = set(tokens)
+    for token in set_tokens:
+        if not isinstance(token, str):
+            return None
+        frequency[token] = tokens.count(token) / number
+    return frequency
+
 
 def create_language_profile(language: str, text: str) -> dict[str, str | dict[str, float]] | None:
     """
@@ -29,7 +43,12 @@ def create_language_profile(language: str, text: str) -> dict[str, str | dict[st
     :param text: a text
     :return: a dictionary with two keys – name, freq
     """
-    print('hello world')
+    if not isinstance(language, str) or not isinstance(text, str):
+        return None
+    frequencies = calculate_frequencies(tokenize(text))
+    if not isinstance(frequencies, dict):
+        return None
+    return {'name': language, 'freq': frequencies}
 
 
 def calculate_mse(predicted: list, actual: list) -> float | None:
@@ -39,7 +58,14 @@ def calculate_mse(predicted: list, actual: list) -> float | None:
     :param actual: a list of actual values
     :return: the score
     """
-    print('hello world')
+    if not isinstance(predicted, list) or not isinstance(actual, list) \
+            or len(predicted) != len(actual):
+        return None
+    zipped_values = zip(predicted, actual)
+    summation = 0
+    for i in zipped_values:
+        summation += (i[1] - i[0]) ** 2
+    return summation / len(predicted)
 
 
 def compare_profiles(
@@ -67,7 +93,7 @@ def detect_language(
     :param profile_2: a dictionary of a known profile
     :return: a language
     """
-    print('hello world')
+
 
 
 def load_profile(path_to_file: str) -> dict | None:
@@ -76,7 +102,7 @@ def load_profile(path_to_file: str) -> dict | None:
     :param path_to_file: a path to the language profile
     :return: a dictionary with at least two keys – name, freq
     """
-    print('hello world')
+
 
 
 def preprocess_profile(profile: dict) -> dict[str, str | dict] | None:
@@ -86,7 +112,7 @@ def preprocess_profile(profile: dict) -> dict[str, str | dict] | None:
     :return: a dict with a lower-cased loaded profile
     with relative frequencies without unnecessary ngrams
     """
-    print('hello world')
+
 
 
 def collect_profiles(paths_to_profiles: list) -> list[dict[str, str | dict[str, float]]] | None:
@@ -95,7 +121,7 @@ def collect_profiles(paths_to_profiles: list) -> list[dict[str, str | dict[str, 
     :paths_to_profiles: a list of strings to the profiles
     :return: a list of loaded profiles
     """
-    print('hello world')
+
 
 
 def detect_language_advanced(unknown_profile: dict[str, str | dict[str, float]],
@@ -106,7 +132,7 @@ def detect_language_advanced(unknown_profile: dict[str, str | dict[str, float]],
     :param known_profiles: a list of known profiles
     :return: a sorted list of tuples containing a language and a distance
     """
-    print('hello world')
+
 
 
 def print_report(detections: list[tuple[str, float]]) -> None:
@@ -114,4 +140,4 @@ def print_report(detections: list[tuple[str, float]]) -> None:
     Prints report for detection of language
     :param detections: a list with distances for each available language
     """
-    print('hello world')
+
