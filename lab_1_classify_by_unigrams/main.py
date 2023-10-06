@@ -16,11 +16,7 @@ def tokenize(text: str) -> list[str] | None:
     if not isinstance(text, str):
         return None
     text = ''.join(symbol for symbol in text if symbol.isalpha()).lower()
-    result = []
-    for i in text:
-        if i not in punctuation:
-            result += i
-    return result
+    return text
 
 
 def calculate_frequencies(tokens: list[str] | None) -> dict[str, float] | None:
@@ -31,10 +27,12 @@ def calculate_frequencies(tokens: list[str] | None) -> dict[str, float] | None:
     """
     if not isinstance(tokens, list):
         return None
-    for i in tokens:
+    set_tokens = set(tokens)
+    len_of_tokens = len(tokens)
+    for i in set_tokens:
         if not isinstance(i, str):
             return None
-    frequency_counter = {j: tokens.count(j) / len(tokens) for j in tokens}
+    frequency_counter = {j: tokens.count(j) / len_of_tokens for j in tokens}
     return frequency_counter
 
 
@@ -84,6 +82,17 @@ def compare_profiles(
         return None
     unknown_profile_list = []
     compare_profiles_list = []
+    set_meaning1 = set(unknown_profile['freq'].keys())
+    set_meaning2 = set(profile_to_compare['freq'].keys())
+    inion_of_sets = set_meaning1 | set_meaning2
+    for elem in inion_of_sets:
+        unknown_profile_list.append(unknown_profile['freq'].get(elem, 0))
+        compare_profiles_list.append(profile_to_compare['freq'].get(elem, 0))
+    return calculate_mse(unknown_profile_list, compare_profiles_list)
+
+
+
+
 
 
 
