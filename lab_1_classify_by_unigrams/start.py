@@ -27,12 +27,12 @@ def main() -> None:
     language_profiles = collect_profiles(path_to_profiles)
     if (isinstance(unk_profile, dict)
         and all(isinstance(profile, dict) for profile in language_profiles)
-        and isinstance(language_profiles, list)
-    ):
+            and isinstance(language_profiles, list)):
         result = detect_language_advanced(unk_profile, language_profiles)
 
     if result:
-        print(print_report(result))
+        print_report(result)
+
     assert result, "Detection result is None"
 
 
