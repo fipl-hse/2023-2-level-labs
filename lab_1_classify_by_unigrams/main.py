@@ -28,10 +28,12 @@ def calculate_frequencies(tokens: list[str] | None) -> dict[str, float] | None:
         return None
 
     text_freq = {}
-    for character in tokens:
+    length = len(tokens)
+
+    for character in set(tokens):
         if character not in text_freq:
             text_freq[character] = 0.0
-        text_freq[character] += 1 / len(tokens)
+        text_freq[character] += tokens.count(character) / length
 
     return text_freq
 
@@ -66,8 +68,8 @@ def calculate_mse(predicted: list, actual: list) -> float | None:
         return None
 
     mse = 0.0
-    for index, pred_value in enumerate(predicted):
-        mse += (pred_value - actual[index]) ** 2
+    for pred_value, actual_value in zip(predicted, actual):
+        mse += (pred_value - actual_value) ** 2
 
     return mse / len(predicted)
 
