@@ -35,13 +35,11 @@ def calculate_frequencies(tokens: list[str] | None) -> dict[str, float] | None:
     tokens_frequency_dict = {}
     total_tokens = len(tokens)
 
-    for token in tokens:
+    for token in set(tokens):
         if not isinstance(token, str):
             return None
-        tokens_frequency_dict[token] = tokens_frequency_dict.get(token, 0) + 1
-
-    for token in tokens_frequency_dict:
-        tokens_frequency_dict[token] /= total_tokens
+        tokens_frequency = tokens.count(token)
+        tokens_frequency_dict[token] = tokens_frequency / total_tokens
 
     return tokens_frequency_dict
 
@@ -77,9 +75,8 @@ def calculate_mse(predicted: list, actual: list) -> float | None:
     if len(predicted) != len(actual):
         return None
 
-    mse = 0
     squared_differences = [(true - pred) ** 2 for true, pred in zip(actual, predicted)]
-    mse += sum(squared_differences) / len(predicted)
+    mse = sum(squared_differences) / len(predicted)
 
     return mse
 
@@ -139,15 +136,14 @@ def detect_language(
     lang_1 = str(profile_1['name'])
     lang_2 = str(profile_2['name'])
 
-    if isinstance(mse_lang_1, float) and isinstance(mse_lang_2, float):
-        if mse_lang_1 < mse_lang_2:
-            return lang_1
-        if mse_lang_1 > mse_lang_2:
-            return lang_2
-        if mse_lang_1 == mse_lang_2:
-            return sorted([lang_1, lang_2])[0]
-
-    return None
+    if not isinstance(mse_lang_1, float) or not isinstance(mse_lang_2, float):
+        return None
+    if mse_lang_1 < mse_lang_2:
+        return lang_1
+    if mse_lang_1 > mse_lang_2:
+        return lang_2
+    if mse_lang_1 == mse_lang_2:
+        return sorted([lang_1, lang_2])[0]
 
 
 def load_profile(path_to_file: str) -> dict | None:
@@ -159,14 +155,12 @@ def load_profile(path_to_file: str) -> dict | None:
     if not isinstance(path_to_file, str):
         return None
 
-    try:
-        with open(path_to_file, 'r', encoding="utf-8") as file:
-            language_profile = json.load(file)
-            if not isinstance(language_profile, dict):
-                raise ValueError("Invalid language profile format. Expected a dictionary.")
-            return language_profile
-    except FileNotFoundError:
-        return None
+    with open(path_to_file, 'r', encoding="utf-8") as file:
+        language_profile = json.load(file)
+        if not isinstance(language_profile, dict):
+            raise ValueError("Invalid language profile format. Expected a dictionary.")
+            return None
+        return language_profile
 
 
 def preprocess_profile(profile: dict) -> dict[str, str | dict] | None:
