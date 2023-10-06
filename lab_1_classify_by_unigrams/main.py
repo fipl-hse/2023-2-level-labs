@@ -10,7 +10,6 @@ def tokenize(text: str) -> list[str] | None:
 
 from typing import List, Dict
 
-
 def calculate_frequencies(tokens: List[str] | None) -> Dict[str, float] | None:
     pass
     if not isinstance(tokens, list) or not all(isinstance(token, str) for token in tokens):
