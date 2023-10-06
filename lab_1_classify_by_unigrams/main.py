@@ -19,7 +19,7 @@ def tokenize(text: str) -> list[str] | None:
         if symbol in punctuation:
             text = text.replace(symbol, "")
         else:
-            tokens = list(tokens)
+            return None
     return list(tokens)
 
 
