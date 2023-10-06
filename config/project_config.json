@@ -3,6 +3,10 @@
         {
             "name": "lab_1_classify_by_unigrams",
             "coverage": 10
+        },
+        {
+            "name": "lab_2_tokenize_by_bpe",
+            "coverage": 10
         }
     ],
     "addons": [],
