@@ -16,7 +16,7 @@ def tokenize(text: str) -> list[str] | None:
     tokens = text.lower()
     for symbol in text:
         if symbol.isalpha():
-            tokens = []
+            return None
         if not symbol.isalpha():
             text = text.replace(symbol,"")
     return list(tokens)
