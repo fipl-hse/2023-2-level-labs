@@ -1,7 +1,7 @@
-from lab_1_classify_by_unigrams.main import tokenize, calculate_frequencies, create_language_profile
 """
 Language detection starter
 """
+from lab_1_classify_by_unigrams.main import calculate_frequencies, create_language_profile, tokenize
 
 
 def main() -> None:
@@ -19,6 +19,8 @@ def main() -> None:
     en_freqs = calculate_frequencies(en_tokenized)
     en_profile = create_language_profile("eng", en_text)
     print(en_profile)
+    result = en_profile
+    assert result, "Detection result is None"
 
 
 if __name__ == "__main__":
