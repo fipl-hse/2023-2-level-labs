@@ -7,10 +7,10 @@ import json
 
 def tokenize(text: str) -> list[str] | None:
     """
-        Splits a text into tokens, converts the tokens into lowercase,
-        removes punctuation, digits and other symbols
-        :param text: a text
-        :return: a list of lower-cased tokens without punctuation
+    Splits a text into tokens, converts the tokens into lowercase,
+    removes punctuation, digits and other symbols
+    :param text: a text
+    :return: a list of lower-cased tokens without punctuation
     """
     list1 = []
 
@@ -26,9 +26,9 @@ def tokenize(text: str) -> list[str] | None:
 
 def calculate_frequencies(tokens: list[str] | None) -> dict[str, float] | None:
     """
-        Calculates frequencies of given tokens
-        :param tokens: a list of tokens
-        :return: a dictionary with frequencies
+    Calculates frequencies of given tokens
+    :param tokens: a list of tokens
+    :return: a dictionary with frequencies
         """
     if not isinstance(tokens, list) or not all([isinstance(x, str) for x in tokens]):
         return None
@@ -158,7 +158,7 @@ def detect_language_advanced(unknown_profile: dict[str, str | dict[str, float]],
     """
 
 
-def print_report(detections: list[list[str | float]]) -> None:
+def print_report(detections: list[tuple[str, float]]) -> None:
     """
     Prints report for detection of language
     :param detections: a list with distances for each available language
