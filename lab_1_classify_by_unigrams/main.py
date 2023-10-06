@@ -184,15 +184,14 @@ def preprocess_profile(profile: dict) -> dict[str, str | dict] | None:
         or profile.get('n_words') is None):
         return None
 
-    processed_profile = {'name': profile['name'], 'freq': {}}
-    freq_raw = profile['freq']
-    freq_processed = processed_profile['freq']
+    unigrams = {}
+    for token, count in profile['freq'].items():
+        if len(token) == 1 and (token.isalpha() or token == '²'):
+            unigrams[token.lower()] = unigrams.get(token.lower(), 0) + count
 
-    for token in freq_raw:
-        if token.lower() in freq_processed:
-            freq_processed[token.lower()] += freq_raw[token] / profile['n_words'][0]
-        elif len(token) == 1:
-            freq_processed[token.lower()] = freq_raw[token] / profile['n_words'][0]
+    processed_profile = {'name': profile['name'], 'freq': 
+                         {unigram: count / profile['n_words'][0]
+                          for unigram, count in unigrams.items()}}
 
     return processed_profile
 
