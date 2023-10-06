@@ -17,11 +17,11 @@ def main() -> None:
     unknown_profile = create_language_profile('Unknown', unknown_text)
     en_profile = create_language_profile('English', en_text)
     de_profile = create_language_profile('Deutsch', de_text)
-    assert unknown_profile
-    assert en_profile
-    assert de_profile
+    if not unknown_profile or not en_profile or not de_profile:
+        return None
     result = detect_language(unknown_profile, en_profile, de_profile)
-    assert result, "Detection result is None"
+    if not result:
+        return None
     print(f'Detection result is {result}')
 
 

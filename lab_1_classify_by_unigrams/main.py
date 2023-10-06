@@ -13,8 +13,7 @@ def tokenize(text: str) -> list[str] | None:
     """
     if not isinstance(text, str):
         return None
-    tokens = [symbol.lower() for symbol in text if symbol.isalpha()]
-    return tokens
+    return [symbol for symbol in text.lower() if symbol.isalpha()]
 
 
 def calculate_frequencies(tokens: list[str] | None) -> dict[str, float] | None:
@@ -24,15 +23,14 @@ def calculate_frequencies(tokens: list[str] | None) -> dict[str, float] | None:
     :return: a dictionary with frequencies
     """
     if (not isinstance(tokens, list)
-            or not tokens
-            or not all(isinstance(element, str) for element in tokens)):
+            or not tokens):
         return None
     frequencies = {}
-    unit = 1 / len(tokens)
-    for letter in tokens:
-        if letter not in frequencies:
-            frequencies[letter] = .0
-        frequencies[letter] += unit
+    unit = len(tokens)
+    for letter in set(tokens):
+        if not isinstance(letter, str):
+            return None
+        frequencies[letter] = tokens.count(letter) / unit
     return frequencies
 
 
