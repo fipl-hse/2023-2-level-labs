@@ -18,11 +18,6 @@ if [[ "$LAB_PATH" ]]; then
   check_skip "$PR_NAME" "$PR_AUTHOR" "$LAB_PATH"
 
   TARGET_SCORE=$(get_score "$LAB_PATH")
-
-  if [[ "$LAB_PATH" == "lab_5_scrapper" ]]; then
-    python config/config_param_changer.py --config_path="lab_5_scrapper/scrapper_config.json"
-    echo "Changed config params"
-  fi
 fi
 
 if [[ "$LAB_PATH" ]]; then
@@ -31,12 +26,10 @@ else
   LABEL="${PYTEST_LABEL}"
 fi
 
-if [[ "$LAB_PATH" == "lab_5_scrapper" ]]; then
-  python -m pytest -m "${LABEL}" --capture=no --ignore=lab_6_pipeline
-elif [[ "$LAB_PATH" == "lab_6_pipeline" && ${TARGET_SCORE} == 10 ]]; then
-  python -m pytest -m "${LABEL}" --capture=no
+if [[ "$LAB_PATH" == "lab_1_classify_by_unigrams" ]]; then
+  python -m pytest -m "${LABEL}" --capture=no --ignore=lab_2_tokenize_by_bpe
 else
-  python -m pytest -m "${LABEL}" --capture=no --ignore lab_6_pipeline/tests/s4_pos_frequency_pipeline_test.py --ignore lab_6_pipeline/tests/s3_6_advanced_pipeline_test.py
+  python -m pytest -m "${LABEL}" --capture=no
 fi
 
 ret=$?
