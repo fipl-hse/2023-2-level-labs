@@ -70,6 +70,7 @@ def front_times(input_string: str, how_many: int) -> str:
     """
     # student realisation goes here
 
+
 # Function calls with expected result:
 # front_times('Chocolate', 2) → 'ChoCho'
 # front_times('Chocolate', 3) → 'ChoChoCho'
@@ -118,6 +119,7 @@ def reverse_word(sentence: str) -> str:
     Spaces will be included only when more than one word is present.
     """
     # student realisation goes here
+
 
 # reverse_word("Hey fellow warriors") == "Hey wollef sroirraw"
 #
