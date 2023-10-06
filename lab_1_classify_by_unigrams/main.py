@@ -12,16 +12,17 @@ def tokenize(text: str) -> list[str] | None:
         :param text: a text
         :return: a list of lower-cased tokens without punctuation
     """
-    list = []
+    list1 = []
 
     if not isinstance(text, str):
         return None
 
     for i in text.lower():
         if i.isalpha():
-            list.append(i)
+            list1.append(i)
 
-    return list
+    return list1
+
 
 def calculate_frequencies(tokens: list[str] | None) -> dict[str, float] | None:
     """
@@ -35,7 +36,6 @@ def calculate_frequencies(tokens: list[str] | None) -> dict[str, float] | None:
     return dict((i, tokens.count(i) / len(tokens)) for i in tokens)
 
 
-
 def create_language_profile(language: str, text: str) -> dict[str, str | dict[str, float]] | None:
     """
     Creates a language profile
@@ -46,7 +46,7 @@ def create_language_profile(language: str, text: str) -> dict[str, str | dict[st
     if not isinstance(language, str) or not isinstance(text, str):
         return None
 
-    return dict((("name",language), ("freq", calculate_frequencies(tokenize(text)))))
+    return dict((("name", language), ("freq", calculate_frequencies(tokenize(text)))))
 
 
 def calculate_mse(predicted: list, actual: list) -> float | None:
@@ -59,11 +59,11 @@ def calculate_mse(predicted: list, actual: list) -> float | None:
     if not isinstance(predicted, list) or not isinstance(actual, list) or len(predicted) != len(actual):
         return None
 
-    differense = 0
+    difference = 0
     for i in range(0, len(predicted)):
-        differense += (predicted[i]-actual[i])**2
+        difference += (predicted[i]-actual[i])**2
 
-    return differense / len(predicted)
+    return difference / len(predicted)
 
 
 def compare_profiles(
@@ -91,6 +91,7 @@ def compare_profiles(
 
     return calculate_mse(unknown, to_compare)
 
+
 def detect_language(
         unknown_profile: dict[str, str | dict[str, float]],
         profile_1: dict[str, str | dict[str, float]],
@@ -117,13 +118,14 @@ def detect_language(
         alp_names = [profile_1['name'], profile_2['name']].sort()
         return alp_names[0]
 
+
 def load_profile(path_to_file: str) -> dict | None:
     """
     Loads a language profile
     :param path_to_file: a path to the language profile
     :return: a dictionary with at least two keys – name, freq
     """
-    if not isinstance(path_to_file,str):
+    if not isinstance(path_to_file, str):
         return None
 
     return json.loads(open(path_to_file, encoding='utf-8').read())
