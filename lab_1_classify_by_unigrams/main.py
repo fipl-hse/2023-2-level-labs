@@ -14,11 +14,12 @@ def tokenize(text: str) -> list[str] | None:
     if not isinstance(text, str):
         return None
     tokens = text.lower()
-    for symbol in text:
-        if symbol.isalpha():
-            return None
-        if not symbol.isalpha():
-            text = text.replace(symbol,"")
+    punctuation = "0123456789!#$%&'()*+,-./:;<=>?@[\]^_`{|}~"
+    for symbol in punctuation:
+        if symbol in punctuation:
+            text = text.replace(symbol, "")
+        else:
+            tokens = list(tokens)
     return list(tokens)
 
 
