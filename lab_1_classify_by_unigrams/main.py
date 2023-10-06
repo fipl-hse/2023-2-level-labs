@@ -67,8 +67,8 @@ def calculate_mse(predicted: list, actual: list) -> float | None:
         return None
     quantity_of_meanings = len(predicted)
     sum_of_diff = 0
-    for count, el in enumerate(predicted):
-        sum_of_diff += (el - actual[count]) ** 2
+    for count, meaning in enumerate(predicted):
+        sum_of_diff += (meaning - actual[count]) ** 2
     return sum_of_diff / quantity_of_meanings
 
 
