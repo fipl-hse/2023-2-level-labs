@@ -63,8 +63,8 @@ def calculate_mse(predicted: list, actual: list) -> float | None:
         return None
 
     difference = 0
-    for i, n in enumerate(predicted):
-        difference += (n-actual[i])**2
+    for i, pred in enumerate(predicted):
+        difference += (pred-actual[i])**2
 
     return difference / len(predicted)
 
@@ -80,8 +80,11 @@ def compare_profiles(
     :return: the distance between the profiles
     """
     if not (
-        isinstance(unknown_profile, dict) and isinstance(profile_to_compare, dict) and 'freq' in unknown_profile
-        and 'freq' in profile_to_compare and 'name' in unknown_profile and 'name' in profile_to_compare
+        isinstance(unknown_profile, dict) and isinstance(profile_to_compare, dict)
+        and 'freq' in unknown_profile
+        and 'freq' in profile_to_compare
+        and 'name' in unknown_profile
+        and 'name' in profile_to_compare
     ):
         return None
 
@@ -107,7 +110,11 @@ def detect_language(
     :param profile_2: a dictionary of a known profile
     :return: a language
     """
-    if not isinstance(unknown_profile, dict) or not isinstance(profile_1, dict) or not isinstance(profile_2, dict):
+    if (
+            not isinstance(unknown_profile, dict) or
+            not isinstance(profile_1, dict) or
+            not isinstance(profile_2, dict)
+    ):
         return None
 
     mse1 = compare_profiles(unknown_profile, profile_1)
