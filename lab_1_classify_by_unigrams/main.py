@@ -99,6 +99,20 @@ def detect_language(
     :param profile_2: a dictionary of a known profile
     :return: a language
     """
+    if not isinstance(unknown_profile, dict) or not isinstance(profile_1, dict) or not isinstance(profile_2, dict):
+        return None
+    first_comp = compare_profiles(unknown_profile, profile_1)
+    second_comp = compare_profiles(unknown_profile, profile_2)
+    if first_comp == second_comp:
+        name_l = []
+        for name in profile_1['name'] and profile_2['name']:
+            name_l += name
+        true_name = sorted(name_l)
+        return true_name[0]
+    elif first_comp < second_comp:
+        return profile_1['name']
+    elif second_comp < first_comp:
+        return profile_2['name']
 
 
 def load_profile(path_to_file: str) -> dict | None:
