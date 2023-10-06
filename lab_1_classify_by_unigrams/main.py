@@ -27,12 +27,11 @@ def calculate_frequencies(tokens: list[str] | None) -> dict[str, float] | None:
     if not isinstance(tokens, list) or not all(isinstance(el, str) for el in tokens):
         return None
     freqs = {}
+    len_tokens = len(tokens)
     for token in tokens:
         if token not in freqs:
             freqs[token] = 0.0
-        freqs[token] += 1
-    for key, value in freqs.items():
-        freqs[key] = value / len(tokens)
+        freqs[token] += 1 / len_tokens
     return freqs
 
 
