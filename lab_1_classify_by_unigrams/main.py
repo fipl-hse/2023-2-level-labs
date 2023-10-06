@@ -16,7 +16,6 @@ def tokenize(text: str) -> list[str] | None:
         return None
 
     tokens = []
-
     for symbol in text:
         if symbol.isalpha():
             tokens.append(symbol.lower())
@@ -189,7 +188,7 @@ def preprocess_profile(profile: dict) -> dict[str, str | dict] | None:
         if len(token) == 1 and (token.isalpha() or token == '²'):
             unigrams[token.lower()] = unigrams.get(token.lower(), 0) + count
 
-    processed_profile = {'name': profile['name'], 'freq': 
+    processed_profile = {'name': profile['name'], 'freq':
                          {unigram: count / profile['n_words'][0]
                           for unigram, count in unigrams.items()}}
 
