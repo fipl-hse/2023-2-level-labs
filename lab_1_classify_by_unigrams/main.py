@@ -32,7 +32,7 @@ def calculate_frequencies(tokens: list[str] | None) -> dict[str, float] | None:
     for i in set_tokens:
         if not isinstance(i, str):
             return None
-    frequency_counter = {j: tokens.count(j) / len_of_tokens for j in tokens}
+    frequency_counter = {j: tokens.count(j) / len_of_tokens for j in set_tokens}
     return frequency_counter
 
 
