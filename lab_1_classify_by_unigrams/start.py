@@ -14,7 +14,6 @@ def main() -> None:
         de_text = file_to_read_de.read()
     with open("assets/texts/unknown.txt", "r", encoding="utf-8") as file_to_read_unk:
         unknown_text = file_to_read_unk.read()
-    result = None
     result = tokenize('en', en_text)
     assert result, "Detection result is None"
 
