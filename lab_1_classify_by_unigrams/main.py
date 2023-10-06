@@ -13,12 +13,10 @@ def tokenize(text: str) -> list[str] | None:
     """
     if not isinstance(text, str):
         return None
-
     tokens = text.lower()
-    tokens = []
     for symbol in text:
         if not symbol.isalpha():
-            text = text.replace(symbol, "")
+            text = text.replace(symbol,"")
     return list(tokens)
 
 
