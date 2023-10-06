@@ -13,8 +13,8 @@ def tokenize(text: str) -> list[str] | None:
     """
     if not isinstance(text, str):
         return None
-    iterator = filter(str.isalpha, text.lower())
-    return list(iterator)
+    return list(filter(str.isalpha, text.lower()))
+
 
 def calculate_frequencies(tokens: list[str] | None) -> dict[str, float] | None:
     """
