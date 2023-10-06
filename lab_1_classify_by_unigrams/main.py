@@ -11,6 +11,8 @@ def tokenize(text: str) -> list[str] | None:
     :param text: a text
     :return: a list of lower-cased tokens without punctuation
     """
+    if not isinstance(text, str):
+        return None
     text = text.lower()
     text = "".join(c for c in text if c.isalpha())
     return list(text)
@@ -22,7 +24,7 @@ def calculate_frequencies(tokens: list[str] | None) -> dict[str, float] | None:
     :param tokens: a list of tokens
     :return: a dictionary with frequencies
     """
-    if not (tokens, list):
+    if not isinstance(tokens, list):
         return None
     frequency = {}
     for i in tokens:
@@ -37,7 +39,7 @@ def create_language_profile(language: str, text: str) -> dict[str, str | dict[st
     :param text: a text
     :return: a dictionary with two keys – name, freq
     """
-    if not (language, str) and (text, str):
+    if not isinstance(language, str) and (text, str):
         return None
     tokenized = tokenize(text)
     frequencies = calculate_frequencies(tokenized)
@@ -52,7 +54,7 @@ def calculate_mse(predicted: list, actual: list) -> float | None:
     :param actual: a list of actual values
     :return: the score
     """
-    if not (predicted, list) and (actual, list):
+    if not isinstance(predicted, list) and (actual, list):
         return None
     results = 0
     for i in range(len(predicted)):
@@ -73,7 +75,7 @@ def compare_profiles(
     :param profile_to_compare: a dictionary of a profile to compare the unknown profile to
     :return: the distance between the profiles
     """
-    if not (unknown_profile, dict) and (profile_to_compare, dict):
+    if not isinstance(unknown_profile, dict) and (profile_to_compare, dict):
         return None
     stats1 = unknown_profile.get('freq')
     stats2 = profile_to_compare.get('freq')
@@ -104,7 +106,7 @@ def detect_language(
     :param profile_2: a dictionary of a known profile
     :return: a language
     """
-    if not (unknown_profile, dict) and (profile_1, dict) and (profile_2, dict):
+    if not isinstance(unknown_profile, dict) and (profile_1, dict) and (profile_2, dict):
         return None
     res1 = compare_profiles(profile_1, unknown_profile)
     res2 = compare_profiles(profile_2, unknown_profile)
