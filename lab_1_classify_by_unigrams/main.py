@@ -53,6 +53,13 @@ def calculate_mse(predicted: list, actual: list) -> float | None:
     :param actual: a list of actual values
     :return: the score
     """
+    if not isinstance(predicted, list) or not isinstance(actual, list) or (len(predicted) != len(actual)):
+        return None
+    val_num = len(actual)
+    sq_of_dif = []
+    for unit in range(val_num):
+        sq_of_dif.append((actual[unit] - predicted[unit]) ** 2)
+    return sum(sq_of_dif) / val_num
 
 
 def compare_profiles(
@@ -65,6 +72,19 @@ def compare_profiles(
     :param profile_to_compare: a dictionary of a profile to compare the unknown profile to
     :return: the distance between the profiles
     """
+    if not isinstance(unknown_profile, dict) or not isinstance(profile_to_compare, dict):
+        return None
+    if ('name' or 'freq') not in unknown_profile.keys() or ('name' or 'freq') not in profile_to_compare.keys():
+        return None
+    unknown_freqs = set(unknown_profile['freq'])
+    comp_freqs = set(profile_to_compare['freq'])
+    value_set = unknown_freqs.union(comp_freqs)
+    freqs_pred = []
+    freqs_to_comp = []
+    for value in value_set:
+        freqs_pred.append(unknown_profile['freq'].get(value, 0))
+        freqs_to_comp.append(profile_to_compare['freq'].get(value, 0))
+    return calculate_mse(freqs_pred, freqs_to_comp)
 
 
 def detect_language(
