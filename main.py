@@ -30,3 +30,15 @@ def calculate_frequencies(tokens: List[str] | None) -> Dict[str, float] | None:
         frequency_dict[token] = count / token_count
 
     return frequency_dict
+
+# step 3
+def create_language_profile(language: str, text: str) -> dict[str, str | dict[str, float]] | None:
+    pass
+    if not isinstance(language,str) or not isinstance(text, str):
+        return None
+
+    tokens = tokenize(text)
+    frequencies = calculate_frequencies(tokens)
+
+    profile = {'name': language, 'freq': frequencies}
+    return profile
