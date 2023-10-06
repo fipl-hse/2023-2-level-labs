@@ -1,4 +1,3 @@
-# step 1
 def tokenize(text: str) -> list[str] | None:
     pass
     if not isinstance(text, str):
@@ -9,8 +8,8 @@ def tokenize(text: str) -> list[str] | None:
             tokens.append(char)
     return tokens
 
-# step 2
 from typing import List, Dict
+
 
 def calculate_frequencies(tokens: List[str] | None) -> Dict[str, float] | None:
     pass
@@ -31,7 +30,6 @@ def calculate_frequencies(tokens: List[str] | None) -> Dict[str, float] | None:
 
     return frequency_dict
 
-# step 3
 def create_language_profile(language: str, text: str) -> dict[str, str | dict[str, float]] | None:
     pass
     if not isinstance(language,str) or not isinstance(text, str):
