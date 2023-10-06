@@ -121,10 +121,10 @@ def create_phone_number(nums: list) -> str:
 # Function calls with expected result:
 # create_phone_number([1, 2, 3, 4, 5, 6, 7, 8, 9, 0])
 # => returns "(123) 456-7890"
-    digit = ''.join(str(i) for i in nums)
+'''''    digit = ''.join(str(i) for i in nums)
     phone = f"({digit[0:3]}) {digit[3:6]}-{digit[6:]}"
     print(phone)
-create_phone_number([1, 2, 3, 4, 5, 6, 7, 8, 9, 0])
+create_phone_number([1, 2, 3, 4, 5, 6, 7, 8, 9, 0])'''''
 
 
 # Task 5
