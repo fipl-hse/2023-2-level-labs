@@ -30,7 +30,7 @@ def calculate_frequencies(tokens: list[str] | None) -> dict[str, float] | None:
     :param tokens: a list of tokens
     :return: a dictionary with frequencies
         """
-    if not isinstance(tokens, list) or not all([isinstance(x, str) for x in tokens]):
+    if not isinstance(tokens, list) or not all(isinstance(token, str) for token in tokens):
         return None
 
     return dict((i, tokens.count(i) / len(tokens)) for i in tokens)
@@ -56,7 +56,10 @@ def calculate_mse(predicted: list, actual: list) -> float | None:
     :param actual: a list of actual values
     :return: the score
     """
-    if not isinstance(predicted, list) or not isinstance(actual, list) or len(predicted) != len(actual):
+    if not (
+            isinstance(predicted, list) and isinstance(actual, list)
+            and len(predicted) == len(actual)
+    ):
         return None
 
     difference = 0
@@ -112,11 +115,9 @@ def detect_language(
 
     if mse1 < mse2:
         return profile_1['name']
-    elif mse1 > mse2:
+    if mse1 > mse2:
         return profile_2['name']
-    else:
-        alp_names = [profile_1['name'], profile_2['name']].sort()
-        return alp_names[0]
+    return sorted([profile_1['name'], profile_2['name']])[0]
 
 
 def load_profile(path_to_file: str) -> dict | None:
