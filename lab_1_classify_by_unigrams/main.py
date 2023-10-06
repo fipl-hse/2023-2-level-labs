@@ -15,7 +15,7 @@ def tokenize(text: str) -> list[str] | None:
         return None
     tokens = text.lower()
     punctuation = "0123456789!#$%&'()*+,-./:;<=>?@[\]^_`{|}~"
-    for symbol in punctuation:
+    for symbol in text:
         if symbol in punctuation:
             text = text.replace(symbol, "")
         else:
