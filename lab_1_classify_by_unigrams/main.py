@@ -32,8 +32,8 @@ def calculate_frequencies(tokens: list[str] | None) -> dict[str, float] | None:
     for token in tokens:
         if token not in dict_of_freq:
             occurence_of_token = tokens.count(token)
-            frequency = occurence_of_token / quantity_of_tokens
-            dict_of_freq.update({token: frequency})
+            relative_frequency = occurence_of_token / quantity_of_tokens
+            dict_of_freq.update({token: relative_frequency})
 
     return dict_of_freq
 
@@ -171,12 +171,15 @@ def preprocess_profile(profile: dict) -> dict[str, str | dict] | None:
     profile_raw = {'name': profile['name'], 'freq': {}}
 
     for token in profile['freq']:
-        if token.lower() in profile_raw['freq']:
-            profile_raw['freq'][token.lower()] += \
-            profile['freq'][token] / profile['n_words'][0]
+        token_low = token.lower()
+        freq_of_token = profile['freq'][token]
+        freq_of_unigram = profile['n_words'][0]
+        if token_low in profile_raw['freq']:
+            profile_raw['freq'][token_low] += \
+             freq_of_token  / freq_of_unigram
         elif len(token) == 1:
-            profile_raw['freq'][token.lower()] = \
-            profile['freq'][token] / profile['n_words'][0]
+            profile_raw['freq'][token_low] = \
+             freq_of_token  / freq_of_unigram
     return profile_raw
 
 
@@ -229,4 +232,3 @@ def print_report(detections: list[tuple[str, float]]) -> None:
     """
     for language in detections:
         print(f'{language[0]}: MSE {language[1]:.5f}')
-   
