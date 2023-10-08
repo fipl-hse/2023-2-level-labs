@@ -14,6 +14,18 @@ def prepare_word(
     :param end_of_word: a token that signifies the end of word
     :return: preprocessed word
     """
+    if raw_word == None:
+        return None
+
+    raw_tokens = [*raw_word]
+    if start_of_word != None:
+        raw_tokens.insert(0, start_of_word)
+    if end_of_word != None:
+        raw_tokens.append(end_of_word)
+    return tuple(raw_tokens)
+
+
+
 
 
 def collect_frequencies(
@@ -26,6 +38,22 @@ def collect_frequencies(
     :param end_of_word: a token that signifies the end of word
     :return: dictionary in the form of <preprocessed word: number of occurrences>
     """
+    if not isinstance(text, str) or not isinstance(end_of_word, str):
+        return None
+    if not isinstance(start_of_word, str) and start_of_word != None:
+        return None
+
+    word_list = text.split()
+    dictionary = {}
+    for i in set(word_list):
+        word_freq = word_list.count(i)
+        word_prepared = prepare_word(i, start_of_word, end_of_word)
+        if word_prepared == None:
+            return None
+
+        dictionary[word_prepared] = word_freq
+
+    return dictionary
 
 
 def count_tokens_pairs(
@@ -36,7 +64,23 @@ def count_tokens_pairs(
     :param word_frequencies: dictionary in the form of <preprocessed word: number of occurrences>
     :return: dictionary in the form of <token pair: number of occurrences>
     """
+    if not isinstance(word_frequencies, dict):
+        return None
 
+    result = {}
+
+    for word in word_frequencies.keys():
+        if len(word) <= 1:
+            continue
+
+        for index, letter in enumerate(word[:-1]):
+            pair = (word[index], word[index + 1])
+            if pair not in result:
+                result[pair] = 1
+            else:
+                result[pair] = result[pair] + 1
+
+    return result
 
 def merge_tokens(
     word_frequencies: dict[tuple[str, ...], int], pair: tuple[str, str]
@@ -47,6 +91,12 @@ def merge_tokens(
     :param pair: a pair of tokens to be merged
     :return: dictionary in the form of <preprocessed word: number of occurrences>
     """
+    if not isinstance(word_frequencies, dict) or not isinstance(pair, tuple):
+        return None
+
+    for index, apair in enumerate(word_frequencies):
+
+
 
 
 def train(
