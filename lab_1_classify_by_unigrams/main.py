@@ -78,7 +78,6 @@ def compare_profiles(
     :param profile_to_compare: a dictionary of a profile to compare the unknown profile to
     :return: the distance between the profiles
     """
-    print('hello world')
 
 
 def detect_language(
