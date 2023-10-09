@@ -2,8 +2,10 @@
 BPE Tokenizer starter
 """
 from pathlib import Path
-from lab_2_tokenize_by_bpe.main import (collect_frequencies, decode, get_vocabulary, train)
-import json
+
+from lab_2_tokenize_by_bpe.main import collect_frequencies, decode, get_vocabulary, train
+
+# import json
 
 
 def main() -> None:
@@ -29,6 +31,8 @@ def main() -> None:
     #     else:
     #         corrected_vocab[key] = value
 
+    if not merged_freq:
+        return None
     vocab = get_vocabulary(merged_freq, '<unk>')
     secret_list = [int(num) for num in secret_text.split()]
     decoded_secret = decode(secret_list, vocab, '</s>')
