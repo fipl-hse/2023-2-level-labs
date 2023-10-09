@@ -108,31 +108,21 @@ def train(
     if (not isinstance(word_frequencies, dict) or
         not isinstance(num_merges, int)):
         return None
-    for i in range(num_merges):
-        if count_tokens_pairs(word_frequencies) is None:
-            return None
-        tokens_freq = count_tokens_pairs(word_frequencies)
-        pair = ()
-        for token in tokens_freq:
-            if tokens_freq[token] == max(tokens_freq.values()):
-                pair = token
-                for token_2 in tokens_freq:
-                    if tokens_freq[token] == tokens_freq[token_2]:
-                        if len(''.join(token)) > len(''.join(token_2)):
-                            pair = token
-                        elif len(''.join(token)) < len(''.join(token_2)):
-                            pair = token_2
-                        else:
-                            if ''.join(token) < ''.join(token_2):
-                                pair = token
-                            else:
-                                pair = token_2
-        if merge_tokens(word_frequencies, pair) is None:
-            return None
-        if all(len(tokens) == 1 for tokens in word_frequencies):
-            return word_frequencies
-        word_frequencies = merge_tokens(word_frequencies, pair)
-    return word_frequencies
+    tokens_freq = count_tokens_pairs(word_frequencies)
+    if tokens_freq is None:
+        return None
+    if len(tokens_freq) < num_merges:
+        num_merges = tokens_freq
+    m_f_pairs = [pair for pair, freq in tokens_freq.items() if freq == max(tokens_freq.values())]
+    m_length = max([len(''.join(pair)) for pair in m_f_pairs])
+    longest_pairs_s = sorted([pair for pair in m_f_pairs if m_length == len(''.join(pair))])
+    word_frequencies = merge_tokens(word_frequencies, longest_pairs_s[0])
+    if word_frequencies is None:
+        return None
+    if num_merges == 1:
+        return word_frequencies
+    assert isinstance(word_frequencies)
+    return train(word_frequencies, num_merges - 1)
 
 
 def get_vocabulary(
