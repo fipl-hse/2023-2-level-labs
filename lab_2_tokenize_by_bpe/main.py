@@ -2,6 +2,7 @@
 Lab 2
 BPE and machine translation evaluation
 """
+import json
 
 
 def prepare_word(
@@ -156,20 +157,37 @@ def get_vocabulary(
     :param unknown_token: a token to signify an unknown token
     :return: dictionary in the form of <token: identifier>
     """
-    if not isinstance(word_frequencies, dict):
+    if not isinstance(word_frequencies, dict) \
+            or not isinstance(unknown_token, str):
         return None
 
-    tokens = list(word_frequencies)
-    tokens.sort(key=len, reverse=True)
-    length = 0
+    words = [word[0] for word in word_frequencies]
+    words += [unknown_token]
 
-    d = {}
-    return d
+    for word in word_frequencies:
+        tokenized_word = prepare_word(word[0], None, None)
+        if not tokenized_word:
+            return None
+        words += list(tokenized_word)
 
+    unique_tokens = set(words)
+
+    lengths = sorted(set(len(token) for token in unique_tokens), reverse=True)
+
+    identifiers = {}
+    index = 0
+    for length in lengths:
+        same_len_words = [token for token in unique_tokens if len(token) == length]
+        same_len_words.sort()
+        for same_len_word in same_len_words:
+            identifiers[same_len_word] = index
+            index += 1
+
+    return identifiers
 
 
 def decode(
-        encoded_text: list[int] | None, vocabulary: dict[str, int] | None, end_of_word_token: str | None
+        encoded_text: list[int], vocabulary: dict[str, int] | None, end_of_word_token: str | None
 ) -> str | None:
     """
     Translates encoded sequence into decoded one
@@ -178,6 +196,31 @@ def decode(
     :param end_of_word_token: an end-of-word token
     :return: decoded sequence
     """
+    if not isinstance(encoded_text, list) \
+            or not all(isinstance(el, int) for el in encoded_text) \
+            or not isinstance(vocabulary, dict) \
+            or not (isinstance(end_of_word_token, str) or end_of_word_token is None):
+        return None
+
+    encoded_dict = {}
+    for index, num in enumerate(encoded_text):
+        if num not in encoded_dict:
+            encoded_dict[num] = []
+        encoded_dict[num].append(index)
+
+    decoded_text = [''] * len(encoded_text)
+
+    for token, identifier in vocabulary.items():
+        if token == end_of_word_token and identifier in encoded_dict:
+            space_indexes = encoded_dict[identifier]
+            for space_index in space_indexes:
+                decoded_text[space_index] = ' '
+        elif identifier in encoded_dict:
+            indexes = encoded_dict[identifier]
+            for index in indexes:
+                decoded_text[index] = token
+
+    return ''.join(decoded_text)
 
 
 def tokenize_word(
@@ -191,6 +234,43 @@ def tokenize_word(
     :param unknown_token: token that signifies unknown sequence
     :return: list of token identifiers
     """
+    if not isinstance(word, tuple) or not isinstance(vocabulary, dict) \
+            or not (isinstance(end_of_word, str) or end_of_word is None) \
+            or not isinstance(unknown_token, str):
+        return None
+
+    if end_of_word:
+        tokens = sorted(list(vocabulary) + [end_of_word], key=len, reverse=True)
+    else:
+        tokens = sorted(list(vocabulary), key=len, reverse=True)
+
+    word_str = ''.join([str(el) for el in word])
+    word_list = list(word)
+
+    for token in tokens:
+        if token not in word_str:
+            continue
+        elif token in word_str and not token.isdigit():
+            if token in [unknown_token, end_of_word]:
+                start_index = word_list.index(token)
+                end_index = start_index
+            elif isinstance(end_of_word, str) and end_of_word in token:
+                start_index = word_list.index(token[0])
+                end_index = len(word_list)
+            else:
+                start_index = word_list.index(token[0])
+                end_index = word_list.index(token[-1])
+
+            word_list[start_index: end_index + 1] = [str(vocabulary[token])]
+
+            if ''.join(word_list).isdigit():
+                return [int(num) for num in word_list]
+            return tokenize_word(tuple(word_list), vocabulary, end_of_word, unknown_token)
+
+    for index, num in enumerate(word_list):
+        if not num.isdigit():
+            word_list[index] = str(vocabulary[unknown_token])
+    return [int(num) for num in word_list]
 
 
 def load_vocabulary(vocab_path: str) -> dict[str, int] | None:
@@ -199,6 +279,14 @@ def load_vocabulary(vocab_path: str) -> dict[str, int] | None:
     :param vocab_path: path to the saved vocabulary
     :return: dictionary in the form of <token: identifier>
     """
+    if not isinstance(vocab_path, str):
+        return None
+
+    with open(vocab_path, 'r', encoding='utf-8') as file:
+        vocabulary = json.load(file)
+    if not vocabulary:
+        return None
+    return dict(vocabulary)
 
 
 def encode(
