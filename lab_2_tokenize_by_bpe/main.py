@@ -21,12 +21,12 @@ def prepare_word(
         return None
 
     if not start_of_word and not end_of_word:
-        return tuple([el for el in raw_word])
+        return tuple(list(raw_word))
     if not start_of_word:
-        return tuple([el for el in raw_word] + [str(end_of_word)])
+        return tuple(list(raw_word) + [str(end_of_word)])
     if not end_of_word:
-        return tuple([start_of_word] + [el for el in raw_word])
-    return tuple([start_of_word] + [el for el in raw_word] + [end_of_word])
+        return tuple([start_of_word] + list(raw_word))
+    return tuple([start_of_word] + list(raw_word) + [end_of_word])
 
 
 def collect_frequencies(
@@ -128,14 +128,12 @@ def train(
     token_pairs = count_tokens_pairs(word_frequencies)
     if not token_pairs:
         return None
-    num_token_pairs = len(token_pairs)
-    if num_merges > num_token_pairs:
-        num_merges = num_token_pairs
+    num_merges = min(num_merges, len(token_pairs))
 
     occur_max = max(token_pairs.values())
     pair_max_occur = [key for key, value in token_pairs.items() if value == occur_max]
 
-    len_max = max([len(''.join(pair)) for pair in pair_max_occur])
+    len_max = max(len(''.join(pair)) for pair in pair_max_occur)
     pair_max_len = [pair for pair in pair_max_occur if len_max == len(''.join(pair))]
 
     preferred_pairs = sorted(pair_max_len)
@@ -250,7 +248,7 @@ def tokenize_word(
     for token in tokens:
         if token not in word_str:
             continue
-        elif token in word_str and not token.isdigit():
+        if token in word_str and not token.isdigit():
             if token in [unknown_token, end_of_word]:
                 start_index = word_list.index(token)
                 end_index = start_index
