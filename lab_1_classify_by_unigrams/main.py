@@ -125,16 +125,18 @@ def detect_language(
         unknown_profile,
         profile_2
     )
+    name_1 = str(profile_1['name'])
+    name_2 = str(profile_2['name'])
     if isinstance(first_pair, float) and isinstance(second_pair, float):
         if first_pair < second_pair:
-            return profile_1["name"]
+            return name_1
         if second_pair < first_pair:
-            return profile_2["name"]
+            return name_2
         if first_pair == second_pair:
-            if profile_1["name"] > profile_2["name"]:
-                return profile_2["name"]
-            if profile_1["name"] < profile_2["name"]:
-                return profile_1["name"]
+            if name_1 > name_2:
+                return name_2
+            if name_1 < name_2:
+                return name_1
 
     return None
 
