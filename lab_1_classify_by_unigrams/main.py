@@ -61,11 +61,9 @@ def calculate_mse(predicted: list, actual: list) -> float | None:
     ):
         return None
 
-    summa = sum((p - a) ** 2 for p, a in zip(predicted, actual))
-    itisafloat = 0
-    itisafloat += summa
+    summa = float(sum((p - a) ** 2 for p, a in zip(predicted, actual)))
 
-    return itisafloat / len(predicted)
+    return summa / len(predicted)
 
 
 def compare_profiles(
