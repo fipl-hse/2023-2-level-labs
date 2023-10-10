@@ -116,7 +116,6 @@ def train(
     if not isinstance(word_frequencies, dict) and word_frequencies != None:
         return None
 
-
 #    num_existed = 0
 #    while num_existed != num_merges:
 #        max_number = max(word_frequencies.values())
