@@ -2,6 +2,7 @@
 BPE Tokenizer starter
 """
 from pathlib import Path
+
 from lab_2_tokenize_by_bpe.main import collect_frequencies, decode, get_vocabulary, train
 
 
@@ -16,13 +17,12 @@ def main() -> None:
         encoded_secret = text_file.read()
     dict_frequencies = collect_frequencies(text, None, '</s>')
     merged_tokens = train(dict_frequencies, 100)
-    if not merged_tokens:
-        return None
-    vocabulary = get_vocabulary(merged_tokens, '<unk>')
-    secret = [int(num) for num in encoded_secret.split()]
-    result = decode(secret, vocabulary, '</s>')
-    print(result)
-    assert result, "Encoding is not working"
+    if merged_tokens:
+        vocabulary = get_vocabulary(merged_tokens, '<unk>')
+        secret = [int(num) for num in encoded_secret.split()]
+        result = decode(secret, vocabulary, '</s>')
+        print(result)
+        assert result, "Encoding is not working"
 
 
 if __name__ == "__main__":
