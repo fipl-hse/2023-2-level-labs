@@ -78,7 +78,7 @@ def count_tokens_pairs(
             if pair not in result:
                 result[pair] = 1
             else:
-                result[pair] = result[pair] + 1
+                result[pair] += 1
 
     return result
 
@@ -94,9 +94,12 @@ def merge_tokens(
     if not isinstance(word_frequencies, dict) or not isinstance(pair, tuple):
         return None
 
-    for index, apair in enumerate(word_frequencies):
+    old_value = word_frequencies[pair]
+    changed_pair = "".join(filter(str.isalnum, pair))
+    word_frequencies.pop(pair)
+    word_frequencies[changed_pair] = old_value
 
-
+    return word_frequencies
 
 
 def train(
@@ -108,6 +111,22 @@ def train(
     :param num_merges: required number of new tokens
     :return: dictionary in the form of <preprocessed word: number of occurrences>
     """
+    if not isinstance(num_merges, int):
+        return None
+    if not isinstance(word_frequencies, dict) and word_frequencies != None:
+        return None
+
+
+#    num_existed = 0
+#    while num_existed != num_merges:
+#        max_number = max(word_frequencies.values())
+#        prepared_pair = [p for p, v in word_frequencies.items() if v == max_number]
+#
+#        merge_tokens(word_frequencies, prepared_pair)
+#        num_existed += 1
+#        print(max_number)
+#
+#    return word_frequencies
 
 
 def get_vocabulary(
