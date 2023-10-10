@@ -12,7 +12,7 @@ def main() -> None:
     with open(assets_path / 'text.txt', 'r', encoding='utf-8') as text_file:
         text = text_file.read()
 
-    result = main_py.collect_ngrams(text, None, '</s>')
+    result = main_py.collect_frequencies(text, None, '</s>')
     assert result, "Encoding is not working"
 
 
