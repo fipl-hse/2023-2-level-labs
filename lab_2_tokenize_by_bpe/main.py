@@ -93,9 +93,11 @@ def merge_tokens(
     """
     if not isinstance(word_frequencies, dict) or not isinstance(pair, tuple):
         return None
+    if pair not in word_frequencies:
+        return None
 
     old_value = word_frequencies[pair]
-    changed_pair = "".join(filter(str.isalnum, pair))
+    changed_pair = ("".join(filter(str.isalnum, pair)),)
     word_frequencies.pop(pair)
     word_frequencies[changed_pair] = old_value
 
