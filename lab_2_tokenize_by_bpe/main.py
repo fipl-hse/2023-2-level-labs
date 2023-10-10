@@ -62,14 +62,13 @@ def count_tokens_pairs(
     """
     if not isinstance(word_frequencies, dict):
         return None
-    bi_freq = {}
+    pair_freq = {}
     for word in word_frequencies:
         for i in range(len(word) - 1):
-            bi_freq[(word[i], word[i + 1])] = 0
-    for word in word_frequencies:
-        for i in range(len(word) - 1):
-            bi_freq[(word[i], word[i + 1])] += word_frequencies[word]
-    return bi_freq
+            if (word[i], word[i + 1]) not in pair_freq:
+                pair_freq[(word[i], word[i + 1])] = 0
+            pair_freq[(word[i], word[i + 1])] += word_frequencies[word]
+    return pair_freq
 
 
 def merge_tokens(
@@ -86,13 +85,17 @@ def merge_tokens(
         return None
     freq_2 = {}
     for word in word_frequencies:
-        word_list = list(word)
-        for i, letter in enumerate(word_list):
-            if i + 1 < len(word_list):
-                if (word_list[i], word_list[i + 1]) == pair:
-                    word_list.remove(word_list[i + 1])
-                    word_list[i] = ''.join(pair)
-        freq_2[tuple(word_list)] = word_frequencies[word]
+        if ''.join(pair) in ''.join(word):
+            pair_i = []
+            word_list = list(word)
+            for i in range(len(word) - 1):
+                if (word[i], word[i + 1]) == pair:
+                    pair_i.append(i)
+            for i in pair_i:
+                word_list[i:i + 2] = [''.join(pair)]
+            freq_2[tuple(word_list)] = word_frequencies[word]
+        else:
+            freq_2[word] = word_frequencies[word]
     return freq_2
 
 
@@ -111,17 +114,16 @@ def train(
     tokens_freq = count_tokens_pairs(word_frequencies)
     if tokens_freq is None:
         return None
-    if len(tokens_freq) < num_merges:
-        num_merges = tokens_freq
-    m_f_pairs = [pair for pair, freq in tokens_freq.items() if freq == max(tokens_freq.values())]
-    m_length = max([len(''.join(pair)) for pair in m_f_pairs])
-    longest_pairs_s = sorted([pair for pair in m_f_pairs if m_length == len(''.join(pair))])
-    word_frequencies = merge_tokens(word_frequencies, longest_pairs_s[0])
-    if word_frequencies is None:
+    if num_merges > len(tokens_freq):
+        num_merges = len(tokens_freq)
+    m_f_pairs = [key for key, value in tokens_freq.items() if value == max(tokens_freq.values())]
+    len_max = max([len(''.join(pair)) for pair in m_f_pairs])
+    longest_pairs = sorted([pair for pair in m_f_pairs if len_max == len(''.join(pair))])
+    word_frequencies = merge_tokens(word_frequencies, longest_pairs[0])
+    if not word_frequencies:
         return None
     if num_merges == 1:
         return word_frequencies
-    assert isinstance(word_frequencies)
     return train(word_frequencies, num_merges - 1)
 
 
