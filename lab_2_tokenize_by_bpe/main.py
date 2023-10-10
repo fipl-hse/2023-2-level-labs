@@ -216,7 +216,8 @@ def decode(
 
 
 def tokenize_word(
-        word: tuple[str, ...], vocabulary: dict[str, int], end_of_word: str | None, unknown_token: str
+        word: tuple[str, ...], vocabulary: dict[str, int],
+        end_of_word: str | None, unknown_token: str
 ) -> list[int] | None:
     """
     Splits word into tokens
@@ -304,17 +305,6 @@ def encode(
         prepared_word = prepare_word(word, start_of_word_token, end_of_word_token)
         if not prepared_word:
             return None
-        # smth + </s> < smth</s>
-        # Активный взмах крыльями альбатрос делает только при взлете, полагаясь далее на силу и направление ветра.'
-        # expected = [
-        #     96, 72, 67, 34,  # -> [96, 72, 179, 24] - только: то | ль | ко | </s> или то | ль | к | о</s>
-            # мой вариант вернее, так как длина о</s> - максимальная
-            # 40, 34,  # -> [184, 185, 20] - при: при | </s> или п | р | и</s>
-            # мой вариант вернее, тк длина и</s> - максимальная
-        # ]
-
-        # 'Под влиянием латинского albus («белый») alcatraz чуть позднее превратился в albatross.'
-
         tokens = tokenize_word(prepared_word, vocabulary, end_of_word_token, unknown_token)
         if not tokens:
             return None
