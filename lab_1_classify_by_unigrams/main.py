@@ -25,10 +25,10 @@ def calculate_frequencies(tokens: list[str] | None) -> dict[str, float] | None:
     """
     if not (isinstance(tokens, list) and all(isinstance(token, str) for token in tokens)):
         return None
-    length = len(tokens)
-    freq_dict = {token: (tokens.count(token) / length) for token in tokens}
 
-    return freq_dict
+    length = len(tokens)
+
+    return {token: (tokens.count(token) / length) for token in tokens}
 
 
 def create_language_profile(language: str, text: str) -> dict[str, str | dict[str, float]] | None:
@@ -40,9 +40,12 @@ def create_language_profile(language: str, text: str) -> dict[str, str | dict[st
     """
     if not (isinstance(language, str) and isinstance(text, str)):
         return None
-    language_profile = {"name": language, "freq": calculate_frequencies(tokenize(text))}
 
-    return language_profile
+    frequencies = calculate_frequencies(tokenize(text))
+    if not isinstance(frequencies, dict):
+        return None
+
+    return {"name": language, "freq": calculate_frequencies(tokenize(text))}
 
 
 def calculate_mse(predicted: list, actual: list) -> float | None:
@@ -57,10 +60,10 @@ def calculate_mse(predicted: list, actual: list) -> float | None:
             and len(predicted) == len(actual)
     ):
         return None
-    number = len(predicted)
+
     summa = sum((p - a) ** 2 for p, a in zip(predicted, actual))
 
-    return summa / number
+    return summa / len(predicted)
 
 
 def compare_profiles(
@@ -82,6 +85,7 @@ def compare_profiles(
             and "freq" in profile_to_compare
     ):
         return None
+
     unknown_freq = unknown_profile['freq']
     compare_freq = profile_to_compare['freq']
     tokens = set(unknown_freq.keys()).union(compare_freq.keys())
@@ -89,9 +93,7 @@ def compare_profiles(
     unknown_freq_values = [unknown_freq.get(token, 0) for token in tokens]
     compare_freq_values = [compare_freq.get(token, 0) for token in tokens]
 
-    calculated_mse = calculate_mse(unknown_freq_values, compare_freq_values)
-
-    return calculated_mse
+    return calculate_mse(unknown_freq_values, compare_freq_values)
 
 
 def detect_language(
@@ -112,6 +114,7 @@ def detect_language(
             and isinstance(profile_2, dict)
     ):
         return None
+
     first_pair = compare_profiles(
         unknown_profile,
         profile_1
