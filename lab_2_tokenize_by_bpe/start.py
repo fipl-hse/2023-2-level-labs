@@ -11,9 +11,8 @@ def main() -> None:
     assets_path = Path(__file__).parent / 'assets'
     with open(assets_path / 'text.txt', 'r', encoding='utf-8') as text_file:
         text = text_file.read()
-        main_py.collect_frequencies(text, None, '</s>')
 
-    result = None
+    result = main_py.collect_ngrams(text, None, '</s>')
     assert result, "Encoding is not working"
 
 
