@@ -69,11 +69,10 @@ def count_tokens_pairs(
     seq_freq = {}
     for key in word_frequencies:
         for token_index in range(len(key) - 1):
-            token_1 = key[token_index]
-            token_2 = key[token_index + 1]
-            if (token_1, token_2) not in seq_freq:
-                seq_freq[(token_1, token_2)] = 0
-            seq_freq[(token_1, token_2)] += word_frequencies[key]
+            tokens = (key[token_index], key[token_index + 1])
+            if tokens not in seq_freq:
+                seq_freq[tokens] = 0
+            seq_freq[tokens] += word_frequencies[key]
 
     return seq_freq
 
@@ -97,9 +96,8 @@ def merge_tokens(
         if str(pair)[1:-2] in str(key):
             pair_indexes = []
             for token_index in range(len(key) - 1):
-                token_1 = key[token_index]
-                token_2 = key[token_index + 1]
-                if (token_1, token_2) == pair:
+                tokens = (key[token_index], key[token_index + 1])
+                if tokens == pair:
                     pair_indexes.append(token_index)
 
             saved_tokens = list(key)
@@ -159,27 +157,23 @@ def get_vocabulary(
             or not isinstance(unknown_token, str):
         return None
 
-    words = [word[0] for word in word_frequencies]
-    words += [unknown_token]
+    words = [unknown_token]
 
-    for word in word_frequencies:
-        tokenized_word = prepare_word(word[0], None, None)
-        if not tokenized_word:
-            return None
-        words += list(tokenized_word)
+    for tokens in word_frequencies:
+        for token in tokens:
+            words.append(token)
+            tokenized_word = prepare_word(token, None, None)
+            if not tokenized_word:
+                return None
+            words += list(tokenized_word)
 
-    unique_tokens = set(words)
-
-    lengths = sorted(set(len(token) for token in unique_tokens), reverse=True)
+    unique_words = set(words)
+    alphabetical_order = sorted(unique_words)
+    len_alp_sorted = sorted(alphabetical_order, key=len, reverse=True)
 
     identifiers = {}
-    index = 0
-    for length in lengths:
-        same_len_words = [token for token in unique_tokens if len(token) == length]
-        same_len_words.sort()
-        for same_len_word in same_len_words:
-            identifiers[same_len_word] = index
-            index += 1
+    for index, word in enumerate(len_alp_sorted):
+        identifiers[word] = index
 
     return identifiers
 
@@ -249,17 +243,12 @@ def tokenize_word(
         if token not in word_str:
             continue
         if token in word_str and not token.isdigit():
-            if token in [unknown_token, end_of_word]:
-                start_index = word_list.index(token)
-                end_index = start_index
-            elif isinstance(end_of_word, str) and end_of_word in token:
-                start_index = word_list.index(token[0])
-                end_index = len(word_list)
-            else:
-                start_index = word_list.index(token[0])
-                end_index = word_list.index(token[-1])
-
-            word_list[start_index: end_index + 1] = [str(vocabulary[token])]
+            length = len(word)
+            for start_index in range(length):
+                for end_index in range(start_index, length):
+                    potential_token = ''.join(word_list[start_index:end_index + 1])
+                    if potential_token == token:
+                        word_list[start_index: end_index + 1] = [str(vocabulary[token])]
 
             if ''.join(word_list).isdigit():
                 return [int(num) for num in word_list]
@@ -289,7 +278,7 @@ def load_vocabulary(vocab_path: str) -> dict[str, int] | None:
 
 def encode(
         original_text: str,
-        vocabulary: dict[str, int] | None,
+        vocabulary: dict[str, int],
         start_of_word_token: str | None,
         end_of_word_token: str | None,
         unknown_token: str,
@@ -303,6 +292,35 @@ def encode(
     :param unknown_token: token that signifies unknown sequence
     :return: list of token identifiers
     """
+    if not isinstance(original_text, str) or not isinstance(vocabulary, dict) \
+            or not (isinstance(start_of_word_token, str) or start_of_word_token is None) \
+            or not (isinstance(end_of_word_token, str) or end_of_word_token is None) \
+            or not isinstance(unknown_token, str):
+        return None
+
+    encoded = []
+    text_words = original_text.split()
+    for word in text_words:
+        prepared_word = prepare_word(word, start_of_word_token, end_of_word_token)
+        if not prepared_word:
+            return None
+        # smth + </s> < smth</s>
+        # Активный взмах крыльями альбатрос делает только при взлете, полагаясь далее на силу и направление ветра.'
+        # expected = [
+        #     96, 72, 67, 34,  # -> [96, 72, 179, 24] - только: то | ль | ко | </s> или то | ль | к | о</s>
+            # мой вариант вернее, так как длина о</s> - максимальная
+            # 40, 34,  # -> [184, 185, 20] - при: при | </s> или п | р | и</s>
+            # мой вариант вернее, тк длина и</s> - максимальная
+        # ]
+
+        # 'Под влиянием латинского albus («белый») alcatraz чуть позднее превратился в albatross.'
+
+        tokens = tokenize_word(prepared_word, vocabulary, end_of_word_token, unknown_token)
+        if not tokens:
+            return None
+        encoded.extend(tokens)
+
+    return encoded
 
 
 def collect_ngrams(text: str, order: int) -> list[tuple[str, ...]] | None:
