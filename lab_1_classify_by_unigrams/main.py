@@ -13,8 +13,8 @@ def tokenize(text: str) -> list[str] | None:
     """
     if not isinstance(text, str):
         return None
-    tokenized = [token for token in text if token.isalpha()]
-    return tokenized
+
+    return [token.lower() for token in text if token.isalpha()]
 
 
 def calculate_frequencies(tokens: list[str] | None) -> dict[str, float] | None:
@@ -27,6 +27,7 @@ def calculate_frequencies(tokens: list[str] | None) -> dict[str, float] | None:
         return None
     length = len(tokens)
     freq_dict = {token: (tokens.count(token) / length) for token in tokens}
+
     return freq_dict
 
 
@@ -40,6 +41,7 @@ def create_language_profile(language: str, text: str) -> dict[str, str | dict[st
     if not (isinstance(language, str) and isinstance(text, str)):
         return None
     language_profile = {"name": language, "freq": calculate_frequencies(tokenize(text))}
+
     return language_profile
 
 
@@ -57,6 +59,7 @@ def calculate_mse(predicted: list, actual: list) -> float | None:
         return None
     number = len(predicted)
     summa = sum((p - a) ** 2 for p, a in zip(predicted, actual))
+
     return summa / number
 
 
@@ -87,6 +90,7 @@ def compare_profiles(
     compare_freq_values = [compare_freq.get(token, 0) for token in tokens]
 
     calculated_mse = calculate_mse(unknown_freq_values, compare_freq_values)
+
     return calculated_mse
 
 
@@ -125,6 +129,7 @@ def detect_language(
             return profile_2["name"]
         if profile_1["name"] < profile_2["name"]:
             return profile_1["name"]
+
     return None
 
 
