@@ -111,7 +111,7 @@ def compare_profiles(
 def detect_language(
         unknown_profile: dict[str, str | dict[str, float]],
         profile_1: dict[str, str | dict[str, float]],
-        profile_2: dict[str, str | dict[str, float]]
+        profile_2: dict[str, str | dict[str, float]],
 ) -> str | None:
     """
     Detects the language of an unknown profile
