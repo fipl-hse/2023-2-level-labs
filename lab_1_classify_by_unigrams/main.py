@@ -4,8 +4,6 @@ Language detection
 """
 import json
 
-from string import punctuation
-
 
 def tokenize(text: str) -> list[str] | None:
     """
