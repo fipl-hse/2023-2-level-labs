@@ -6,13 +6,14 @@ Language detection
 def tokenize(text: str) -> list[str] | None:
     punc = '''!()-[]{};:'"\\,<>./?@#$%^&*_~ '''
     if type(text) == str:
-        for symbol in text:
+        text1 = text.lower()
+        for symbol in text1:
             if symbol in punc:  # проверка, не является ли символ пробелом или знаокм препинания
-                text = text.replace(symbol, '')  # удаление пробелов и знаков препинания
-        return [symbol for symbol in text]
+                text1 = text1.replace(symbol, '')  # удаление пробелов и знаков препинания
+        return [symbol for symbol in text1]
     else:
-        return 'None'
-print(tokenize(en_text))
+        return None
+
 
 def calculate_frequencies(tokens: list[str] | None) -> dict[str, float] | None:
     """
