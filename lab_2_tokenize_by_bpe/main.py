@@ -15,6 +15,22 @@ def prepare_word(
     :return: preprocessed word
     """
 
+    if (not isinstance(raw_word, str) 
+        or (start_of_word is not None and not isinstance(start_of_word, str))
+        or (end_of_word is not None and not isinstance(end_of_word, str))):
+        return None
+
+    tokens_list = []
+    if start_of_word:
+        tokens_list.append(start_of_word)
+    for symbol in raw_word:
+        tokens_list.append(symbol)
+    if end_of_word:
+        tokens_list.append(end_of_word)
+    prepared_word = tuple(tokens_list)
+
+    return prepared_word
+
 
 def collect_frequencies(
     text: str, start_of_word: str | None, end_of_word: str
@@ -27,6 +43,24 @@ def collect_frequencies(
     :return: dictionary in the form of <preprocessed word: number of occurrences>
     """
 
+    if (not isinstance(text, str)
+        or (start_of_word is not None and not isinstance(start_of_word, str))
+        or not isinstance(end_of_word, str)):
+        return None
+
+    frequency_dict = {}
+    words = text.split()
+
+    for word in words:
+        prepared_word = prepare_word(word, start_of_word, end_of_word)
+
+        if not prepared_word:
+            return None
+
+        frequency_dict.update({prepared_word: words.count(word)})
+
+    return frequency_dict
+
 
 def count_tokens_pairs(
     word_frequencies: dict[tuple[str, ...], int]
@@ -36,6 +70,22 @@ def count_tokens_pairs(
     :param word_frequencies: dictionary in the form of <preprocessed word: number of occurrences>
     :return: dictionary in the form of <token pair: number of occurrences>
     """
+
+    if not isinstance(word_frequencies, dict):
+        return None
+
+    tokens_pairs_frequencies = {}
+    for word in word_frequencies:
+
+        for index in range(len(word) - 1):
+            token_pair = (word[index], word[index+1])
+
+            if token_pair not in tokens_pairs_frequencies:
+                tokens_pairs_frequencies[token_pair] = 0
+
+            tokens_pairs_frequencies[token_pair] += word_frequencies[word]
+
+    return tokens_pairs_frequencies
 
 
 def merge_tokens(
