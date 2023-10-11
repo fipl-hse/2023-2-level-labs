@@ -4,6 +4,9 @@ Language detection starter
 from lab_1_classify_by_unigrams.main import (collect_profiles, create_language_profile,
                                              detect_language_advanced, print_report)
 
+from lab_1_classify_by_unigrams.main import (collect_profiles, create_language_profile,
+                                             detect_language_advanced, print_report)
+
 
 def main() -> None:
     """
@@ -25,14 +28,13 @@ def main() -> None:
                   'assets/profiles/tr.json']
 
     unknown = create_language_profile('unknown', unknown_text)
-    known_profs = collect_profiles(json_paths)
+    known = collect_profiles(json_paths)
+    if isinstance(unknown, dict) and isinstance(known, list):
+        result = detect_language_advanced(unknown, known)
+    if result:
+        print_report(result)
 
-    if isinstance(unknown, dict) and known_profs:
-        result = detect_language_advanced(unknown, known_profs)
-        if result:
-            print_report(result)
-            assert result, "Detection result is None"
-
+    assert result, "Detection result is None"
 
 if __name__ == "__main__":
     main()
