@@ -1,7 +1,6 @@
 """
 Language detection starter
 """
-from lab_1_classify_by_unigrams.main import calculate_frequencies, create_language_profile, tokenize
 
 from lab_1_classify_by_unigrams.main import (collect_profiles, create_language_profile,
                                              detect_language_advanced, print_report)
