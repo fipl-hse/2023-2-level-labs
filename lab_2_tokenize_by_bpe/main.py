@@ -136,6 +136,24 @@ def get_vocabulary(
     :param unknown_token: a token to signify an unknown token
     :return: dictionary in the form of <token: identifier>
     """
+    if (not isinstance(word_frequencies, dict) or
+        not isinstance(unknown_token, str)):
+        return None
+    tokens = [unknown_token]
+    for word in word_frequencies:
+        tokens.extend(list(word))
+    for token in tokens:
+        if tokens.count(token) > 1:
+            tokens.remove(token)
+    tokens_by_length = []
+    max_length = max([len(token) for token in tokens])
+    while max_length != 0:
+        tokens_by_length.extend(sorted([token for token in tokens if len(token) == max_length]))
+        max_length -= 1
+    idents = {}
+    for i, token in enumerate(tokens_by_length):
+        idents[token] = i
+    return idents
 
 
 def decode(
