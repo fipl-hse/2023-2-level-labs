@@ -17,14 +17,6 @@ def tokenize(text: str) -> list[str] | None:
 
     return [token.lower() for token in text if token.isalpha()]
 
-    if not isinstance(text, str):
-        return None
-    new_text = []
-    for symbol in text.lower():
-        if symbol.isalpha():
-            new_text += symbol
-    return new_text
-
 
 def calculate_frequencies(tokens: list[str] | None) -> dict[str, float] | None:
     """
@@ -39,13 +31,6 @@ def calculate_frequencies(tokens: list[str] | None) -> dict[str, float] | None:
 
     frequency_dict = {el: (tokens.count(el) / len(tokens)) for el in tokens}
     return frequency_dict
-
-    if not isinstance(tokens, list) or not all(isinstance(token, str) for token in tokens):
-        return None
-    calc = {}
-    for token in tokens:
-        calc[token] = tokens.count(token) / len(tokens)
-    return calc
 
 
 def create_language_profile(language: str, text: str) -> dict[str, str | dict[str, float]] | None:
@@ -68,13 +53,6 @@ def create_language_profile(language: str, text: str) -> dict[str, str | dict[st
 
     return {'name': language, 'freq': frequency_dict}
 
-    if not isinstance(language, str) or not isinstance(text, str):
-        return None
-    freq_dict = calculate_frequencies(tokenize(text))
-    if not isinstance(freq_dict, dict):
-        return None
-    return {"name": language, "freq": freq_dict}
-
 
 def calculate_mse(predicted: list, actual: list) -> float | None:
     """
@@ -95,17 +73,6 @@ def calculate_mse(predicted: list, actual: list) -> float | None:
         sum_diff += (freq_value[0] - freq_value[1]) ** 2
     mse = sum_diff / len(predicted)
     return mse
-
-    if not (isinstance(predicted, list)
-            and isinstance(actual, list)
-            and len(predicted) == len(actual)
-            ):
-        return None
-    quantity_of_meanings = len(predicted)
-    sum_of_diff = 0
-    for count, meaning in enumerate(predicted):
-        sum_of_diff += (meaning - actual[count]) ** 2
-    return sum_of_diff / quantity_of_meanings
 
 
 def compare_profiles(
@@ -140,26 +107,11 @@ def compare_profiles(
     calculated_mse = calculate_mse(unknown_freq, compare_freq)
     return calculated_mse
 
-    if not isinstance(unknown_profile, dict) or not isinstance(profile_to_compare, dict):
-        return None
-    if not ('name' or 'freq') in unknown_profile or not ('name' or 'freq') in profile_to_compare:
-        return None
-    unknown = set(unknown_profile['freq'])
-    comparable = set(profile_to_compare['freq'])
-    set_of_tokens = unknown.union(comparable)
-    unknown_freq = []
-    to_compare_freq = []
-    for token in set_of_tokens:
-        unknown_freq.append(unknown_profile['freq'].get(token, 0))
-        to_compare_freq.append(profile_to_compare['freq'].get(token, 0))
-    mse_to_compare = calculate_mse(unknown_freq, to_compare_freq)
-    return mse_to_compare
-
 
 def detect_language(
         unknown_profile: dict[str, str | dict[str, float]],
         profile_1: dict[str, str | dict[str, float]],
-        profile_2: dict[str, str | dict[str, float]]
+        profile_2: dict[str, str | dict[str, float]],
 ) -> str | None:
     """
     Detects the language of an unknown profile
@@ -189,19 +141,6 @@ def detect_language(
         return str(profile_1['name'])
 
     return [profile_1['name'], profile_2['name']].sort()
-
-    if (not isinstance(unknown_profile, dict)
-            or not isinstance(profile_1, dict)
-            or not isinstance(profile_2, dict)):
-        return None
-    mse_1 = compare_profiles(unknown_profile, profile_1)
-    mse_2 = compare_profiles(unknown_profile, profile_2)
-    if isinstance(mse_1, float) and isinstance(mse_2, float):
-        if mse_1 < mse_2:
-            return str(profile_1['name'])
-        if mse_2 < mse_1:
-            return str(profile_2['name'])
-    return str([profile_1['name'], profile_2['name']].sort())
 
 
 def load_profile(path_to_file: str) -> dict | None:
