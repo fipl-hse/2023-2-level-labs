@@ -22,7 +22,7 @@ def prepare_word(
     ):
         return None
 
-    tokenized_word = [symbol for symbol in raw_word]
+    tokenized_word = list(raw_word)
     if start_of_word:
         tokenized_word.insert(0, start_of_word)
     if end_of_word:
