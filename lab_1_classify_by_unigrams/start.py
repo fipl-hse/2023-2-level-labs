@@ -15,7 +15,8 @@ def main() -> None:
         unknown_text = file_to_read_unk.read()
     result = None
     assert result, "Detection result is None"
-
+    import main
+    print(tokenize(en_text))
 
 if __name__ == "__main__":
     main()

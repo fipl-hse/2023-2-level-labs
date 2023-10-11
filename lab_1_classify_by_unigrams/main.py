@@ -3,15 +3,16 @@ Lab 1
 Language detection
 """
 
-
 def tokenize(text: str) -> list[str] | None:
-    """
-    Splits a text into tokens, converts the tokens into lowercase,
-    removes punctuation, digits and other symbols
-    :param text: a text
-    :return: a list of lower-cased tokens without punctuation
-    """
-
+    punc = '''!()-[]{};:'"\\,<>./?@#$%^&*_~ '''
+    if type(text) == str:
+        for symbol in text:
+            if symbol in punc:  # проверка, не является ли символ пробелом или знаокм препинания
+                text = text.replace(symbol, '')  # удаление пробелов и знаков препинания
+        return [symbol for symbol in text]
+    else:
+        return 'None'
+print(tokenize(en_text))
 
 def calculate_frequencies(tokens: list[str] | None) -> dict[str, float] | None:
     """
