@@ -53,11 +53,6 @@ def create_language_profile(language: str, text: str) -> dict[str, str | dict[st
 
     return {'name': language, 'freq': frequency_dict}
 
-    dict_of_freq = calculate_frequencies(tokenize(text))
-
-    if not isinstance(dict_of_freq, dict):
-        return None
-    return {'name': language, 'freq': dict_of_freq}
 
 def calculate_mse(predicted: list, actual: list) -> float | None:
     """
@@ -112,29 +107,6 @@ def compare_profiles(
     calculated_mse = calculate_mse(unknown_freq, compare_freq)
     return calculated_mse
 
-    if not isinstance(unknown_profile, dict) or not isinstance(profile_to_compare, dict):
-        return None
-    if ('name' or 'freq') not in (unknown_profile or profile_to_compare):
-        return None
-
-    joint_elements = [[],[]]
-    unknown_frequence = unknown_profile['freq']
-    compare_frequence = profile_to_compare['freq']
-
-    for symbol in compare_frequence:
-        if symbol in unknown_frequence:
-            joint_elements[0].append(unknown_frequence.get(symbol))
-            joint_elements[1].append(compare_frequence.get(symbol))
-        else:
-            joint_elements[0].append(0.0)
-            joint_elements[1].append(compare_frequence.get(symbol))
-
-    for element in unknown_frequence:
-        if element not in compare_frequence:
-            joint_elements[1].append(0.0)
-            joint_elements[0].append(unknown_frequence.get(element))
-
-    return calculate_mse(joint_elements[0], joint_elements[1])
 
 def detect_language(
         unknown_profile: dict[str, str | dict[str, float]],
@@ -170,21 +142,6 @@ def detect_language(
 
     return [profile_1['name'], profile_2['name']].sort()
 
-    mse_1 = compare_profiles(unknown_profile, profile_1)
-    mse_2 = compare_profiles(unknown_profile, profile_2)
-
-    name_1 = str(profile_1['name'])
-    name_2 = str(profile_2['name'])
-
-    if isinstance(mse_1, float) and isinstance(mse_2, float):
-        if mse_1 > mse_2:
-            return name_2
-        if mse_2 > mse_1:
-            return name_1
-        list_of_names = [name_1, name_2]
-        list_of_names.sort()
-        return list_of_names[0]
-    return None
 
 def load_profile(path_to_file: str) -> dict | None:
     """
