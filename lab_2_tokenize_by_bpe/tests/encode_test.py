@@ -54,11 +54,9 @@ class EncodeTest(unittest.TestCase):
             134, 16, 16, 139, 34, 101, 142, 170, 174, 180, 196, 178, 143, 102,
             34, 129, 134, 130, 129, 140, 138, 129, 16, 34, 192, 188, 187, 30,
             83, 176, 173, 76, 19, 184, 85, 171, 185, 47, 177, 180, 11, 18, 129,
-            134, 16, 129, 140, 138, 137, 139, 139, 15
-        ]
+            134, 16, 129, 140, 138, 137, 139, 139, 15]
         actual = encode(self.original_text_with_unk, self.vocabulary, None,
                         '</s>', '<unk>')
-        print('\n', expected, actual, sep='\n')
         self.assertEqual(expected, actual)
 
     @pytest.mark.lab_2_tokenize_by_bpe

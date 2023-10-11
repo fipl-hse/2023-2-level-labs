@@ -203,10 +203,10 @@ def decode(
     decoded_text = [''] * len(encoded_text)
 
     for token, identifier in vocabulary.items():
-        if token == end_of_word_token and identifier in encoded_dict:
+        if end_of_word_token in token and identifier in encoded_dict:
             space_indexes = encoded_dict[identifier]
             for space_index in space_indexes:
-                decoded_text[space_index] = ' '
+                decoded_text[space_index] = token[:-4] + ' '
         elif identifier in encoded_dict:
             indexes = encoded_dict[identifier]
             for index in indexes:
@@ -331,6 +331,15 @@ def calculate_precision(
     :param reference: expected sequence of n-grams
     :return: value of Precision metric
     """
+    if not isinstance(actual, list) or not isinstance(reference, list):
+        return None
+    if len(actual) == 0:
+        return 0.0
+    True_positive = 0
+    for token in set(reference):
+        if token in actual:
+            True_positive += actual.count(token)
+    return float(True_positive / len(reference))
 
 
 def geo_mean(precisions: list[float], max_order: int) -> float | None:
