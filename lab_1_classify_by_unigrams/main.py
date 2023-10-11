@@ -17,7 +17,6 @@ def tokenize(text: str) -> list[str] | None:
 
     return [token.lower() for token in text if token.isalpha()]
 
-    return [i for i in text.lower() if i.isalpha()]
 
 def calculate_frequencies(tokens: list[str] | None) -> dict[str, float] | None:
     """
@@ -54,11 +53,6 @@ def create_language_profile(language: str, text: str) -> dict[str, str | dict[st
 
     return {'name': language, 'freq': frequency_dict}
 
-    tokens = tokenize(text)
-    dict_freq = calculate_frequencies(tokens)
-    profile = {'name': language,
-               'freq': dict_freq}
-    return profile
 
 def calculate_mse(predicted: list, actual: list) -> float | None:
     """
