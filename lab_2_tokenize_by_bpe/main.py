@@ -335,11 +335,11 @@ def calculate_precision(
         return None
     if len(actual) == 0:
         return 0.0
-    True_positive = 0
+    true_positive = 0
     for token in set(reference):
         if token in actual:
-            True_positive += actual.count(token)
-    return float(True_positive / len(reference))
+            true_positive += actual.count(token)
+    return float(true_positive / len(reference))
 
 
 def geo_mean(precisions: list[float], max_order: int) -> float | None:
