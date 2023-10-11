@@ -17,10 +17,6 @@ def tokenize(text: str) -> list[str] | None:
 
     return [token.lower() for token in text if token.isalpha()]
 
-    if not isinstance(text, str):
-        return None
-    return [i.lower() for i in text if i.isalpha()]
-
 
 def calculate_frequencies(tokens: list[str] | None) -> dict[str, float] | None:
     """
@@ -56,20 +52,6 @@ def create_language_profile(language: str, text: str) -> dict[str, str | dict[st
         return None
 
     return {'name': language, 'freq': frequency_dict}
-
-    if not (isinstance(language, str) and isinstance(text, str)):
-        return None
-
-    tokens = tokenize(text)
-    frequencies = calculate_frequencies(tokens)
-
-    if not isinstance(frequencies, dict):
-        return None
-
-    return {
-        "name": language,
-        "freq": frequencies
-    }
 
 
 def calculate_mse(predicted: list, actual: list) -> float | None:
@@ -251,18 +233,6 @@ def detect_language_advanced(unknown_profile: dict[str, str | dict[str, float]],
     if not isinstance(detected_language, list):
         return None
 
-    return detected_language
-
-    if not (
-            isinstance(unknown_profile, dict)
-            and isinstance(known_profiles, list)
-    ):
-        return None
-
-    detected_language = []
-    for profile in known_profiles:
-        detected_language.append((profile['name'], compare_profiles(profile, unknown_profile)))
-    detected_language = sorted(detected_language, key=lambda x: (x[1], x[0]))
     return detected_language
 
 
