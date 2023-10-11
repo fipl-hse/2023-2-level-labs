@@ -203,7 +203,7 @@ def decode(
     decoded_text = [''] * len(encoded_text)
 
     for token, identifier in vocabulary.items():
-        if end_of_word_token in token and identifier in encoded_dict:
+        if end_of_word_token and end_of_word_token in token and identifier in encoded_dict:
             space_indexes = encoded_dict[identifier]
             for space_index in space_indexes:
                 decoded_text[space_index] = token[:-4] + ' '
