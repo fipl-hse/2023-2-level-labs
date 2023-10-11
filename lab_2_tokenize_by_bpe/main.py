@@ -24,7 +24,6 @@ def prepare_word(
         new_word = new_word + tuple(end_of_word.split())
     if not end_of_word and start_of_word:
         new_word = tuple(start_of_word.split()) + new_word
-
     return new_word
 
 
