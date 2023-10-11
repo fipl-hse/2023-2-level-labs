@@ -84,7 +84,7 @@ def merge_tokens(
     """
     if not isinstance(word_frequencies, dict) or not isinstance(pair, tuple):
         return None
-    # merged_dict ={}
+    # merged_dict = {}
 
 
 def train(
