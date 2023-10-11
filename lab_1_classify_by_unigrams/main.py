@@ -15,7 +15,7 @@ def tokenize(text: str) -> list[str] | None:
     if not isinstance(text, str):
         return None
     punc = ''''1234567890!"#$%&'()’*º+,-./:;<=>?@[\\]^_\' \'`{\\\n|}~'''
-    return [token.lower() for token in text if token not in punc]
+    return [token for token in text.lower() if token not in punc]
 
 
 def calculate_frequencies(tokens: list[str] | None) -> dict[str, float] | None:
@@ -27,10 +27,11 @@ def calculate_frequencies(tokens: list[str] | None) -> dict[str, float] | None:
     if not isinstance(tokens, list):
         return None
     freqs_dict = {}
-    for token in tokens:
+    len_tokens = len(tokens)
+    for token in set(tokens):
         if not isinstance(token, str):
             return None
-        freqs_dict[token] = tokens.count(token) / len(tokens)
+        freqs_dict[token] = tokens.count(token) / len_tokens
     return freqs_dict
 
 
@@ -62,8 +63,8 @@ def calculate_mse(predicted: list, actual: list) -> float | None:
             and len(predicted) == len(actual)):
         return None
     mse_calculation = 0
-    for num, act in enumerate(actual):
-        mse_calculation += (act - predicted[num])**2
+    for act, pred in zip(actual, predicted):
+        mse_calculation += (act - pred)**2
     return mse_calculation / len(actual)
 
 
