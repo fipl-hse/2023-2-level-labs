@@ -28,7 +28,7 @@ class TokenizeWordTest(unittest.TestCase):
         """
         Ideal tokenize word scenario
         """
-        expected = [0, 186, 29]  # 196, 34
+        expected = [0, 186, 29]
         actual = tokenize_word(self.ideal_word, self.vocabulary, '</s>', '<unk>')
         self.assertEqual(expected, actual)
 
