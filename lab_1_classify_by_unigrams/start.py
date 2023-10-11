@@ -16,14 +16,15 @@ def main() -> None:
     with open("assets/texts/unknown.txt", "r", encoding="utf-8") as file_to_read_unk:
         unknown_text = file_to_read_unk.read()
 
-    #result = None
-    #assert result, "Detection result is None"
     en_tokens = lab_1_classify_by_unigrams.main.tokenize(en_text)
     print(en_tokens)
     frequencies = lab_1_classify_by_unigrams.main.calculate_frequencies(en_tokens)
     print(frequencies)
     language_profile = lab_1_classify_by_unigrams.main.create_language_profile('en', en_text)
     print(language_profile)
+    result = language_profile
+    assert result, "Detection result is None"
+
 
 if __name__ == "__main__":
     main()

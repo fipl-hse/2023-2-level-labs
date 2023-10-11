@@ -13,17 +13,17 @@ Data Type: Lists
 
 # Create a list
 example = [1, 2, 3]
-print(example)
+#print(example)
 
 # List concatenation, the original list doesn't change
 first_list = example + [2, 3, 4]
-print(example)
-print(first_list)
+#print(example)
+#print(first_list)
 
 # List changes
 example.append(2)
 example.extend([2, 3, 4])
-print(example)
+#print(example)
 
 # List copy
 # import copy
@@ -31,9 +31,9 @@ print(example)
 
 first_test = [1, 2, 3, [1, 2, 3]]
 test_copy = first_test.copy()
-print(first_test, test_copy)
+#print(first_test, test_copy)
 test_copy[3].append(4)
-print(first_test, test_copy)
+#print(first_test, test_copy)
 
 first_test = [1, 2, 3, [1, 2, 3]]
 # test_deepcopy = copy.deepcopy(first_test)
@@ -59,12 +59,16 @@ def count_evens(nums: list) -> int:
     Return the number of even ints in the given array.
     """
     # student realization goes here
-
+    count_ev = 0
+    for element in nums:
+        if element % 2 == 0:
+            count_ev += 1
+    print(count_ev)
 
 # Function calls with expected result:
-# count_evens([2, 1, 2, 3, 4]) → 3
-# count_evens([2, 2, 0]) → 3
-# count_evens([1, 3, 5]) → 0
+count_evens([2, 1, 2, 3, 4])
+count_evens([2, 2, 0])
+count_evens([1, 3, 5])
 
 # Task 2:
 # easy level
@@ -76,12 +80,18 @@ def sum13(nums: list) -> int:
     also do not count.
     """
     # student realization goes here
-
+    nums = []
+    for num in nums:
+        if num != 13:
+            nums += num
+        else:
+            break
+    print(sum13)
 # Function calls with expected result:
-# sum13([1, 2, 2, 1]) → 6
-# sum13([1, 1]) → 2
-# sum13([1, 2, 2, 1, 13]) → 6
-# sum13([1, 2, 2, 1, 13, 5, 6]) → 6
+sum13([1, 2, 2, 1])
+# sum13([1, 1])
+# sum13([1, 2, 2, 1, 13])
+# sum13([1, 2, 2, 1, 13, 5, 6])
 
 
 # Task 3
@@ -94,11 +104,28 @@ def sum67(nums: list) -> int:
     Return 0 for no numbers.
     """
     # student realization goes here
+    count = 0
+    index_6 = nums.index(6)
+    index_7 = nums.index(7)
+    if 6 in nums:
+        index_6 = nums.index(6)
+    else:
+        index_6 = len(nums) + 1
+    if 7 in nums:
+        index_7 = nums.index(7)
+    else:
+        index_7 = len(nums) + 1
 
+    for i,number in enumerate(nums):
+        if i >= index_6 and i <= index_7:
+            continue
+        count += number
+
+    print(count)
 # Function calls with expected result:
-# sum67([1, 2, 2]) → 5
-# sum67([1, 2, 2, 6, 99, 99, 7]) → 5
-# sum67([1, 1, 6, 7, 2]) → 4
+#sum67([1, 2, 2])
+sum67([1, 2, 2, 6, 99, 99, 7])
+sum67([1, 1, 6, 7, 2])
 
 
 # Task 4
@@ -109,9 +136,15 @@ def create_phone_number(nums: list) -> str:
     that returns a string of those numbers in the form of a phone number.
     """
     # student realization goes here
+    nums = ''.join(str(i) for i in nums)
+    first_part = nums[:3]
+    second_part = nums[3:6]
+    third_part = nums[6:]
 
+    phone_number = f"({first_part}) {second_part}-{third_part}"
+    print(phone_number)
 # Function calls with expected result:
-# create_phone_number([1, 2, 3, 4, 5, 6, 7, 8, 9, 0])
+create_phone_number([1, 2, 3, 4, 5, 6, 7, 8, 9, 0])
 # => returns "(123) 456-7890"
 
 
