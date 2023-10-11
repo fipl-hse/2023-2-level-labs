@@ -40,6 +40,7 @@ def collect_frequencies(
     if not prepare_word(text, start_of_word, end_of_word):
         return None
     raw_words = {prepare_word(words, start_of_word, end_of_word): text.count(text.split()[j]) for j, words in enumerate(text.split())}
+
     return raw_words
 
 
