@@ -84,8 +84,8 @@ def compare_profiles(
     """
     if not isinstance(unknown_profile, dict) or not isinstance(profile_to_compare, dict):
         return None
-    if (not ("name" or "freq") in unknown_profile.keys() or
-            not ("name" or "freq") in profile_to_compare.keys()):
+    if (not (("name" or "freq") in unknown_profile.keys()) or
+            not (("name" or "freq") in profile_to_compare.keys())):
         return None
     freq_unknown_profile = unknown_profile["freq"]
     freq_profile_to_compare = profile_to_compare["freq"]
@@ -117,7 +117,6 @@ def detect_language(
     if (not isinstance(unknown_profile, dict) or not isinstance(profile_1, dict)
             or not isinstance(profile_2, dict)):
         return None
-
     comp_profile_1 = compare_profiles(unknown_profile, profile_1)
     comp_profile_2 = compare_profiles(unknown_profile, profile_2)
     if comp_profile_1 < comp_profile_2:
@@ -128,6 +127,7 @@ def detect_language(
         profile_both = [profile_1['name'], profile_2['name']]
         profile_both.sort()
         return str(profile_both[0])
+    return None
 
 
 def load_profile(path_to_file: str) -> dict | None:
