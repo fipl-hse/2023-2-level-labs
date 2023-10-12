@@ -31,11 +31,11 @@ def calculate_frequencies(tokens: list[str] | None) -> dict[str, float] | None:
     :param tokens: a list of tokens
     :return: a dictionary with frequencies
     """
-    if not isinstance(tokens, list):
+    if not isinstance(tokens,list):
         return None
     else:
         for token in tokens:
-            if not isinstance(token, str):
+            if not isinstance(token,str):
                 return None
             else:
                 numberallitems=len(tokens)
@@ -56,9 +56,9 @@ def create_language_profile(language: str, text: str) -> dict[str, str | dict[st
     :param text: a text
     :return: a dictionary with two keys – name, freq
     """
-    if not isinstance(language, str):
+    if not isinstance(language,str):
         return None
-    elif not isinstance(text, str):
+    elif not isinstance(text,str):
         return None
     else:
         goodlist=tokenize(text)
@@ -95,7 +95,7 @@ def compare_profiles(
     :param profile_to_compare: a dictionary of a profile to compare the unknown profile to
     :return: the distance between the profiles
     """
-    if not isinstance(unknown_profile, dict) or not isinstance(profile_to_compare, dict):
+    if not isinstance(unknown_profile,dict) or not isinstance(profile_to_compare,dict):
         return None
     if "name" not in unknown_profile or "freq" not in unknown_profile:
         return None
@@ -134,11 +134,11 @@ def detect_language(
     :param profile_2: a dictionary of a known profile
     :return: a language
     """
-    if not isinstance(unknown_profile, dict) or not isinstance(profile_1, dict) or not isinstance(profile_2, dict):
+    if not isinstance(unknown_profile,dict) or not isinstance(profile_1,dict) or not isinstance(profile_2,dict):
         return None
     else:
-            mse_1=compare_profiles(unknown_profile, profile_1)
-            mse_2=compare_profiles(unknown_profile, profile_2)
+            mse_1=compare_profiles(unknown_profile,profile_1)
+            mse_2=compare_profiles(unknown_profile,profile_2)
             lang_1=str(profile_1["name"])
             lang_2=str(profile_2["name"])
             if mse_1>mse_2:
