@@ -18,7 +18,7 @@ def tokenize(text: str) -> list[str] | None:
     for item in wronglist:
         if item.isalpha():
             goodlist.append(item)
-    return(goodlist)
+    return goodlist
 
 
 
@@ -66,7 +66,7 @@ def create_language_profile(language: str, text: str) -> dict[str, str | dict[st
         profilel={"name": language, "freq": {}}
         for key, value in freq_dict.items():
             profilel["freq"][key]=(value)
-    return(profilel)
+    return profilel
 
 
 
