@@ -2,7 +2,6 @@
 Lab 2
 BPE and machine translation evaluation
 """
-from typing import Tuple, List
 
 
 def prepare_word(
@@ -24,8 +23,8 @@ def prepare_word(
         token_list.insert(0, start_of_word)
     if end_of_word is not None:
         token_list.append(end_of_word)
-    token_tuple = tuple(token_list)
-    return token_tuple
+    return tuple(token_list)
+
 
 
 def collect_frequencies(
@@ -47,7 +46,8 @@ def collect_frequencies(
         split_word = prepare_word(i, start_of_word, end_of_word)
         if split_word is None:
             return None
-        tokens_dictionary[split_word] = text.split().count(i)
+        if split_word not in tokens_dictionary:
+            tokens_dictionary[split_word] = text.split().count(i)
     return tokens_dictionary
 
 
@@ -63,7 +63,7 @@ def count_tokens_pairs(
         return None
     pairs_dictionary = {}
     for token in word_frequencies:
-        for i, index in enumerate(token):
+        for index, letter in enumerate(token):
             token_pair = (token[index], token[index + 1])
             if token_pair not in pairs_dictionary:
                 pairs_dictionary[token_pair] = 0
