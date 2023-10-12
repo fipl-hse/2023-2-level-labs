@@ -13,14 +13,13 @@ def tokenize(text: str) -> list[str] | None:
     """
     if not isinstance(text, str):
         return None
-    else:
-        import string
-        text1 = text.lower()
-        for symbol in text1:
-            if symbol in string.punctuation:  # проверка, не является ли символ пробелом или знаком препинания
-                text1 = text1.replace(symbol, '')  # удаление пробелов и знаков препинания
-        tokens = [symbol for symbol in text1]
-        return tokens
+    import string
+    text1 = text.lower()
+    for symbol in text1:
+        if symbol in string.punctuation:  # проверка, не является ли символ пробелом или знаком препинания
+            text1 = text1.replace(symbol, '')  # удаление пробелов и знаков препинания
+    tokens = [symbol for symbol in text1]
+    return tokens
 
 
 def calculate_frequencies(tokens: list[str] | None) -> dict[str, float] | None:
@@ -32,13 +31,12 @@ def calculate_frequencies(tokens: list[str] | None) -> dict[str, float] | None:
     if not isinstance(tokens, list):
         return None
     else:
-        dict_freq = {}
-        for token in tokens:
-            if not isinstance(token, str):
-                return None
-            else:
-                dict_freq[token] = tokens.count(token)/len(tokens)
-        return dict_freq
+    dict_freq = {}
+    for token in tokens:
+        if not isinstance(token, str):
+            return None
+    dict_freq[token] = tokens.count(token)/len(tokens)
+    return dict_freq
 
 
 def create_language_profile(language: str, text: str) -> dict[str, str | dict[str, float]] | None:
@@ -50,13 +48,12 @@ def create_language_profile(language: str, text: str) -> dict[str, str | dict[st
     """
     if not isinstance(language, str) or not isinstance(text, str):
         return None
-    else:
-        freq_dict = calculate_frequencies(tokenize(text))
-        language_dict = {
-            "name": language,
-            "freq": freq_dict
-        }
-        return language_dict
+    freq_dict = calculate_frequencies(tokenize(text))
+    language_dict = {
+        "name": language,
+        "freq": freq_dict
+    }
+    return language_dict
 
 
 def calculate_mse(predicted: list, actual: list) -> float | None:
@@ -69,13 +66,12 @@ def calculate_mse(predicted: list, actual: list) -> float | None:
 
     if not isinstance(predicted, list) or not isinstance(actual, list):
         return None
-    else:
-        sumlist = []
-        for predicted_value in predicted:
-            for actual_value in actual:
-                sumlist = sumlist.append((actual_value - predicted_value) ** 2)
-        mse = sum(sumlist)/len(sumlist)
-        return mse
+    sumlist = []
+    for predicted_value in predicted:
+        for actual_value in actual:
+            sumlist = sumlist.append((actual_value - predicted_value) ** 2)
+    mse = sum(sumlist)/len(sumlist)
+    return mse
 
 
 def compare_profiles(
@@ -98,17 +94,17 @@ def compare_profiles(
             and 'freq' in profile_to_compare
     ):
         return None
-    else:
-        unknown_freq = []
-        compare_freq = []
-        unknown_tokens = set(unknown_profile['freq'].keys())
-        compare_tokens = set(profile_to_compare['freq'].keys())
-        tokens = unknown_tokens | compare_tokens
-        for token in tokens:
-            unknown_freq.append(unknown_profile['freq'].get(token, 0.0))
-            compare_freq.append(profile_to_compare['freq'].get(token, 0.0))
-        mse = calculate_mse(unknown_freq, compare_freq)
-        return mse
+
+    unknown_freq = []
+    compare_freq = []
+    unknown_tokens = set(unknown_profile['freq'].keys())
+    compare_tokens = set(profile_to_compare['freq'].keys())
+    tokens = unknown_tokens | compare_tokens
+    for token in tokens:
+        unknown_freq.append(unknown_profile['freq'].get(token, 0.0))
+        compare_freq.append(profile_to_compare['freq'].get(token, 0.0))
+    mse = calculate_mse(unknown_freq, compare_freq)
+    return mse
 
 
 def detect_language(
