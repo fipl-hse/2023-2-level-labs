@@ -38,12 +38,24 @@ def create_language_profile(language: str, text: str) -> dict[str, str | dict[st
     else:
         return None
 
-#create_language_profile(en, en_text)
-
-
 
 
 def calculate_mse(predicted: list, actual: list) -> float | None:
+    if type(predicted) == list and type(actual) == list:
+        sumlist = []
+        for p in predicted:
+            for y in actual:
+                sumlist = sumlist.append((y - p) ** 2)
+                mse = sum(sumlist)/sumlist.count()
+                return mse
+    else:
+        return None
+
+
+#MSE = frac{sum(y_{i} - p_{i})^2}{n}
+
+
+
     """
     Calculates mean squared error between predicted and actual values
     :param predicted: a list of predicted values
@@ -56,6 +68,22 @@ def compare_profiles(
         unknown_profile: dict[str, str | dict[str, float]],
         profile_to_compare: dict[str, str | dict[str, float]]
 ) -> float | None:
+    if type(unknown_profile) == dict and type(profile_to_compare) == dict and 'name' in unknown_profile and 'name' in profile_to_compare and 'freq' in unknown_profile and 'freq' in profile_to_compare:
+        unknown_freq = []
+        compare_freq = []
+        unknown_tokens = set(unknown_profile['freq'].keys())
+        compare_tokens = set(profile_to_compare['freq'].keys())
+        tokens = unknown_tokens | compare_tokens
+        for token in tokens:
+            unknown_freq.append(unknown_profile['freq'].get(token, 0.0))
+            compare_freq.append(profile_to_compare['freq'].get(token, 0.0))
+        mse = calculate_mse(unknown_freq, compare_freq)
+        return mse
+    else:
+        return None
+
+
+
     """
     Compares profiles and calculates the distance using symbols
     :param unknown_profile: a dictionary of an unknown profile

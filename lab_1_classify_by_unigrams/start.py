@@ -16,7 +16,10 @@ def main() -> None:
     result = None
     assert result, "Detection result is None"
     import main
-    print(tokenize(en_text))
+    tokenize(en_text)
+    calculate_frequencies(tokenize(en_text))
+    create_language_profile(en,en_text)
+
 
 if __name__ == "__main__":
     main()
