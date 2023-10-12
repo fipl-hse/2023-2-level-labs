@@ -87,19 +87,15 @@ def compare_profiles(
     if (not ("name" or "freq") in unknown_profile.keys() or not ("name" or "freq")
                                                                 in profile_to_compare.keys()):
         return None
-    freq_unknown_profile = unknown_profile.get("freq")
-    freq_profile_to_compare = profile_to_compare.get("freq")
-    for i in freq_unknown_profile.keys():
-        if i not in freq_profile_to_compare:
-            freq_profile_to_compare[i] = 0.0
-    for i in freq_profile_to_compare.keys():
-        if i not in freq_unknown_profile.keys():
-            freq_unknown_profile[i] = 0.0
-    freq_unknown_profile = dict(sorted(freq_unknown_profile.items()))
-    freq_profile_to_compare = dict(sorted(freq_profile_to_compare.items()))
-    freq_profile_to_compare = list(freq_profile_to_compare.values())
-    freq_unknown_profile = list(freq_unknown_profile.values())
-    return calculate_mse(freq_unknown_profile, freq_profile_to_compare)
+    freq_unknown_profile = unknown_profile["freq"]
+    freq_profile_to_compare = profile_to_compare["freq"]
+    union_profiles = set(freq_unknown_profile.keys()) | set(freq_profile_to_compare.keys())
+    freq_list_unknown = []
+    freq_list_compare = []
+    for i in union_profiles:
+        freq_list_unknown.append(freq_unknown_profile.get(i, 0))
+        freq_list_compare.append(freq_profile_to_compare.get(i, 0))
+    return calculate_mse(freq_list_unknown, freq_list_compare)
 
 
 def detect_language(
