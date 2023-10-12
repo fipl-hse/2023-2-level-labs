@@ -76,7 +76,12 @@ def sum13(nums: list) -> int:
     also do not count.
     """
     # student realization goes here
-
+   res = 0
+   for number in nums:
+       if number == 13:
+           break
+       res += number
+   return res
 # Function calls with expected result:
 # sum13([1, 2, 2, 1]) → 6
 # sum13([1, 1]) → 2
@@ -94,7 +99,10 @@ def sum67(nums: list) -> int:
     Return 0 for no numbers.
     """
     # student realization goes here
-
+    sum_67 = 0
+    index_ignore = ()
+    if 6 in nums
+        index_ignore = range(nums_index)
 # Function calls with expected result:
 # sum67([1, 2, 2]) → 5
 # sum67([1, 2, 2, 6, 99, 99, 7]) → 5
@@ -130,6 +138,7 @@ def check_exam(correct_answers: list, student_answers: list) -> int:
     If the score < 0, return 0.
     """
     # student realization goes here
+
 
 # Function calls with expected result:
 # check_exam(["a", "a", "b", "b"], ["a", "c", "b", "d"]) → 6
