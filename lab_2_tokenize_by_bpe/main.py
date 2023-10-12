@@ -141,20 +141,17 @@ def get_vocabulary(
     if not (isinstance(word_frequencies, dict)
             and isinstance(unknown_token, str)):
         return None
+    vocab_dict = {}
     not_good_list = set()
-    for token in word_frequencies.keys():
-        list_token = list(token)
-        for tkn in list_token:
+    for tuples in word_frequencies.keys():
+        for tkn in tuples:
             not_good_list.add(tkn)
             for symb in tkn:
                 not_good_list.add(symb)
     not_good_list.add(unknown_token)
-    tokens_list = sorted(not_good_list, key=lambda x: (-len(x), x))
-    vocab_dict = {}
-    index = 0
-    for token in tokens_list:
-        vocab_dict[token] = index
-        index += 1
+    len_sorted = sorted(not_good_list, key=lambda x: (-len(x), x))
+    for num, token in enumerate(len_sorted):
+        vocab_dict[token] = num
     return vocab_dict
 
 
@@ -168,6 +165,20 @@ def decode(
     :param end_of_word_token: an end-of-word token
     :return: decoded sequence
     """
+    if not (isinstance(encoded_text, list)
+            and isinstance(vocabulary, dict)
+            and (isinstance(end_of_word_token, str) or end_of_word_token is None)):
+        return None
+    text = ''
+    inv_d = {value: key for key, value in vocabulary.items()}
+    for num in encoded_text:
+        if inv_d[num] == end_of_word_token:
+            text += ' '
+        elif num in vocabulary.values():
+            text += inv_d[num]
+    return text
+
+
 
 
 def tokenize_word(
