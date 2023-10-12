@@ -49,10 +49,10 @@ def create_language_profile(language: str, text: str) -> dict[str, str | dict[st
     :return: a dictionary with two keys – name, freq
     """
     calculated_freq = calculate_frequencies(tokenize(text))
-    if not isinstance(language, str) or not isinstance(text, str) or not isinstance(calculated_freq, dict):
+    if (not isinstance(language, str) or not isinstance(text, str)
+            or not isinstance(calculated_freq, dict)):
         return None
-    profile = {"name": language, "freq": calculated_freq}
-    return profile
+    return {"name": language, "freq": calculated_freq}
 
 
 def calculate_mse(predicted: list, actual: list) -> float | None:
@@ -117,14 +117,15 @@ def detect_language(
     if not (isinstance(unknown_profile, dict) and isinstance(profile_1, dict)
             and isinstance(profile_2, dict)):
         return None
-    if compare_profiles(unknown_profile, profile_1) < compare_profiles(unknown_profile, profile_2):
-        return profile_1["name"]
-    if (compare_profiles(unknown_profile, profile_1) >
-            compare_profiles(unknown_profile, profile_2)):
-        return profile_2["name"]
-    if compare_profiles(unknown_profile, profile_1) == compare_profiles(unknown_profile, profile_2):
+    comp_profile_1 = compare_profiles(unknown_profile, profile_1)
+    comp_profile_2 = compare_profiles(unknown_profile, profile_2)
+    if comp_profile_1 < comp_profile_2:
+        return str(profile_1["name"])
+    if comp_profile_1 > comp_profile_2:
+        return str(profile_2["name"])
+    if comp_profile_1 == comp_profile_2:
         sorted_names = sorted(list([profile_1["name"]] + [profile_2["name"]]))
-        return sorted_names[0]
+        return str(sorted_names[0])
 
 
 def load_profile(path_to_file: str) -> dict | None:
