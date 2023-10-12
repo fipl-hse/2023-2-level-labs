@@ -220,10 +220,9 @@ def decode(
     decoded_text = ''
     for number in encoded_text:
         token = vocab_inverted[number]
-        if token[-4:-2] == end_of_word_token or token == end_of_word_token:
-            decoded_text += ' '
-        else:
-            decoded_text += token
+        if end_of_word_token and end_of_word_token in token:
+            token = token.replace(end_of_word_token, ' ')
+        decoded_text += token
 
     return decoded_text
 
