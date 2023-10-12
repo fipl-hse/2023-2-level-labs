@@ -115,17 +115,12 @@ def train(
     paired_words = count_tokens_pairs(word_frequencies)
     if not paired_words:
         return None
-
     num_merges = min(num_merges, len(paired_words))
-
     max_occur = max(paired_words.values())
     good_pairs = [pair for pair, freq in paired_words.items() if freq == max_occur]
-
     max_len = max(len(''.join(pair)) for pair in good_pairs)
     longest_pairs = [pair for pair in good_pairs if len(''.join(pair)) == max_len]
-
     best_pair = sorted(longest_pairs)
-
     word_frequencies = merge_tokens(word_frequencies, best_pair[0])
     if not word_frequencies:
         return None
@@ -143,6 +138,24 @@ def get_vocabulary(
     :param unknown_token: a token to signify an unknown token
     :return: dictionary in the form of <token: identifier>
     """
+    if not (isinstance(word_frequencies, dict)
+            and isinstance(unknown_token, str)):
+        return None
+    not_good_list = set()
+    for token in word_frequencies.keys():
+        list_token = list(token)
+        for tkn in list_token:
+            not_good_list.add(tkn)
+            for symb in tkn:
+                not_good_list.add(symb)
+    not_good_list.add(unknown_token)
+    tokens_list = sorted(not_good_list, key=lambda x: (-len(x), x))
+    vocab_dict = {}
+    index = 0
+    for token in tokens_list:
+        vocab_dict[token] = index
+        index += 1
+    return vocab_dict
 
 
 def decode(
