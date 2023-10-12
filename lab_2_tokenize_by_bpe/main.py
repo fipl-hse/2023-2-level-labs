@@ -166,6 +166,26 @@ def decode(
     :param end_of_word_token: an end-of-word token
     :return: decoded sequence
     """
+    if (not isinstance(encoded_text, list) or
+        not isinstance(vocabulary, dict)):
+        return None
+    if (isinstance(end_of_word_token, str) or
+        end_of_word_token is None):
+        decoded_text = ''
+        for num in encoded_text:
+            for token in vocabulary:
+                if vocabulary[token] == num and end_of_word_token is not None:
+                    if token == end_of_word_token:
+                        decoded_text += ' '
+                    else:
+                        decoded_text += token
+                if vocabulary[token] == num and end_of_word_token is None:
+                    if token == end_of_word_token:
+                        decoded_text += ''
+                    else:
+                        decoded_text += token
+        return decoded_text
+    return None
 
 
 def tokenize_word(
