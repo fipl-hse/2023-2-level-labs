@@ -64,7 +64,7 @@ def calculate_mse(predicted: list, actual: list) -> float | None:
 
     difference = 0
     for i, pred in enumerate(predicted):
-        difference += (pred-actual[i])**2
+        difference += (pred - actual[i]) ** 2
 
     return difference / len(predicted)
 
@@ -80,11 +80,11 @@ def compare_profiles(
     :return: the distance between the profiles
     """
     if not (
-        isinstance(unknown_profile, dict) and isinstance(profile_to_compare, dict)
-        and 'freq' in unknown_profile
-        and 'freq' in profile_to_compare
-        and 'name' in unknown_profile
-        and 'name' in profile_to_compare
+            isinstance(unknown_profile, dict) and isinstance(profile_to_compare, dict)
+            and 'freq' in unknown_profile
+            and 'freq' in profile_to_compare
+            and 'name' in unknown_profile
+            and 'name' in profile_to_compare
     ):
         return None
 
@@ -146,6 +146,27 @@ def preprocess_profile(profile: dict) -> dict[str, str | dict] | None:
     :return: a dict with a lower-cased loaded profile
     with relative frequencies without unnecessary ngrams
     """
+    if not (
+            isinstance(profile, dict)
+            and "name" in profile
+            and "freq" in profile
+            and "n_words" in profile
+    ):
+        return None
+
+    profile_new = {
+        "name": profile["name"],
+        "freq": {}
+    }
+
+    for i in profile["freq"]:
+        if i.lower() in profile_new["freq"]:
+            profile_new["freq"][i.lower()] += profile["freq"][i] / profile["n_words"][0]
+
+        elif len(i) == 1 and i.isalpha:
+            profile_new["freq"][i.lower()] = profile["freq"][i] / profile["n_words"][0]
+
+    return profile_new
 
 
 def collect_profiles(paths_to_profiles: list) -> list[dict[str, str | dict[str, float]]] | None:
@@ -154,6 +175,18 @@ def collect_profiles(paths_to_profiles: list) -> list[dict[str, str | dict[str, 
     :paths_to_profiles: a list of strings to the profiles
     :return: a list of loaded profiles
     """
+    if not (
+            isinstance(paths_to_profiles, list)
+            and all(isinstance(path, str) for path in paths_to_profiles)
+    ):
+        return None
+
+    profiles = []
+
+    for path in paths_to_profiles:
+        profiles.append(preprocess_profile(load_profile(path)))
+
+    return profiles
 
 
 def detect_language_advanced(unknown_profile: dict[str, str | dict[str, float]],
@@ -164,6 +197,17 @@ def detect_language_advanced(unknown_profile: dict[str, str | dict[str, float]],
     :param known_profiles: a list of known profiles
     :return: a sorted list of tuples containing a language and a distance
     """
+    if not (
+        isinstance(unknown_profile, dict)
+        and isinstance(known_profiles, list)
+    ):
+        return None
+
+    langs = [(i, compare_profiles(i, unknown_profile)) for i in known_profiles]
+
+    langs = sorted(langs, key=lambda x: (x[1], x[0]))
+
+    return langs
 
 
 def print_report(detections: list[tuple[str, float]]) -> None:
@@ -171,3 +215,8 @@ def print_report(detections: list[tuple[str, float]]) -> None:
     Prints report for detection of language
     :param detections: a list with distances for each available language
     """
+    if isinstance(detections, list):
+        return None
+
+    for detect in detections:
+        print(f'{detect[0]}: MSE {detect[1]:.5f}')
