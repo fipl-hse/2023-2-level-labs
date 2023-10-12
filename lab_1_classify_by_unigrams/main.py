@@ -77,7 +77,7 @@ def calculate_mse(predicted: list, actual: list) -> float | None:
     :param actual: a list of actual values
     :return: the score
     """
-    if not isinstance(predicted, list) or not isinstance(actual, list) or len(predicted) != len(actual):
+    if not isinstance(predicted,list) or not isinstance(actual,list) or len(predicted) != len(actual):
         return None
     else:
         numerator = 0
