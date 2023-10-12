@@ -4,26 +4,42 @@ Language detection
 """
 
 def tokenize(text: str) -> list[str] | None:
-    punc = '''!()-[]{};:'"\\,<>./?@#$%^&*_~ '''
+    punc = '''0123456789!()-[]{};:'"\\,<>./?@#$%^&*_~ '''
     if type(text) == str:
         text1 = text.lower()
         for symbol in text1:
             if symbol in punc:  # проверка, не является ли символ пробелом или знаокм препинания
                 text1 = text1.replace(symbol, '')  # удаление пробелов и знаков препинания
-        return [symbol for symbol in text1]
+        tokens = [symbol for symbol in text1]
+        return tokens
     else:
         return None
 
-
 def calculate_frequencies(tokens: list[str] | None) -> dict[str, float] | None:
-    """
-    Calculates frequencies of given tokens
-    :param tokens: a list of tokens
-    :return: a dictionary with frequencies
-    """
-
+    if type (tokens) == list:
+        dict = {}
+        for token in tokens:
+            if type(token) == str:
+                dict[token] = tokens.count(token)/len(tokens)
+            else:
+                return None
+        return dict
+    else:
+        return None
 
 def create_language_profile(language: str, text: str) -> dict[str, str | dict[str, float]] | None:
+    if type(language) == str and type(text) == str:
+        freq_dict = calculate_frequencies(tokenize(text))
+        dict = {
+            "name": language,
+            "freq": freq_dict
+        }
+        return dict
+    else:
+        return None
+
+#create_language_profile(en, en_text)
+
     """
     Creates a language profile
     :param language: a language
