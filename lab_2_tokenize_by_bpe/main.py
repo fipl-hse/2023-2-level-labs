@@ -142,9 +142,9 @@ def get_vocabulary(
     tokens = [unknown_token]
     for word in word_frequencies:
         tokens.extend(list(word))
-    for token in tokens:
-        if tokens.count(token) > 1:
-            tokens.remove(token)
+        for symbol in ''.join(word):
+            if symbol not in tokens:
+                tokens.append(symbol)
     tokens_by_length = []
     max_length = max([len(token) for token in tokens])
     while max_length != 0:
