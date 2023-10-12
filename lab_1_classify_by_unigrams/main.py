@@ -84,18 +84,21 @@ def compare_profiles(
     """
     if not isinstance(unknown_profile, dict) or not isinstance(profile_to_compare, dict):
         return None
-    if (not ("name" or "freq") in unknown_profile.keys() or not ("name" or "freq")
-                                                                in profile_to_compare.keys()):
+    if (not ("name" or "freq") in unknown_profile.keys() or
+            not ("name" or "freq") in profile_to_compare.keys()):
         return None
     freq_unknown_profile = unknown_profile["freq"]
     freq_profile_to_compare = profile_to_compare["freq"]
-    union_profiles = set(freq_unknown_profile.keys()) | set(freq_profile_to_compare.keys())
+    union_profiles = []
+    union_profiles = list(freq_unknown_profile.keys())[:]
+    for i in freq_profile_to_compare:
+        if i not in union_profiles:
+            union_profiles += i
     freq_list_unknown = []
     freq_list_compare = []
     for i in union_profiles:
         freq_list_unknown.append(freq_unknown_profile.get(i, 0))
         freq_list_compare.append(freq_profile_to_compare.get(i, 0))
-
     return calculate_mse(freq_list_unknown, freq_list_compare)
 
 
@@ -111,9 +114,10 @@ def detect_language(
     :param profile_2: a dictionary of a known profile
     :return: a language
     """
-    if not (isinstance(unknown_profile, dict) and isinstance(profile_1, dict)
-            and isinstance(profile_2, dict)):
+    if (not isinstance(unknown_profile, dict) or not isinstance(profile_1, dict)
+            or not isinstance(profile_2, dict)):
         return None
+
     comp_profile_1 = compare_profiles(unknown_profile, profile_1)
     comp_profile_2 = compare_profiles(unknown_profile, profile_2)
     if comp_profile_1 < comp_profile_2:
@@ -124,6 +128,7 @@ def detect_language(
         profile_both = [profile_1['name'], profile_2['name']]
         profile_both.sort()
         return str(profile_both[0])
+
 
 def load_profile(path_to_file: str) -> dict | None:
     """
