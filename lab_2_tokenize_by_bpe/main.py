@@ -188,7 +188,6 @@ def decode(
     return None
 
 
-
 def tokenize_word(
     word: tuple[str, ...], vocabulary: dict[str, int], end_of_word: str | None, unknown_token: str
 ) -> list[int] | None:
