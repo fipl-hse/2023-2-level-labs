@@ -124,7 +124,8 @@ def detect_language(
         if comp_profile_1 == comp_profile_2:
             sorted_names = ([profile_1["name"]] + [profile_2["name"]]).sort
             return str(sorted_names)
-
+    else:
+        return None
 
 def load_profile(path_to_file: str) -> dict | None:
     """
