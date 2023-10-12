@@ -90,8 +90,7 @@ def compare_profiles(
 
     unknown = []
     to_compare = []
-
-    for cur_tok in unknown_profile['freq'] | profile_to_compare['freq']:
+    for cur_tok in set(unknown_profile.get('freq').keys()) | set(profile_to_compare.get('freq').keys()):
         unknown.append(unknown_profile['freq'].get(cur_tok, 0))
         to_compare.append(profile_to_compare['freq'].get(cur_tok, 0))
 
@@ -124,7 +123,7 @@ def detect_language(
         return profile_1['name']
     if mse1 > mse2:
         return profile_2['name']
-    return sorted([profile_1['name'], profile_2['name']])[0]
+    return str(sorted([profile_1['name'], profile_2['name']])[0])
 
 
 def load_profile(path_to_file: str) -> dict | None:
