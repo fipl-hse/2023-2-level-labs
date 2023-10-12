@@ -14,12 +14,8 @@ def tokenize(text: str) -> list[str] | None:
     if not isinstance(text, str):
         return None
     import string
-    text1 = text.lower()
-    for symbol in text1:
-        if symbol in string.punctuation:  # проверка, не является ли символ пробелом или знаком препинания
-            text1 = text1.replace(symbol, '')  # удаление пробелов и знаков препинания
-    tokens = [symbol for symbol in text1]
-    return tokens
+    low_text = text.lower()
+    return [symbol for symbol in low_text if ((symbol not in string.punctuation) and (symbol != ' '))]
 
 
 def calculate_frequencies(tokens: list[str] | None) -> dict[str, float] | None:
@@ -48,6 +44,8 @@ def create_language_profile(language: str, text: str) -> dict[str, str | dict[st
     if not isinstance(language, str) or not isinstance(text, str):
         return None
     freq_dict = calculate_frequencies(tokenize(text))
+    if not freq_dict:
+        return None
     language_dict = {
         "name": language,
         "freq": freq_dict
