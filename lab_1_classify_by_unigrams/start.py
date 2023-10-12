@@ -6,8 +6,8 @@ Language detection starter
 from main import tokenize
 from main import calculate_frequencies
 from main import create_language_profile
-from main import calculate_mse
-from main import compare_profiles
+
+
 def main() -> None:
     """
     Launches an implementation
@@ -23,8 +23,7 @@ def main() -> None:
     tokenize(en_text)
     calculate_frequencies(tokenize(en_text))
     create_language_profile('en', en_text)
-    calculate_mse()
-    compare_profiles()
+
 
 if __name__ == "__main__":
     main()
