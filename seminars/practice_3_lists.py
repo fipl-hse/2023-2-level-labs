@@ -100,6 +100,9 @@ def sum67(nums: list) -> int:
 # sum67([1, 2, 2, 6, 99, 99, 7]) → 5
 # sum67([1, 1, 6, 7, 2]) → 4
 
+sum67 = 0
+index_ignore = ()
+
 
 # Task 4
 # easy level
