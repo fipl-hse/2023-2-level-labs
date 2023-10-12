@@ -15,8 +15,9 @@ def tokenize(text: str) -> list[str] | None:
     """
     if not isinstance(text, str):
         return None
-    text = ''.join(symbol for symbol in text if symbol.isalpha()).lower()
-    return text
+    text_in_string = ''.join(symbol for symbol in text if symbol.isalpha()).lower()
+    text_in_list = list(text_in_string)
+    return text_in_list
 
 
 def calculate_frequencies(tokens: list[str] | None) -> dict[str, float] | None:
@@ -91,14 +92,6 @@ def compare_profiles(
     return calculate_mse(unknown_profile_list, compare_profiles_list)
 
 
-
-
-
-
-
-
-
-
 def detect_language(
         unknown_profile: dict[str, str | dict[str, float]],
         profile_1: dict[str, str | dict[str, float]],
@@ -111,6 +104,19 @@ def detect_language(
     :param profile_2: a dictionary of a known profile
     :return: a language
     """
+    if not isinstance(unknown_profile, dict) or not isinstance(profile_1, dict) \
+            or not isinstance(profile_2, dict):
+        return None
+
+    the_first_mse = compare_profiles(unknown_profile, profile_1)
+    the_second_mse = compare_profiles(unknown_profile, profile_2)
+
+    if isinstance(the_first_mse, float) and isinstance(the_second_mse, float):
+        if the_first_mse < the_second_mse:
+            return str(profile_1['name'])
+        if the_first_mse > the_second_mse:
+            return str(profile_2['name'])
+    return str([profile_1['name'], profile_2['name']].sort())
 
 
 def load_profile(path_to_file: str) -> dict | None:
