@@ -8,7 +8,7 @@ def tokenize(text: str) -> list[str] | None:
     if type(text) == str:
         text1 = text.lower()
         for symbol in text1:
-            if symbol in punc:  # проверка, не является ли символ пробелом или знаокм препинания
+            if symbol in punc:  # проверка, не является ли символ пробелом или знаком препинания
                 text1 = text1.replace(symbol, '')  # удаление пробелов и знаков препинания
         tokens = [symbol for symbol in text1]
         return tokens
@@ -40,12 +40,7 @@ def create_language_profile(language: str, text: str) -> dict[str, str | dict[st
 
 #create_language_profile(en, en_text)
 
-    """
-    Creates a language profile
-    :param language: a language
-    :param text: a text
-    :return: a dictionary with two keys – name, freq
-    """
+
 
 
 def calculate_mse(predicted: list, actual: list) -> float | None:
