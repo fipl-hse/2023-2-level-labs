@@ -118,7 +118,9 @@ def detect_language(
     comp_profile_2 = compare_profiles(unknown_profile, profile_2)
     if not isinstance(comp_profile_1, float) and not isinstance(comp_profile_2, float):
         return None
-    profile_both = [profile_1["name"]] + [profile_2["name"]]
+    # profile_both = [profile_1["name"]] + [profile_2["name"]]
+    # profile_both.sort()
+    profile_both = [profile_1['name'], profile_2['name']]
     profile_both.sort()
     if comp_profile_1 < comp_profile_2:
         return str(profile_1["name"])
