@@ -3,7 +3,6 @@ Lab 2
 BPE and machine translation evaluation
 """
 
-
 def prepare_word(
     raw_word: str, start_of_word: str | None, end_of_word: str | None
 ) -> tuple[str, ...] | None:
@@ -14,7 +13,18 @@ def prepare_word(
     :param end_of_word: a token that signifies the end of word
     :return: preprocessed word
     """
+    if not isinstance(raw_word, str) \
+        or not (isinstance(start_of_word, str) or start_of_word is None) \
+        or not (isinstance(end_of_word, str) or end_of_word is None):
+        return None
+    list_of_tokens = list(raw_word)
 
+    if start_of_word:
+        list_of_tokens.insert(0, start_of_word)
+    if end_of_word:
+        list_of_tokens.append(end_of_word)
+
+    return tuple(list_of_tokens)
 
 def collect_frequencies(
     text: str, start_of_word: str | None, end_of_word: str
