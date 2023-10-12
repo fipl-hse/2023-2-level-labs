@@ -95,6 +95,7 @@ def compare_profiles(
     for i in union_profiles:
         freq_list_unknown.append(freq_unknown_profile.get(i, 0))
         freq_list_compare.append(freq_profile_to_compare.get(i, 0))
+
     return calculate_mse(freq_list_unknown, freq_list_compare)
 
 
@@ -115,13 +116,14 @@ def detect_language(
         return None
     comp_profile_1 = compare_profiles(unknown_profile, profile_1)
     comp_profile_2 = compare_profiles(unknown_profile, profile_2)
-    sorted_names = ([profile_1["name"]] + [profile_2["name"]]).sort
     if isinstance(comp_profile_1, float) and isinstance(comp_profile_2, float):
         if comp_profile_1 < comp_profile_2:
             return str(profile_1["name"])
         if comp_profile_1 > comp_profile_2:
             return str(profile_2["name"])
-    return str(sorted_names)
+        if comp_profile_1 == comp_profile_2:
+            sorted_names = ([profile_1["name"]] + [profile_2["name"]]).sort
+            return str(sorted_names)
 
 
 def load_profile(path_to_file: str) -> dict | None:
