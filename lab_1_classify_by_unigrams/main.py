@@ -7,7 +7,7 @@ Language detection
 def tokenize(text: str) -> list[str] | None:
     if not isinstance(text, str):
         return None
-    punctuation = "0123456789!#$%&'()*+,-./:;<=>?@[\]^_`{|}~"
+    punctuation = "0123456789!#$%&'()\*+,-./.:;<=>?@[\\]^_`{|}~"
     tokens = text.lower()
     for token in tokens:
         if token in punctuation:
