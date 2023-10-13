@@ -45,6 +45,11 @@ def create_language_profile(language: str, text: str) -> dict[str, str | dict[st
     if not isinstance(language, str) or not isinstance(text, str):
         return None
     symbols = tokenize(text)
+    if symbols is None:
+        return None
+    calculate_frequencies_dict = calculate_frequencies(symbols)
+    if calculate_frequencies_dict is None:
+        return None
     dictionary = dict({"name": language, "freq": calculate_frequencies(symbols)})
     return dictionary
 
@@ -61,7 +66,7 @@ def calculate_mse(predicted: list, actual: list) -> float | None:
         return None
     len_of_actual_numbers = len(actual)
     difference_squared = [(i - k) ** 2 for i, k in zip(actual, predicted)]
-    mse = sum(difference_squared) / len_of_actual_numbers
+    mse = float(sum(difference_squared) / len_of_actual_numbers)
     return mse
 
 
