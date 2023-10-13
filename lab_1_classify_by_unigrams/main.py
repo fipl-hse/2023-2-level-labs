@@ -46,7 +46,7 @@ def create_language_profile(language: str, text: str) -> dict[str, str | dict[st
     if not isinstance(language, str) or not isinstance(text, str):
         return None
 
-    return dict((("name", language), ("freq", calculate_frequencies(tokenize(text)))))
+    return {(("name", language), ("freq", calculate_frequencies(tokenize(text))))}
 
 
 def calculate_mse(predicted: list, actual: list) -> float | None:
@@ -129,7 +129,7 @@ def detect_language(
         return str(profile_1['name'])
     if mse1 > mse2:
         return str(profile_2['name'])
-    return str(sorted([profile_1['name'], profile_2['name']])[0])
+    return sorted([profile_1['name'], profile_2['name']])[0]
 
 
 def load_profile(path_to_file: str) -> dict | None:
@@ -141,7 +141,7 @@ def load_profile(path_to_file: str) -> dict | None:
     if not isinstance(path_to_file, str):
         return None
 
-    return json.loads(open(path_to_file, encoding='utf-8').read())
+    return json.loads(open(path_to_file, "r", encoding='utf-8').read())
 
 
 def preprocess_profile(profile: dict) -> dict[str, str | dict] | None:
