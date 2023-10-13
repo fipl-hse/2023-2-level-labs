@@ -211,6 +211,7 @@ def collect_profiles(paths_to_profiles: list) -> list[dict[str, str | dict[str, 
         profiles.append(preprocessed_profile)
         if not preprocessed_profile:
             return None
+
     return profiles
 
 
