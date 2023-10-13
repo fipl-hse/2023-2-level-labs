@@ -83,8 +83,8 @@ def compare_profiles(
     compare_profiles_list = []
     set_meaning1 = set(unknown_profile['freq'].keys())
     set_meaning2 = set(profile_to_compare['freq'].keys())
-    inion_of_sets = set_meaning1 | set_meaning2
-    for elem in inion_of_sets:
+    combined_sets = set_meaning1 | set_meaning2
+    for elem in combined_sets:
         unknown_profile_list.append(unknown_profile['freq'].get(elem, 0))
         compare_profiles_list.append(profile_to_compare['freq'].get(elem, 0))
     return calculate_mse(unknown_profile_list, compare_profiles_list)
