@@ -42,12 +42,12 @@ def collect_frequencies(
             not isinstance(end_of_word, str):
         return None
     tokens_dictionary = {}
-    for i in text.split():
-        split_word = prepare_word(i, start_of_word, end_of_word)
+    for token in text.split():
+        split_word = prepare_word(token, start_of_word, end_of_word)
         if split_word is None:
             return None
         if split_word not in tokens_dictionary:
-            tokens_dictionary[split_word] = text.split().count(i)
+            tokens_dictionary[split_word] = text.split().count(token)
     return tokens_dictionary
 
 
@@ -79,7 +79,21 @@ def merge_tokens(
     :param pair: a pair of tokens to be merged
     :return: dictionary in the form of <preprocessed word: number of occurrences>
     """
-
+    if not isinstance(word_frequencies, dict) or not isinstance(pair, tuple):
+        return None
+    merge_token_dictionary = {}
+    for token in word_frequencies:
+        token_list = list(token)
+        if f"'{pair[0]}','{pair[1]}'" in token:
+            pair_list = list(pair)
+            new_token = pair_list[0] + pair_list[1]
+            for index in range(len(token_list) - 1):
+                if (token[index], token[index + 1]) == pair:
+                    token_list[index: index + 1] = [new_token]
+            merge_token_dictionary[tuple(token_list)] = word_frequencies[token]
+        else:
+            merge_token_dictionary[token] = word_frequencies[token]
+    return merge_token_dictionary
 
 def train(
     word_frequencies: dict[tuple[str, ...], int] | None, num_merges: int
