@@ -20,7 +20,7 @@ def main() -> None:
     if isinstance(unknown, dict) and isinstance(known, list):
         result = detect_language(unknown, known)
     if result:
-        print_answer(result)
+        print_report(result)
 
     assert result, "Detection result is None"
 
