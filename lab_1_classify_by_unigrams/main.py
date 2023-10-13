@@ -97,8 +97,8 @@ def compare_profiles(
     freq_list_unknown = []
     freq_list_compare = []
     for i in union_profiles:
-        freq_list_unknown.append(freq_unknown_profile.get(i, 0))
-        freq_list_compare.append(freq_profile_to_compare.get(i, 0))
+        freq_list_unknown.append(freq_unknown_profile.get(i, 0.0))
+        freq_list_compare.append(freq_profile_to_compare.get(i, 0.0))
     return calculate_mse(freq_list_unknown, freq_list_compare)
 
 
