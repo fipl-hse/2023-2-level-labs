@@ -3,6 +3,8 @@ Lab 1
 Language detection
 """
 
+import string
+
 
 def tokenize(text: str) -> list[str] | None:
     """
@@ -13,9 +15,9 @@ def tokenize(text: str) -> list[str] | None:
     """
     if not isinstance(text, str):
         return None
-    import string
     low_text = text.lower()
-    return [symbol for symbol in low_text if ((symbol not in string.punctuation) and (symbol != ' '))]
+    return [symbol for symbol in low_text
+            if ((symbol not in string.punctuation) and (symbol != ' '))]
 
 
 def calculate_frequencies(tokens: list[str] | None) -> dict[str, float] | None:
@@ -65,8 +67,9 @@ def calculate_mse(predicted: list, actual: list) -> float | None:
             or not isinstance(actual, list)
             or len(predicted) != len(actual)):
         return None
-    summa = sum([(actual_value - predicted_value) ** 2
-                 for actual_value, predicted_value in zip(actual, predicted)])
+    summa = 0
+    for actual_value, predicted_value in zip(actual, predicted):
+        summa += ((actual_value - predicted_value) ** 2)
     mse = summa/len(predicted)
     return mse
 
