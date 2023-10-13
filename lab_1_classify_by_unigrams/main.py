@@ -17,9 +17,6 @@ def tokenize(text: str) -> list[str] | None:
     return [token for token in text.lower() if token.isalpha()]
 
 
-
-
-
 def calculate_frequencies(tokens: list[str] | None) -> dict[str, float] | None:
     """
     Calculates frequencies of given tokens
@@ -53,7 +50,6 @@ def create_language_profile(language: str, text: str) -> dict[str, str | dict[st
     return {'name': language, 'freq': frequencies}
 
 
-
 def calculate_mse(predicted: list, actual: list) -> float | None:
     """
     Calculates mean squared error between predicted and actual values
@@ -66,10 +62,9 @@ def calculate_mse(predicted: list, actual: list) -> float | None:
     if not isinstance(predicted, list) or not isinstance(actual, list):
         return None
     mse_sum = 0
-    for index, element in enumerate(predicted):
-        mse_sum += (element - actual[index]) ** 2
+    for pred, act in zip(predicted, actual):
+        mse_sum += (pred - act) ** 2
     return mse_sum / len(predicted)
-
 
 
 def compare_profiles(
@@ -106,7 +101,6 @@ def compare_profiles(
     return calculate_mse(unk_prof_freq, prof_comp_freq)
 
 
-
 def detect_language(
         unknown_profile: dict[str, str | dict[str, float]],
         profile_1: dict[str, str | dict[str, float]],
@@ -139,7 +133,6 @@ def detect_language(
     return None
 
 
-
 def load_profile(path_to_file: str) -> dict | None:
     """
     Loads a language profile
@@ -153,7 +146,6 @@ def load_profile(path_to_file: str) -> dict | None:
     if isinstance(profile, dict):
         return profile
     return None
-
 
 
 def preprocess_profile(profile: dict) -> dict[str, str | dict] | None:
@@ -188,8 +180,6 @@ def preprocess_profile(profile: dict) -> dict[str, str | dict] | None:
     return None
 
 
-
-
 def collect_profiles(paths_to_profiles: list) -> list[dict[str, str | dict[str, float]]] | None:
     """
     Collects profiles for a given path
@@ -208,8 +198,6 @@ def collect_profiles(paths_to_profiles: list) -> list[dict[str, str | dict[str, 
     return list_of_profiles
 
 
-
-
 def detect_language_advanced(unknown_profile: dict[str, str | dict[str, float]],
                              known_profiles: list) -> list | None:
     """
@@ -225,7 +213,6 @@ def detect_language_advanced(unknown_profile: dict[str, str | dict[str, float]],
         mse_list.append((profile.get('name'), compare_profiles(unknown_profile, profile)))
     mse_list.sort(key=lambda a: (a[1], a[0]))
     return mse_list
-
 
 
 def print_report(detections: list[tuple[str, float]]) -> None:
