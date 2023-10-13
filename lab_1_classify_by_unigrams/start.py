@@ -3,8 +3,7 @@ Language detection starter
 """
 
 
-from main import tokenize
-from main import calculate_frequencies
+from main import detect_language
 from main import create_language_profile
 
 
@@ -18,11 +17,15 @@ def main() -> None:
         de_text = file_to_read_de.read()
     with open("assets/texts/unknown.txt", "r", encoding="utf-8") as file_to_read_unk:
         unknown_text = file_to_read_unk.read()
-    result = None
-    assert result, "Detection result is None"
-    tokenize(en_text)
-    calculate_frequencies(tokenize(en_text))
-    create_language_profile('en', en_text)
+
+    unknown_prof = create_language_profile("unknown", unknown_text)
+    en_prof = create_language_profile("en", en_text)
+    de_prof = create_language_profile("de", de_text)
+    if (isinstance(unknown_prof, dict)
+            and isinstance(en_prof, dict)
+            and isinstance(de_prof, dict)):
+        result = detect_language(unknown_prof, en_prof, de_prof)
+        assert result, "Detection result is None"
 
 
 if __name__ == "__main__":

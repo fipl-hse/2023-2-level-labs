@@ -82,14 +82,12 @@ def compare_profiles(
         :return: the distance between the profiles
         """
 
-    if not (
-            isinstance(unknown_profile, dict)
+    if not (isinstance(unknown_profile, dict)
             and isinstance(profile_to_compare, dict)
             and 'name' in unknown_profile
             and 'name' in profile_to_compare
             and 'freq' in unknown_profile
-            and 'freq' in profile_to_compare
-    ):
+            and 'freq' in profile_to_compare):
         return None
 
     unknown_freq = []
