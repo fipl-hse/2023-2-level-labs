@@ -43,3 +43,23 @@ matrix:
   sources:
   - 'docs/**/*[^(_ru)].md'
   default_encoding: utf-8
+
+- name: Docstrings
+  aspell:
+    lang: en
+    ignore-case: true
+  dictionary:
+    wordlists:
+    - config/spellcheck/.wordlist_en.txt
+    encoding: utf-8
+    output: build/dictionary/dictionary.dic
+  pipeline:
+  - pyspelling.filters.python:
+      docstrings: true
+      comments: false
+  sources:
+  - 'lab*/**/*.py'
+  - 'lab*/*.py'
+  - 'config/**/*.py'
+  - 'config/*.py'
+  default_encoding: utf-8
