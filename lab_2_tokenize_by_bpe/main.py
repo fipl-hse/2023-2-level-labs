@@ -84,12 +84,10 @@ def merge_tokens(
     merge_token_dictionary = {}
     for token in word_frequencies:
         token_list = list(token)
-        if f"'{pair[0]}','{pair[1]}'" in token:
-            pair_list = list(pair)
-            new_token = pair_list[0] + pair_list[1]
-            for index in range(len(token_list) - 1):
+        if str(pair)[0:2] in str(token):
+            for index in range(len(token) - 1):
                 if (token[index], token[index + 1]) == pair:
-                    token_list[index: index + 1] = [new_token]
+                    token_list[index: index + 2] = [''.join(pair)]
             merge_token_dictionary[tuple(token_list)] = word_frequencies[token]
         else:
             merge_token_dictionary[token] = word_frequencies[token]
@@ -104,6 +102,8 @@ def train(
     :param num_merges: required number of new tokens
     :return: dictionary in the form of <preprocessed word: number of occurrences>
     """
+    if not isinstance(word_frequencies, dict) or not isinstance(num_merges, int):
+        return None
 
 
 def get_vocabulary(
@@ -115,6 +115,7 @@ def get_vocabulary(
     :param unknown_token: a token to signify an unknown token
     :return: dictionary in the form of <token: identifier>
     """
+
 
 
 def decode(
