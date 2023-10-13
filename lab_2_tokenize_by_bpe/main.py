@@ -59,6 +59,17 @@ def count_tokens_pairs(
     :param word_frequencies: dictionary in the form of <preprocessed word: number of occurrences>
     :return: dictionary in the form of <token pair: number of occurrences>
     """
+    if not isinstance(word_frequencies, dict):
+        return None
+    token_pairs = {}
+    for word in word_frequencies:
+        for index, token in enumerate(word):
+            if (index + 1) < len(word):
+                if (token, word[index + 1]) in token_pairs:
+                    token_pairs[(token, word[index + 1])] += 1
+                else:
+                    token_pairs[(token, word[index + 1])] = 1
+    return token_pairs
 
 
 def merge_tokens(
@@ -70,6 +81,20 @@ def merge_tokens(
     :param pair: a pair of tokens to be merged
     :return: dictionary in the form of <preprocessed word: number of occurrences>
     """
+    if not isinstance(word_frequencies, dict) or not isinstance(pair, tuple):
+        return None
+    for word in word_frequencies:
+        if pair[0] and pair[1] in word:
+            new_word = [word]
+            replace_index = word.index(pair[0])
+            new_pair = pair[0] + pair[1]
+            new_word[replace_index] = new_pair
+            new_word.pop(replace_index + 1)
+            new_word = tuple(new_word)
+            word_frequencies[new_word] = word_frequencies[word]
+            del word
+    return word_frequencies
+print(merge_tokens({('Д', 'ю', 'й', 'м', 'о', 'в', 'о', 'ч', 'к', 'а', '\n', 'Г', 'а', 'н', 'с', '</s>') : 1}, ('ч','к')))
 
 
 def train(
