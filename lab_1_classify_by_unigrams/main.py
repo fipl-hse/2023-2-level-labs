@@ -13,7 +13,7 @@ def tokenize(text: str) -> list[str] | None:
     """
     tokenized_text = []
     for i in text:
-        if i isalpha():
+        if i.isalpha():
             tokenized_text += i
     # if not isinstance(text, str):
     #     return None
