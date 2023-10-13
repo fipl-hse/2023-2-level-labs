@@ -14,7 +14,7 @@ def prepare_word(
     :param end_of_word: a token that signifies the end of word
     :return: preprocessed word
     """
-
+    print('hello worl')
 
 def collect_frequencies(
     text: str, start_of_word: str | None, end_of_word: str
