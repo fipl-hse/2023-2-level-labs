@@ -4,8 +4,6 @@ Language detection
 """
 
 
-
-
 def tokenize(text: str) -> list[str] | None:
     """
     Splits a text into tokens, converts the tokens into lowercase,
