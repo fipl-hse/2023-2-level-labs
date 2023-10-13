@@ -1,9 +1,10 @@
 """
 BPE Tokenizer starter
 """
-from pathlib import Path
-from lab_2_tokenize_by_bpe.main import collect_frequencies, train, get_vocabulary, decode
 
+from pathlib import Path
+
+from lab_2_tokenize_by_bpe.main import collect_frequencies, train, get_vocabulary, decode
 
 
 def main() -> None:
@@ -21,7 +22,7 @@ def main() -> None:
     secret_prepared = []
     for num in secret.split():
         secret_prepared.append(int(num))
-    result = decode(secret_prepared, vocab, '<unk>')
+    result = decode(secret_prepared, vocab, '</s>')
     print(result)
     assert result, "Encoding is not working"
 
