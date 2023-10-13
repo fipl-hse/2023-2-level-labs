@@ -147,7 +147,13 @@ def load_profile(path_to_file: str) -> dict | None:
     if not isinstance(path_to_file, str):
         return None
 
-    return json.loads(open(path_to_file, "r", encoding='utf-8').read())
+    with open(path_to_file, 'r', encoding='utf-8') as f:
+        profile = json.load(f)
+
+    if not isinstance(profile, dict):
+        return None
+
+    return profile
 
 
 def preprocess_profile(profile: dict) -> dict[str, str | dict] | None:
