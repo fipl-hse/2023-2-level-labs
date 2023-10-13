@@ -15,10 +15,6 @@ def tokenize(text: str) -> list[str] | None:
     for i in text:
         if i.isalpha():
             tokenized_text += i
-    # if not isinstance(text, str):
-    #     return None
-    # punctuation = '''!()-[]{};:'",<>./?@#$%^&*_~0123456789\\ '''
-    # return [el for el in text.lower() if el not in punctuation]
     return tokenized_text
 
 def calculate_frequencies(tokens: list[str] | None) -> dict[str, float] | None:
