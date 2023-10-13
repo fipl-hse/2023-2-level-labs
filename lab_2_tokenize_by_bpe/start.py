@@ -12,7 +12,7 @@ def main() -> None:
     assets_path = Path(__file__).parent / 'assets'
     with open(assets_path / 'text.txt', 'r', encoding='utf-8') as text_file:
         text = text_file.read()
-    with open(assets_path / 'secrets/secret_5.txt', 'r', encoding='utf-8') as text_file:
+    with open(assets_path / 'secrets/secret_4.txt', 'r', encoding='utf-8') as text_file:
         secret = text_file.read()
     word_frequencies = collect_frequencies(text, None, '</s>')
     massive_merge = train(word_frequencies, 100)

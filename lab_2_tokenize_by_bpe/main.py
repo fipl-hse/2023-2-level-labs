@@ -139,12 +139,14 @@ def get_vocabulary(
     if (not isinstance(word_frequencies, dict) or
         not isinstance(unknown_token, str)):
         return None
-    tokens = [unknown_token]
+    tokens = set()
+    tokens.add(unknown_token)
     for word in word_frequencies:
-        tokens.extend(list(word))
+        for token in word:
+            tokens.add(token)
         for symbol in ''.join(word):
-            if symbol not in tokens:
-                tokens.append(symbol)
+            tokens.add(symbol)
+    tokens = list(tokens)
     tokens_by_length = []
     max_length = max([len(token) for token in tokens])
     while max_length != 0:
@@ -184,6 +186,9 @@ def decode(
                         decoded_text += ''
                     else:
                         decoded_text += token
+        if end_of_word_token is not None:
+            if end_of_word_token in decoded_text:
+                decoded_text.replace(end_of_word_token, ' ')
         return decoded_text
     return None
 
