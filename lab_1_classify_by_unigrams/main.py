@@ -119,7 +119,11 @@ def detect_language(
             or not isinstance(profile_2, dict)):
         return None
     comp_profile_1 = compare_profiles(unknown_profile, profile_1)
+    if not isinstance(comp_profile_1, float):
+        return None
     comp_profile_2 = compare_profiles(unknown_profile, profile_2)
+    if not isinstance(comp_profile_2, float):
+        return None
     if comp_profile_1 < comp_profile_2:
         return str(profile_1["name"])
     if comp_profile_1 > comp_profile_2:
