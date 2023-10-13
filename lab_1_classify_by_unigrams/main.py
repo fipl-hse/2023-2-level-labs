@@ -7,9 +7,12 @@ Language detection
 def tokenize(text: str) -> list[str] | None:
     if not isinstance(text, str):
         return None
-    text_without_punctuation = ''.join(char for char in text if char not in str.punctuation)
-    characters = list(text_without_punctuation.lower())
+    characters = []
+    for char in text.lower():
+        if char.isalpha():
+            characters.append(char)
     return characters
+
 
 
 def calculate_frequencies(tokens: list[str] | None) -> dict[str, float] | None:
