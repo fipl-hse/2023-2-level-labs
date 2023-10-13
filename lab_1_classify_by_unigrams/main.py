@@ -3,7 +3,7 @@ Lab 1
 Language detection
 """
 
-from string import punctuation
+
 
 
 def tokenize(text: str) -> list[str] | None:
@@ -62,8 +62,8 @@ def calculate_mse(predicted: list, actual: list) -> float | None:
             or len(predicted) != len(actual):
         return None
     len_of_actual_numbers = len(actual)
-    difference_squared = sum([(i - k) ** 2 for i, k in zip(actual, predicted)])
-    mse = difference_squared / len_of_actual_numbers
+    difference_squared = [(i - k) ** 2 for i, k in zip(actual, predicted)]
+    mse = sum(difference_squared) / len_of_actual_numbers
     return mse
 
 
