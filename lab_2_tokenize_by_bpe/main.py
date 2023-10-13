@@ -14,7 +14,11 @@ def prepare_word(
     :param end_of_word: a token that signifies the end of word
     :return: preprocessed word
     """
-    print('hello worl')
+    if not isinstance(raw_word, str) or not (isinstance(
+            start_of_word, str) or start_of_word is None) or not (
+            isinstance(end_of_word, str) or end_of_word is None):
+        return None
+
 
 def collect_frequencies(
     text: str, start_of_word: str | None, end_of_word: str
