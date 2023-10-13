@@ -117,7 +117,7 @@ def train(
     if num_merges > len(tokens_freq):
         num_merges = len(tokens_freq)
     m_f_pairs = [key for key, value in tokens_freq.items() if value == max(tokens_freq.values())]
-    len_max = max([len(''.join(pair)) for pair in m_f_pairs])
+    len_max = max(len(''.join(pair)) for pair in m_f_pairs)
     longest_pairs = sorted([pair for pair in m_f_pairs if len_max == len(''.join(pair))])
     word_frequencies = merge_tokens(word_frequencies, longest_pairs[0])
     if not word_frequencies:
@@ -148,7 +148,7 @@ def get_vocabulary(
             tokens.add(symbol)
     tokens = list(tokens)
     tokens_by_length = []
-    max_length = max([len(token) for token in tokens])
+    max_length = max(len(token) for token in tokens)
     while max_length != 0:
         tokens_by_length.extend(sorted([token for token in tokens if len(token) == max_length]))
         max_length -= 1
