@@ -1,5 +1,5 @@
 """
-Checks the second lab's collect ngrams function
+Checks the second lab's collect n-grams function
 """
 import unittest
 
@@ -10,13 +10,13 @@ from lab_2_tokenize_by_bpe.main import collect_ngrams
 
 class CollectNgramsTest(unittest.TestCase):
     """
-    Tests collecting ngrams function
+    Tests collecting n-grams function
     """
     @pytest.mark.lab_2_tokenize_by_bpe
     @pytest.mark.mark10
     def test_collect_ngrams_ideal(self):
         """
-        Ideal collect ngrams scenario
+        Ideal collect n-grams scenario
         """
         expected = [('Д', 'о', 'б'), ('о', 'б', 'р'), ('б', 'р', 'ы'),
                     ('р', 'ы', 'й'), ('ы', 'й', ' '), ('й', ' ', 'в'),
@@ -37,7 +37,7 @@ class CollectNgramsTest(unittest.TestCase):
     @pytest.mark.mark10
     def test_collect_ngrams_bad_input(self):
         """
-        Collect ngrams invalid inputs check
+        Collect n-grams invalid inputs check
         """
         text_bad_input = [(), [None], {}, None, 1, 1.1, True]
         order_bad_input = [None, (), 1.1, [None], 'string', {}]
@@ -54,7 +54,7 @@ class CollectNgramsTest(unittest.TestCase):
     @pytest.mark.mark10
     def test_collect_ngrams_return_value(self):
         """
-        Collect ngrams return value check
+        Collect n-grams return value check
         """
         actual = collect_ngrams('Добрый вечер! Как прошел Ваш день?', 3)
         self.assertTrue(isinstance(actual, list))
