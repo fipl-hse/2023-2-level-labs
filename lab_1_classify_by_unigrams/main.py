@@ -200,7 +200,7 @@ def collect_profiles(paths_to_profiles: list) -> list[dict[str, str | dict[str, 
 
     profiles = []
 
-    if not preprocess_profile:
+    if preprocess_profile is None:
         return None
 
     for path in paths_to_profiles:
