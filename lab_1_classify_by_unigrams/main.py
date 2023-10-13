@@ -203,10 +203,10 @@ def collect_profiles(paths_to_profiles: list) -> list[dict[str, str | dict[str, 
     for path in paths_to_profiles:
 
         loaded_profile = load_profile(path)
-        if load_profile(path) is None:
+        if loaded_profile is None:
             return None
         preprocessed_profile = preprocess_profile(loaded_profile)
-        if preprocess_profile(loaded_profile) is None:
+        if preprocessed_profile is None:
             return None
         profiles.append(preprocessed_profile)
         if not preprocessed_profile:
