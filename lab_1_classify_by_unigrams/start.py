@@ -16,6 +16,5 @@ def main() -> None:
         unknown_text = file_to_read_unk.read()
     result = print(tokenize(en_text))
 
-
 if __name__ == "__main__":
     main()

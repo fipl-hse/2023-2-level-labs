@@ -7,13 +7,14 @@ Language detection
 def tokenize(text: str) -> list[str] | None:
     if not isinstance(text, str):
         return None
-    punctuation = "0123456789!#$%&'()\*+,-./.:;<=>?@[\\]^_`{|}~"
-    tokens = text.lower()
-    for token in tokens:
-        if token in punctuation:
-            token = tokens.replace(token, '')
-            tokens = tokens.replace(' ', '')
+    if isinstance(text, str):
+        tokens = text.lower()
+        for token in tokens:
+            if token.isalpha():
+                token = tokens.replace(token, '')
+                tokens = tokens.replace(' ', '')
     return list(tokens)
+
 
 
 def calculate_frequencies(tokens: list[str] | None) -> dict[str, float] | None:
