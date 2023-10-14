@@ -41,8 +41,7 @@ def collect_frequencies(
     for i in text.split():
         if prepare_word(i, start_of_word, end_of_word) is None:
             return None
-        else:
-            dictionary.update({prepare_word(i, start_of_word, end_of_word): text.split().count(i)})
+        dictionary.update({prepare_word(i, start_of_word, end_of_word): text.split().count(i)})
     return dictionary
 
 
@@ -58,12 +57,11 @@ def count_tokens_pairs(
         return None
     pair_dictionary = {}
     for word, frequency in word_frequencies.items():
-        if len(word) >= 2:
-            for i in range(len(word)-1):
-                if (word[i], word[i+1]) in pair_dictionary:
-                    pair_dictionary[(word[i], word[i+1])] += frequency
-                else:
-                    pair_dictionary[(word[i], word[i + 1])] = frequency
+        for i in range(len(word)-1):
+            if (word[i], word[i+1]) in pair_dictionary:
+                pair_dictionary[(word[i], word[i+1])] += frequency
+            else:
+                pair_dictionary[(word[i], word[i + 1])] = frequency
     return pair_dictionary
 
 
