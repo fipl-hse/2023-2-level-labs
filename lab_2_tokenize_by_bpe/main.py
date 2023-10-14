@@ -165,13 +165,17 @@ def decode(
             end_of_word_token, str) or end_of_word_token is None):
         return None
     decoded = ''
+    print(vocabulary)
     for identifier in encoded_text:
         token_list = [key for key in vocabulary if vocabulary[key] == identifier]
-        token = str(token_list)
-        if end_of_word_token == token[2:-2]:
-            decoded += ' '
-        else:
-            decoded += token[2:-2]
+        for token in token_list:
+            if end_of_word_token:
+                if end_of_word_token in token:
+                    decoded += token[:-4] + ' '
+                else:
+                    decoded += token
+            else:
+                decoded += token
     return decoded
 
 
