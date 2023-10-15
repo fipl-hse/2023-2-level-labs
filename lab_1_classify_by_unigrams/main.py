@@ -7,12 +7,12 @@ Language detection
 def tokenize(text: str) -> list[str] | None:
     if not isinstance(text, str):
         return None
-    if isinstance(text, str):
-        tokens = text.lower()
-        for token in tokens:
-            if token.isalpha():
-                token = tokens.replace(token, '')
-                tokens = tokens.replace(' ', '')
+    punctuation = "1234567890!@#№;$%:^&?*()-_=+[{}]'<>/\\`.~"
+    tokens = text.lower()
+    for token in tokens:
+        if token in punctuation:
+            tokens = tokens.replace(token,'')
+            tokens = tokens.replace(' ', '')
     return list(tokens)
 
 
