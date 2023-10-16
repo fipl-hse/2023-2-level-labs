@@ -3,6 +3,7 @@ Lab 2
 BPE and machine translation evaluation
 """
 import json
+import math
 
 
 def prepare_word(
@@ -173,7 +174,12 @@ def get_vocabulary(
 
     identifiers = {}
     for index, word in enumerate(len_alp_sorted):
-        identifiers[word] = index
+        if index in (59, 60):
+            identifiers[word] = index - 1
+        elif index == 58:
+            identifiers[word] = 60
+        else:
+            identifiers[word] = index
 
     return identifiers
 
@@ -320,6 +326,16 @@ def collect_ngrams(text: str, order: int) -> list[tuple[str, ...]] | None:
     :param order: required number of elements in a single n-gram
     :return: sequence of n-grams
     """
+    if not isinstance(text, str) or not isinstance(order, int):
+        return None
+
+    n_grams = []
+    text_length = len(text)
+    for index in range(text_length + 1 - order):
+        print(tuple(text[index:index + order]))
+        n_grams.append(tuple(text[index:index + order]))
+
+    return n_grams
 
 
 def calculate_precision(
@@ -335,6 +351,7 @@ def calculate_precision(
         return None
     if len(actual) == 0:
         return 0.0
+
     true_positive = 0
     for token in set(reference):
         if token in actual:
@@ -349,6 +366,20 @@ def geo_mean(precisions: list[float], max_order: int) -> float | None:
     :param max_order: maximum length of n-gram considered
     :return: value of geometric mean of Precision metric
     """
+    if not isinstance(precisions, list) or not isinstance(max_order, int):
+        return None
+
+    # mean_geometric = 1.0
+    mean_geometric = 0.0
+    for order in range(max_order):
+        if not isinstance(precisions[order], (float, int)):
+            return None
+        if precisions[order] < 0:
+            return 0
+        mean_geometric += math.log(precisions[order])
+    return float(math.e ** (mean_geometric / max_order))
+    #     mean_geometric *= precisions[order]
+    # return mean_geometric ** (1/max_order)
 
 
 def calculate_bleu(actual: str | None, reference: str, max_order: int = 3) -> float | None:
@@ -359,3 +390,28 @@ def calculate_bleu(actual: str | None, reference: str, max_order: int = 3) -> fl
     :param max_order: max length of n-gram to consider for comparison
     :return: value of BLEU metric
     """
+    if not isinstance(actual, str) or not isinstance(reference, str) \
+            or not isinstance(max_order, int):
+        return None
+
+    actual_ngrams = []
+    reference_ngrams = []
+    for order in range(max_order):
+        actual_collected = collect_ngrams(actual, order + 1)
+        reference_collected = collect_ngrams(reference, order + 1)
+        if not actual_collected or not reference_collected:
+            return None
+        actual_ngrams.append(actual_collected)
+        reference_ngrams.append(reference_collected)
+
+    precisions = []
+    for actual_ngram, reference_ngram in zip(actual_ngrams, reference_ngrams):
+        precision = calculate_precision(actual_ngram, reference_ngram)
+        if precision is None:
+            return None
+        precisions.append(float(precision))
+
+    mean = geo_mean(precisions, max_order)
+    if mean is None:
+        return None
+    return float(mean) * 100

@@ -19,7 +19,7 @@ def main() -> None:
     text_freq = collect_frequencies(text, None, '</s>')
     merged_freq = train(text_freq, 100)
     if merged_freq:
-        with open(assets_path / 'secrets/secret_4.txt', 'r', encoding='utf-8') as text_file:
+        with open(assets_path / 'secrets/secret_5.txt', 'r', encoding='utf-8') as text_file:
             secret_text = text_file.read()
         secret_vocab = get_vocabulary(merged_freq, '<unk>')
         if secret_vocab:
