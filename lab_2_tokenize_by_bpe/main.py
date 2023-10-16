@@ -28,9 +28,9 @@ def prepare_word(
     if end_of_word:
         tokenized_word.append(end_of_word)
 
-    tokenized_word = tuple(tokenized_word)
+    tokenized_word_tuple = tuple(tokenized_word)
 
-    return tokenized_word
+    return tokenized_word_tuple
 
 
 def collect_frequencies(
@@ -114,7 +114,7 @@ def merge_tokens(
                 if token_pair == pair:
                     pair_token_index.append(index)
 
-            for pair_index in pair_token_index:
+            for pair_index in reversed(pair_token_index):
                 word_tokens_list[pair_index: pair_index + 2] = [''.join(pair)]
 
             merged_dict[tuple(word_tokens_list)] = word_frequencies[word_tokens]
