@@ -174,12 +174,12 @@ def get_vocabulary(
 
     identifiers = {}
     for index, word in enumerate(len_alp_sorted):
-        if index in (59, 60):
-            identifiers[word] = index - 1
-        elif index == 58:
-            identifiers[word] = 60
-        else:
-            identifiers[word] = index
+        # if index in (59, 60):
+        #     identifiers[word] = index - 1
+        # elif index == 58:
+        #     identifiers[word] = 60
+        # else:
+        identifiers[word] = index
 
     return identifiers
 
@@ -238,33 +238,41 @@ def tokenize_word(
             or not isinstance(unknown_token, str):
         return None
 
-    if end_of_word:
+    if end_of_word is not None and (end_of_word not in vocabulary):
         tokens = sorted(list(vocabulary) + [end_of_word], key=len, reverse=True)
     else:
         tokens = sorted(list(vocabulary), key=len, reverse=True)
 
     word_str = ''.join([str(el) for el in word])
+    word_tokens = [token for token in tokens if token in word_str]
+    word_len = len(word)
     word_list = list(word)
 
-    for token in tokens:
-        if token not in word_str:
-            continue
-        if token in word_str and not token.isdigit():
-            length = len(word)
-            for start_index in range(length):
-                for end_index in range(start_index, length):
-                    potential_token = ''.join(word_list[start_index:end_index + 1])
-                    if potential_token == token:
-                        word_list[start_index: end_index + 1] = [str(vocabulary[token])]
+    encoded = [-1] * word_len
+    for token in word_tokens:
+        count_token = word_str.count(token)
+        for start_index in range(word_len):
+            for end_index in range(start_index + 1, word_len+1):
+                possible_token = ''.join(word_list[start_index:end_index])
+                if possible_token == token:
+                    encoded[start_index:end_index] = [vocabulary[token]]
+                    word_list[start_index:end_index] = [token]
+                    word_len = len(word_list)
+                    count_token -= 1
+                    break
+            if count_token == 0:
+                break
 
-            if ''.join(word_list).isdigit():
-                return [int(num) for num in word_list]
-            return tokenize_word(tuple(word_list), vocabulary, end_of_word, unknown_token)
-
-    for index, num in enumerate(word_list):
-        if not num.isdigit():
-            word_list[index] = str(vocabulary[unknown_token])
-    return [int(num) for num in word_list]
+    if -1 in encoded:
+        corrected_encoded = []
+        for num in encoded:
+            if num == -1:
+                corrected_encoded.append(vocabulary[unknown_token])
+            else:
+                corrected_encoded.append(num)
+    else:
+        corrected_encoded = encoded
+    return corrected_encoded
 
 
 def load_vocabulary(vocab_path: str) -> dict[str, int] | None:
@@ -352,11 +360,12 @@ def calculate_precision(
     if len(actual) == 0:
         return 0.0
 
+    unique_reference = set(reference)
     true_positive = 0
-    for token in set(reference):
+    for token in unique_reference:
         if token in actual:
-            true_positive += actual.count(token)
-    return float(true_positive / len(reference))
+            true_positive += 1
+    return float(true_positive / len(unique_reference))
 
 
 def geo_mean(precisions: list[float], max_order: int) -> float | None:
@@ -369,7 +378,6 @@ def geo_mean(precisions: list[float], max_order: int) -> float | None:
     if not isinstance(precisions, list) or not isinstance(max_order, int):
         return None
 
-    # mean_geometric = 1.0
     mean_geometric = 0.0
     for order in range(max_order):
         if not isinstance(precisions[order], (float, int)):
@@ -378,8 +386,6 @@ def geo_mean(precisions: list[float], max_order: int) -> float | None:
             return 0
         mean_geometric += math.log(precisions[order])
     return float(math.e ** (mean_geometric / max_order))
-    #     mean_geometric *= precisions[order]
-    # return mean_geometric ** (1/max_order)
 
 
 def calculate_bleu(actual: str | None, reference: str, max_order: int = 3) -> float | None:
