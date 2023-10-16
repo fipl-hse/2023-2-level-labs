@@ -21,8 +21,8 @@ def main() -> None:
     word_frequencies = train(word_frequencies, 100)
     if word_frequencies:
         vocabulary = get_vocabulary(word_frequencies, '<unk>')
-        encoded_text = [int(num) for num in encoded_text.split()]
-        result = decode(encoded_text, vocabulary, '</s>')
+        encoded_text_list = [int(num) for num in encoded_text.split()]
+        result = decode(encoded_text_list, vocabulary, '</s>')
         print(result)
         assert result, "Encoding is not working"
 

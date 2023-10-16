@@ -190,10 +190,11 @@ def get_vocabulary(
             for token_part in token:
                 all_tokens.add(token_part)
     all_tokens.add(unknown_token)
-    all_tokens = sorted(all_tokens, key=lambda x: (-len(x), x))
+    all_tokens_list = list(all_tokens)
+    all_tokens_list = sorted(all_tokens_list, key=lambda x: (-len(x), x))
 
     tokens_id_dict = {}
-    for i, token in enumerate(all_tokens):
+    for i, token in enumerate(all_tokens_list):
         tokens_id_dict[token] = i
 
     return tokens_id_dict
@@ -315,8 +316,8 @@ def encode(
         prepared_words.append(prepared_word)
 
     encoded_text_large = []
-    for word in prepared_words:
-        tokenized_word = tokenize_word(word, vocabulary, end_of_word_token, unknown_token)
+    for word_tokens in prepared_words:
+        tokenized_word = tokenize_word(word_tokens, vocabulary, end_of_word_token, unknown_token)
         if not tokenized_word:
             return None
 
