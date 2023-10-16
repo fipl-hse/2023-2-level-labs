@@ -15,10 +15,15 @@ def prepare_word(
     :return: preprocessed word
     """
     if not isinstance(raw_word, str) \
-            or not isinstance(start_of_word, (str or None)) \
-            or not isinstance(end_of_word, (str or None)):
+            or not isinstance(start_of_word, (str | None)) \
+            or not isinstance(end_of_word, (str | None)):
         return None
-    preprocessed = tuple([start_of_word, *list(raw_word), end_of_word])
+    if start_of_word is None:
+        preprocessed = tuple([*list(raw_word), end_of_word])
+    elif end_of_word is None:
+        preprocessed = tuple([start_of_word, *list(raw_word)])
+    else:
+        preprocessed = tuple([start_of_word, *list(raw_word), end_of_word])
     return preprocessed
 
 
@@ -33,8 +38,8 @@ def collect_frequencies(
     :return: dictionary in the form of <preprocessed word: number of occurrences>
     """
     if not isinstance(text, str) \
-            or not isinstance(start_of_word, (str or None)) \
-            or not isinstance(end_of_word, (str)):
+            or not isinstance(start_of_word, (str | None)) \
+            or not isinstance(end_of_word, str):
         return None
     splited = text.split()
     freq = {}
