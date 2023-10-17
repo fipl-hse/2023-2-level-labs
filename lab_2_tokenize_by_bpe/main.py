@@ -64,12 +64,15 @@ def count_tokens_pairs(
     if not isinstance(word_frequencies, dict):
         return None
     pair_freq = {}
-    for word in word_frequencies:
+    for word, freq in word_frequencies.items():
         for i in range(len(word) - 1):
             token_pair = (word[i], word[i+1])
             if token_pair not in pair_freq:
                 pair_freq[token_pair] = 0
-            pair_freq[token_pair] += 1
+            if freq > 1:
+                pair_freq[token_pair] += freq
+            else:
+                pair_freq[token_pair] += 1
     return pair_freq
 
 
