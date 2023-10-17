@@ -2,7 +2,6 @@
 Lab 1
 Language detection
 """
-import json
 
 def tokenize(text: str) -> list[str] | None:
     """
@@ -19,10 +18,6 @@ def tokenize(text: str) -> list[str] | None:
         if item.isalpha():
             goodlist.append(item)
     return goodlist
-
-
-
-
 
 
 def calculate_frequencies(tokens: list[str] | None) -> dict[str, float] | None:
@@ -58,16 +53,15 @@ def create_language_profile(language: str, text: str) -> dict[str, str | dict[st
         return None
     if not isinstance(text,str):
         return None
-    else:
-        goodlist=tokenize(text)
-        freq_dict=calculate_frequencies(goodlist)
+    goodlist=tokenize(text)
+    freq_dict=calculate_frequencies(goodlist)
 
-        if not isinstance(freq_dict, dict):
-            return None
+    if not isinstance(freq_dict, dict):
+        return None
 
-        profilel={"name": language, "freq": {}}
-        for key, value in freq_dict.items():
-            profilel["freq"][key]=(value)
+    profilel={"name": language, "freq": {}}
+    for key, value in freq_dict.items():
+        profilel["freq"][key]=(value)
     return profilel
 
 
@@ -81,9 +75,9 @@ def calculate_mse(predicted: list, actual: list) -> float | None:
     """
     if not isinstance(predicted,list):
         return None
-    elif not isinstance(actual,list):
+    if not isinstance(actual,list):
         return None
-    elif len(predicted) != len(actual):
+    if len(predicted) != len(actual):
         return None
     numerator = 0
     dlina=len(actual)
@@ -140,9 +134,9 @@ def detect_language(
     """
     if not isinstance(unknown_profile,dict):
         return None
-    elif not isinstance(profile_1,dict):
+    if not isinstance(profile_1,dict):
         return None
-    elif not isinstance(profile_2,dict):
+    if not isinstance(profile_2,dict):
         return None
     mse_1=compare_profiles(unknown_profile,profile_1)
     mse_2=compare_profiles(unknown_profile,profile_2)
@@ -152,10 +146,9 @@ def detect_language(
         return lang_2
     if mse_1<mse_2:
         return lang_1
-    else:
-        list_lang=("lang_1", "lang_2")
-        list_lang.sort()
-        return list_lang[0]
+    list_lang=("lang_1", "lang_2")
+    list_lang.sort()
+    return list_lang[0]
 
 def load_profile(path_to_file: str) -> dict | None:
     """
