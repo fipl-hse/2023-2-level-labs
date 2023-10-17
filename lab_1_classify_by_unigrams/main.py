@@ -2,7 +2,7 @@
 Lab 1
 Language detection
 """
-
+import json
 
 def tokenize(text: str) -> list[str] | None:
     """
@@ -63,6 +63,10 @@ def create_language_profile(language: str, text: str) -> dict[str, str | dict[st
     else:
         goodlist=tokenize(text)
         freq_dict=calculate_frequencies(goodlist)
+
+        if not isinstance(freq_dict, dict):
+            return None
+
         profilel={"name": language, "freq": {}}
         for key, value in freq_dict.items():
             profilel["freq"][key]=(value)
