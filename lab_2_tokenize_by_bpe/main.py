@@ -14,7 +14,19 @@ def prepare_word(
     :param end_of_word: a token that signifies the end of word
     :return: preprocessed word
     """
-#jfhvguwhejrio
+    if not isinstance(raw_word, str) or not isinstance(start_of_word, str | None) or not isinstance(end_of_word, str | None):
+        return None
+    list_of_tokens = []
+    for i in raw_word:
+        if i == ' ':
+            list_of_tokens += end_of_word
+            list_of_tokens += start_of_word
+        else:
+            list_of_tokens += i
+    tuple_of_tokens = tuple(list)
+    return tuple_of_tokens
+
+
 
 def collect_frequencies(
     text: str, start_of_word: str | None, end_of_word: str
