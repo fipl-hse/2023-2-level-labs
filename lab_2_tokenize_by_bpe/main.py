@@ -26,8 +26,7 @@ def prepare_word(
                 list_of_tokens.append(start_of_word)
         else:
             list_of_tokens.append(i)
-    tuple_of_tokens = tuple(list)
-    return tuple_of_tokens
+    return tuple(list)
 
 
 def collect_frequencies(
