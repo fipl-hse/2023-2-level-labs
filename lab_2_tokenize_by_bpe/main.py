@@ -42,7 +42,7 @@ def collect_frequencies(
             or prepare_word(text, start_of_word, end_of_word) is None):
         return None
     dict_of_frequencies = {}
-    tuple_of_words = tuple(text.split())
+    tuple_of_words = text.split()
     for word in tuple_of_words:
         prepared_word = prepare_word(word, start_of_word, end_of_word)
         dict_of_frequencies = {
