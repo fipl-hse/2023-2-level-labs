@@ -25,8 +25,7 @@ def prepare_word(
             list_of_tokens.append(token)
     if end_of_word is not None:
         list_of_tokens.append(end_of_word)
-
-    return tuple(list)
+    return tuple(list_of_tokens)
 
 
 def collect_frequencies(
