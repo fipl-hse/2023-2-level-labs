@@ -2,6 +2,7 @@
 BPE Tokenizer starter
 """
 from pathlib import Path
+from lab_2_tokenize_by_bpe.main import prepare_word, collect_frequencies
 
 
 def main() -> None:
@@ -14,7 +15,7 @@ def main() -> None:
 
     result = None
     assert result, "Encoding is not working"
-#hgturqrhiqh4tfi
+    collect_frequencies('текст', None, '/s')
 
 if __name__ == "__main__":
     main()
