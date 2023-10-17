@@ -85,6 +85,23 @@ def merge_tokens(
     :param pair: a pair of tokens to be merged
     :return: dictionary in the form of <preprocessed word: number of occurrences>
     """
+    if not isinstance(word_frequencies, dict) or not isinstance(pair, tuple):
+        return None
+    str_pair = pair[0] + pair[1]
+    new_dict = {}
+    for word, freq in word_frequencies.items():
+        new_word = []
+        i = 0
+        while i < len(word) - 1:
+            if (word[i], word[i+1]) == pair:
+                new_word.append(str_pair)
+                i += 2
+            else:
+                new_word.append(word[i])
+                i += 1
+        new_word.append(word[i])
+        new_dict.update({tuple(new_word): freq})
+    return new_dict
 
 
 def train(
@@ -96,6 +113,13 @@ def train(
     :param num_merges: required number of new tokens
     :return: dictionary in the form of <preprocessed word: number of occurrences>
     """
+    if not isinstance(word_frequencies, dict) or not isinstance(num_merges, int):
+        return None
+    pair_freq = count_tokens_pairs(word_frequencies)
+
+
+
+
 
 
 def get_vocabulary(
