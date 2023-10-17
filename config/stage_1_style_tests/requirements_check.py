@@ -34,7 +34,7 @@ def compile_pattern() -> re.Pattern:
     return re.compile(r'\w+(-\w+|\[\w+\])*==\d+(\.\d+)+')
 
 
-def check_dependencies(lines: list, compiled_pattern: re.Pattern):
+def check_dependencies(lines: list, compiled_pattern: re.Pattern) -> bool:
     """
     Checks that dependencies confirm to the template
     """
@@ -49,7 +49,7 @@ def check_dependencies(lines: list, compiled_pattern: re.Pattern):
     return True
 
 
-def main():
+def main() -> None:
     """
     Calls functions
     """
