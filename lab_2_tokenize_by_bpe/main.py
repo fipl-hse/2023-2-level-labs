@@ -19,8 +19,10 @@ def prepare_word(
     list_of_tokens = []
     for i in raw_word:
         if i == ' ':
-            list_of_tokens += end_of_word
-            list_of_tokens += start_of_word
+            if end_of_word is not None:
+                list_of_tokens += end_of_word
+            if start_of_word is not None:
+                list_of_tokens += start_of_word
         else:
             list_of_tokens += i
     tuple_of_tokens = tuple(list)
