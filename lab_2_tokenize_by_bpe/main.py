@@ -45,9 +45,7 @@ def collect_frequencies(
     tuple_of_words = text.split()
     for word in tuple_of_words:
         prepared_word = prepare_word(word, start_of_word, end_of_word)
-        dict_of_frequencies = {
-            prepared_word: tuple_of_words.count(word)
-        }
+        dict_of_frequencies[prepared_word] = tuple_of_words.count(word)
     return dict_of_frequencies
 
 
