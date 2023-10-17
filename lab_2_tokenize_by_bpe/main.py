@@ -18,14 +18,14 @@ def prepare_word(
             or not isinstance(end_of_word, str | None)):
         return None
     list_of_tokens = []
-    for i in raw_word:
-        if i == ' ':
-            if end_of_word is not None:
-                list_of_tokens.append(end_of_word)
-            if start_of_word is not None:
-                list_of_tokens.append(start_of_word)
-        else:
-            list_of_tokens.append(i)
+    if start_of_word is not None:
+        list_of_tokens.append(start_of_word)
+    for token in raw_word:
+        if token != start_of_word and token != end_of_word:
+            list_of_tokens.append(token)
+    if end_of_word is not None:
+        list_of_tokens.append(end_of_word)
+
     return tuple(list)
 
 
