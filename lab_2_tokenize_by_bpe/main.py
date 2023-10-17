@@ -14,20 +14,20 @@ def prepare_word(
     :param end_of_word: a token that signifies the end of word
     :return: preprocessed word
     """
-    if not isinstance(raw_word, str) or not isinstance(start_of_word, str | None) or not isinstance(end_of_word, str | None):
+    if (not isinstance(raw_word, str) or not isinstance(start_of_word, str | None)
+            or not isinstance(end_of_word, str | None)):
         return None
     list_of_tokens = []
     for i in raw_word:
         if i == ' ':
             if end_of_word is not None:
-                list_of_tokens += end_of_word
+                list_of_tokens.append(end_of_word)
             if start_of_word is not None:
-                list_of_tokens += start_of_word
+                list_of_tokens.append(start_of_word)
         else:
-            list_of_tokens += i
+            list_of_tokens.append(i)
     tuple_of_tokens = tuple(list)
     return tuple_of_tokens
-
 
 
 def collect_frequencies(
@@ -40,6 +40,8 @@ def collect_frequencies(
     :param end_of_word: a token that signifies the end of word
     :return: dictionary in the form of <preprocessed word: number of occurrences>
     """
+    if not isinstance(text, str) or not isinstance(start_of_word, str | None) or not isinstance(end_of_word, str):
+        return None
 
 
 def count_tokens_pairs(
