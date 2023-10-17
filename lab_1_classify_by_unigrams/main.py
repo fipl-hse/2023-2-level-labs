@@ -33,17 +33,15 @@ def calculate_frequencies(tokens: list[str] | None) -> dict[str, float] | None:
     """
     if not isinstance(tokens,list):
         return None
-    else:
-        for token in tokens:
-            if not isinstance(token,str):
-                return None
-            else:
-                numberallitems=len(tokens)
-                freq_dict={}
-                for item in tokens:
-                    numberi=tokens.count(item)
-                    freqi=numberi/numberallitems
-                    freq_dict[item]=freqi
+    for token in tokens:
+        if not isinstance(token,str):
+            return None
+        numberallitems=len(tokens)
+        freq_dict={}
+        for item in tokens:
+            numberi=tokens.count(item)
+            freqi=numberi/numberallitems
+            freq_dict[item]=freqi
     return freq_dict
 
 
@@ -58,7 +56,7 @@ def create_language_profile(language: str, text: str) -> dict[str, str | dict[st
     """
     if not isinstance(language,str):
         return None
-    elif not isinstance(text,str):
+    if not isinstance(text,str):
         return None
     else:
         goodlist=tokenize(text)
@@ -81,15 +79,18 @@ def calculate_mse(predicted: list, actual: list) -> float | None:
     :param actual: a list of actual values
     :return: the score
     """
-    if not isinstance(predicted,list) or not isinstance(actual,list) or len(predicted) != len(actual):
+    if not isinstance(predicted,list):
         return None
-    else:
-        numerator = 0
-        dlina=len(actual)
-        for index in range(dlina):
-            numerator += (actual[index] - predicted[index])**2
-        mse=(numerator/dlina)
-        return mse
+    elif not isinstance(actual,list):
+        return None
+    elif len(predicted) != len(actual):
+        return None
+    numerator = 0
+    dlina=len(actual)
+    for index in range(dlina):
+        numerator += (actual[index] - predicted[index])**2
+    mse=(numerator/dlina)
+    return mse
 def compare_profiles(
         unknown_profile: dict[str, str | dict[str, float]],
         profile_to_compare: dict[str, str | dict[str, float]]) -> float | None:
@@ -105,25 +106,24 @@ def compare_profiles(
         return None
     if "name" not in profile_to_compare or "freq" not in profile_to_compare:
         return None
-    else:
-        united_keys=[]
-        unknown_profile_frequency=[]
-        profile_to_compare_frequency=[]
-        for key in unknown_profile.get("freq"):
+    united_keys=[]
+    unknown_profile_frequency=[]
+    profile_to_compare_frequency=[]
+    for key in unknown_profile.get("freq"):
+        united_keys.append(key)
+    for key in profile_to_compare.get("freq"):
+        if key not in united_keys:
             united_keys.append(key)
-        for key in profile_to_compare.get("freq"):
-            if key not in united_keys:
-                united_keys.append(key)
-        for key in united_keys:
-            if key in unknown_profile["freq"]:
-                unknown_profile_frequency.append(unknown_profile["freq"].get(key))
-            else:
-                unknown_profile_frequency.append(0)
-            if key in profile_to_compare["freq"]:
-                profile_to_compare_frequency.append(profile_to_compare["freq"].get(key))
-            else:
-                profile_to_compare_frequency.append(0)
-        return calculate_mse(unknown_profile_frequency, profile_to_compare_frequency)
+    for key in united_keys:
+        if key in unknown_profile["freq"]:
+            unknown_profile_frequency.append(unknown_profile["freq"].get(key))
+        else:
+            unknown_profile_frequency.append(0)
+        if key in profile_to_compare["freq"]:
+            profile_to_compare_frequency.append(profile_to_compare["freq"].get(key))
+        else:
+            profile_to_compare_frequency.append(0)
+    return calculate_mse(unknown_profile_frequency, profile_to_compare_frequency)
 
 
 def detect_language(
@@ -138,21 +138,24 @@ def detect_language(
     :param profile_2: a dictionary of a known profile
     :return: a language
     """
-    if not isinstance(unknown_profile,dict) or not isinstance(profile_1,dict) or not isinstance(profile_2,dict):
+    if not isinstance(unknown_profile,dict):
         return None
+    elif not isinstance(profile_1,dict):
+        return None
+    elif not isinstance(profile_2,dict):
+        return None
+    mse_1=compare_profiles(unknown_profile,profile_1)
+    mse_2=compare_profiles(unknown_profile,profile_2)
+    lang_1=str(profile_1["name"])
+    lang_2=str(profile_2["name"])
+    if mse_1>mse_2:
+        return lang_2
+    if mse_1<mse_2:
+        return lang_1
     else:
-            mse_1=compare_profiles(unknown_profile,profile_1)
-            mse_2=compare_profiles(unknown_profile,profile_2)
-            lang_1=str(profile_1["name"])
-            lang_2=str(profile_2["name"])
-            if mse_1>mse_2:
-                return lang_2
-            elif mse_1<mse_2:
-                return lang_1
-            else:
-                list_lang=("lang_1", "lang_2")
-                list_lang.sort()
-                return list_lang[0]
+        list_lang=("lang_1", "lang_2")
+        list_lang.sort()
+        return list_lang[0]
 
 def load_profile(path_to_file: str) -> dict | None:
     """
