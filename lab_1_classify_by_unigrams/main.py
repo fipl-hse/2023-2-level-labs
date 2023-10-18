@@ -60,8 +60,7 @@ def create_language_profile(language: str, text: str) -> dict[str, str | dict[st
         return None
 
     profilel={"name": language, "freq": {}}
-    for key, value in freq_dict.items():
-        profilel["freq"][key]=value
+    profilel["freq"]=freq_dict
     return profilel
 
 
