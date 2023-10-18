@@ -26,7 +26,7 @@ def main() -> None:
     known = collect_profiles(json_paths)
     result="0"
     if isinstance(unknown, dict) and isinstance(known, list):
-        result = detect_language_advanced(unknown, known)
+        result = detect_language(unknown, known)
     if result:
         print(result)
         assert result
