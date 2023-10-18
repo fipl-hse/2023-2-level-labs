@@ -50,10 +50,10 @@ def create_language_profile(language: str, text: str) -> dict[str, str | dict[st
     :return: a dictionary with two keys – name, freq
     """
     if not (isinstance(language,str)
-            and not isinstance(text,str):
+            and isinstance(text,str)):
         return None
-    goodlist=tokenize(text)
-    freq_dict=calculate_frequencies(goodlist)
+    goodlist = tokenize(text)
+    freq_dict = calculate_frequencies(goodlist)
 
     if not isinstance(freq_dict,dict):
         return None
