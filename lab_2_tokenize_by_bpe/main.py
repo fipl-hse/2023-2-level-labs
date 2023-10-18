@@ -46,7 +46,7 @@ def collect_frequencies(
         prepared_word = prepare_word(word, start_of_word, end_of_word)
         if prepared_word is None:
             return None
-        dict_of_frequencies[prepared_word] = tuple_of_words.count(word)
+        dict_of_frequencies[prepared_word] = max(tuple_of_words.count(word+' '), tuple_of_words.count(word+' '))
     return dict_of_frequencies
 
 
