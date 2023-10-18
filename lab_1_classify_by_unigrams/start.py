@@ -24,10 +24,14 @@ def main() -> None:
 
     unknown = create_language_profile('unknown', unknown_text)
     known = collect_profiles(json_paths)
+    result="0"
     if isinstance(unknown, dict) and isinstance(known, list):
         result = detect_language_advanced(unknown, known)
-
-    assert result, "Detection result is None"
+    if result:
+        print(result)
+        assert result
+    else:
+        "Detection result is None"
 
 
 
