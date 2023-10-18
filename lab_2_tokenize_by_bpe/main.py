@@ -87,7 +87,10 @@ def merge_tokens(
             for index in range(len(list_word) - 1):
                 if (i[index], i[index+1]) == pair:
                     list_word[index+1] = pair[0] + pair[1]
-                    list_word.pop(index)
+                    list_word[index] = 'none'
+            for el in list_word:
+                if el == 'none':
+                    list_word.remove('none')
             dict_merged_tokens.update({tuple(list_word): word_frequencies[i]})
         else:
             dict_merged_tokens.update({i: word_frequencies[i]})
@@ -165,7 +168,6 @@ def decode(
             end_of_word_token, str) or end_of_word_token is None):
         return None
     decoded = ''
-    print(vocabulary)
     for identifier in encoded_text:
         token_list = [key for key in vocabulary if vocabulary[key] == identifier]
         for token in token_list:
