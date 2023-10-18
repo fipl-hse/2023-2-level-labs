@@ -88,8 +88,8 @@ def merge_tokens(
                 if (i[index], i[index+1]) == pair:
                     list_word[index+1] = pair[0] + pair[1]
                     list_word[index] = 'none'
-            for el in list_word:
-                if el == 'none':
+            for token in list_word:
+                if token == 'none':
                     list_word.remove('none')
             dict_merged_tokens.update({tuple(list_word): word_frequencies[i]})
         else:
