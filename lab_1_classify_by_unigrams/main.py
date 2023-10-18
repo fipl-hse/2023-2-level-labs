@@ -56,10 +56,10 @@ def create_language_profile(language: str, text: str) -> dict[str, str | dict[st
     goodlist=tokenize(text)
     freq_dict=calculate_frequencies(goodlist)
 
-    profilel={"name": language, "freq": {}}
-    profilel["freq"]=freq_dict
     if not isinstance(freq_dict, dict):
         return None
+
+    profilel={"name": language, "freq": freq_dict}
     return profilel
 
 
@@ -78,9 +78,10 @@ def calculate_mse(predicted: list, actual: list) -> float | None:
     if len(predicted) != len(actual):
         return None
     numerator = 0
-    for index in range (len(actual)):
+    dlina=len(actual)
+    for index in range(dlina):
         numerator += (actual[index] - predicted[index])**2
-    mse=(numerator/len(actual))
+    mse=(numerator/dlina)
     return mse
 def compare_profiles(
         unknown_profile: dict[str, str | dict[str, float]],
