@@ -50,7 +50,6 @@ def collect_frequencies(
     return dict_of_frequencies
 
 
-
 def count_tokens_pairs(
     word_frequencies: dict[tuple[str, ...], int]
 ) -> dict[tuple[str, str], int] | None:
