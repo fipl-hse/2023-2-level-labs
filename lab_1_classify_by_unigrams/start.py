@@ -33,7 +33,7 @@ def main() -> None:
         print(result)
         assert result
     else:
-        "Detection result is None"
+       assert "Detection result is None"
 
 
 
