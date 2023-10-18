@@ -26,7 +26,6 @@ def main() -> None:
     known = collect_profiles(json_paths)
     if isinstance(unknown, dict) and isinstance(known, list):
         result = detect_language_advanced(unknown, known)
-    if result:
 
     assert result, "Detection result is None"
 
