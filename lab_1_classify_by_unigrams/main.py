@@ -60,7 +60,8 @@ def create_language_profile(language: str, text: str) -> dict[str, str | dict[st
         return None
 
     profilel={"name": language, "freq": freq_dict}
-    return profilel
+    if profilel:
+        return profilel
 
 
 
