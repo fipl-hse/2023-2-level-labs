@@ -39,9 +39,10 @@ def collect_frequencies(
         return None
     dictionary = {}
     for i in text.split():
-        if prepare_word(i, start_of_word, end_of_word) is None:
+        symbols = prepare_word(i, start_of_word, end_of_word)
+        if symbols is None:
             return None
-        dictionary.update({prepare_word(i, start_of_word, end_of_word): text.split().count(i)})
+        dictionary.update({symbols: text.split().count(i)})
     return dictionary
 
 
@@ -61,7 +62,7 @@ def count_tokens_pairs(
             if (word[i], word[i+1]) in pair_dictionary:
                 pair_dictionary[(word[i], word[i+1])] += frequency
             else:
-                pair_dictionary[(word[i], word[i + 1])] = frequency
+                pair_dictionary[(word[i], word[i+1])] = frequency
     return pair_dictionary
 
 
@@ -74,6 +75,23 @@ def merge_tokens(
     :param pair: a pair of tokens to be merged
     :return: dictionary in the form of <preprocessed word: number of occurrences>
     """
+    if not isinstance(word_frequencies, dict) or not isinstance(pair, tuple):
+        return None
+    dictionary = {}
+    united = pair[0]+pair[1]
+    for symbols in word_frequencies.keys():
+        new_symbols = list()
+        i = 0
+        while i != len(symbols)-1:
+            if (symbols[i], symbols[i+1]) == pair:
+                new_symbols.append(united)
+                i += 2
+            else:
+                new_symbols.append(symbols[i])
+                i += 1
+        new_symbols.append(symbols[i])
+        dictionary[tuple(new_symbols)] = word_frequencies[symbols]
+    return dictionary
 
 
 def train(
