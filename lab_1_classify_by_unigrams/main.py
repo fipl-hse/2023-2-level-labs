@@ -49,9 +49,8 @@ def create_language_profile(language: str, text: str) -> dict[str, str | dict[st
     :param text: a text
     :return: a dictionary with two keys – name, freq
     """
-    if not isinstance(language,str):
-        return None
-    if not isinstance(text,str):
+    if not (isinstance(language,str)
+            and not isinstance(text,str):
         return None
     goodlist=tokenize(text)
     freq_dict=calculate_frequencies(goodlist)
@@ -60,9 +59,7 @@ def create_language_profile(language: str, text: str) -> dict[str, str | dict[st
         return None
 
     profilel={"name": language, "freq": freq_dict}
-    if profilel:
-        return profilel
-    return None
+    return profilel
 
 
 
