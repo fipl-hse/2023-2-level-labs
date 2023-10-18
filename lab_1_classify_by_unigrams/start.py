@@ -2,7 +2,7 @@
 Language detection starter
 """
 
-from lab_1_classify_by_unigrams.main import (collect_profiles, create_language_profile,
+from lab_1_classify_by_unigrams.main import (create_language_profile,
                                              detect_language)
 
 
@@ -16,24 +16,16 @@ def main() -> None:
         de_text = file_to_read_de.read()
     with open("assets/texts/unknown.txt", "r", encoding="utf-8") as file_to_read_unk:
         unknown_text = file_to_read_unk.read()
-    json_paths = ['assets/profiles/de.json',
-                  'assets/profiles/en.json',
-                  'assets/profiles/es.json',
-                  'assets/profiles/fr.json',
-                  'assets/profiles/it.json',
-                  'assets/profiles/ru.json',
-                  'assets/profiles/tr.json']
 
-    unknown = create_language_profile('unknown', unknown_text)
-    known = collect_profiles(json_paths)
-    result="0"
-    if isinstance(unknown, dict) and isinstance(known, dict):
-        result = detect_language(unknown, known)
-    if result:
-        print(result)
-        assert result
-    else:
-        assert "Detection result is None"
+    unknown_text = create_language_profile("un", unknown_text)
+    en_text = create_language_profile("en", en_text)
+    de_text = create_language_profile("de", de_text)
+    if (isinstance(unknown_text, dict) and
+    isinstance(en_text, dict) and
+    isinstance(de_text, dict)):
+        result = detect_language(unknown_text, en_text, de_text)
+        assert result, "Detection result is None"
+
 
 
 
