@@ -2,7 +2,8 @@
 BPE Tokenizer starter
 """
 from pathlib import Path
-from lab_2_tokenize_by_bpe.main import (collect_frequencies, train)
+from lab_2_tokenize_by_bpe.main import (collect_frequencies,
+                                        merge_tokens, train)
 
 
 def main() -> None:
