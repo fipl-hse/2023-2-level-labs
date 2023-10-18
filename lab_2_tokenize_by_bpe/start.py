@@ -17,6 +17,7 @@ def main() -> None:
     print(prepare_word("it's", '</b>', '</s>'))
     print(collect_frequencies(text, None, '</s>'))
     print(count_tokens_pairs(collect_frequencies("It's far, farther, farthest and old, older, oldest", None, '</s>')))
+
     result = count_tokens_pairs
     assert result, "Encoding is not working"
 

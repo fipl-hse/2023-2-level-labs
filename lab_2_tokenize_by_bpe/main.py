@@ -46,6 +46,7 @@ def collect_frequencies(
     raw_words = {
         prepare_word(word, start_of_word, end_of_word): text.count(word_list[i]) for i, word in enumerate(word_list)
     }
+
     return raw_words
 
 
