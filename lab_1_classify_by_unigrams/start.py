@@ -18,12 +18,12 @@ def main() -> None:
 
 
     unknown_text = create_language_profile("un", "unknown_text")
-    en_text = create_language_profile("en", "en_text")
-    de_text = create_language_profile("de", "de_text")
+    eng_text = create_language_profile("en", "en_text")
+    deu_text = create_language_profile("de", "de_text")
     if (isinstance(unknown_text, dict) and
     isinstance(en_text, dict) and
     isinstance(de_text, dict)):
-        result = detect_language(unknown_text, en_text, de_text)
+        result = detect_language(unknown_text, eng_text, deu_text)
         assert result, "Detection result is None"
 
 
