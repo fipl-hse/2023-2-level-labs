@@ -2,6 +2,7 @@
 Lab 2
 BPE and machine translation evaluation
 """
+from typing import Tuple
 
 
 def prepare_word(
@@ -22,10 +23,11 @@ def prepare_word(
         new_word = tuple(start_of_word.split()) + new_word + tuple(end_of_word.split())
     if not start_of_word and end_of_word:
         new_word = new_word + tuple(end_of_word.split())
-    if not end_of_word and start_of_word:
+    if start_of_word and not end_of_word:
         new_word = tuple(start_of_word.split()) + new_word
 
     return new_word
+
 
 def collect_frequencies(
         text: str, start_of_word: str | None, end_of_word: str
@@ -40,8 +42,9 @@ def collect_frequencies(
     if prepare_word(text, start_of_word, end_of_word) is None:
         return None
 
+    word_list = text.split()
     raw_words = {
-        prepare_word(i, start_of_word, end_of_word): text.count(text.split()[j]) for j, i in enumerate(text.split())
+        prepare_word(word, start_of_word, end_of_word): text.count(word_list[i]) for i, word in enumerate(word_list)
     }
     return raw_words
 
@@ -54,7 +57,18 @@ def count_tokens_pairs(
     :param word_frequencies: dictionary in the form of <preprocessed word: number of occurrences>
     :return: dictionary in the form of <token pair: number of occurrences>
     """
-    
+    if not isinstance(word_frequencies, dict):
+        return None
+
+    tokens_pair_dict = {}
+    for word in word_frequencies.keys():
+        for i, letter in enumerate(word[:-1]):
+            token_pair = word[i] + word[i + 1]
+            if token_pair not in tokens_pair_dict:
+                tokens_pair_dict[token_pair] = 0
+            tokens_pair_dict[token_pair] += 1
+
+    return tokens_pair_dict
 
 
 def merge_tokens(
