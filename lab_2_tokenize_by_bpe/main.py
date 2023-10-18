@@ -38,15 +38,15 @@ def collect_frequencies(
     :param end_of_word: a token that signifies the end of word
     :return: dictionary in the form of <preprocessed word: number of occurrences>
     """
-    if (not isinstance(text, str) or not isinstance(start_of_word, str | None) or not isinstance(end_of_word, str)
-            or prepare_word(text, start_of_word, end_of_word) is None):
+    if not isinstance(text, str) or not isinstance(start_of_word, str | None) or not isinstance(end_of_word, str):
         return None
     dict_of_frequencies = {}
     tuple_of_words = text.split()
     for word in tuple_of_words:
         prepared_word = prepare_word(word, start_of_word, end_of_word)
-        if prepared_word is not None:
-            dict_of_frequencies[prepared_word] = tuple_of_words.count(word)
+        if prepared_word is None:
+            return None
+        dict_of_frequencies[prepared_word] = tuple_of_words.count(word)
     return dict_of_frequencies
 
 
