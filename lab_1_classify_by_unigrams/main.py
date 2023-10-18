@@ -62,7 +62,8 @@ def create_language_profile(language: str, text: str) -> dict[str, str | dict[st
     profilel={"name": language, "freq": freq_dict}
     if not isinstance(profilel, dict):
         return None
-    return profilel
+    else:
+        return profilel
 
 
 
