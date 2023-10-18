@@ -38,8 +38,8 @@ def collect_frequencies(
     :param end_of_word: a token that signifies the end of word
     :return: dictionary in the form of <preprocessed word: number of occurrences>
     """
-    if not(isinstance(text, str) and isinstance(end_of_word, str)) or not(
-        isinstance(start_of_word, str) or start_of_word is None
+    if not (isinstance(text, str) and isinstance(end_of_word, str)) or not (
+            isinstance(start_of_word, str) or start_of_word is None
     ):
         return None
     freq_dict = {}
@@ -66,10 +66,9 @@ def count_tokens_pairs(
     for word, freq in word_frequencies.items():
         for ind in range(len(word) - 1):
             token_pair = (word[ind], word[ind + 1])
-            if token_pair in pairs_of_tokens:
-                pairs_of_tokens[token_pair] += freq
-            else:
+            if token_pair not in pairs_of_tokens:
                 pairs_of_tokens[token_pair] = freq
+            pairs_of_tokens[token_pair] += freq
     return pairs_of_tokens
 
 
@@ -84,7 +83,15 @@ def merge_tokens(
     """
     if not isinstance(word_frequencies, dict) or not isinstance(pair, tuple):
         return None
-    # merged_dict = {}
+    merged_dict = {}
+    for word, freq in word_frequencies.items():
+        new_word = ''.join(word).replace(pair[0] + '' + pair[1], pair[0] + pair[1])
+        new_word_tupled = tuple(new_word.split())
+        if new_word_tupled not in merged_dict:
+            merged_dict[new_word_tupled] += freq
+        else:
+            merged_dict[new_word_tupled] = freq
+    return merged_dict
 
 
 def train(
@@ -96,6 +103,19 @@ def train(
     :param num_merges: required number of new tokens
     :return: dictionary in the form of <preprocessed word: number of occurrences>
     """
+    if not isinstance(word_frequencies, dict) or not isinstance(num_merges, int):
+        return None
+    while num_merges > 0:
+        pairs_of_tokens = count_tokens_pairs(word_frequencies)
+        if not pairs_of_tokens:
+            return None
+        if num_merges > len(pairs_of_tokens):
+            num_merges = len(pairs_of_tokens)
+        max_prevalence = max(pairs_of_tokens.values())
+        max_prev_pairs = []
+        for pair, frequency in word_frequencies.items():
+            if frequency == max_prevalence:
+                max_prev_pairs.append(pair)
 
 
 def get_vocabulary(
