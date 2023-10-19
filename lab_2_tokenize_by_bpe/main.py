@@ -44,7 +44,7 @@ def collect_frequencies(
     for word in tuple_of_words:
         prepared_word = prepare_word(word, start_of_word, end_of_word)
         if prepared_word is None:
-            return
+            return None
         if prepared_word not in dict_of_frequencies:
             dict_of_frequencies[prepared_word] = 1
         else:
