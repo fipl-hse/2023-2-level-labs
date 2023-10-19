@@ -4,6 +4,7 @@ BPE Tokenizer starter
 from pathlib import Path
 import lab_2_tokenize_by_bpe.main as main_py
 
+
 def main() -> None:
     """
     Launches an implementation
