@@ -3,6 +3,7 @@ Lab 1
 Language detection
 """
 
+
 def tokenize(text: str) -> list[str] | None:
     """
     Splits a text into tokens, converts the tokens into lowercase,
@@ -12,11 +13,10 @@ def tokenize(text: str) -> list[str] | None:
     """
     if not isinstance(text, str):
         return None
-    new_text = ''
+    tokens = []
     for i in text:
         if i.isalpha():
-            new_text += i
-    tokens = list(new_text.lower())
+            tokens += i.lower()
     return tokens
 
 
@@ -64,10 +64,10 @@ def calculate_mse(predicted: list, actual: list) -> float | None:
     """
     if not isinstance(predicted, list) or not isinstance(actual, list) or len(actual) != len(predicted):
         return None
-    sum = 0
+    sum_squares = 0
     for i in range(len(actual)):
-        sum += (actual[i] - predicted[i]) ** 2
-    mse = sum / len(actual)
+        sum_squares += (actual[i] - predicted[i]) ** 2
+    mse = sum_squares / len(actual)
     return mse
 
 
@@ -88,6 +88,16 @@ def compare_profiles(
         ('name' or 'freq') not in profile_to_compare
     ):
         return None
+    unknown_freq = []
+    compare_freq = []
+    unknown_tokens = set(unknown_profile['freq'].keys())
+    compare_tokens = set(profile_to_compare['freq'].keys())
+    tokens = unknown_tokens | compare_tokens
+    for token in tokens:
+        unknown_freq.append(unknown_profile['freq'].get(token, 0.0))
+        compare_freq.append(profile_to_compare['freq'].get(token, 0.0))
+    mse = calculate_mse(unknown_freq, compare_freq)
+    return mse
 
 
 def detect_language(
@@ -102,6 +112,20 @@ def detect_language(
     :param profile_2: a dictionary of a known profile
     :return: a language
     """
+    if (
+        not isinstance(unknown_profile, dict) or
+        not isinstance(profile_1, dict) or
+        not isinstance(profile_2, dict)
+    ):
+        return None
+    profile_1_mse = compare_profiles(unknown_profile, profile_1)
+    profile_2_mse = compare_profiles(unknown_profile, profile_2)
+    if isinstance(profile_1_mse, float) and isinstance(profile_2_mse, float):
+        if profile_1_mse < profile_2_mse:
+            return str(profile_1['name'])
+        if profile_1_mse > profile_2_mse:
+            return str(profile_2['name'])
+    return str([profile_1['name'], profile_2['name']].sort())
 
 
 def load_profile(path_to_file: str) -> dict | None:
