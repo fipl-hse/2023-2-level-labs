@@ -118,10 +118,6 @@ def train(
     pair_freq = count_tokens_pairs(word_frequencies)
 
 
-
-
-
-
 def get_vocabulary(
     word_frequencies: dict[tuple[str, ...], int], unknown_token: str
 ) -> dict[str, int] | None:
