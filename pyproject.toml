@@ -23,7 +23,7 @@ omit = [
 python_version = '3.10'
 exclude = [
     'venv*',
-    'tests/'
+    'test.py'
 ]
 
 disallow_untyped_defs = true
