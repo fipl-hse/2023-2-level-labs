@@ -15,6 +15,8 @@ def main() -> None:
 
     result = collect_frequencies(text, None, '/s')
     print(result)
+    assert result, "Encoding is not working"
+
 
 
 if __name__ == "__main__":
