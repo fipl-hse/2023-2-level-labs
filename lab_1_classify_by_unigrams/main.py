@@ -10,7 +10,7 @@ def tokenize(text: str) -> list[str] | None:
     :param text: a text
     :return: a list of lower-cased tokens without punctuation
     """
-    if not isinstance(text,str):
+    if not isinstance(text, str):
         return None
     wronglist = (list(text.lower()))
     goodlist = []
@@ -26,10 +26,10 @@ def calculate_frequencies(tokens: list[str] | None) -> dict[str, float] | None:
     :param tokens: a list of tokens
     :return: a dictionary with frequencies
     """
-    if not isinstance(tokens,list):
+    if not isinstance(tokens, list):
         return None
     for token in tokens:
-        if not isinstance(token,str):
+        if not isinstance(token, str):
             return None
         numberallitems=len(tokens)
         freq_dict = {}
@@ -49,13 +49,13 @@ def create_language_profile(language: str, text: str) -> dict[str, str | dict[st
     :param text: a text
     :return: a dictionary with two keys – name, freq
     """
-    if not isinstance(language,str):
+    if not isinstance(language, str):
         return None
-    if not isinstance(text,str):
+    if not isinstance(text, str):
         return None
     freq_dict = calculate_frequencies(tokenize(text))
 
-    if not isinstance(freq_dict,dict):
+    if not isinstance(freq_dict, dict):
         return None
 
     return{"name": language, "freq": freq_dict}
@@ -70,9 +70,9 @@ def calculate_mse(predicted: list, actual: list) -> float | None:
     :param actual: a list of actual values
     :return: the score
     """
-    if not isinstance(predicted,list):
+    if not isinstance(predicted, list):
         return None
-    if not isinstance(actual,list):
+    if not isinstance(actual, list):
         return None
     if len(predicted) != len(actual):
         return None
@@ -91,7 +91,7 @@ def compare_profiles(
     :param profile_to_compare: a dictionary of a profile to compare the unknown profile to
     :return: the distance between the profiles
     """
-    if not isinstance(unknown_profile,dict) or not isinstance(profile_to_compare,dict):
+    if not isinstance(unknown_profile, dict) or not isinstance(profile_to_compare, dict):
         return None
     if "name" not in unknown_profile or "freq" not in unknown_profile:
         return None
