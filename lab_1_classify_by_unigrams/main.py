@@ -49,7 +49,7 @@ def create_language_profile(language: str, text: str) -> dict[str, str | dict[st
     """
     if not isinstance(language, str) or not isinstance(text, str):
         return None
-    lang_prof = {}
+    lang_prof = dict({})
     lang_prof['name'] = language
     lang_prof['freq'] = calculate_frequencies(tokenize(text))
     return lang_prof
@@ -62,7 +62,11 @@ def calculate_mse(predicted: list, actual: list) -> float | None:
     :param actual: a list of actual values
     :return: the score
     """
-    if not isinstance(predicted, list) or not isinstance(actual, list) or len(actual) != len(predicted):
+    if (
+        not isinstance(predicted, list) or
+        not isinstance(actual, list) or
+        len(actual) != len(predicted)
+    ):
         return None
     sum_squares = 0
     for i in range(len(actual)):
