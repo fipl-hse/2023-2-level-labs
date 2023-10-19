@@ -12,8 +12,8 @@ def tokenize(text: str) -> list[str] | None:
     """
     if not isinstance(text,str):
         return None
-    wronglist=(list(text.lower()))
-    goodlist=[]
+    wronglist = (list(text.lower()))
+    goodlist = []
     for item in wronglist:
         if item.isalpha():
             goodlist.append(item)
@@ -32,11 +32,11 @@ def calculate_frequencies(tokens: list[str] | None) -> dict[str, float] | None:
         if not isinstance(token,str):
             return None
         numberallitems=len(tokens)
-        freq_dict={}
+        freq_dict = {}
         for item in tokens:
-            numberi=tokens.count(item)
-            freqi=numberi/numberallitems
-            freq_dict[item]=freqi
+            numberi = tokens.count(item)
+            freqi = numberi/numberallitems
+            freq_dict[item] = freqi
     return freq_dict
 
 
@@ -134,8 +134,8 @@ def detect_language(
     and isinstance(profile_2, dict)
     ):
         return None
-    mse_1=compare_profiles(unknown_profile,profile_1)
-    mse_2=compare_profiles(unknown_profile,profile_2)
+    mse_1 = compare_profiles(unknown_profile,profile_1)
+    mse_2 = compare_profiles(unknown_profile,profile_2)
     if not (isinstance(mse_1,float)
     and isinstance(mse_2,float)):
         return None
