@@ -69,8 +69,8 @@ def calculate_mse(predicted: list, actual: list) -> float | None:
     ):
         return None
     sum_squares = 0
-    for i in range(len(actual)):
-        sum_squares += (actual[i] - predicted[i]) ** 2
+    for i, c in enumerate(actual):
+        sum_squares += (c - predicted[i]) ** 2
     mse = sum_squares / len(actual)
     return mse
 
