@@ -62,6 +62,7 @@ epsilon
 error
 evaluation
 excel
+exp
 expected
 explained
 extraction
