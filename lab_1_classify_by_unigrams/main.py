@@ -18,11 +18,12 @@ def tokenize(text: str) -> list[str] | None:
     for token in tokens:
         if token in punctuation:
             tokens = tokens.replace(token, '')
-            tokens = tokens.replace(' ', '')
+            tokens = tokens = tokens.replace(' ', '')
     return list(tokens)
-
-
-   def calculate_frequencies(tokens: list[str] | None) -> dict[str, float] | None:
+        
+        
+        
+def calculate_frequencies(tokens: list[str] | None) -> dict[str, float] | None:
     """
     Calculates frequencies of given tokens
     :param tokens: a list of tokens
