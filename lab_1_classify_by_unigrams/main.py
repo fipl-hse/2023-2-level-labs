@@ -126,7 +126,7 @@ def detect_language(
             return str(profile_2['name'])
     list_of_names = [profile_1['name'], profile_2['name']]
     list_of_names.sort()
-    return list_of_names[0]
+    return str(list_of_names[0])
 
 
 def load_profile(path_to_file: str) -> dict | None:
