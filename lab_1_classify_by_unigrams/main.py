@@ -78,7 +78,7 @@ def calculate_mse(predicted: list, actual: list) -> float | None:
         return None
     numerator = 0
     length=len(actual)
-    for index in range(dlina):
+    for index in range(lenght):
         numerator += (actual[index] - predicted[index])**2
     mse=(numerator/length)
     return mse
