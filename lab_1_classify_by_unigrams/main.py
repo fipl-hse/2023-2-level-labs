@@ -146,6 +146,8 @@ def detect_language(
     detect_list = [profile_1["name"], profile_2["name"]].sort()
     if detect_list is not None:
         return detect_list[0]
+    else:
+        return None
 def load_profile(path_to_file: str) -> dict | None:
     """
     Loads a language profile
