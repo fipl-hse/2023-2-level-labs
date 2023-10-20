@@ -83,16 +83,18 @@ def merge_tokens(
     """
     if not isinstance(word_frequencies, dict) or not isinstance(pair, tuple):
         return None
+    altered_words = {}
+    new_words = {}
     for word in word_frequencies:
-        if pair[0] and pair[1] in word:
-            new_word = [word]
+        if pair[0:] in word:
+            new_word = [*word]
             replace_index = word.index(pair[0])
             new_pair = pair[0] + pair[1]
             new_word[replace_index] = new_pair
-            new_word.pop(replace_index + 1)
-            new_word = tuple(new_word)
-            word_frequencies[new_word] = word_frequencies[word]
-            del word
+            new_words[tuple(new_word)] = word_frequencies[word]
+            altered_words[word] = word_frequencies[word]
+    for word in altered_words:
+        word_frequencies.pop(word)
     return word_frequencies
 print(merge_tokens({('Д', 'ю', 'й', 'м', 'о', 'в', 'о', 'ч', 'к', 'а', '\n', 'Г', 'а', 'н', 'с', '</s>') : 1}, ('ч','к')))
 
