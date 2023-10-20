@@ -1,6 +1,7 @@
 """
 Checks the first lab text preprocessing functions
 """
+
 import unittest
 
 import pytest
