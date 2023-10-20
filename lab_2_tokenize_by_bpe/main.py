@@ -21,13 +21,13 @@ def prepare_word(
             not (isinstance(end_of_word, str) or end_of_word is None):
         return None
 
-    if not start_of_word and not end_of_word:
-        return tuple(list(raw_word))
-    if not start_of_word:
-        return tuple(list(raw_word) + [str(end_of_word)])
-    if not end_of_word:
-        return tuple([start_of_word] + list(raw_word))
-    return tuple([start_of_word] + list(raw_word) + [end_of_word])
+    tokens = []
+    if start_of_word:
+        tokens.append(start_of_word)
+    tokens.extend(list(raw_word))
+    if end_of_word:
+        tokens.append(end_of_word)
+    return tuple(tokens)
 
 
 def collect_frequencies(
@@ -129,20 +129,24 @@ def train(
         return None
     num_merges = min(num_merges, len(token_pairs))
 
-    occur_max = max(token_pairs.values())
-    pair_max_occur = [key for key, value in token_pairs.items() if value == occur_max]
+    for iteration in range(num_merges):
+        occur_max = max(token_pairs.values())
+        pair_max_occur = [key for key, value in token_pairs.items() if value == occur_max]
 
-    len_max = max(len(''.join(pair)) for pair in pair_max_occur)
-    pair_max_len = [pair for pair in pair_max_occur if len_max == len(''.join(pair))]
+        len_max = max(len(''.join(pair)) for pair in pair_max_occur)
+        pair_max_len = [pair for pair in pair_max_occur if len_max == len(''.join(pair))]
 
-    preferred_pairs = sorted(pair_max_len)
+        preferred_pair = sorted(pair_max_len)[0]
+        word_frequencies = merge_tokens(word_frequencies, preferred_pair)
+        if not word_frequencies:
+            return None
 
-    word_frequencies = merge_tokens(word_frequencies, preferred_pairs[0])
-    if not word_frequencies:
-        return None
-    if num_merges == 1:
-        return word_frequencies
-    return train(word_frequencies, num_merges - 1)
+        token_pairs.pop(preferred_pair)
+        token_pairs = count_tokens_pairs(word_frequencies)
+        if not token_pairs:
+            return None
+
+    return word_frequencies
 
 
 def get_vocabulary(
@@ -180,7 +184,7 @@ def get_vocabulary(
 
 
 def decode(
-    encoded_text: list[int], vocabulary: dict[str, int] | None, end_of_word_token: str | None
+    encoded_text: list[int] | None, vocabulary: dict[str, int] | None, end_of_word_token: str | None
 ) -> str | None:
     """
     Translates encoded sequence into decoded one
@@ -217,8 +221,8 @@ def decode(
 
 
 def tokenize_word(
-    word: tuple[str, ...], vocabulary: dict[str, int],
-    end_of_word: str | None, unknown_token: str
+        word: tuple[str, ...], vocabulary: dict[str, int],
+        end_of_word: str | None, unknown_token: str
 ) -> list[int] | None:
     """
     Splits word into tokens
@@ -282,7 +286,7 @@ def load_vocabulary(vocab_path: str) -> dict[str, int] | None:
 
 def encode(
         original_text: str,
-        vocabulary: dict[str, int],
+        vocabulary: dict[str, int] | None,
         start_of_word_token: str | None,
         end_of_word_token: str | None,
         unknown_token: str,

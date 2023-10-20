@@ -21,12 +21,12 @@ def main() -> None:
     if merged_freq:
         with open(assets_path / 'secrets/secret_5.txt', 'r', encoding='utf-8') as file:
             secret_text = file.read()
-        secret_vocab = get_vocabulary(merged_freq, '<unk>')
-        if secret_vocab:
-            print(secret_vocab)
+        vocabulary = get_vocabulary(merged_freq, '<unk>')
+        if vocabulary:
+            print(vocabulary)
 
             secret_list = [int(num) for num in secret_text.split()]
-            decoded_secret = decode(secret_list, secret_vocab, '</s>')
+            decoded_secret = decode(secret_list, vocabulary, '</s>')
 
             decoded_secret = decoded_secret.replace('ев', 'ел')
             decoded_secret = decoded_secret.replace('до', 'ев')
