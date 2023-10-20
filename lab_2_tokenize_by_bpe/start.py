@@ -3,9 +3,8 @@ BPE Tokenizer starter
 """
 import json
 from pathlib import Path
-from lab_2_tokenize_by_bpe.main import (collect_frequencies, decode, encode,
-                                        get_vocabulary, train)
 
+from lab_2_tokenize_by_bpe.main import collect_frequencies, decode, encode, get_vocabulary, train
 
 
 def main() -> None:
@@ -14,14 +13,14 @@ def main() -> None:
     """
     assets_path = Path(__file__).parent / 'assets'
     # Mark6 results
-    with open(assets_path / 'text.txt', 'r', encoding='utf-8') as text_file:
-        text = text_file.read()
+    with open(assets_path / 'text.txt', 'r', encoding='utf-8') as file:
+        text = file.read()
     text_freq = collect_frequencies(text, None, '</s>')
     merged_freq = train(text_freq, 100)
     # Secrets
     if merged_freq:
-        with open(assets_path / 'secrets/secret_5.txt', 'r', encoding='utf-8') as text_file:
-            secret_text = text_file.read()
+        with open(assets_path / 'secrets/secret_5.txt', 'r', encoding='utf-8') as file:
+            secret_text = file.read()
         secret_vocab = get_vocabulary(merged_freq, '<unk>')
         if secret_vocab:
             print(secret_vocab)
@@ -38,8 +37,8 @@ def main() -> None:
     # Step 14
     with open(assets_path / 'for_translation_ru_raw.txt', 'r', encoding='utf-8') as file:
         text_predicted = file.read()
-    with open(assets_path / 'vocab.json', 'r', encoding='utf-8') as vocab_file:
-        vocabulary = json.load(vocab_file)
+    with open(assets_path / 'vocab.json', 'r', encoding='utf-8') as file:
+        vocabulary = json.load(file)
     with open(assets_path / 'for_translation_ru_encoded.txt', 'r', encoding='utf-8') as file:
         encoded_actual = file.read()
 
@@ -51,6 +50,7 @@ def main() -> None:
     # _Произошло : 1003, (53, 11759, 1492 / 1483, 6737), 818
     # _Космонавтом : 5468, 230, (5699, 30218, 46 / 13283, 222, 6896)
     # _Гагарин. : 7150, (1382, 8324, 141 / 7744, 2190), 3
+
 
 if __name__ == "__main__":
     main()

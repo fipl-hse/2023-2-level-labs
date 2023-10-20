@@ -7,7 +7,7 @@ import math
 
 
 def prepare_word(
-        raw_word: str, start_of_word: str | None, end_of_word: str | None
+    raw_word: str, start_of_word: str | None, end_of_word: str | None
 ) -> tuple[str, ...] | None:
     """
     Tokenizes word into unigrams and appends end-of-word token
@@ -31,7 +31,7 @@ def prepare_word(
 
 
 def collect_frequencies(
-        text: str, start_of_word: str | None, end_of_word: str
+    text: str, start_of_word: str | None, end_of_word: str
 ) -> dict[tuple[str, ...], int] | None:
     """
     Counts number of occurrences of each word
@@ -57,7 +57,7 @@ def collect_frequencies(
 
 
 def count_tokens_pairs(
-        word_frequencies: dict[tuple[str, ...], int]
+    word_frequencies: dict[tuple[str, ...], int]
 ) -> dict[tuple[str, str], int] | None:
     """
     Counts number of occurrences of each pair of subsequent tokens
@@ -79,7 +79,7 @@ def count_tokens_pairs(
 
 
 def merge_tokens(
-        word_frequencies: dict[tuple[str, ...], int], pair: tuple[str, str]
+    word_frequencies: dict[tuple[str, ...], int], pair: tuple[str, str]
 ) -> dict[tuple[str, ...], int] | None:
     """
     Updates word frequency dictionary by replacing a pair of token with a merged one
@@ -113,7 +113,7 @@ def merge_tokens(
 
 
 def train(
-        word_frequencies: dict[tuple[str, ...], int] | None, num_merges: int
+    word_frequencies: dict[tuple[str, ...], int] | None, num_merges: int
 ) -> dict[tuple[str, ...], int] | None:
     """
     Creates required number of new tokens by merging existing ones
@@ -146,7 +146,7 @@ def train(
 
 
 def get_vocabulary(
-        word_frequencies: dict[tuple[str, ...], int], unknown_token: str
+    word_frequencies: dict[tuple[str, ...], int], unknown_token: str
 ) -> dict[str, int] | None:
     """
     Establishes correspondence between tokens and its integer identifier
@@ -174,18 +174,13 @@ def get_vocabulary(
 
     identifiers = {}
     for index, word in enumerate(len_alp_sorted):
-        # if index in (59, 60):
-        #     identifiers[word] = index - 1
-        # elif index == 58:
-        #     identifiers[word] = 60
-        # else:
         identifiers[word] = index
 
     return identifiers
 
 
 def decode(
-        encoded_text: list[int], vocabulary: dict[str, int] | None, end_of_word_token: str | None
+    encoded_text: list[int], vocabulary: dict[str, int] | None, end_of_word_token: str | None
 ) -> str | None:
     """
     Translates encoded sequence into decoded one
@@ -222,8 +217,8 @@ def decode(
 
 
 def tokenize_word(
-        word: tuple[str, ...], vocabulary: dict[str, int],
-        end_of_word: str | None, unknown_token: str
+    word: tuple[str, ...], vocabulary: dict[str, int],
+    end_of_word: str | None, unknown_token: str
 ) -> list[int] | None:
     """
     Splits word into tokens
@@ -244,35 +239,29 @@ def tokenize_word(
         tokens = sorted(list(vocabulary), key=len, reverse=True)
 
     word_str = ''.join([str(el) for el in word])
-    word_tokens = [token for token in tokens if token in word_str]
-    word_len = len(word)
+    tokens = [token for token in tokens if token in word_str]
     word_list = list(word)
 
-    encoded = [-1] * word_len
-    for token in word_tokens:
+    encoded = [-1] * len(word)
+    for token in tokens:
         count_token = word_str.count(token)
-        for start_index in range(word_len):
-            for end_index in range(start_index + 1, word_len+1):
+        for start_index in range(len(word_list)):
+            for end_index in range(start_index + 1, len(word_list)+1):
                 possible_token = ''.join(word_list[start_index:end_index])
                 if possible_token == token:
                     encoded[start_index:end_index] = [vocabulary[token]]
                     word_list[start_index:end_index] = [token]
-                    word_len = len(word_list)
                     count_token -= 1
                     break
             if count_token == 0:
                 break
 
     if -1 in encoded:
-        corrected_encoded = []
-        for num in encoded:
+        for index, num in enumerate(encoded):
             if num == -1:
-                corrected_encoded.append(vocabulary[unknown_token])
-            else:
-                corrected_encoded.append(num)
-    else:
-        corrected_encoded = encoded
-    return corrected_encoded
+                encoded[index] = vocabulary[unknown_token]
+
+    return encoded
 
 
 def load_vocabulary(vocab_path: str) -> dict[str, int] | None:
