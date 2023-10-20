@@ -144,9 +144,8 @@ def detect_language(
     if mse_1<mse_2:
         return str(profile_1["name"])
     detect_list = [profile_1["name"], profile_2["name"]].sort()
-    if detect_list is None:
-        return None
-    return detect_list[0]
+    if detect_list is not None:
+        return detect_list[0]
 def load_profile(path_to_file: str) -> dict | None:
     """
     Loads a language profile
