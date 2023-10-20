@@ -2,7 +2,7 @@
 Lab 1
 Language detection
 """
-from string import punctuation
+from string import punctuation, digits, whitespace
 
 def tokenize(text: str) -> list[str] | None:
     """
@@ -16,6 +16,10 @@ def tokenize(text: str) -> list[str] | None:
     tokens = text.lower()
     for token in tokens:
         if token in punctuation:
+            tokens = tokens.replace(token, '')
+        if token in digits:
+            tokens = tokens.replace(token, '')
+        if token in whitespace:
             tokens = tokens.replace(token, '')
     return list(tokens)
         
