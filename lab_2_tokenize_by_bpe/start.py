@@ -14,7 +14,7 @@ def main() -> None:
 
     result = None
     assert result, "Encoding is not working"
-    p
+
 
 if __name__ == "__main__":
     main()
