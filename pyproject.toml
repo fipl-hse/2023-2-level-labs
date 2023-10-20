@@ -4,7 +4,8 @@ markers = [
     "mark6: tests for level 6",
     "mark8: tests for level 8",
     "mark10: tests for level 10",
-    "lab_1_classify_by_unigrams: tests for lab 1"
+    "lab_1_classify_by_unigrams: tests for lab 1",
+    "lab_2_tokenize_by_bpe: tests for lab 2"
 ]
 norecursedirs = [
     "venv*"
@@ -13,14 +14,16 @@ norecursedirs = [
 [tool.coverage.run]
 omit = [
     '*/tests/*',
-    '*/start.py'
+    '*/start.py',
+    'lab_2_tokenize_by_bpe/helpers.py',
+    'lab_2_tokenize_by_bpe/assets/nmt_demo*'
 ]
 
 [tool.mypy]
 python_version = '3.10'
 exclude = [
     'venv*',
-    'tests/'
+    'test.py'
 ]
 
 disallow_untyped_defs = true
