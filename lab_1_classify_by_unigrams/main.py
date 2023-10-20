@@ -77,10 +77,10 @@ def calculate_mse(predicted: list, actual: list) -> float | None:
     if len(predicted) != len(actual):
         return None
     numerator = 0
-    dlina=len(actual)
+    length=len(actual)
     for index in range(dlina):
         numerator += (actual[index] - predicted[index])**2
-    mse=(numerator/dlina)
+    mse=(numerator/length)
     return mse
 def compare_profiles(
         unknown_profile: dict[str, str | dict[str, float]],
@@ -143,8 +143,8 @@ def detect_language(
         return str(profile_2["name"])
     if mse_1<mse_2:
         return str(profile_1["name"])
-    return [profile_1["name"], profile_2["name"]].sort()
-
+    listi = [profile_1["name"], profile_2["name"]].sort()
+    return listi[0]
 def load_profile(path_to_file: str) -> dict | None:
     """
     Loads a language profile
