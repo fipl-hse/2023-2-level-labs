@@ -16,7 +16,7 @@ def tokenize(text: str) -> list[str] | None:
     tokens = []
     for i in text:
         if i.isalpha():
-            tokens += i.lower()
+            tokens.append(i.lower())
     return tokens
 
 
@@ -31,13 +31,7 @@ def calculate_frequencies(tokens: list[str] | None) -> dict[str, float] | None:
     for i in tokens:
         if not isinstance(i, str):
             return None
-    dictionary = {}
-    for i in tokens:
-        if i in dictionary:
-            dictionary[i] += 1 / len(tokens)
-        else:
-            dictionary[i] = 1 / len(tokens)
-    return dictionary
+    return {i: tokens.count(i) / len(tokens) for i in tokens}
 
 
 def create_language_profile(language: str, text: str) -> dict[str, str | dict[str, float]] | None:
@@ -127,10 +121,12 @@ def detect_language(
     profile_2_mse = compare_profiles(unknown_profile, profile_2)
     if isinstance(profile_1_mse, float) and isinstance(profile_2_mse, float):
         if profile_1_mse < profile_2_mse:
-            return str(profile_1['name'])
+            return profile_1['name']
         if profile_1_mse > profile_2_mse:
-            return str(profile_2['name'])
-    return str([profile_1['name'], profile_2['name']].sort())
+            return profile_2['name']
+    list_of_names = [profile_1['name'], profile_2['name']]
+    list_of_names.sort()
+    return list_of_names[0]
 
 
 def load_profile(path_to_file: str) -> dict | None:
