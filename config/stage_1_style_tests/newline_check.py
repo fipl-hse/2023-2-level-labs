@@ -24,7 +24,7 @@ def get_paths() -> list:
     return list_with_paths
 
 
-def check_paths(list_with_paths: list):
+def check_paths(list_with_paths: list) -> list:
     """
     Checks if the path is correct
     """
@@ -62,7 +62,7 @@ def has_newline(paths: list) -> bool:
     return True
 
 
-def main():
+def main() -> None:
     """
     Entrypoint for module
     """
