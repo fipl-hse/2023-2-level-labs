@@ -15,8 +15,7 @@ def prepare_word(
     :return: preprocessed word
     """
     if not isinstance(raw_word, str) \
-            or not isinstance(start_of_word, (str | None)) \
-            or not isinstance(end_of_word, (str | None)):
+            or not isinstance(start_of_word and end_of_word, (str | None)):
         return None
     if start_of_word is None:
         preprocessed = tuple([*list(raw_word), end_of_word])
@@ -69,10 +68,7 @@ def count_tokens_pairs(
             token_pair = (word[i], word[i+1])
             if token_pair not in pair_freq:
                 pair_freq[token_pair] = 0
-            if freq > 1:
-                pair_freq[token_pair] += freq
-            else:
-                pair_freq[token_pair] += 1
+            pair_freq[token_pair] += freq
     return pair_freq
 
 
