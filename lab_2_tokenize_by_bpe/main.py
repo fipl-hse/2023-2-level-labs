@@ -113,8 +113,7 @@ def train(
         paired_words = count_tokens_pairs(word_frequencies)
         if not paired_words:
             return None
-        if num_merges > len(paired_words):
-            num_merges = len(paired_words)
+        num_merges = min(num_merges, len(paired_words))
         max_occur = max(paired_words.values())
         good_pairs = [pair for pair, freq in paired_words.items() if freq == max_occur]
         max_len = max(len(str(pair)) for pair in good_pairs)
@@ -167,14 +166,14 @@ def decode(
             and isinstance(vocabulary, dict)
             and (isinstance(end_of_word_token, str) or end_of_word_token is None)):
         return None
-    dec_text = ''
+    text = ''
     inv_d = {value: key for key, value in vocabulary.items()}
     for num in encoded_text:
-        token = inv_d[num]
-        if end_of_word_token and end_of_word_token in token:
-            token = token.replace(end_of_word_token, ' ')
-        dec_text += token
-    return dec_text
+        if end_of_word_token and end_of_word_token in inv_d[num]:
+            text += inv_d[num].replace(end_of_word_token, ' ')
+        elif num in vocabulary.values():
+            text += inv_d[num]
+    return text
 
 
 def tokenize_word(
