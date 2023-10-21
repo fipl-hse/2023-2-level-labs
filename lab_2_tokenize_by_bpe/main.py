@@ -82,9 +82,6 @@ def count_tokens_pairs(
 
             pair_frequency_dict[pair_token] += word_frequencies[word_tokens]
 
-    if not pair_frequency_dict:
-        return None
-
     return pair_frequency_dict
 
 
@@ -193,8 +190,8 @@ def get_vocabulary(
     for word_tokens in word_frequencies:
         for token in word_tokens:
             all_tokens.append(token)
-            prepared_word = list(prepare_word(token, None, None))
-            all_tokens.extend(prepared_word)
+            prepared_word = prepare_word(token, None, None)
+            all_tokens += prepared_word
     all_tokens_unique = set(all_tokens)
     all_tokens_sorted = sorted(all_tokens_unique, key=lambda x: (-len(x), x))
 
