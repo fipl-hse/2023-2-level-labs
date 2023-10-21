@@ -68,7 +68,10 @@ def count_tokens_pairs(
     :param word_frequencies: dictionary in the form of <preprocessed word: number of occurrences>
     :return: dictionary in the form of <token pair: number of occurrences>
     """
-    if not isinstance(word_frequencies, dict):
+    if not (
+            isinstance(word_frequencies, dict)
+            and all(isinstance(token_words, tuple) for token_words in word_frequencies)
+    ):
         return None
 
     pair_frequency_dict = {}
@@ -191,7 +194,7 @@ def get_vocabulary(
         for token in word_tokens:
             all_tokens.append(token)
             prepared_word = prepare_word(token, None, None)
-            all_tokens += prepared_word
+            all_tokens += list(prepared_word)
     all_tokens_unique = set(all_tokens)
     all_tokens_sorted = sorted(all_tokens_unique, key=lambda x: (-len(x), x))
 
