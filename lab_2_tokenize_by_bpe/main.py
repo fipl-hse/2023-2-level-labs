@@ -28,9 +28,7 @@ def prepare_word(
     if end_of_word:
         tokenized_word.append(end_of_word)
 
-    tokenized_word_tuple = tuple(tokenized_word)
-
-    return tokenized_word_tuple
+    return tuple(tokenized_word)
 
 
 def collect_frequencies(
@@ -51,12 +49,13 @@ def collect_frequencies(
         return None
 
     frequency_dict = {}
-    for word in text.split():
+    text_list = text.split()
+    for word in text_list:
         prepared_word = prepare_word(word, start_of_word, end_of_word)
         if not prepared_word:
             return None
 
-        frequency_dict[prepared_word] = text.split().count(word)
+        frequency_dict[prepared_word] = text_list.count(word)
 
     return frequency_dict
 
@@ -76,14 +75,12 @@ def count_tokens_pairs(
 
     for word_tokens in word_frequencies:
         for i in range(len(word_tokens) - 1):
-            token = word_tokens[i]
-            next_token = word_tokens[i + 1]
-            pair_token = (token, next_token)
+            pair_token = word_tokens[i:i + 2]
 
             if pair_token not in pair_frequency_dict:
-                pair_frequency_dict[pair_token] = word_frequencies[word_tokens]
-            else:
-                pair_frequency_dict[pair_token] += word_frequencies[word_tokens]
+                pair_frequency_dict[pair_token] = 0
+
+            pair_frequency_dict[pair_token] += word_frequencies[word_tokens]
 
     return pair_frequency_dict
 
@@ -104,13 +101,14 @@ def merge_tokens(
         return None
 
     merged_dict = {}
+    second_token = pair[1]
 
     for word_tokens in word_frequencies:
         word_tokens_list = list(word_tokens)
-        if pair[1] in word_tokens:
+        if second_token in word_tokens:
             pair_token_index = []
             for index in range(len(word_tokens) - 1):
-                token_pair = (word_tokens[index], word_tokens[index + 1])
+                token_pair = word_tokens[index: index + 2]
                 if token_pair == pair:
                     pair_token_index.append(index)
 
@@ -147,25 +145,27 @@ def train(
     if num_merges > len(token_pairs_dict):
         num_merges = len(token_pairs_dict)
 
-    max_freq = max(token_pairs_dict.values())
-    max_freq_tokens = []
+    for i in range(num_merges):
+        max_freq = max(token_pairs_dict.values())
+        max_freq_tokens = []
 
-    for pair in token_pairs_dict:
-        if token_pairs_dict[pair] == max_freq:
-            max_freq_tokens.append(pair)
+        for pair in token_pairs_dict:
+            if token_pairs_dict[pair] == max_freq:
+                max_freq_tokens.append(pair)
 
-    max_freq_tokens = sorted(max_freq_tokens, key=lambda x: (-len(''.join(x)), x))
-    token_pair = max_freq_tokens[0]
+        max_freq_tokens = sorted(max_freq_tokens, key=lambda x: (-len(''.join(x)), x))
+        token_pair = max_freq_tokens[0]
 
-    word_frequencies = merge_tokens(word_frequencies, token_pair)
+        word_frequencies = merge_tokens(word_frequencies, token_pair)
+
+        token_pairs_dict = count_tokens_pairs(word_frequencies)
+        if not token_pairs_dict:
+            return None
 
     if not word_frequencies:
         return None
 
-    if num_merges == 1:
-        return word_frequencies
-
-    return train(word_frequencies, num_merges - 1)
+    return word_frequencies
 
 
 def get_vocabulary(
@@ -183,14 +183,13 @@ def get_vocabulary(
     ):
         return None
 
-    all_tokens = set()
+    all_tokens = [unknown_token]
     for word_tokens in word_frequencies:
         for token in word_tokens:
-            all_tokens.add(token)
-            for token_part in token:
-                all_tokens.add(token_part)
-    all_tokens.add(unknown_token)
-    all_tokens_list = list(all_tokens)
+            all_tokens.append(token)
+            prepared_word = prepare_word(token, None, None)
+            all_tokens.extend(prepared_word)
+    all_tokens_list = set(all_tokens)
     all_tokens_list = sorted(all_tokens_list, key=lambda x: (-len(x), x))
 
     tokens_id_dict = {}
