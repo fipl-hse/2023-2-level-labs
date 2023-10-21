@@ -75,15 +75,12 @@ def count_tokens_pairs(
 
     for word_tokens in word_frequencies:
         for i in range(len(word_tokens) - 1):
-            pair_token = word_tokens[i:i + 2]
+            pair_token = (word_tokens[i], word_tokens[i + 1])
 
             if pair_token not in pair_frequency_dict:
                 pair_frequency_dict[pair_token] = 0
 
             pair_frequency_dict[pair_token] += word_frequencies[word_tokens]
-
-    if len(pair_frequency_dict) == 0:
-        return None
 
     return pair_frequency_dict
 
