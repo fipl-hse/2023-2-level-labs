@@ -82,6 +82,9 @@ def count_tokens_pairs(
 
             pair_frequency_dict[pair_token] += word_frequencies[word_tokens]
 
+    if not pair_frequency_dict:
+        return None
+
     return pair_frequency_dict
 
 
