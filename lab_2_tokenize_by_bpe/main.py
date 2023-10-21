@@ -191,12 +191,12 @@ def get_vocabulary(
         for token in word_tokens:
             all_tokens.append(token)
             prepared_word = prepare_word(token, None, None)
-            all_tokens.extend(prepared_word)
-    all_tokens_list = set(all_tokens)
-    all_tokens_list = sorted(all_tokens_list, key=lambda x: (-len(x), x))
+            all_tokens.extend(list(prepared_word))
+    all_tokens = set(all_tokens)
+    all_tokens_sorted = sorted(list(all_tokens), key=lambda x: (-len(x), x))
 
     tokens_id_dict = {}
-    for i, token in enumerate(all_tokens_list):
+    for i, token in enumerate(all_tokens_sorted):
         tokens_id_dict[token] = i
 
     return tokens_id_dict
