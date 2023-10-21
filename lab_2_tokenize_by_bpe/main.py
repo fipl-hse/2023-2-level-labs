@@ -161,6 +161,9 @@ def train(
 
         word_frequencies = merge_tokens(word_frequencies, token_pair)
 
+        if not word_frequencies:
+            return None
+
         token_pairs_dict = count_tokens_pairs(word_frequencies)
         if not token_pairs_dict:
             return None
@@ -190,10 +193,10 @@ def get_vocabulary(
     for word_tokens in word_frequencies:
         for token in word_tokens:
             all_tokens.append(token)
-            prepared_word = prepare_word(token, None, None)
-            all_tokens.extend(list(prepared_word))
-    all_tokens = set(all_tokens)
-    all_tokens_sorted = sorted(list(all_tokens), key=lambda x: (-len(x), x))
+            prepared_word = list(prepare_word(token, None, None))
+            all_tokens.extend(prepared_word)
+    all_tokens_unique = set(all_tokens)
+    all_tokens_sorted = sorted(all_tokens_unique, key=lambda x: (-len(x), x))
 
     tokens_id_dict = {}
     for i, token in enumerate(all_tokens_sorted):
