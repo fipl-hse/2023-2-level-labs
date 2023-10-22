@@ -21,15 +21,12 @@ def prepare_word(
     ):
         return None
 
-    word_tokens = []
 
-    if start_of_word is not None:
-        word_tokens.append(start_of_word)
-
-    for char in raw_word:
-        word_tokens.append(char)
-
-    word_tokens.append(end_of_word)
+    word_tokens = list(raw_word)
+    if start_of_word:
+        word_tokens.insert(0, start_of_word)
+    if end_of_word:
+        word_tokens.append(end_of_word)
 
     return tuple(word_tokens)
 
@@ -58,7 +55,7 @@ def collect_frequencies(
         if prepared_word is None:
             return None
 
-        frequencies.update({prepared_word: words.count(word)})
+        frequencies[prepared_word] = words.count(word)
 
     return frequencies
 
@@ -81,11 +78,7 @@ def count_tokens_pairs(
             token = word_tokens[i]
             next_token = word_tokens[i + 1]
             pair = (token, next_token)
-
-            if pair not in pair_frequency_dict:
-                pair_frequency_dict[pair] = word_frequencies[word_tokens]
-            else:
-                pair_frequency_dict[pair] += word_frequencies[word_tokens]
+            pair_frequency_dict[pair] = pair_frequency_dict.get(pair, 0) + word_frequencies[word_tokens]
 
     return pair_frequency_dict
 
