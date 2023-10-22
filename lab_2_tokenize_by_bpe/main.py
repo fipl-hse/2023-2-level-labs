@@ -118,11 +118,9 @@ def train(
     for n in range(num_merges):
         tokens = count_tokens_pairs(merged_text)
         if not tokens:
-            return None
-        top_tokens = sorted(tokens.items(), key=lambda x: (-x[1], len(x[0]), str(x[0]).lower()))
-        if len(top_tokens) < n:
             break
-        merged_text = merge_tokens(merged_text, top_tokens[n][0])
+        top_tokens = sorted(tokens.items(), key=lambda x: (-x[1], -len(''.join(x[0])), str(x[0]).lower()))
+        merged_text = merge_tokens(merged_text, top_tokens[0][0])
         if not merged_text:
             return None
     return merged_text
