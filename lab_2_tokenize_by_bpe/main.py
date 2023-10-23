@@ -15,8 +15,8 @@ def prepare_word(
     :return: preprocessed word
     """
     if (not isinstance(raw_word, str)
-        or not isinstance(start_of_word, str | None)
-        or not isinstance(end_of_word, str | None)):
+       or not isinstance(start_of_word, str | None)
+       or not isinstance(end_of_word, str | None)):
         return None
     tokens = list(symbol for symbol in raw_word)
     if start_of_word:
@@ -37,8 +37,8 @@ def collect_frequencies(
     :return: dictionary in the form of <preprocessed word: number of occurrences>
     """
     if (not isinstance(text, str)
-        or not isinstance(start_of_word, str | None)
-        or not isinstance(end_of_word, str)):
+       or not isinstance(start_of_word, str | None)
+       or not isinstance(end_of_word, str)):
         return None
     words = text.split()
     freq_dict = {prepare_word(word, start_of_word, end_of_word): words.count(word) for word in set(words)}
@@ -76,7 +76,7 @@ def merge_tokens(
     :return: dictionary in the form of <preprocessed word: number of occurrences>
     """
     if (not isinstance(word_frequencies, dict)
-        or not isinstance(pair, tuple)):
+       or not isinstance(pair, tuple)):
         return None
     new_dict = {}
     for word in word_frequencies:
@@ -112,7 +112,7 @@ def train(
     :return: dictionary in the form of <preprocessed word: number of occurrences>
     """
     if (not isinstance(word_frequencies, dict | None)
-        or not isinstance(num_merges, int)):
+       or not isinstance(num_merges, int)):
         return None
     merged_text = word_frequencies
     for n in range(num_merges):
@@ -135,6 +135,21 @@ def get_vocabulary(
     :param unknown_token: a token to signify an unknown token
     :return: dictionary in the form of <token: identifier>
     """
+    if (not isinstance(word_frequencies, dict)
+            or not isinstance(unknown_token, str)):
+        return None
+    tokens = [unknown_token]
+    for word in word_frequencies:
+        for word_part in word:
+            tokens.append(word_part)
+            for symbol in word_part:
+                if symbol not in tokens:
+                    tokens.append(symbol)
+    tokens.sort(key=lambda x: (-len(x), str(x[0])))
+    id_clues = {}
+    for i in range(len(tokens)):
+        id_clues[tokens[i]] = i
+    return id_clues
 
 
 def decode(
