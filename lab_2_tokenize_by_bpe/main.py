@@ -41,14 +41,12 @@ def collect_frequencies(
         return None
     dict_of_frequencies = {}
     tuple_of_words = text.split()
+    set_of_words = set(tuple_of_words)
     for word in tuple_of_words:
         prepared_word = prepare_word(word, start_of_word, end_of_word)
         if prepared_word is None:
             return None
-        if prepared_word not in dict_of_frequencies:
-            dict_of_frequencies[prepared_word] = 1
-        else:
-            dict_of_frequencies[prepared_word] += 1
+        dict_of_frequencies[prepared_word] = tuple_of_words.count(word)
     return dict_of_frequencies
 
 
