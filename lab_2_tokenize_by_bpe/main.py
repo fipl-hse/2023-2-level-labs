@@ -41,7 +41,6 @@ def collect_frequencies(
         return None
     dict_of_frequencies = {}
     tuple_of_words = text.split()
-    set_of_words = set(tuple_of_words)
     for word in tuple_of_words:
         prepared_word = prepare_word(word, start_of_word, end_of_word)
         if prepared_word is None:
@@ -69,7 +68,6 @@ def count_tokens_pairs(
             else:
                 dict_of_token_pairs[pair_as_tuple] += word_frequencies[key]
     return dict_of_token_pairs
-
 
 
 def merge_tokens(
