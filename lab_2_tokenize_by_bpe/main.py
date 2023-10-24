@@ -58,6 +58,18 @@ def count_tokens_pairs(
     :param word_frequencies: dictionary in the form of <preprocessed word: number of occurrences>
     :return: dictionary in the form of <token pair: number of occurrences>
     """
+    if not isinstance(word_frequencies, dict):
+        return None
+    dict_of_token_pairs = {}
+    for key in word_frequencies.keys():
+        for i in range(len(key)-1):
+            pair_as_tuple = (key[i], key[i+1])
+            if pair_as_tuple not in dict_of_token_pairs.keys():
+                dict_of_token_pairs[pair_as_tuple] = word_frequencies[key]
+            else:
+                dict_of_token_pairs[pair_as_tuple] += word_frequencies[key]
+    return dict_of_token_pairs
+
 
 
 def merge_tokens(
