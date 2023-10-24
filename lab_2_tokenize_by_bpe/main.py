@@ -162,6 +162,16 @@ def decode(
     :param end_of_word_token: an end-of-word token
     :return: decoded sequence
     """
+    if (not isinstance(encoded_text, list)
+       or not isinstance(vocabulary, dict)
+       or not isinstance(end_of_word_token, str | None)):
+        return None
+    decoded_text = ''
+    reverse_vocabulary = {pair[1]: (pair[0].replace(end_of_word_token, ' ') if end_of_word_token else pair[0])
+                          for pair in vocabulary.items()}
+    for code in encoded_text:
+        decoded_text += reverse_vocabulary[code]
+    return decoded_text
 
 
 def tokenize_word(
@@ -175,6 +185,7 @@ def tokenize_word(
     :param unknown_token: token that signifies unknown sequence
     :return: list of token identifiers
     """
+
 
 
 def load_vocabulary(vocab_path: str) -> dict[str, int] | None:
