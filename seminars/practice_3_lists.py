@@ -82,14 +82,7 @@ def sum13(nums: list) -> int:
     also do not count.
     """
     # student realization goes here
-    nums = []
-    for num in nums:
-        if num != 13:
-            nums += num
-        else:
-            break
-    print(sum13)
-    return sum13
+
 # Function calls with expected result:
 # sum13([1, 2, 2, 1])
 # sum13([1, 1])
@@ -140,14 +133,14 @@ def create_phone_number(nums: list) -> str:
     that returns a string of those numbers in the form of a phone number.
     """
     # student realization goes here
-    nums = ''.join(str(i) for i in nums)
-    first_part = nums[:3]
-    second_part = nums[3:6]
-    third_part = nums[6:]
+    #nums = ''.join(str(i) for i in nums)
+    #first_part = nums[:3]
+    #second_part = nums[3:6]
+    #third_part = nums[6:]
 
-    phone_number = f"({first_part}) {second_part}-{third_part}"
-    print(phone_number)
-    return phone_number
+    #phone_number = f"({first_part}) {second_part}-{third_part}"
+    #print(phone_number)
+    #return phone_number
 # Function calls with expected result:
 # create_phone_number([1, 2, 3, 4, 5, 6, 7, 8, 9, 0])
 # => returns "(123) 456-7890"
