@@ -24,7 +24,6 @@ def calculate_frequencies(tokens: list[str] | None) -> dict[str, float] | None:
     :param tokens: a list of tokens
     :return: a dictionary with frequencies
     """
-<<<<<<< HEAD
 
     if not isinstance(tokens, list):
         return None
@@ -38,16 +37,6 @@ def calculate_frequencies(tokens: list[str] | None) -> dict[str, float] | None:
         freq_dict[token] = tokens.count(token) / length
 
     return freq_dict
-
-=======
-    if not (
-            isinstance(tokens, list) and all(isinstance(el, str) for el in tokens)
-    ):
-        return None
-
-    frequency_dict = {el: (tokens.count(el) / len(tokens)) for el in tokens}
-    return frequency_dict
->>>>>>> 65edb31c98e5022471da1958587681a895d1b48e
 
 
 def create_language_profile(language: str, text: str) -> dict[str, str | dict[str, float]] | None:
