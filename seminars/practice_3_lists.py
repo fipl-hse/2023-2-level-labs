@@ -50,6 +50,7 @@ first_test = [1, 2, 3, [1, 2, 3]]
 # .reverse() – reverses the list in place
 # .copy() – returns a shallow copy of the list
 
+
 # TASKS
 
 # Task 1:
@@ -64,11 +65,12 @@ def count_evens(nums: list) -> int:
         if element % 2 == 0:
             count_ev += 1
     print(count_ev)
+    return count_ev
 
 # Function calls with expected result:
-count_evens([2, 1, 2, 3, 4])
-count_evens([2, 2, 0])
-count_evens([1, 3, 5])
+# count_evens([2, 1, 2, 3, 4])
+# count_evens([2, 2, 0])
+# count_evens([1, 3, 5])
 
 # Task 2:
 # easy level
@@ -87,8 +89,9 @@ def sum13(nums: list) -> int:
         else:
             break
     print(sum13)
+    return sum13
 # Function calls with expected result:
-sum13([1, 2, 2, 1])
+# sum13([1, 2, 2, 1])
 # sum13([1, 1])
 # sum13([1, 2, 2, 1, 13])
 # sum13([1, 2, 2, 1, 13, 5, 6])
@@ -122,10 +125,11 @@ def sum67(nums: list) -> int:
         count += number
 
     print(count)
+    return count
 # Function calls with expected result:
-#sum67([1, 2, 2])
-sum67([1, 2, 2, 6, 99, 99, 7])
-sum67([1, 1, 6, 7, 2])
+# sum67([1, 2, 2])
+# sum67([1, 2, 2, 6, 99, 99, 7])
+# sum67([1, 1, 6, 7, 2])
 
 
 # Task 4
@@ -143,8 +147,9 @@ def create_phone_number(nums: list) -> str:
 
     phone_number = f"({first_part}) {second_part}-{third_part}"
     print(phone_number)
+    return phone_number
 # Function calls with expected result:
-create_phone_number([1, 2, 3, 4, 5, 6, 7, 8, 9, 0])
+# create_phone_number([1, 2, 3, 4, 5, 6, 7, 8, 9, 0])
 # => returns "(123) 456-7890"
 
 
