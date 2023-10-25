@@ -58,8 +58,8 @@ def count_tokens_pairs(
         return None
     pairs_of_tokens = {}
     for tokens, count in word_frequencies.items():
-        for i in range(len(tokens) - 1):
-            pair = (tokens[i], tokens[i + 1])
+        for index in range(len(tokens) - 1):
+            pair = (tokens[index], tokens[index + 1])
             pairs_of_tokens[pair] = pairs_of_tokens.get(pair, 0) + 1
     return pairs_of_tokens
 
@@ -114,7 +114,7 @@ def train(
         num_merges -= 1
     return word_frequencies
 
-print(train({('a', 'b'): 3, ('b', 'cd'): 3, ('b', 'ca'): 3}, 2))
+
 def get_vocabulary(
     word_frequencies: dict[tuple[str, ...], int], unknown_token: str
 ) -> dict[str, int] | None:
