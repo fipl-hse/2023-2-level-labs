@@ -1,4 +1,4 @@
-name: "Check Pull Request Readiness"
+name: "Check PR"
 
 on:
   push:
@@ -85,6 +85,7 @@ jobs:
     needs: [ install-dependencies ]
     env:
       PR_NAME: ${{ github.event.pull_request.title }}
+      PR_AUTHOR: ${{ github.actor }}
 
     steps:
       - uses: actions/checkout@v3
@@ -92,7 +93,7 @@ jobs:
         uses: fipl-hse/setup-env-action@v0.9
       - name: Run tests
         run: |
-          bash config/run_tests.sh "$PR_NAME"
+          bash config/run_tests.sh "$PR_NAME" "$PR_AUTHOR"
 
   start:
     name: Check start.py
@@ -191,6 +192,36 @@ jobs:
         if: ${{ env.REPOSITORY_TYPE == 'admin' }}
         run: |
           bash config/stage_1_style_tests/_stage_run_pymarkdownlnt.sh
+
+  doc8-checks:
+    name: Doc8 checks
+    runs-on: ubuntu-latest
+    timeout-minutes: 2
+    needs: [ install-dependencies ]
+
+    steps:
+      - uses: actions/checkout@v3
+      - name: Setup FIPL environment
+        uses: fipl-hse/setup-env-action@v0.9
+      - name: Doc8 check
+        if: ${{ env.REPOSITORY_TYPE == 'admin' }}
+        run: |
+          bash config/stage_1_style_tests/_stage_run_doc8.sh
+
+  docstring-style-checks:
+    name: Docstring style checks
+    runs-on: ubuntu-latest
+    timeout-minutes: 2
+    needs: [ install-dependencies ]
+
+    steps:
+      - uses: actions/checkout@v3
+      - name: Setup FIPL environment
+        uses: fipl-hse/setup-env-action@v0.9
+      - name: Docstring style checks
+        if: ${{ env.REPOSITORY_TYPE == 'admin' }}
+        run: |
+          bash config/stage_1_style_tests/_stage_docstring_check.sh
 
   requirements-check:
     name: Requirements check
