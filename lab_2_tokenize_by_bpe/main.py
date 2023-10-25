@@ -23,7 +23,7 @@ def prepare_word(
         list_of_tokens.insert(0, start_of_word)
     if end_of_word:
         list_of_tokens.append(end_of_word)
-        return tuple(list_of_tokens)
+    return tuple(list_of_tokens)
 
 
 def collect_frequencies(
@@ -59,7 +59,6 @@ def count_tokens_pairs(
     if not isinstance(word_frequencies, dict):
         return None
     word_frequencies_list = list(word_frequencies)
-    print(word_frequencies_list)
     dictionary = {}
     for i in word_frequencies_list:
         for j in range(len(i) - 1):
@@ -83,6 +82,17 @@ def merge_tokens(
     if not isinstance(word_frequencies, dict) or not isinstance(pair, tuple):
         return None
     dict_with_tokens = {}
+    pair_indexes = f"'{pair[0]}', '{pair[1]}'"
+    for elem in word_frequencies:
+        list_with_words = list(elem)
+        if pair_indexes in str(elem):
+            for symbol in range(len(elem) - 1):
+                if (elem[symbol] + elem[symbol + 1]) == pair[0] + pair[1]:
+                    list_with_words[symbol + 1] = ''.join(pair)
+                    list_with_words.pop(symbol)
+        dict_with_tokens.update({tuple(list_with_words): word_frequencies[elem]})
+    return dict_with_tokens
+
 
 def train(
     word_frequencies: dict[tuple[str, ...], int] | None, num_merges: int
