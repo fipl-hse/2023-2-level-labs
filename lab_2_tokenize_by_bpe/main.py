@@ -17,13 +17,15 @@ def prepare_word(
     if not isinstance(raw_word, str) \
             or not isinstance(start_of_word and end_of_word, (str | None)):
         return None
-    if start_of_word is None:
-        preprocessed = tuple([*list(raw_word), end_of_word])
-    elif end_of_word is None:
-        preprocessed = tuple([start_of_word, *list(raw_word)])
-    else:
-        preprocessed = tuple([start_of_word, *list(raw_word), end_of_word])
-    return preprocessed
+    if start_of_word is not None and end_of_word is not None:
+        return tuple([start_of_word, *list(raw_word), end_of_word])
+    if start_of_word is None and end_of_word is None:
+        return tuple([*list(raw_word)])
+    if start_of_word is None and end_of_word is not None:
+        return tuple([*list(raw_word), end_of_word])
+    if end_of_word is None and start_of_word is not None:
+        return tuple([start_of_word, *list(raw_word)])
+    return None
 
 
 def collect_frequencies(
@@ -88,8 +90,8 @@ def merge_tokens(
     for word, freq in word_frequencies.items():
         new_word = list(word)
         for i in range(1, len(word)):
-            if (word[i-1], word[i]) == pair:
-                new_word[i-1] = str_pair
+            if (word[i - 1], word[i]) == pair:
+                new_word[i - 1] = str_pair
                 new_word[i] = ""
         if "" in new_word:
             new_word.remove("")
@@ -109,26 +111,23 @@ def train(
     if not isinstance(word_frequencies, dict) or not isinstance(num_merges, int):
         return None
     merges_count = 0
-    merged = word_frequencies.copy()
     while merges_count < num_merges:
-
-        pair_freq = count_tokens_pairs(merged)
+        pair_freq = count_tokens_pairs(word_frequencies)
         if pair_freq is None:
             return None
         if pair_freq != {}:
             sorted_dict = dict(
                 sorted(pair_freq.items(),
                        key=lambda item: (-item[1], -len("".join(item[0])), "".join(item[0]))))
-
             for k in sorted_dict.keys():
-                merged = merge_tokens(merged, k)
-                if merged is None:
+                word_frequencies = merge_tokens(word_frequencies, k)
+                if word_frequencies is None:
                     return None
                 merges_count += 1
                 break
             continue
         break
-    return merged
+    return word_frequencies
 
 
 def get_vocabulary(
