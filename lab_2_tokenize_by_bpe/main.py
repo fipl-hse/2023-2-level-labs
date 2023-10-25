@@ -122,7 +122,7 @@ def train(
                 max_freq = freq
         for pair in token_pairs:
             if token_pairs[pair] == max_freq:
-                max_pairs.append(word)
+                max_pairs.append(pair)
         if len(max_pairs) > 1:
             long_pair = ""
             for pair in max_pairs:
