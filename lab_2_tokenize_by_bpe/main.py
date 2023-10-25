@@ -333,7 +333,6 @@ def collect_ngrams(text: str, order: int) -> list[tuple[str, ...]] | None:
     n_grams = []
     text_length = len(text)
     for index in range(text_length + 1 - order):
-        print(tuple(text[index:index + order]))
         n_grams.append(tuple(text[index:index + order]))
 
     return n_grams

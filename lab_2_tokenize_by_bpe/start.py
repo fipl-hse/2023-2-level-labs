@@ -4,7 +4,7 @@ BPE Tokenizer starter
 import json
 from pathlib import Path
 
-from lab_2_tokenize_by_bpe.main import collect_frequencies, decode, encode, get_vocabulary, train
+from lab_2_tokenize_by_bpe.main import calculate_bleu, collect_frequencies, decode, encode, get_vocabulary, train
 
 
 def main() -> None:
@@ -44,12 +44,33 @@ def main() -> None:
 
     encoded_pred = encode(text_predicted, vocabulary, '\u2581', None, '<unk>')
     if encoded_pred:
-        for letter_pred, letter_actual in zip(encoded_pred, encoded_actual.split()):
-            if letter_pred != int(letter_actual):
-                print(letter_pred, letter_actual)
+        for pred, actual in zip(encoded_pred, encoded_actual.split()):
+            if pred != actual:
+                # print(pred, actual)
+                pass
+
+    # It's correct, but there are three words that can be made with fewer n-grams or differently
     # _Произошло : 1003, (53, 11759, 1492 / 1483, 6737), 818
     # _Космонавтом : 5468, 230, (5699, 30218, 46 / 13283, 222, 6896)
     # _Гагарин. : 7150, (1382, 8324, 141 / 7744, 2190), 3
+
+    print("\u2581\u041f\u0440\u043e", "\u0438", "\u0437\u043e", "\u0448", "\u043b\u043e")
+    print("\u2581\u041f\u0440\u043e", "\u0438\u0437", "\u043e\u0448", "\u043b\u043e")
+    print("\u2581\u041a\u043e", "\u0441", "\u043c\u043e\u043d", "\u0430\u0432\u0442\u043e", "\u043c")
+    print("\u2581\u041a\u043e", "\u0441", "\u043c\u043e\u043d\u0430", "\u0432", "\u0442\u043e\u043c")
+    print("\u2581\u0413\u0430", "\u0433", "\u0430\u0440\u0438", "\u043d", ".")
+    print("\u2581\u0413\u0430", "\u0433\u0430\u0440", "\u0438\u043d", ".")
+
+    with open(assets_path / 'for_translation_en_encoded.txt', 'r', encoding='utf-8') as file:
+        encoded = file.read()
+    decoded = decode([int(num) for num in encoded.split()], vocabulary, None)
+    decoded = decoded.replace('\u2581', ' ')
+    # decoded = decoded[6:-4]  # tokens of start and end of text
+    print(decoded)
+    with open(assets_path / 'for_translation_en_raw.txt', 'r', encoding='utf-8') as file:
+        actual = file.read()
+    bleu = calculate_bleu(decoded, actual)
+    print(bleu)
 
 
 if __name__ == "__main__":
