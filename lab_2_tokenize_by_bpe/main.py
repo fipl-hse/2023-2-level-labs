@@ -15,8 +15,8 @@ def prepare_word(
     :return: preprocessed word
     """
     if (not isinstance(raw_word, str) or not 
-        isinstance(start_of_word, str or None) or not 
-        isinstance(end_of_word, str or None)):
+        (isinstance(start_of_word, str) or start_of_word is None) or not 
+        (isinstance(end_of_word, str) or end_of_word is None)):
         return None
     preprocessed_word = []
     if start_of_word != None:
@@ -39,7 +39,7 @@ def collect_frequencies(
     :return: dictionary in the form of <preprocessed word: number of occurrences>
     """
     if (not isinstance(text, str) or not 
-        isinstance(start_of_word, str or None) or not
+        (isinstance(start_of_word, str) or start_of_word is None) or not
         isinstance(end_of_word, str)):
         return None
     freq_dictionary = {}
