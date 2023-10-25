@@ -19,13 +19,11 @@ def prepare_word(
         return None
 
     new_word = list(raw_word)
-    if start_of_word:#and end_of_word:
+    if start_of_word:
         new_word.insert(0, start_of_word)
         #= tuple(start_of_word.split()) + new_word + tuple(end_of_word.split())
     if end_of_word:#not start_of_word and end_of_word:
         new_word.append(end_of_word) #= new_word + tuple(end_of_word.split())
-    #if start_of_word and not end_of_word:
-        #new_word = tuple(start_of_word.split()) + new_word
 
     return tuple(new_word)
 
