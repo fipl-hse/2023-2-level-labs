@@ -141,7 +141,7 @@ def train(
         else:
             pair_to_merge = max_pairs[0]
             del token_pairs[pair_to_merge]
-        word_frequencies = merge_tokens(wors_frequencies, pair_to_merge)
+        word_frequencies = merge_tokens(word_frequencies, pair_to_merge)
     return word_frequencies
 
 
