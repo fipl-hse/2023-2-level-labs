@@ -41,9 +41,10 @@ def collect_frequencies(
     :param end_of_word: a token that signifies the end of word
     :return: dictionary in the form of <preprocessed word: number of occurrences>
     """
-    if not (isinstance(text, str)
-            and isinstance(start_of_word, (str, type(None)))
-            and isinstance(end_of_word, str)
+    if not (
+        isinstance(text, str)
+        and isinstance(start_of_word, (str, type(None)))
+        and isinstance(end_of_word, str)
     ):
         return None
 
@@ -92,8 +93,9 @@ def merge_tokens(
     :param pair: a pair of tokens to be merged
     :return: dictionary in the form of <preprocessed word: number of occurrences>
     """
-    if not (isinstance(word_frequencies, dict)
-            and isinstance(pair, tuple)
+    if not (
+        isinstance(word_frequencies, dict)
+        and isinstance(pair, tuple)
     ):
         return None
 
@@ -157,6 +159,24 @@ def get_vocabulary(
     :param unknown_token: a token to signify an unknown token
     :return: dictionary in the form of <token: identifier>
     """
+    if not (
+        isinstance(word_frequencies, dict)
+        and isinstance(unknown_token, str)
+    ):
+        return None
+
+    vocabulary = {}
+    not_good_list = set()
+    for tuples in word_frequencies.keys():
+        for token in tuples:
+            not_good_list.add(token)
+            for symbol in token:
+                not_good_list.add(symbol)
+    not_good_list.add(unknown_token)
+    len_sorted = sorted(not_good_list, key=lambda x: (-len(x), x))
+    for number, token in enumerate(len_sorted):
+        vocabulary[token] = number
+    return vocabulary
 
 
 def decode(
@@ -169,6 +189,23 @@ def decode(
     :param end_of_word_token: an end-of-word token
     :return: decoded sequence
     """
+    if not (
+        isinstance(encoded_text, list)
+        and all(isinstance(number, int) for number in encoded_text)
+        and isinstance(vocabulary, dict)
+        and (isinstance(end_of_word_token, str) or end_of_word_token is None)
+    ):
+        return None
+
+    vocabulary_inverted = {id: token for token, id in vocabulary.items()}
+    decoded_text = str()
+    for number in encoded_text:
+        token = vocabulary_inverted[number]
+        if end_of_word_token and end_of_word_token in token:
+            token = token.replace(end_of_word_token, ' ')
+        decoded_text += token
+
+    return decoded_text
 
 
 def tokenize_word(
