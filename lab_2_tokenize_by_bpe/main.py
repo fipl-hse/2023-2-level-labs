@@ -70,6 +70,16 @@ def count_tokens_pairs(
     if not isinstance(word_frequencies, dict):
         return None
 
+    processed_token_pairs = {}
+
+    for word in word_frequencies.keys():
+        for i in range(len(word) - 1):
+            token_pair = (word[i], word[i + 1])
+            if token_pair not in processed_token_pairs:
+                processed_token_pairs[token_pair] = 0
+            processed_token_pairs[token_pair] += word_frequencies[word]
+
+    return processed_token_pairs
 
 
 def merge_tokens(
@@ -81,6 +91,28 @@ def merge_tokens(
     :param pair: a pair of tokens to be merged
     :return: dictionary in the form of <preprocessed word: number of occurrences>
     """
+    if not(
+        isinstance(word_frequencies, dict)
+        and isinstance(pair, tuple)
+    ):
+        return None
+
+    merged_tokens = {}
+    merged_pair = f"{pair[0]}{pair[1]}"
+
+    for word in word_frequencies.keys():
+        if merged_pair in "".join(word):
+            list_word = list(word)
+            for i in range(len(word) - 1):
+                token_pair = f"{word[i]}{word[i + 1]}"
+                if token_pair == merged_pair:
+                    list_word[i + 1] = merged_pair
+                    list_word.pop(i)
+            merged_tokens[tuple(list_word)] = word_frequencies[word]
+        else:
+            merged_tokens[word] = word_frequencies[word]
+
+    return merged_tokens
 
 
 def train(
@@ -92,6 +124,20 @@ def train(
     :param num_merges: required number of new tokens
     :return: dictionary in the form of <preprocessed word: number of occurrences>
     """
+    if not(isinstance(word_frequencies, dict | None)
+            and isinstance(num_merges, int)):
+        return None
+    trained = word_frequencies
+    while num_merges > 0:
+        pairs = count_tokens_pairs(trained)
+        if not pairs:
+            break
+        most_freq_pairs = sorted(pairs.items(), key = lambda x: (-x[1], -len(''.join(x[0])), str(x[0]).lower()))
+        trained = merge_tokens(trained, most_freq_pairs[0][0])
+        if not trained:
+            return None
+        num_merges -= 1
+    return trained
 
 
 def get_vocabulary(
@@ -103,6 +149,22 @@ def get_vocabulary(
     :param unknown_token: a token to signify an unknown token
     :return: dictionary in the form of <token: identifier>
     """
+    if not(
+        isinstance(word_frequencies, dict)
+        and isinstance(unknown_token, str)
+    ):
+        return None
+    tokens = [unknown_token]
+    for word in word_frequencies:
+        for token in word:
+            tokens.append(token)
+            for symbol in token:
+                if symbol not in tokens:
+                    tokens.append(symbol)
+
+    tokens = sorted(tokens, key = lambda x: (-len(x), str(x[0])))
+
+    return {tokens[i] : i for i in range(len(tokens))}
 
 
 def decode(
@@ -115,6 +177,26 @@ def decode(
     :param end_of_word_token: an end-of-word token
     :return: decoded sequence
     """
+    if not(
+        isinstance(encoded_text, list)
+        and isinstance(vocabulary, dict)
+        and isinstance(end_of_word_token, str)
+        or end_of_word_token is None
+    ):
+        return None
+
+    decoded_text = ""
+    for id in encoded_text:
+        tokens = [key for key in vocabulary if vocabulary[key] == id]
+        for token in tokens:
+            if end_of_word_token:
+                if end_of_word_token in token:
+                    decoded_text += token[:-4] + " "
+                else:
+                    decoded_text += token
+            else:
+                decoded_text += token
+    return decoded_text
 
 
 def tokenize_word(
