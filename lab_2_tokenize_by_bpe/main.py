@@ -15,8 +15,8 @@ def prepare_word(
     :return: preprocessed word
     """
     if not isinstance(raw_word, str) or\
-            not isinstance(start_of_word, str | None) or\
-            not isinstance(end_of_word, str | None):
+            not (isinstance(start_of_word, str) or start_of_word is None) or\
+            not (isinstance(end_of_word, str) or end_of_word is None):
         return None
     token_list = list(raw_word)
     if start_of_word is not None:
@@ -84,7 +84,7 @@ def merge_tokens(
     merge_token_dictionary = {}
     for token in word_frequencies:
         token_list = list(token)
-        if str(pair)[0 : 2] in str(token):
+        if pair[0] in token and pair[1] in token:
             for index in range(len(token_list) - 1):
                 if (token[index], token[index + 1]) == pair:
                     token_list[index: index + 2] = [''.join(pair)]
