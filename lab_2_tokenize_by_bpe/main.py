@@ -112,7 +112,7 @@ def train(
     if (not (isinstance(word_frequencies, dict) or word_frequencies is None) or not
         isinstance(num_merges, int)):
         return None
-    token_pairs = count_token_pairs(word_frequencies)
+    token_pairs = count_tokens_pairs(word_frequencies)
     while (num_merges > 0) and len(token_pairs) > 0:
         num_merges -= 1
         max_freq = 0
