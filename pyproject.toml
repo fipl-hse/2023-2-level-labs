@@ -14,9 +14,7 @@ norecursedirs = [
 [tool.coverage.run]
 omit = [
     '*/tests/*',
-    '*/start.py',
-    'lab_2_tokenize_by_bpe/helpers.py',
-    'lab_2_tokenize_by_bpe/assets/nmt_demo*'
+    '*/start.py'
 ]
 
 [tool.mypy]
