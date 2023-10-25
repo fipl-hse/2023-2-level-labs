@@ -18,7 +18,7 @@ def prepare_word(
         return None
     if not isinstance(start_of_word, str) and start_of_word is not None:
         return None
-    if not isinstance(end_of_word, str) or end_of_word is not None:
+    if not isinstance(end_of_word, str) and end_of_word is not None:
         return None
 
     if not start_of_word and not end_of_word:
