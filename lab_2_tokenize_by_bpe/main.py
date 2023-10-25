@@ -24,7 +24,8 @@ def prepare_word(
     word = list(raw_word)
     if start_of_word is not None:
         word.insert(0, start_of_word)
-    word.append(end_of_word)
+    if end_of_word:
+        word.append(end_of_word)
 
     return tuple(word)
 
@@ -132,7 +133,10 @@ def train(
         pairs = count_tokens_pairs(trained)
         if not pairs:
             break
-        most_freq_pairs = sorted(pairs.items(), key = lambda x: (-x[1], -len(''.join(x[0])), str(x[0]).lower()))
+        most_freq_pairs = sorted(
+            pairs.items(), key = lambda x:
+            (-x[1], -len(''.join(x[0])), str(x[0]).lower())
+        )
         trained = merge_tokens(trained, most_freq_pairs[0][0])
         if not trained:
             return None
@@ -186,8 +190,8 @@ def decode(
         return None
 
     decoded_text = ""
-    for id in encoded_text:
-        tokens = [key for key in vocabulary if vocabulary[key] == id]
+    for num in encoded_text:
+        tokens = [key for key in vocabulary if vocabulary[key] == num]
         for token in tokens:
             if end_of_word_token:
                 if end_of_word_token in token:
