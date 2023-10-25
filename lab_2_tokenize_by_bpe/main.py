@@ -160,9 +160,6 @@ def decode(
             not (isinstance(vocabulary, dict) or vocabulary is None) or\
             not (isinstance(end_of_word_token, str) or end_of_word_token is None):
         return None
-    exit_string = ''
-
-    
 
 
 
