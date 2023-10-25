@@ -72,6 +72,7 @@ def count_evens(nums: list) -> int:
 # count_evens([2, 2, 0])
 # count_evens([1, 3, 5])
 
+
 # Task 2:
 # easy level
 def sum13(nums: list) -> int:
@@ -100,25 +101,25 @@ def sum67(nums: list) -> int:
     Return 0 for no numbers.
     """
     # student realization goes here
-    count = 0
-    index_6 = nums.index(6)
-    index_7 = nums.index(7)
-    if 6 in nums:
-        index_6 = nums.index(6)
-    else:
-        index_6 = len(nums) + 1
-    if 7 in nums:
-        index_7 = nums.index(7)
-    else:
-        index_7 = len(nums) + 1
+    # count = 0
+    # index_6 = nums.index(6)
+    # index_7 = nums.index(7)
+    # if 6 in nums:
+        #index_6 = nums.index(6)
+    # else:
+        #index_6 = len(nums) + 1
+    # if 7 in nums:
+        # index_7 = nums.index(7)
+    # else:
+        # index_7 = len(nums) + 1
 
-    for i,number in enumerate(nums):
-        if i >= index_6 and i <= index_7:
-            continue
-        count += number
+    # for i,number in enumerate(nums):
+        # if index_6 <= i and index_7 >= i:
+            #continue
+        #count += number
 
-    print(count)
-    return count
+    #print(count)
+    #return count
 # Function calls with expected result:
 # sum67([1, 2, 2])
 # sum67([1, 2, 2, 6, 99, 99, 7])
