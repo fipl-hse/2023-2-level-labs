@@ -110,12 +110,12 @@ def train(
             return None
         if num_merges > len(num_of_pairs):
             num_merges = len(num_of_pairs)
-        len_most_freq = max(num_of_pairs.values())
-        most_freq_pairs = [pair for pair, frequency in num_of_pairs.items() if frequency == len_most_freq]
-        max_length = max(len(str(pair)) for pair in most_freq_pairs)
-        longest_pairs = [pair for pair in most_freq_pairs if len(str(pair)) == max_length]
-        more_suitable_pairs = sorted(longest_pairs)
-        word_frequencies = merge_tokens(word_frequencies, more_suitable_pairs[0])
+        max_freq = max(num_of_pairs.values())
+        pairs_list = []
+        for pair, frequency in num_of_pairs.items():
+            if frequency == max_freq:
+                pairs_list.append(pair)
+        word_frequencies = merge_tokens(word_frequencies, (sorted(pairs_list,key = len ))[0])
         if word_frequencies is None:
             return None
         num_merges -= 1
@@ -133,18 +133,18 @@ def get_vocabulary(
     if not isinstance(word_frequencies, dict) or\
             not isinstance(unknown_token, str):
         return None
-    list_of_words = []
+    list_of_tokens = set()
     get_vocabulary_dict = {}
-    for word in word_frequencies.keys():
-        for token in str(word):
-            list_of_words.append(token)
-    tokens = set(list_of_words)
-    right_order = sorted(tokens, key = len)
-    right_order.insert(0, unknown_token)
+    for tuples in word_frequencies.keys():
+        for word in tuples:
+            list_of_tokens.add(word)
+            for token in word:
+                list_of_tokens.add(token)
+    list_of_tokens.add(unknown_token)
+    right_order = sorted(list_of_tokens, key=lambda item: (-len(item), item))
     for index, token in enumerate(right_order):
         get_vocabulary_dict[token] = index
     return get_vocabulary_dict
-
 
 def decode(
     encoded_text: list[int] | None, vocabulary: dict[str, int] | None, end_of_word_token: str | None
@@ -156,10 +156,12 @@ def decode(
     :param end_of_word_token: an end-of-word token
     :return: decoded sequence
     """
-    if not isinstance(encoded_text, list| None) or\
-            not isinstance(vocabulary, dict) or\
-            not isinstance(end_of_word_token, str):
+    if not (isinstance(encoded_text, list) or encoded_text is None) or\
+            not (isinstance(vocabulary, dict) or vocabulary is None) or\
+            not (isinstance(end_of_word_token, str) or end_of_word_token is None):
         return None
+    exit_string = ''
+
     
 
 
