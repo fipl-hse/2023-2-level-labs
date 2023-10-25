@@ -21,25 +21,17 @@ def prepare_word(
     if not isinstance(end_of_word, str) and end_of_word is not None:
         return None
 
-    symbol_list = []
-    for symbol in raw_word:
-        symbol_list.append(symbol)
+    symbol_list = list(raw_word)
 
-    if start_of_word is None and end_of_word is None:
-        return tuple(raw_word)
-    elif start_of_word is None and end_of_word is not None:
-        symbol_list.append(end_of_word)
-        return tuple(symbol_list)
-    elif start_of_word is not None and end_of_word is None:
+    if start_of_word is not None:
         symbol_list.insert(0, start_of_word)
-        return tuple(symbol_list)
-    symbol_list.insert(0, start_of_word)
-    symbol_list.append(end_of_word)
+    if end_of_word is not None:
+        symbol_list.append(end_of_word)
     return tuple(symbol_list)
 
 
 def collect_frequencies(
-        text: str, start_of_word: str | None, end_of_word: str
+    text: str, start_of_word: str | None, end_of_word: str
 ) -> dict[tuple[str, ...], int] | None:
     """
     Counts number of occurrences of each word
@@ -79,22 +71,11 @@ def count_tokens_pairs(
     pair_dict = {}
 
     for word in word_frequencies:
-        for index, token in enumerate(word):
-            if index == len(word) - 1:
-                break
-            next_token_index = index + 1
-            pair = (token, word[next_token_index])
-            pair_dict[pair] = 0
-
-    for pair in pair_dict.copy():
-        freq = 0
-        for word in word_frequencies:
-            for index, token in enumerate(word):
-                if index == len(word) - 1:
-                    break
-                if token == pair[0] and word[index + 1] == pair[1]:
-                    freq += word_frequencies[word]
-                    pair_dict[pair] = freq
+        for index in range(len(word) - 1):
+            pair = (word[index], word[index + 1])
+            if pair not in pair_dict:
+                pair_dict[pair] = 0
+            pair_dict[pair] += word_frequencies[word]
 
     return pair_dict
 
@@ -144,38 +125,32 @@ def train(
     if not isinstance(word_frequencies, dict) or not isinstance(num_merges, int):
         return None
 
-    for i in range(num_merges):
+    pair_dict = count_tokens_pairs(word_frequencies)
+    if pair_dict is None:
+        return None
+
+    for _ in range(num_merges):
+        max_value = max(pair_dict.values())
+        pair_list = [key for key, value in pair_dict.items() if value == max_value]
+
+        len_list = []
+        for pair in pair_list:
+            pair_len = len(''.join(list(pair)))
+            len_list.append(pair_len)
+        max_len = max(len_list)
+
+        max_len_pairs = []
+        for pair in pair_list:
+            if max_len == len(''.join(pair)):
+                max_len_pairs.append(pair)
+
+        word_frequencies = merge_tokens(word_frequencies, sorted(max_len_pairs)[0])
+        if word_frequencies is None:
+            return None
+
+        pair_dict.pop(sorted(max_len_pairs)[0])
         pair_dict = count_tokens_pairs(word_frequencies)
         if pair_dict is None:
-            return None
-        max_value = max(list(pair_dict.values()))
-        pair_list = [key for key, value in pair_dict.items() if value == max_value]
-        if len(pair_list) > 1:
-            len_list = []
-            for pair in pair_list:
-                keys = list(word_frequencies.keys())
-                if pair[1] == keys[0][-1]:
-                    pair_len = len(pair[0]) + 1
-                elif keys[0][-1] in pair[0]:
-                    pair_len = len(pair[0]) - len(keys[0][-1]) + 1 + len(pair[1])
-                elif keys[0][-1] in pair[1]:
-                    pair_len = len(pair[0]) + len(pair[1]) - len(keys[0][-1]) + 1
-                else:
-                    pair_len = len(pair[0]) + len(pair[1])
-                len_list.append(pair_len)
-            if len_list.count(max(len_list)) > 1:
-                max_len_pairs = []
-                for j in range(len_list.count(max(len_list))):
-                    max_len_pairs.append(pair_list[len_list.index(max(len_list))])
-                    pair_list.pop(len_list.index(max(len_list)))
-                    len_list.pop(len_list.index(max(len_list)))
-                max_len_pairs.sort()
-                word_frequencies = merge_tokens(word_frequencies, max_len_pairs[0])
-            else:
-                word_frequencies = merge_tokens(word_frequencies, pair_list[len_list.index(max(len_list))])
-        elif len(pair_list) == 1:
-            word_frequencies = merge_tokens(word_frequencies, pair_list[0])
-        if word_frequencies is None:
             return None
 
     return word_frequencies
