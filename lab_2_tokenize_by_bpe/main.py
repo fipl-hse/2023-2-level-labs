@@ -90,7 +90,9 @@ def merge_tokens(
         for i in range(1, len(word)):
             if (word[i-1], word[i]) == pair:
                 new_word[i-1] = str_pair
-                new_word.pop(i)
+                new_word[i] = ""
+        if "" in new_word:
+            new_word.remove("")
         new_dict.update({tuple(new_word): freq})
     return new_dict
 
@@ -138,6 +140,21 @@ def get_vocabulary(
     :param unknown_token: a token to signify an unknown token
     :return: dictionary in the form of <token: identifier>
     """
+    if not isinstance(word_frequencies, dict) or not isinstance(unknown_token, str):
+        return None
+    tokens_set = set()
+    tokens_set.add(unknown_token)
+    for word in word_frequencies.keys():
+        for token in word:
+            tokens_set.add(token)
+            if len(token) > 1:
+                for symbol in token:
+                    tokens_set.add(symbol)
+    sorted_tokens_set = sorted(tokens_set, key=lambda item: (-len(item), item))
+    vocabulary = {}
+    for i in range(len(sorted_tokens_set)):
+        vocabulary.update({sorted_tokens_set[i]: i})
+    return vocabulary
 
 
 def decode(
@@ -150,6 +167,18 @@ def decode(
     :param end_of_word_token: an end-of-word token
     :return: decoded sequence
     """
+    if not isinstance(encoded_text, list) \
+            or not isinstance(vocabulary, dict) \
+            or not isinstance(end_of_word_token, (str | None)):
+        return None
+    decoded_list = []
+    for code in encoded_text:
+        for k, v in vocabulary.items():
+            if code == v:
+                decoded_list.append(k)
+    decoded_text = "".join(decoded_list)
+    final_text = decoded_text.replace('</s>', ' ')
+    return final_text
 
 
 def tokenize_word(
