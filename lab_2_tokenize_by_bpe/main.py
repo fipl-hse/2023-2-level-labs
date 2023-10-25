@@ -5,7 +5,7 @@ BPE and machine translation evaluation
 
 
 def prepare_word(
-    raw_word: str, start_of_word: str | None, end_of_word: str | None
+        raw_word: str, start_of_word: str | None, end_of_word: str | None
 ) -> tuple[str, ...] | None:
     """
     Tokenizes word into unigrams and appends end-of-word token
@@ -27,7 +27,7 @@ def prepare_word(
 
 
 def collect_frequencies(
-    text: str, start_of_word: str | None, end_of_word: str
+        text: str, start_of_word: str | None, end_of_word: str
 ) -> dict[tuple[str, ...], int] | None:
     """
     Counts number of occurrences of each word
@@ -53,7 +53,7 @@ def collect_frequencies(
 
 
 def count_tokens_pairs(
-    word_frequencies: dict[tuple[str, ...], int]
+        word_frequencies: dict[tuple[str, ...], int]
 ) -> dict[tuple[str, str], int] | None:
     """
     Counts number of occurrences of each pair of subsequent tokens
@@ -65,7 +65,7 @@ def count_tokens_pairs(
     pair_freq = {}
     for word, freq in word_frequencies.items():
         for i in range(len(word) - 1):
-            token_pair = (word[i], word[i+1])
+            token_pair = (word[i], word[i + 1])
             if token_pair not in pair_freq:
                 pair_freq[token_pair] = 0
             pair_freq[token_pair] += freq
@@ -73,7 +73,7 @@ def count_tokens_pairs(
 
 
 def merge_tokens(
-    word_frequencies: dict[tuple[str, ...], int], pair: tuple[str, str]
+        word_frequencies: dict[tuple[str, ...], int], pair: tuple[str, str]
 ) -> dict[tuple[str, ...], int] | None:
     """
     Updates word frequency dictionary by replacing a pair of token with a merged one
@@ -86,22 +86,17 @@ def merge_tokens(
     str_pair = pair[0] + pair[1]
     new_dict = {}
     for word, freq in word_frequencies.items():
-        new_word = []
-        i = 0
-        while i < len(word) - 1:
-            if (word[i], word[i+1]) == pair:
-                new_word.append(str_pair)
-                i += 2
-            else:
-                new_word.append(word[i])
-                i += 1
-        new_word.append(word[i])
+        new_word = list(word)
+        for i in range(1, len(word)):
+            if (word[i-1], word[i]) == pair:
+                new_word[i-1] = str_pair
+                new_word.pop(i)
         new_dict.update({tuple(new_word): freq})
     return new_dict
 
 
 def train(
-    word_frequencies: dict[tuple[str, ...], int] | None, num_merges: int
+        word_frequencies: dict[tuple[str, ...], int] | None, num_merges: int
 ) -> dict[tuple[str, ...], int] | None:
     """
     Creates required number of new tokens by merging existing ones
@@ -111,11 +106,31 @@ def train(
     """
     if not isinstance(word_frequencies, dict) or not isinstance(num_merges, int):
         return None
-    pair_freq = count_tokens_pairs(word_frequencies)
+    merges_count = 0
+    merged = word_frequencies.copy()
+    while merges_count < num_merges:
+
+        pair_freq = count_tokens_pairs(merged)
+        if pair_freq is None:
+            return None
+        if pair_freq != {}:
+            sorted_dict = dict(
+                sorted(pair_freq.items(),
+                       key=lambda item: (-item[1], -len("".join(item[0])), "".join(item[0]))))
+
+            for k in sorted_dict.keys():
+                merged = merge_tokens(merged, k)
+                if merged is None:
+                    return None
+                merges_count += 1
+                break
+            continue
+        break
+    return merged
 
 
 def get_vocabulary(
-    word_frequencies: dict[tuple[str, ...], int], unknown_token: str
+        word_frequencies: dict[tuple[str, ...], int], unknown_token: str
 ) -> dict[str, int] | None:
     """
     Establishes correspondence between tokens and its integer identifier
@@ -126,7 +141,7 @@ def get_vocabulary(
 
 
 def decode(
-    encoded_text: list[int] | None, vocabulary: dict[str, int] | None, end_of_word_token: str | None
+        encoded_text: list[int] | None, vocabulary: dict[str, int] | None, end_of_word_token: str | None
 ) -> str | None:
     """
     Translates encoded sequence into decoded one
@@ -138,7 +153,7 @@ def decode(
 
 
 def tokenize_word(
-    word: tuple[str, ...], vocabulary: dict[str, int], end_of_word: str | None, unknown_token: str
+        word: tuple[str, ...], vocabulary: dict[str, int], end_of_word: str | None, unknown_token: str
 ) -> list[int] | None:
     """
     Splits word into tokens
@@ -159,11 +174,11 @@ def load_vocabulary(vocab_path: str) -> dict[str, int] | None:
 
 
 def encode(
-    original_text: str,
-    vocabulary: dict[str, int] | None,
-    start_of_word_token: str | None,
-    end_of_word_token: str | None,
-    unknown_token: str,
+        original_text: str,
+        vocabulary: dict[str, int] | None,
+        start_of_word_token: str | None,
+        end_of_word_token: str | None,
+        unknown_token: str,
 ) -> list[int] | None:
     """
     Translates decoded sequence into encoded one
@@ -186,7 +201,7 @@ def collect_ngrams(text: str, order: int) -> list[tuple[str, ...]] | None:
 
 
 def calculate_precision(
-    actual: list[tuple[str, ...]], reference: list[tuple[str, ...]]
+        actual: list[tuple[str, ...]], reference: list[tuple[str, ...]]
 ) -> float | None:
     """
     Compares two sequences by virtue of Precision metric
