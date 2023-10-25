@@ -4,7 +4,8 @@ BPE Tokenizer starter
 import json
 from pathlib import Path
 
-from lab_2_tokenize_by_bpe.main import calculate_bleu, collect_frequencies, decode, encode, get_vocabulary, train
+from lab_2_tokenize_by_bpe.main import (calculate_bleu, collect_frequencies, decode, encode,
+                                        get_vocabulary, train)
 
 
 def main() -> None:
@@ -16,22 +17,22 @@ def main() -> None:
     with open(assets_path / 'text.txt', 'r', encoding='utf-8') as file:
         text = file.read()
     text_freq = collect_frequencies(text, None, '</s>')
-    merged_freq = train(text_freq, 100)
+    text_freq = train(text_freq, 100)
     # Secrets
-    if merged_freq:
+    if text_freq:
         with open(assets_path / 'secrets/secret_5.txt', 'r', encoding='utf-8') as file:
             secret_text = file.read()
-        vocabulary = get_vocabulary(merged_freq, '<unk>')
+        vocabulary = get_vocabulary(text_freq, '<unk>')
         if vocabulary:
             print(vocabulary)
 
             secret_list = [int(num) for num in secret_text.split()]
-            decoded_secret = decode(secret_list, vocabulary, '</s>')
+            decoded = decode(secret_list, vocabulary, '</s>')
 
-            decoded_secret = decoded_secret.replace('ев', 'ел')
-            decoded_secret = decoded_secret.replace('до', 'ев')
-            print(decoded_secret)
-            result = decoded_secret
+            decoded = decoded.replace('ев', 'ел')
+            decoded = decoded.replace('до', 'ев')
+            print(decoded)
+            result = decoded
             assert result, "Encoding is not working"
 
     # Step 14
@@ -56,8 +57,10 @@ def main() -> None:
 
     print("\u2581\u041f\u0440\u043e", "\u0438", "\u0437\u043e", "\u0448", "\u043b\u043e")
     print("\u2581\u041f\u0440\u043e", "\u0438\u0437", "\u043e\u0448", "\u043b\u043e")
-    print("\u2581\u041a\u043e", "\u0441", "\u043c\u043e\u043d", "\u0430\u0432\u0442\u043e", "\u043c")
-    print("\u2581\u041a\u043e", "\u0441", "\u043c\u043e\u043d\u0430", "\u0432", "\u0442\u043e\u043c")
+    print("\u2581\u041a\u043e", "\u0441", "\u043c\u043e\u043d",
+            "\u0430\u0432\u0442\u043e", "\u043c")
+    print("\u2581\u041a\u043e", "\u0441", "\u043c\u043e\u043d\u0430",
+            "\u0432", "\u0442\u043e\u043c")
     print("\u2581\u0413\u0430", "\u0433", "\u0430\u0440\u0438", "\u043d", ".")
     print("\u2581\u0413\u0430", "\u0433\u0430\u0440", "\u0438\u043d", ".")
 
@@ -69,8 +72,7 @@ def main() -> None:
     print(decoded)
     with open(assets_path / 'for_translation_en_raw.txt', 'r', encoding='utf-8') as file:
         actual = file.read()
-    bleu = calculate_bleu(decoded, actual)
-    print(bleu)
+    print(calculate_bleu(decoded, actual))
 
 
 if __name__ == "__main__":
