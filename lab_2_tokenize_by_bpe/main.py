@@ -22,7 +22,7 @@ def prepare_word(
     if start_of_word:
         new_word.insert(0, start_of_word)
         #= tuple(start_of_word.split()) + new_word + tuple(end_of_word.split())
-    if end_of_word:#not start_of_word and end_of_word:
+    if end_of_word:
         new_word.append(end_of_word) #= new_word + tuple(end_of_word.split())
 
     return tuple(new_word)

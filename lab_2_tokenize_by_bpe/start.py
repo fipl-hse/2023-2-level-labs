@@ -15,7 +15,7 @@ def main() -> None:
         text = text_file.read()
 
     print(prepare_word("cats", '</b>', '</s>'))
-    #print(collect_frequencies(text, None, '</s>'))
+    print(collect_frequencies(text, None, '</s>'))
     print(count_tokens_pairs(collect_frequencies("It's far, farther, farthest and old, older, oldest", None, '</s>')))
     print(merge_tokens(count_tokens_pairs(collect_frequencies(text, None, '</s>')), ("е", "л")))
     result = merge_tokens
