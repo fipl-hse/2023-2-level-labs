@@ -156,8 +156,8 @@ def decode(
     :param end_of_word_token: an end-of-word token
     :return: decoded sequence
     """
-    if not (isinstance(encoded_text, list) or encoded_text is None) or\
-            not (isinstance(vocabulary, dict) or vocabulary is None) or\
+    if not isinstance(encoded_text, list) or\
+            not isinstance(vocabulary, dict) or\
             not (isinstance(end_of_word_token, str) or end_of_word_token is None):
         return None
     decoding = ''
