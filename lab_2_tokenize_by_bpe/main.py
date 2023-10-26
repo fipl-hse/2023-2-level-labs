@@ -3,7 +3,6 @@ Lab 2
 BPE and machine translation evaluation
 """
 import json
-
 import math
 
 
@@ -42,12 +41,15 @@ def collect_frequencies(
     if not isinstance(text, str) or not isinstance(end_of_word, str) or not (
             isinstance(start_of_word, str) or start_of_word is None):
         return None
+
     dict_frequencies = {}
+
     for i in text.split():
         word = prepare_word(i, start_of_word, end_of_word)
         if not word:
             return None
         dict_frequencies[word] = text.split().count(i)
+
     return dict_frequencies
 
 
@@ -61,13 +63,16 @@ def count_tokens_pairs(
     """
     if not isinstance(word_frequencies, dict):
         return None
+
     dict_with_pairs = {}
+
     for word in word_frequencies:
         for index in range(len(word) - 1):
             pair = (word[index], word[index + 1])
             if pair not in dict_with_pairs:
                 dict_with_pairs[pair] = 0
             dict_with_pairs[pair] += word_frequencies[word]
+
     return dict_with_pairs
 
 
