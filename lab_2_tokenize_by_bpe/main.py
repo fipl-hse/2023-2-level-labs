@@ -114,7 +114,7 @@ def train(
         max_freq = max(num_of_pairs.values())
         pairs_list = []
         for pair, frequency in num_of_pairs.items():
-            if num_of_pairs[pair] == max_freq:
+            if frequency == max_freq:
                 pairs_list.append(pair)
         word_frequencies = merge_tokens(word_frequencies, (sorted(pairs_list,key = len ))[0])
         if word_frequencies is None:
@@ -161,7 +161,7 @@ def decode(
             not isinstance(vocabulary, dict) or\
             not (isinstance(end_of_word_token, str) or end_of_word_token is None):
         return None
-    decoding = ' '
+    decoding = ''
     for number in encoded_text:
         for token in vocabulary:
             if vocabulary[token] == number and end_of_word_token is not None:
