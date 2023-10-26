@@ -41,13 +41,14 @@ def collect_frequencies(
             not isinstance(start_of_word, str | None) or\
             not isinstance(end_of_word, str):
         return None
+    split_text = text.split()
     tokens_dictionary = {}
-    for token in text.split():
+    for token in split_text:
         split_word = prepare_word(token, start_of_word, end_of_word)
         if split_word is None:
             return None
         if split_word not in tokens_dictionary:
-            tokens_dictionary[split_word] = text.split().count(token)
+            tokens_dictionary[split_word] = split_text.count(token)
     return tokens_dictionary
 
 
@@ -113,7 +114,7 @@ def train(
         max_freq = max(num_of_pairs.values())
         pairs_list = []
         for pair, frequency in num_of_pairs.items():
-            if frequency == max_freq:
+            if num_of_pairs[pair] == max_freq:
                 pairs_list.append(pair)
         word_frequencies = merge_tokens(word_frequencies, (sorted(pairs_list,key = len ))[0])
         if word_frequencies is None:
