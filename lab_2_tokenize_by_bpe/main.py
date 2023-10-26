@@ -52,7 +52,6 @@ def collect_frequencies(
         preprocessed_word = prepare_word(preprocessed_word, start_of_word, end_of_word)
         if preprocessed_word is None:
             return None
-
     freq_dict.update({preprocessed_word: text.count(preprocessed_word)})
     return freq_dict
 
