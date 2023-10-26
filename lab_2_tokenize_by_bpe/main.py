@@ -19,14 +19,9 @@ def prepare_word(
         not (isinstance(end_of_word, str) or end_of_word is None)
     ):
         return None
-    # tokens=list(raw_word)
-    # if start_of_word:
-    #     tokens.insert(0, start_of_word, )
-    # if end_of_word:
-    #     tokens += [end_of_word]
-    # print(tokens)
-    # return tuple(tokens)
+
     return tuple(([start_of_word] if start_of_word else []) + list(raw_word) + ([end_of_word] if end_of_word else []))
+
 
 def collect_frequencies(
     text: str, start_of_word: str | None, end_of_word: str
@@ -49,9 +44,12 @@ def collect_frequencies(
         prepared = prepare_word(word, start_of_word, end_of_word)
         if prepared is None:
             return None
+        if prepared not in collection:
+            collection[prepared] = 0
+        collection[prepared] += 1
 
-        collection[prepared] = text.count(word)
     return collection
+
 
 def count_tokens_pairs(
     word_frequencies: dict[tuple[str, ...], int]
@@ -61,6 +59,17 @@ def count_tokens_pairs(
     :param word_frequencies: dictionary in the form of <preprocessed word: number of occurrences>
     :return: dictionary in the form of <token pair: number of occurrences>
     """
+    if not isinstance(word_frequencies, dict):
+         return None
+    pairs = {}
+    for word in word_frequencies:
+        for i in range(len(word)-1):
+            pair = tuple([word[i], word[i+1]])
+            if pair not in pairs:
+                pairs[pair] = 0
+            pairs[pair] += word_frequencies[word]
+
+    return pairs
 
 
 def merge_tokens(
@@ -72,6 +81,24 @@ def merge_tokens(
     :param pair: a pair of tokens to be merged
     :return: dictionary in the form of <preprocessed word: number of occurrences>
     """
+    if not( isinstance(word_frequencies, dict) or
+            isinstance(pair, tuple)
+    ):
+        return None
+    for word in word_frequencies:
+        new_word = list(word)
+        for i in range(len(word)-1):
+            two_tokens = tuple([word[i], word[i+1]])
+            if pair == two_tokens:
+                new_word.remove(pair[0])
+                new_word.remove(pair[1])
+                new_word[i] = pair[0] + pair[1]
+        new_word = tuple(new_word)
+        word_frequencies[new_word] = word_frequencies[word]
+        del word_frequencies[word]
+
+    return word_frequencies
+
 
 
 def train(
