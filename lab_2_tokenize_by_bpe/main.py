@@ -79,7 +79,7 @@ def merge_tokens(
     :param pair: a pair of tokens to be merged
     :return: dictionary in the form of <preprocessed word: number of occurrences>
     """
-    if not isinstance(word_frequencies, dict) or not isinstance(pair, tuple):\
+    if not isinstance(word_frequencies, dict) or not isinstance(pair, tuple):
         return None
     new_dict = {}
     pair_as_str = pair[0] + pair[1]
@@ -105,6 +105,30 @@ def train(
     :param num_merges: required number of new tokens
     :return: dictionary in the form of <preprocessed word: number of occurrences>
     """
+    if not isinstance(word_frequencies, dict) or not isinstance(num_merges, int):
+        return None
+    dict_of_token_pairs = count_tokens_pairs(word_frequencies)
+    if dict_of_token_pairs is None:
+        return None
+    list_of_max_token_pairs = []
+    for i in range(0, num_merges):
+        if len(list_of_max_token_pairs) == num_merges:
+            break
+        temp_list_of_max_token_pairs = []
+        max_token_pair = max(dict_of_token_pairs.values())
+        for token_pair in dict_of_token_pairs:
+            if dict_of_token_pairs[token_pair] == max_token_pair:
+                temp_list_of_max_token_pairs.append(token_pair)
+        temp_list_of_max_token_pairs.sort(key=lambda x: (-len(x), x))
+        for temp_token_pair in temp_list_of_max_token_pairs:
+            if len(list_of_max_token_pairs) < num_merges:
+                list_of_max_token_pairs.append(temp_token_pair)
+    new_dict = word_frequencies
+    for new_token_pair in list_of_max_token_pairs:
+        new_dict = merge_tokens(new_dict, new_token_pair)
+    if new_dict is None:
+        return None
+    return new_dict
 
 
 def get_vocabulary(
