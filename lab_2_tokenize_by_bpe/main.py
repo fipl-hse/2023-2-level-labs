@@ -49,6 +49,7 @@ def collect_frequencies(
         prepared = prepare_word(word, start_of_word, end_of_word)
         if prepared is None:
             return None
+
         collection[prepared] = text.count(word)
     return collection
 
