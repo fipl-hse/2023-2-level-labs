@@ -4,6 +4,8 @@ BPE and machine translation evaluation
 """
 import json
 
+import math
+
 
 def prepare_word(
     raw_word: str, start_of_word: str | None, end_of_word: str | None
@@ -311,6 +313,17 @@ def calculate_precision(
     :param reference: expected sequence of n-grams
     :return: value of Precision metric
     """
+    if not isinstance(actual, list) or not isinstance(reference, list):
+        return None
+
+    unique_ngrams = set(reference)
+    matches = 0
+
+    for n_gram in unique_ngrams:
+        if n_gram in actual:
+            matches += 1
+
+    return matches/len(unique_ngrams)
 
 
 def geo_mean(precisions: list[float], max_order: int) -> float | None:
@@ -320,6 +333,17 @@ def geo_mean(precisions: list[float], max_order: int) -> float | None:
     :param max_order: maximum length of n-gram considered
     :return: value of geometric mean of Precision metric
     """
+    if not isinstance(precisions, list) or not isinstance(max_order,int):
+        return None
+
+    summation = float(0)
+
+    for order in range(max_order):
+        if precisions[order] < 0:
+            return 0
+        summation += math.log(precisions[order])
+
+    return math.exp(1/max_order*summation)
 
 
 def calculate_bleu(actual: str | None, reference: str, max_order: int = 3) -> float | None:
