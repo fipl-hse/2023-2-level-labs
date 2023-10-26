@@ -185,7 +185,26 @@ def tokenize_word(
     :param unknown_token: token that signifies unknown sequence
     :return: list of token identifiers
     """
-
+    if (not isinstance(word, tuple)
+       or not isinstance(vocabulary, dict)
+       or not isinstance(end_of_word, str | None)
+       or not isinstance(unknown_token, str)):
+        return None
+    encoded_word = []
+    search = 0
+    long_word = word[:-1] + tuple(end_of_word)
+    while search < len(word):
+        tokens_left = len(vocabulary)
+        for token in vocabulary:
+            tokens_left -= 1
+            if long_word[search:search + len(token)] == tuple(token):
+                encoded_word.append(vocabulary[token])
+                search += len(token)
+                break
+        if not tokens_left:
+            encoded_word.append(vocabulary[unknown_token])
+            search += 1
+    return encoded_word
 
 
 def load_vocabulary(vocab_path: str) -> dict[str, int] | None:
