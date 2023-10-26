@@ -14,7 +14,23 @@ def prepare_word(
     :param end_of_word: a token that signifies the end of word
     :return: preprocessed word
     """
+    if not isinstance(raw_word, str) or raw_word is None:
+        return None
 
+    tokens = []
+
+    if start_of_word is not None:
+        for char in start_of_word:
+            tokens.append(char)
+
+    for char in raw_word:
+        tokens.append(char)
+
+    if end_of_word is not None:
+        for char in end_of_word:
+            tokens.append(char)
+
+    return tuple(tokens)
 
 def collect_frequencies(
     text: str, start_of_word: str | None, end_of_word: str
