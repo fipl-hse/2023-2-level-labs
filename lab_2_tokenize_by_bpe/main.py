@@ -160,8 +160,20 @@ def decode(
             not (isinstance(vocabulary, dict) or vocabulary is None) or\
             not (isinstance(end_of_word_token, str) or end_of_word_token is None):
         return None
-
-
+    decoding = ''
+    for number in encoded_text:
+        for token in vocabulary:
+            if vocabulary[token] == number and end_of_word_token is not None:
+                if token == end_of_word_token:
+                    decoding += ' '
+                else:
+                    decoding += token
+            if vocabulary[token] == number and end_of_word_token is None:
+                if token == end_of_word_token:
+                    decoding += ''
+                else:
+                    decoding += token
+    return decoding
 
 def tokenize_word(
     word: tuple[str, ...], vocabulary: dict[str, int], end_of_word: str | None, unknown_token: str
