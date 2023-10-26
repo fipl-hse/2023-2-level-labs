@@ -211,21 +211,22 @@ def tokenize_word(
             end_of_word, str) or not isinstance(unknown_token, str):
         return None
 
-    str_word = word_copy = ''.join(word)
+    str_word = ''.join(word)
+    word_copy = ''.join(word)
     sorted_vocabulary = sorted(list(vocabulary.keys()), key=lambda x: (-len(x), x))
     result = []
 
     for key in sorted_vocabulary:
         if key in str_word:
             word_copy = word_copy.replace(key, ' ' + str(vocabulary[key]) + ' ')
-            str_word = str_word.replace(key, '')
 
-    if len(str_word) > 0:
-        for unk in str_word:
+    for unk in str_word:
+        if unk not in sorted_vocabulary:
             word_copy = word_copy.replace(unk, ' ' + str(vocabulary[unknown_token]) + ' ')
-            str_word = str_word.replace(unk, '')
 
     str_result = word_copy.split('  ')
+    print(word_copy)
+
     for number in str_result:
         result.append(int(number))
     return result
@@ -250,11 +251,11 @@ def load_vocabulary(vocab_path: str) -> dict[str, int] | None:
 
 
 def encode(
-        original_text: str,
-        vocabulary: dict[str, int] | None,
-        start_of_word_token: str | None,
-        end_of_word_token: str | None,
-        unknown_token: str,
+    original_text: str,
+    vocabulary: dict[str, int] | None,
+    start_of_word_token: str | None,
+    end_of_word_token: str | None,
+    unknown_token: str,
 ) -> list[int] | None:
     """
     Translates decoded sequence into encoded one
@@ -265,6 +266,23 @@ def encode(
     :param unknown_token: token that signifies unknown sequence
     :return: list of token identifiers
     """
+    if not isinstance(original_text, str) or not isinstance(vocabulary, dict) or not isinstance(
+            unknown_token, str):
+        return None
+
+    encoded = []
+    split_text = original_text.split()
+
+    for word in split_text:
+        prepared = prepare_word(word, start_of_word_token, end_of_word_token)
+        if not prepared:
+            return None
+        result = tokenize_word(prepared, vocabulary, end_of_word_token, unknown_token)
+        if not result:
+            return None
+        encoded.extend(result)
+
+    return encoded
 
 
 def collect_ngrams(text: str, order: int) -> list[tuple[str, ...]] | None:
@@ -274,10 +292,18 @@ def collect_ngrams(text: str, order: int) -> list[tuple[str, ...]] | None:
     :param order: required number of elements in a single n-gram
     :return: sequence of n-grams
     """
+    if not isinstance(text, str) or not isinstance(order, int):
+        return None
+
+    n_grams = []
+    for index in range(len(text) + 1 - order):
+        n_grams.append(tuple(text[index: index + order]))
+
+    return n_grams
 
 
 def calculate_precision(
-        actual: list[tuple[str, ...]], reference: list[tuple[str, ...]]
+    actual: list[tuple[str, ...]], reference: list[tuple[str, ...]]
 ) -> float | None:
     """
     Compares two sequences by virtue of Precision metric
