@@ -37,7 +37,8 @@ def collect_frequencies(
     :param end_of_word: a token that signifies the end of word
     :return: dictionary in the form of <preprocessed word: number of occurrences>
     """
-    if not isinstance(text, str) or not isinstance(start_of_word, str | None) or not isinstance(end_of_word, str):
+    if (not isinstance(text, str) or (not isinstance(start_of_word, str) and start_of_word is not None)
+            or not isinstance(end_of_word, str)):
         return None
     dict_of_frequencies = {}
     tuple_of_words = text.split()
@@ -82,17 +83,17 @@ def merge_tokens(
     if not isinstance(word_frequencies, dict) or not isinstance(pair, tuple):
         return None
     new_dict = {}
-    pair_as_str = pair[0] + pair[1]
     for word in word_frequencies.keys():
         word_as_list = list(word)
         new_dict[word] = word_frequencies[word]
         for i in range(len(word_as_list)-1):
-            if word[i] == pair[0] and word[i+1] == pair[1]:
-                word_as_list[i] = pair_as_str
+            current_pair = tuple([word[i], word[i+1]])
+            if current_pair == pair:
+                word_as_list.remove(pair[0])
                 word_as_list.remove(pair[1])
-                word_as_tuple = tuple(word_as_list)
-                del new_dict[word]
-                new_dict[word_as_tuple] = word_frequencies[word]
+        word_as_tuple = tuple(word_as_list)
+        del new_dict[word]
+        new_dict[word_as_tuple] = word_frequencies[word]
     return new_dict
 
 
@@ -111,9 +112,7 @@ def train(
     if dict_of_token_pairs is None:
         return None
     list_of_max_token_pairs = []
-    for i in range(0, num_merges):
-        if len(list_of_max_token_pairs) == num_merges:
-            break
+    while len(list_of_max_token_pairs) < num_merges:
         temp_list_of_max_token_pairs = []
         max_token_pair = max(dict_of_token_pairs.values())
         for token_pair in dict_of_token_pairs:
@@ -123,6 +122,7 @@ def train(
         for temp_token_pair in temp_list_of_max_token_pairs:
             if len(list_of_max_token_pairs) < num_merges:
                 list_of_max_token_pairs.append(temp_token_pair)
+                del dict_of_token_pairs[temp_token_pair]
     new_dict = word_frequencies
     for new_token_pair in list_of_max_token_pairs:
         new_dict = merge_tokens(new_dict, new_token_pair)
