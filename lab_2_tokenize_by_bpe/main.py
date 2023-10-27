@@ -2,6 +2,7 @@
 Lab 2
 BPE and machine translation evaluation
 """
+import json
 
 
 def prepare_word(
@@ -213,6 +214,13 @@ def load_vocabulary(vocab_path: str) -> dict[str, int] | None:
     :param vocab_path: path to the saved vocabulary
     :return: dictionary in the form of <token: identifier>
     """
+    if not isinstance(vocab_path, str):
+        return None
+    with open(vocab_path, encoding='utf-8') as file_content:
+        vocabulary = json.load(file_content)
+    if not isinstance(vocabulary, dict):
+        return None
+    return vocabulary
 
 
 def encode(
