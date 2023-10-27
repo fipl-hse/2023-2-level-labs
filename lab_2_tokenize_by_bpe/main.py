@@ -20,7 +20,7 @@ def prepare_word(
         and isinstance(end_of_word, str | None)
     ):
         return None
-    return tuple(filter(None, [start_of_word, list(symbol for symbol in raw_word), end_of_word]))
+    return tuple(filter(None, [start_of_word, list(raw_word), end_of_word]))
 
 def collect_frequencies(
     text: str, start_of_word: str | None, end_of_word: str
