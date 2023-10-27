@@ -1,4 +1,5 @@
 set -x
+
 source config/common.sh
 
 configure_script
@@ -16,7 +17,6 @@ done
 
 if [[ "$LAB_PATH" ]]; then
   check_skip "$PR_NAME" "$PR_AUTHOR" "$LAB_PATH"
-
   TARGET_SCORE=$(get_score "$LAB_PATH")
 fi
 
@@ -26,13 +26,9 @@ else
   LABEL="${PYTEST_LABEL}"
 fi
 
-if [[ "$LAB_PATH" == "lab_1_classify_by_unigrams" ]]; then
-  python -m pytest -m "${LABEL}" --capture=no --ignore=lab_2_tokenize_by_bpe
-else
-  python -m pytest -m "${LABEL}" --capture=no
-fi
-
+python -m pytest -m "${LABEL}"
 ret=$?
+
 if [ "$ret" = 5 ]; then
   echo "No tests collected.  Exiting with 0 (instead of 5)."
   exit 0
