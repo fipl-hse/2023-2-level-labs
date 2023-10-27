@@ -106,13 +106,15 @@ def train(
     :param num_merges: required number of new tokens
     :return: dictionary in the form of <preprocessed word: number of occurrences>
     """
-    if not isinstance(word_frequencies, dict) or not isinstance(num_merges, int):
+    if (not isinstance(word_frequencies, dict) and word_frequencies is not None) or not isinstance(num_merges, int):
         return None
     dict_of_token_pairs = count_tokens_pairs(word_frequencies)
-    if dict_of_token_pairs is None:
-        return None
     list_of_max_token_pairs = []
     while len(list_of_max_token_pairs) < num_merges:
+        if dict_of_token_pairs is None:
+            return None
+        if len(dict_of_token_pairs) == 0:
+            break
         temp_list_of_max_token_pairs = []
         max_token_pair = max(dict_of_token_pairs.values())
         for token_pair in dict_of_token_pairs:
