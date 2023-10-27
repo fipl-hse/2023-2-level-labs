@@ -171,12 +171,12 @@ student.live_a_day()
 
 print('*' * 15 + ' TASKS ' + '*' * 15)
 
+
 # Task 1
 # easy level
-# class ...:
-#
-#     def __init__(...):
-#         ...
+class Deadline:
+    def __init__(self):
+        print("Oh, no! It is another deadline!")
 
 # fill the gaps so that the next line prints: "Oh, no! It is another deadline!"
 # deadline = Deadline()
@@ -184,10 +184,10 @@ print('*' * 15 + ' TASKS ' + '*' * 15)
 
 #  Task 2
 # easy level
-# class ...:
-#
-#     def ...:
-#         ...
+class Student:
+    def __init__(self, name: str, year: int) -> None:
+        print(f'''Hello! My name is {name}, I'm in year {year}''')
+
 
 # fill the gaps so that the next lines print the corresponding messages
 # student1 = Student('Marina', 1)  # Hello! My name is Marina, I'm in year 1
@@ -196,13 +196,12 @@ print('*' * 15 + ' TASKS ' + '*' * 15)
 
 # Task 3
 # easy level
-# class Insect:
-#
-#     def __init__(...):
-#         ...
-#
-#     def introduce(self):
-#         print(f'Hi! My name is {self.name} and I have {self.legs} legs')
+class Insect:
+    def __init__(self, name, legs):
+        self.name = name
+        self.legs = legs
+    def introduce(self):
+        print(f'Hi! My name is {self.name} and I have {self.legs} legs')
 
 # bee = Insect('Bee', 6)
 # bee.introduce()  # Hi! My name is Bee and I have 6 legs
@@ -213,12 +212,13 @@ print('*' * 15 + ' TASKS ' + '*' * 15)
 
 # Task 4
 # medium level
-# class Student:
-#     """
-#     If I have less than three deadlines, my mood is Good!
-#     If I have from 3 to 5 deadlines, my mood is So-so...
-#     If I have more than 5 deadlines, my mood is Bad!!!
-#     """
+class Student:
+
+    """
+    If I have less than three deadlines, my mood is Good!
+    If I have from 3 to 5 deadlines, my mood is So-so...
+    If I have more than 5 deadlines, my mood is Bad!!!
+    """
 
 
 # implement a class so that the following code works
@@ -231,16 +231,13 @@ print('*' * 15 + ' TASKS ' + '*' * 15)
 
 # Task 5
 # medium level
-# class Square:
-#
-#     def __init__(self, side_length: float) -> None:
-#         ...
-#
-#     def get_area(self) -> float:
-#         ...
-#
-#     def get_perimeter(self) -> float:
-#         ...
+class Square:
+    def __init__(self, side_length: float) -> None:
+        self.side_length = side_length
+    def get_area(self) -> float:
+        return self.side_length ** 2
+    def get_perimeter(self) -> float:
+        return self.side_length * 4
 
 # square1 = Square(side_length=2)
 # print(square1.get_area(), square1.get_perimeter())  # 4 8
