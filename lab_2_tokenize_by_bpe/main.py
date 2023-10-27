@@ -16,12 +16,11 @@ def prepare_word(
     """
     if not (
         isinstance(raw_word, str)
-        and (isinstance(start_of_word, str) or start_of_word is None)
-        and (isinstance(end_of_word, str) or end_of_word is None)
+        and isinstance(start_of_word, str | None)
+        and isinstance(end_of_word, str | None)
     ):
         return None
-    tokenized_word = [start_of_word, raw_word, end_of_word]
-    return tuple(tokenized_word)
+    return tuple(filter(None, [start_of_word, list(raw_word), end_of_word]))
 
 def collect_frequencies(
     text: str, start_of_word: str | None, end_of_word: str
