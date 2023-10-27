@@ -359,3 +359,31 @@ def calculate_bleu(actual: str | None, reference: str, max_order: int = 3) -> fl
     :param max_order: max length of n-gram to consider for comparison
     :return: value of BLEU metric
     """
+    if not isinstance(actual, str) or not isinstance(
+            reference, str) or max_order != 3:
+        return None
+
+    actual_ngrams = []
+    reference_ngrams = []
+
+    for order in range(max_order):
+        actual_ngram = collect_ngrams(actual, order+1)
+        reference_ngram = collect_ngrams(reference, order+1)
+        if actual_ngram is None or reference_ngram is None:
+            return None
+        actual_ngrams.append(actual_ngram)
+        reference_ngrams.append(reference_ngram)
+
+    precisions = []
+
+    for i, j in zip(actual_ngrams, reference_ngrams):
+        precision = calculate_precision(i, j)
+        if precision is None:
+            return None
+        precisions.append(precision)
+
+    average = geo_mean(precisions, max_order)
+    if average is None:
+        return None
+
+    return average*100
