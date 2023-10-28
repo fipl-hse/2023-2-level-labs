@@ -2,7 +2,7 @@
 Lab 2
 BPE and machine translation evaluation
 """
-import json
+import json, math
 
 
 def prepare_word(
@@ -256,6 +256,23 @@ def encode(
     :param unknown_token: token that signifies unknown sequence
     :return: list of token identifiers
     """
+    if (not isinstance(original_text, str) or
+        not isinstance(vocabulary, dict | None) or
+        not isinstance(start_of_word_token, str | None) or
+        not isinstance(end_of_word_token, str | None) or
+        not isinstance(unknown_token, str)):
+        return None
+    text_list = original_text.split(' ')
+    encoded_text = []
+    for word in text_list:
+        word_prepared = prepare_word(word, start_of_word_token, end_of_word_token)
+        if word_prepared is None:
+            return None
+        word_encoded = tokenize_word(word_prepared, vocabulary, end_of_word_token, unknown_token)
+        if word_encoded is None:
+            return None
+        encoded_text.extend(word_encoded)
+    return encoded_text
 
 
 def collect_ngrams(text: str, order: int) -> list[tuple[str, ...]] | None:
@@ -265,6 +282,15 @@ def collect_ngrams(text: str, order: int) -> list[tuple[str, ...]] | None:
     :param order: required number of elements in a single n-gram
     :return: sequence of n-grams
     """
+    if (not isinstance(text, str) or
+        not isinstance(order, int)):
+        return None
+    ngrams = []
+    for ind, symbol in enumerate(text):
+        if ind + order > len(text):
+            break
+        ngrams.append(tuple([symbol for symbol in text[ind:ind + order]]))
+    return ngrams
 
 
 def calculate_precision(
@@ -276,6 +302,17 @@ def calculate_precision(
     :param reference: expected sequence of n-grams
     :return: value of Precision metric
     """
+    if (not isinstance(actual, list) or
+        not isinstance(reference, list)):
+        return None
+    if len(actual) == 0:
+        return 0
+    precision = 0
+    reference_unique = set(reference)
+    for symbol in reference_unique:
+        if symbol in actual:
+            precision += 1
+    return precision / len(reference_unique)
 
 
 def geo_mean(precisions: list[float], max_order: int) -> float | None:
@@ -285,6 +322,15 @@ def geo_mean(precisions: list[float], max_order: int) -> float | None:
     :param max_order: maximum length of n-gram considered
     :return: value of geometric mean of Precision metric
     """
+    if (not isinstance(precisions, list) or
+        not isinstance(max_order, int)):
+        return None
+    product = 1
+    for order in range(max_order):
+        if precisions[order] < 0:
+            return 0
+        product *= precisions[order]
+    return product ** (1 / max_order)
 
 
 def calculate_bleu(actual: str | None, reference: str, max_order: int = 3) -> float | None:
@@ -295,3 +341,23 @@ def calculate_bleu(actual: str | None, reference: str, max_order: int = 3) -> fl
     :param max_order: max length of n-gram to consider for comparison
     :return: value of BLEU metric
     """
+    if (not isinstance(actual, str | None) or
+        not isinstance(reference, str) or
+        not isinstance(max_order, int)):
+        return None
+    precisions = []
+    for order in range(max_order):
+        actual_ngrams = collect_ngrams(actual, order + 1)
+        if actual_ngrams is None:
+            return None
+        reference_ngrams = collect_ngrams(reference, order + 1)
+        if reference_ngrams is None:
+            return None
+        precision = calculate_precision(actual_ngrams, reference_ngrams)
+        if precision is None:
+            return None
+        precisions.append(precision)
+    g_m = geo_mean(precisions, max_order)
+    if g_m is None:
+        return None
+    return g_m * 100
