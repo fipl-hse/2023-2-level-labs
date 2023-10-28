@@ -191,21 +191,17 @@ def tokenize_word(
        or not isinstance(end_of_word, str | None)
        or not isinstance(unknown_token, str)):
         return None
-    encoded_word = []
-    search = 0
-    long_word = word[:-1] + tuple(end_of_word)
-    while search < len(word):
-        tokens_left = len(vocabulary)
-        for token in vocabulary:
-            tokens_left -= 1
-            if long_word[search:search + len(token)] == tuple(token):
-                encoded_word.append(vocabulary[token])
-                search += len(token)
-                break
-        if not tokens_left:
-            encoded_word.append(vocabulary[unknown_token])
-            search += 1
-    return encoded_word
+    to_be_found = ''.join(word)
+    encoded = []
+    for token in vocabulary:
+        while token in to_be_found:
+            position = to_be_found.count(' ', 0, to_be_found.find(token))
+            encoded.insert(position, vocabulary[token])
+            to_be_found = to_be_found.replace(token, ' ', 1)
+    for i, symbol in enumerate(to_be_found):
+        if symbol != ' ':
+            encoded.insert(i, vocabulary[unknown_token])
+    return encoded
 
 
 def load_vocabulary(vocab_path: str) -> dict[str, int] | None:
@@ -239,6 +235,23 @@ def encode(
     :param unknown_token: token that signifies unknown sequence
     :return: list of token identifiers
     """
+    if (not isinstance(original_text, str)
+            or not isinstance(vocabulary, dict | None)
+            or not isinstance(start_of_word_token, str | None)
+            or not isinstance(end_of_word_token, str | None)
+            or not isinstance(unknown_token, str)):
+        return None
+    words = original_text.split()
+    encoded_text = []
+    for word in words:
+        unigrams = prepare_word(word, start_of_word_token, end_of_word_token)
+        if not unigrams:
+            return None
+        tokens = tokenize_word(unigrams, vocabulary, end_of_word_token, unknown_token)
+        if not tokens:
+            return None
+        encoded_text.extend(tokens)
+    return encoded_text
 
 
 def collect_ngrams(text: str, order: int) -> list[tuple[str, ...]] | None:
