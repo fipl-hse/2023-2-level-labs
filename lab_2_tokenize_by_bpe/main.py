@@ -14,8 +14,6 @@ def prepare_word(
     :param end_of_word: a token that signifies the end of word
     :return: preprocessed word
     """
-
-
     if not isinstance(raw_word, str) or (start_of_word is not None and not isinstance(start_of_word, str)) \
             or (end_of_word is not None and not isinstance(end_of_word, str)):
             return None
@@ -44,10 +42,9 @@ def collect_frequencies(
     frequency_dict = {}
     for word in words:
         prepared_word = prepare_word(word, start_of_word, end_of_word)
-        if prepared_word is not None:
-            frequency_dict[prepared_word] = frequency_dict.get(prepared_word, 0) + 1
-        elif prepared_word is None:
+        if prepared_word is None:
             return None
+        frequency_dict[prepared_word] = frequency_dict.get(prepared_word, 0) + 1
     return frequency_dict
 
 
