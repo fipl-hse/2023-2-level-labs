@@ -21,7 +21,7 @@ def prepare_word(
     ):
         return None
 
-    return tuple(*filter(None, [start_of_word, (i for i in raw_word), end_of_word]))
+    return tuple(filter(None, [start_of_word, *(i for i in raw_word), end_of_word]))
 
 
 def collect_frequencies(
