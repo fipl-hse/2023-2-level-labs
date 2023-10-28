@@ -261,6 +261,12 @@ def collect_ngrams(text: str, order: int) -> list[tuple[str, ...]] | None:
     :param order: required number of elements in a single n-gram
     :return: sequence of n-grams
     """
+    if (not isinstance(text, str)
+       or not isinstance(order, int)):
+        return None
+    chars = list(text)
+    ngrams = [tuple(chars[i:i + order]) for i in range(len(chars) - order + 1)]
+    return ngrams
 
 
 def calculate_precision(
@@ -272,6 +278,12 @@ def calculate_precision(
     :param reference: expected sequence of n-grams
     :return: value of Precision metric
     """
+    if (not isinstance(actual, list)
+       or not isinstance(reference, list)):
+        return None
+    if not actual:
+        return 0
+    return len(set(actual).intersection(reference))/len(set(reference))
 
 
 def geo_mean(precisions: list[float], max_order: int) -> float | None:
