@@ -85,13 +85,16 @@ def merge_tokens(
         return None
     new_freq_dict = {}
     for word in word_frequencies.keys():
-        if ''.join(pair) in ''.join(word):
+        if ''.join(pair)[1] in ''.join(word):
             list_word = list(word)
+            pair_indexes = []
             for ind in range(len(word) - 1):
                 new_key = (word[ind], word[ind + 1])
                 if new_key == pair:
-                    list_word[ind + 1] = ''.join(pair)
-                    list_word.pop(ind)
+                    pair_indexes.append(ind)
+            for index in reversed(pair_indexes):
+                list_word[index + 1] = ''.join(pair)
+                list_word.pop(index)
             new_freq_dict[tuple(list_word)] = word_frequencies[word]
         else:
             new_freq_dict[word] = word_frequencies[word]
@@ -188,6 +191,33 @@ def tokenize_word(
     :param unknown_token: token that signifies unknown sequence
     :return: list of token identifiers
     """
+    if not (isinstance(word, tuple)
+            and isinstance(vocabulary, dict)
+            and isinstance(end_of_word, str)
+            and isinstance(unknown_token, str)):
+        return None
+    ident_list = []
+    str_word = ''.join(word)
+    lst_word = list(word)
+    keys_sorted = list(vocabulary.keys())
+    keys_sorted = sorted(keys_sorted, key=lambda x: (-len(x), x))
+    end = ''
+    for tkn in lst_word:
+        if tkn in keys_sorted:
+            for token in keys_sorted:
+                if end_of_word not in token:
+                    if token in str_word and token[0] == tkn:
+                        ident_list.append(vocabulary[token])
+                        str_word = str_word.replace(token, '', 1)
+                else:
+                    if token in str_word:
+                        end = token
+                        str_word = str_word.replace(token, '')
+        else:
+            ident_list.append(vocabulary['<unk>'])
+    if end_of_word:
+        ident_list.append(vocabulary[end])
+    return ident_list
 
 
 def load_vocabulary(vocab_path: str) -> dict[str, int] | None:
