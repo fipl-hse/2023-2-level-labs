@@ -1,0 +1,9 @@
+[doc8]
+allow-long-titles=True
+max-line-length=100
+ignore=D004
+ignore-path=
+    # Ignoring virtual environments
+    venv*,
+    # Ignoring automatically generated code
+    build/
