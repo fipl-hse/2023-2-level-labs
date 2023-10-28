@@ -2,6 +2,7 @@
 Lab 2
 BPE and machine translation evaluation
 """
+import json
 
 
 def prepare_word(
@@ -196,28 +197,18 @@ def tokenize_word(
             and isinstance(end_of_word, str)
             and isinstance(unknown_token, str)):
         return None
-    ident_list = []
     str_word = ''.join(word)
-    lst_word = list(word)
-    keys_sorted = list(vocabulary.keys())
-    keys_sorted = sorted(keys_sorted, key=lambda x: (-len(x), x))
-    end = ''
-    for tkn in lst_word:
-        if tkn in keys_sorted:
-            for token in keys_sorted:
-                if end_of_word not in token:
-                    if token in str_word and token[0] == tkn:
-                        ident_list.append(vocabulary[token])
-                        str_word = str_word.replace(token, '', 1)
-                else:
-                    if token in str_word:
-                        end = token
-                        str_word = str_word.replace(token, '')
-        else:
-            ident_list.append(vocabulary['<unk>'])
-    if end_of_word:
-        ident_list.append(vocabulary[end])
-    return ident_list
+    copy = ''.join(word)
+    keys_sorted = sorted(list(vocabulary.keys()), key=lambda x: (-len(x), x))
+    for token in keys_sorted:
+        if token in str_word:
+            copy = copy.replace(token, str(vocabulary[token]) + '+')
+    for unk in str_word:
+        if unk not in keys_sorted:
+            copy = copy.replace(unk, str(vocabulary[unknown_token]) + '+')
+    new_copy = copy.split('+')
+    new_copy.pop(-1)
+    return [int(iden) for iden in new_copy]
 
 
 def load_vocabulary(vocab_path: str) -> dict[str, int] | None:
@@ -226,6 +217,14 @@ def load_vocabulary(vocab_path: str) -> dict[str, int] | None:
     :param vocab_path: path to the saved vocabulary
     :return: dictionary in the form of <token: identifier>
     """
+    if not isinstance(vocab_path, str):
+        return None
+
+    with open(vocab_path, 'r', encoding='utf-8') as file:
+        vocabulary = json.load(file)
+    if not vocabulary:
+        return None
+    return dict(vocabulary)
 
 
 def encode(
@@ -244,6 +243,30 @@ def encode(
     :param unknown_token: token that signifies unknown sequence
     :return: list of token identifiers
     """
+    if not (isinstance(original_text, str)
+            and isinstance(vocabulary, dict)
+            and (isinstance(start_of_word_token, str) or start_of_word_token is None)
+            and (isinstance(end_of_word_token, str) or end_of_word_token is None)
+            and isinstance(unknown_token, str)):
+        return None
+    encoded_text = []
+    prepared_words = []
+    tokenized_words = []
+    list_text = original_text.split()
+    for word in list_text:
+        prep_word = prepare_word(word, start_of_word_token, end_of_word_token)
+        if not prep_word:
+            return None
+        prepared_words.append(prep_word)
+    for tpl in prepared_words:
+        tok_word = tokenize_word(tpl, vocabulary, end_of_word_token, unknown_token)
+        if not tok_word:
+            return None
+        tokenized_words.append(tok_word)
+    for ident_lst in tokenized_words:
+        for ident in ident_lst:
+            encoded_text.append(ident)
+    return encoded_text
 
 
 def collect_ngrams(text: str, order: int) -> list[tuple[str, ...]] | None:
