@@ -21,7 +21,8 @@ def prepare_word(
     ):
         return None
 
-    return tuple(filter(None, [start_of_word, *(i for i in raw_word), end_of_word]))
+    return tuple(*filter(None, [start_of_word, (i for i in raw_word), end_of_word]))
+
 
 def collect_frequencies(
     text: str, start_of_word: str | None, end_of_word: str
@@ -45,6 +46,7 @@ def collect_frequencies(
     if None in frequency_dict:
         return None
     return frequency_dict
+
 
 def count_tokens_pairs(
     word_frequencies: dict[tuple[str, ...], int]
