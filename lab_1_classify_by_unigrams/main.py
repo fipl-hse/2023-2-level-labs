@@ -13,13 +13,13 @@ def tokenize(text: str) -> list[str] | None:
     """
     if not isinstance(text, str):
         return None
-    else:
-        tokens = []
-        text = text.lower()
-        for i in text:
-            if i.isalpha():
-                tokens.append(i)
-        return tokens
+
+    tokens = []
+    text = text.lower()
+    for i in text:
+        if i.isalpha():
+            tokens.append(i)
+    return tokens
 
 def calculate_frequencies(tokens: list[str] | None) -> dict[str, float] | None:
     """
@@ -27,11 +27,9 @@ def calculate_frequencies(tokens: list[str] | None) -> dict[str, float] | None:
     :param tokens: a list of tokens
     :return: a dictionary with frequencies
     """
-    if isinstance(tokens, list) and all(isinstance(el,str) for el in tokens):
-        dictionary = {el: (tokens.count(el) / len(tokens)) for el in tokens}
-        return dictionary
-    else:
+    if not isinstance(tokens, list) and not all(isinstance(el,str) for el in tokens):
         return None
+    return {el: (tokens.count(el) / len(tokens)) for el in tokens}
 
 def create_language_profile(language: str, text: str) -> dict[str, str | dict[str, float]] | None:
     """
