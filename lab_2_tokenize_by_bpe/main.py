@@ -112,11 +112,9 @@ def train(
         if num_merges > len(num_of_pairs):
             num_merges = len(num_of_pairs)
         max_freq = max(num_of_pairs.values())
-        pairs_list = []
-        for pair, frequency in num_of_pairs.items():
-            if frequency == max_freq:
-                pairs_list.append(pair)
-        word_frequencies = merge_tokens(word_frequencies, (sorted(pairs_list,key = len ))[0])
+        pairs_list = [pair for pair, frequency in num_of_pairs.items() if frequency == max_freq]
+        pairs_list.sort(key=lambda item: (-len(item)))
+        word_frequencies = merge_tokens(word_frequencies, pairs_list[0])
         if word_frequencies is None:
             return None
         num_merges -= 1
@@ -161,19 +159,13 @@ def decode(
             not isinstance(vocabulary, dict) or\
             not (isinstance(end_of_word_token, str) or end_of_word_token is None):
         return None
+    inverted_vocabulary = {value: token for token, value in vocabulary.items()}
     decoding = ''
     for number in encoded_text:
-        for token in vocabulary:
-            if vocabulary[token] == number and end_of_word_token is not None:
-                if token == end_of_word_token:
-                    decoding += ' '
-                else:
-                    decoding += token
-            if vocabulary[token] == number and end_of_word_token is None:
-                if token == end_of_word_token:
-                    decoding += ''
-                else:
-                    decoding += token
+        token = inverted_vocabulary[number]
+        if end_of_word_token is not None and end_of_word_token in token:
+            token = token.replace(end_of_word_token, ' ')
+        decoding += token
     return decoding
 
 def tokenize_word(
