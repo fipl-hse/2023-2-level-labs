@@ -3,6 +3,7 @@ Lab 2
 BPE and machine translation evaluation
 """
 import json
+import math
 
 
 def prepare_word(
@@ -293,6 +294,12 @@ def geo_mean(precisions: list[float], max_order: int) -> float | None:
     :param max_order: maximum length of n-gram considered
     :return: value of geometric mean of Precision metric
     """
+    if (not isinstance(precisions, list)
+        or not isinstance(max_order, int)):
+        return None
+    if not all(precisions):
+        return 0
+    return math.exp(1 / max_order * sum(math.log(x) for x in precisions[:max_order]))
 
 
 def calculate_bleu(actual: str | None, reference: str, max_order: int = 3) -> float | None:
@@ -303,3 +310,4 @@ def calculate_bleu(actual: str | None, reference: str, max_order: int = 3) -> fl
     :param max_order: max length of n-gram to consider for comparison
     :return: value of BLEU metric
     """
+
