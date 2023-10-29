@@ -2,7 +2,7 @@
 Lab 2
 BPE and machine translation evaluation
 """
-import json, math
+import json
 
 
 def prepare_word(
@@ -289,7 +289,7 @@ def collect_ngrams(text: str, order: int) -> list[tuple[str, ...]] | None:
     for ind, symbol in enumerate(text):
         if ind + order > len(text):
             break
-        ngrams.append(tuple([symbol for symbol in text[ind:ind + order]]))
+        ngrams.append(tuple(symbol for symbol in text[ind:ind + order]))
     return ngrams
 
 
