@@ -113,8 +113,7 @@ def train(
     token_pairs = count_tokens_pairs(word_frequencies)
     if not token_pairs:
         return None
-    if num_merges > len(token_pairs):
-        num_merges = len(token_pairs)
+    num_merges = min(num_merges, len(token_pairs))
     for iteration in range(num_merges):
         often_pair = [key for key, value in token_pairs.items() if value == max(token_pairs.values())]
         longest = max(len(''.join(pair)) for pair in often_pair)
