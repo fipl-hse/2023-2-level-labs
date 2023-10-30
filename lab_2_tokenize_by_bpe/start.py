@@ -13,8 +13,11 @@ def main() -> None:
     with open(assets_path / 'text.txt', 'r', encoding='utf-8') as text_file:
         text = text_file.read()
 
-    result = lab_2_tokenize_by_bpe.main.collect_frequencies(text, None, '</s>')
-    #assert result, "Encoding is not working"
+    word_freq = lab_2_tokenize_by_bpe.main.collect_frequencies(text, None, '</s>')
+    print(lab_2_tokenize_by_bpe.main.train(word_freq, 100))
+
+    # result = lab_2_tokenize_by_bpe.main.collect_frequencies(text, None, '</s>')
+    # assert result, "Encoding is not working"
 
 
 if __name__ == "__main__":
