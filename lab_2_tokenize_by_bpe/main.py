@@ -2,6 +2,8 @@
 Lab 2
 BPE and machine translation evaluation
 """
+import json
+import math
 
 def prepare_word(
     raw_word: str, start_of_word: str | None, end_of_word: str | None
@@ -145,7 +147,27 @@ def get_vocabulary(
     :param unknown_token: a token to signify an unknown token
     :return: dictionary in the form of <token: identifier>
     """
+    if not isinstance(word_frequencies, dict) \
+        or not isinstance(unknown_token, str):
+        return None
 
+    dict_of_ident = {}
+    diff_tokens = set()
+    diff_tokens.add(unknown_token)
+
+    for key in word_frequencies:
+        for word in key:
+            diff_tokens.add(word)
+            for token in word:
+                diff_tokens.add(token)
+
+    alphabetic_sorting = sorted(diff_tokens)
+    len_sorting = sorted(alphabetic_sorting, key = len, reverse = True )
+
+    for index, token in enumerate(len_sorting):
+        dict_of_ident[token] = index
+
+    return dict_of_ident
 
 def decode(
     encoded_text: list[int] | None, vocabulary: dict[str, int] | None, end_of_word_token: str | None
@@ -157,7 +179,26 @@ def decode(
     :param end_of_word_token: an end-of-word token
     :return: decoded sequence
     """
+    if not isinstance(encoded_text, list) \
+        or not isinstance(vocabulary, dict) \
+        or not (isinstance(end_of_word_token, str) \
+        or end_of_word_token is None):
+        return None
 
+    decoded_sequence = ''
+    for ident in encoded_text:
+        list_for_token = [key for key, value in vocabulary.items() if value == ident]
+
+        for token in list_for_token:
+            if end_of_word_token:
+                if end_of_word_token in token:
+                    end_index = len(end_of_word_token)
+                    decoded_sequence += end_of_word_token[end_index:] + ' '
+                else: 
+                    decoded_sequence += token
+            else:
+                decoded_sequence += token
+    return decoded_sequence
 
 def tokenize_word(
     word: tuple[str, ...], vocabulary: dict[str, int], end_of_word: str | None, unknown_token: str
@@ -170,6 +211,26 @@ def tokenize_word(
     :param unknown_token: token that signifies unknown sequence
     :return: list of token identifiers
     """
+    if not isinstance(word, tuple) or not isinstance(vocabulary, dict) \
+        or not (isinstance(end_of_word, str) or end_of_word is None) \
+        or not isinstance(unknown_token, str):
+        return None
+    raw_word = ''.join(word)
+    draft = ''.join(word)
+    sorted_vocab = sorted(vocabulary.keys())
+    sorted_vocab = sorted(sorted_vocab, key = len, reverse = True)
+
+    for n_gramm in sorted_vocab:
+        if n_gramm in raw_word:
+            draft = draft.replace(n_gramm, str(vocabulary[n_gramm]) + ' ')
+
+    for n_gramm in raw_word:
+        if not n_gramm in sorted_vocab:
+            draft = draft.replace(n_gramm, str(vocabulary[unknown_token]) + ' ') 
+
+    draft = draft.split()
+    encoded = [int(num) for num in draft]
+    return encoded
 
 
 def load_vocabulary(vocab_path: str) -> dict[str, int] | None:
@@ -178,7 +239,16 @@ def load_vocabulary(vocab_path: str) -> dict[str, int] | None:
     :param vocab_path: path to the saved vocabulary
     :return: dictionary in the form of <token: identifier>
     """
+    if not isinstance(vocab_path, str):
+        return None
 
+    with open(vocab_path, 'r', encoding='utf-8' ) as file:
+        vocabulary = json.load(file)
+
+    if not vocabulary:
+        return None
+
+    return vocabulary
 
 def encode(
     original_text: str,
@@ -196,7 +266,25 @@ def encode(
     :param unknown_token: token that signifies unknown sequence
     :return: list of token identifiers
     """
+    if not isinstance(original_text, str) \
+        or not (isinstance(vocabulary, dict) or vocabulary is None) \
+        or not (isinstance(start_of_word_token, str) or start_of_word_token is None) \
+        or not (isinstance(end_of_word_token, str) or end_of_word_token is None) \
+        or not isinstance(unknown_token, str):
+        return None
 
+    list_of_ident = []
+    splitted_text = original_text.split()
+    for word in splitted_text:
+        tuple_of_words = prepare_word(word, start_of_word_token, end_of_word_token)
+        if not tuple_of_words:
+            return None
+        list_of_word_ident = tokenize_word(tuple_of_words, vocabulary, end_of_word_token, unknown_token)
+        if not list_of_word_ident:
+            return None
+        list_of_ident += list_of_word_ident
+
+    return list_of_ident 
 
 def collect_ngrams(text: str, order: int) -> list[tuple[str, ...]] | None:
     """
@@ -205,7 +293,16 @@ def collect_ngrams(text: str, order: int) -> list[tuple[str, ...]] | None:
     :param order: required number of elements in a single n-gram
     :return: sequence of n-grams
     """
+    if not isinstance(text, str) or not isinstance(order, int):
+        return None
 
+    list_of_n_gramms = []
+    for index, el in enumerate(text):
+        word_slice = text[index: index + order]
+        if len(word_slice) == order:
+            list_of_n_gramms.append(tuple(el for el in word_slice))
+
+    return list_of_n_gramms
 
 def calculate_precision(
     actual: list[tuple[str, ...]], reference: list[tuple[str, ...]]
@@ -216,7 +313,18 @@ def calculate_precision(
     :param reference: expected sequence of n-grams
     :return: value of Precision metric
     """
+    if not isinstance(actual, list) or not isinstance(reference, list):
+        return None
 
+    matches = 0.0
+    reference = set(reference)
+
+    for n_gram in reference:
+        if n_gram in actual:
+            matches += 1
+    value_of_Precision = matches / len(reference)
+
+    return value_of_Precision
 
 def geo_mean(precisions: list[float], max_order: int) -> float | None:
     """
@@ -225,7 +333,19 @@ def geo_mean(precisions: list[float], max_order: int) -> float | None:
     :param max_order: maximum length of n-gram considered
     :return: value of geometric mean of Precision metric
     """
+    if not isinstance(precisions, list) \
+        or not isinstance(max_order, int):
+        return None
+    total_sum = 0.0
 
+    for order in range(max_order):
+        if not precisions[order] < 0:
+            total_sum += math.log(precisions[order])
+        else:
+            return 0
+    average_geo_mean = math.exp(1/max_order * total_sum)
+
+    return average_geo_mean
 
 def calculate_bleu(actual: str | None, reference: str, max_order: int = 3) -> float | None:
     """
@@ -235,3 +355,29 @@ def calculate_bleu(actual: str | None, reference: str, max_order: int = 3) -> fl
     :param max_order: max length of n-gram to consider for comparison
     :return: value of BLEU metric
     """
+    if not isinstance(actual, str) or not isinstance(reference, str) \
+        or not max_order == 3:
+        return None
+    actual_ngrams = []
+    expected_ngrams = []
+
+    for order in range(max_order):
+        list_for_actual_ngrams = collect_ngrams(actual, order + 1)
+        list_for_expected_ngrams = collect_ngrams(reference, order + 1)
+        if list_for_actual_ngrams is None or list_for_expected_ngrams is None:
+            return None
+        actual_ngrams.append(list_for_actual_ngrams)
+        expected_ngrams.append(list_for_expected_ngrams)
+
+    precisions = []
+    for actual_ngram, expected_ngram in zip(actual_ngrams, expected_ngrams):
+        precision_value = calculate_precision(actual_ngram, expected_ngram)
+        if precision_value is None:
+            return None
+        precisions.append(precision_value)
+
+    average_geo_mean = geo_mean(precisions, max_order)
+    if average_geo_mean is None:
+        return None
+    
+    return average_geo_mean * 100
