@@ -2,7 +2,7 @@
 BPE Tokenizer starter
 """
 from pathlib import Path
-import lab_2_tokenize_by_bpe.main
+import lab_2_tokenize_by_bpe.main as main_file
 
 
 def main() -> None:
@@ -13,8 +13,8 @@ def main() -> None:
     with open(assets_path / 'text.txt', 'r', encoding='utf-8') as text_file:
         text = text_file.read()
 
-    word_freq = lab_2_tokenize_by_bpe.main.collect_frequencies(text, None, '</s>')
-    print(lab_2_tokenize_by_bpe.main.train(word_freq, 100))
+    word_freq = main_file.collect_frequencies(text, None, '</s>')
+    print(main_file.train(word_freq, 100))
 
     # result = lab_2_tokenize_by_bpe.main.collect_frequencies(text, None, '</s>')
     # assert result, "Encoding is not working"
