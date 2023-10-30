@@ -108,13 +108,11 @@ def train(
     while num_merges > 0:
         num_of_pairs = count_tokens_pairs(word_frequencies)
         if num_of_pairs is None:
-            return None
+            break
         if num_merges > len(num_of_pairs):
             num_merges = len(num_of_pairs)
-        max_freq = max(num_of_pairs.values())
-        pairs_list = [pair for pair, frequency in num_of_pairs.items() if frequency == max_freq]
-        pairs_list.sort(key=lambda item: (-len(item)))
-        word_frequencies = merge_tokens(word_frequencies, pairs_list[0])
+        pairs_list = sorted(num_of_pairs.items(), key=lambda x: (-x[1], -len(''.join(x[0])), ''.join(x[0])))
+        word_frequencies = merge_tokens(word_frequencies, pairs_list[0][0])
         if word_frequencies is None:
             return None
         num_merges -= 1
