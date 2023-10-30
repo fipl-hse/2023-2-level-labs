@@ -108,7 +108,7 @@ def train(
     :param num_merges: required number of new tokens
     :return: dictionary in the form of <preprocessed word: number of occurrences>
     """
-    if not isinstance(word_frequencies, dict) and not isinstance(num_merges, int):
+    if not isinstance(word_frequencies, dict) or not isinstance(num_merges, int):
         return None
     token_pairs = count_tokens_pairs(word_frequencies)
     if not token_pairs:
@@ -128,6 +128,7 @@ def train(
             return None
     return word_frequencies
 
+
 def get_vocabulary(
     word_frequencies: dict[tuple[str, ...], int], unknown_token: str
 ) -> dict[str, int] | None:
@@ -137,6 +138,21 @@ def get_vocabulary(
     :param unknown_token: a token to signify an unknown token
     :return: dictionary in the form of <token: identifier>
     """
+    if not isinstance(word_frequencies, dict) or not isinstance(unknown_token, str):
+        return None
+    identifier_dict = {}
+    tokens_list = set()
+    for token in word_frequencies:
+        for letter in token:
+            tokens_list.add(letter)
+            for symbol in letter:
+                tokens_list.add(symbol)
+    tokens_list.add(unknown_token)
+    alphabetical = sorted(tokens_list)
+    length_sorted = sorted(alphabetical, key=len, reverse=True)
+    for index, token in enumerate(length_sorted):
+        identifier_dict[token] = index
+    return identifier_dict
 
 
 def decode(
@@ -149,6 +165,21 @@ def decode(
     :param end_of_word_token: an end-of-word token
     :return: decoded sequence
     """
+    if (not isinstance(encoded_text, list | None)
+            or not isinstance(vocabulary, dict | None)
+            or not isinstance(end_of_word_token, str | None)):
+        return None
+    decode_list = []
+    for number in encoded_text:
+        if number in vocabulary.values():
+            for token, value in vocabulary.items():
+                if value == number:
+                    decode_list.append(token)
+    if end_of_word_token in decode_list:
+        for index, token in enumerate(decode_list):
+            if token == end_of_word_token:
+                decode_list[index] = ' '
+    return ''.join(decode_list)
 
 
 def tokenize_word(
