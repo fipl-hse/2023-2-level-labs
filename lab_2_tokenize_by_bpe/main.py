@@ -109,23 +109,24 @@ def train(
     if (not (isinstance(word_frequencies, dict) or word_frequencies is None) or not
         isinstance(num_merges, int)):
         return None
-    while (num_merges > 0):
+    merges_count = 0
+    while merges_count < num_merges:
         token_pairs = count_tokens_pairs(word_frequencies)
         if token_pairs is None:
             return None
-        if pair_freq != {}:
-            sorted_dict = dict(sorted(token_pairs.items(),
-                               key=lambda item: (-item[1], -len("".join(item[0])), 
-                                                                 "".join(item[0]))))
-                for key in sorted_dict.keys():
-                    word_frequencies = merge_tokens(word_frequencies, key)
-                    if word_frequencies is None:
-                        return None
-                    num_merges -= 1
-                    break
-                continue
-            break
-        return word_frequencies
+        if token_pairs != {}:
+            new_dict = dict(
+                sorted(pair_freq.items(),
+                       key=lambda item: (-item[1], -len("".join(item[0])), "".join(item[0]))))
+            for k in new_dict.keys():
+                word_frequencies = merge_tokens(word_frequencies, k)
+                if word_frequencies is None:
+                    return None
+                merges_count += 1
+                break
+            continue
+        break
+    return word_frequencies
 
 
 def get_vocabulary(
