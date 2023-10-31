@@ -116,7 +116,7 @@ def train(
             return None
         if token_pairs != {}:
             new_dict = dict(
-                sorted(pair_freq.items(),
+                sorted(token_pairs.items(),
                        key=lambda item: (-item[1], -len("".join(item[0])), "".join(item[0]))))
             for k in new_dict.keys():
                 word_frequencies = merge_tokens(word_frequencies, k)
