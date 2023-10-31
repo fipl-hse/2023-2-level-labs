@@ -81,24 +81,24 @@ def merge_tokens(
     :param pair: a pair of tokens to be merged
     :return: dictionary in the form of <preprocessed word: number of occurrences>
     """
-    if not( isinstance(word_frequencies, dict) or
+    if not( isinstance(word_frequencies, dict) and
             isinstance(pair, tuple)
     ):
         return None
+
+    new_word_frequencies = {}
     for word in word_frequencies:
         new_word = list(word)
         for i in range(len(word)-1):
             two_tokens = tuple([word[i], word[i+1]])
             if pair == two_tokens:
-                new_word.remove(pair[0])
-                new_word.remove(pair[1])
+                new_word.pop(i+1)
                 new_word[i] = pair[0] + pair[1]
+
         new_word = tuple(new_word)
-        word_frequencies[new_word] = word_frequencies[word]
-        del word_frequencies[word]
+        new_word_frequencies[new_word] = word_frequencies[word]
 
-    return word_frequencies
-
+    return new_word_frequencies
 
 
 def train(
@@ -110,7 +110,35 @@ def train(
     :param num_merges: required number of new tokens
     :return: dictionary in the form of <preprocessed word: number of occurrences>
     """
+    if not (isinstance(word_frequencies, dict) and
+            isinstance(num_merges, int)
+    ):
+        return None
 
+    count_of_pairs = count_tokens_pairs(word_frequencies)
+    if count_of_pairs is None:
+        return None
+    num_merges = min(num_merges, len(count_of_pairs))
+
+    for i in range(num_merges):
+        maximum = max(count_of_pairs.values())
+
+        local_maximums = [list(key) for key in count_of_pairs if count_of_pairs[key] == maximum]
+        max_length = max(len(''.join(tokens)) for tokens in local_maximums)
+
+        longest_pairs = [p for p in local_maximums if len(''.join(p)) == max_length]
+        pair = sorted(longest_pairs)[0]
+
+        merged_freq = merge_tokens(word_frequencies, tuple(pair))
+        if merged_freq is None:
+            return None
+
+        word_frequencies = merged_freq
+        count_of_pairs = count_tokens_pairs(word_frequencies)
+        if count_of_pairs is None:
+            return None
+
+    return merged_freq
 
 def get_vocabulary(
     word_frequencies: dict[tuple[str, ...], int], unknown_token: str
