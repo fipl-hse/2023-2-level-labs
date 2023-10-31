@@ -22,8 +22,8 @@ def main() -> None:
     word_frequencies = train(word_frequencies, 100)
     if word_frequencies:
         vocabulary = get_vocabulary(word_frequencies, '<unk>')
-        encoded_text_list = [int(num) for num in encoded_text.split()]
-        result = decode(encoded_text_list, vocabulary, '</s>')
+        encoded_text = [int(num) for num in encoded_text.split()]
+        result = decode(encoded_text, vocabulary, '</s>')
         print(result)
         assert result, "Encoding is not working"
 
@@ -35,12 +35,12 @@ def main() -> None:
     with open(assets_path / 'for_translation_ru_encoded.txt', 'r', encoding='utf-8') as file:
         reference_ru = file.read()
 
-    predicted_encoded = encode(predicted_ru, vocabulary_adv, '\u2581', None, '<unk>')
-    if not predicted_encoded:
+    predicted_ru = encode(predicted_ru, vocabulary_adv, '\u2581', None, '<unk>')
+    if not predicted_ru:
         return None
 
-    reference_ru_list = reference_ru.split()
-    for pred_token, actual_token in zip(predicted_encoded, reference_ru_list):
+    reference_ru = reference_ru.split()
+    for pred_token, actual_token in zip(predicted_ru, reference_ru):
         if pred_token != actual_token:
             print(pred_token, actual_token)
 
@@ -59,6 +59,7 @@ def main() -> None:
     if not bleu:
         return None
     print(bleu)
+    return None
 
 
 if __name__ == "__main__":
