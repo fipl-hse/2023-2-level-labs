@@ -3,11 +3,8 @@ BPE Tokenizer starter
 """
 from pathlib import Path
 
-from lab_2_tokenize_by_bpe.main import (
-    collect_frequencies, decode, get_vocabulary, train,
-    load_vocabulary, encode, collect_ngrams,
-    calculate_precision, geo_mean, calculate_bleu
-)
+from lab_2_tokenize_by_bpe.main import (calculate_bleu, collect_frequencies, decode, encode,
+                                        get_vocabulary, load_vocabulary, train)
 
 
 def main() -> None:
