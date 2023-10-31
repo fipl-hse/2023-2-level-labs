@@ -5,6 +5,7 @@ BPE and machine translation evaluation
 import json
 import math
 
+
 def prepare_word(
     raw_word: str, start_of_word: str | None, end_of_word: str | None
 ) -> tuple[str, ...] | None:
@@ -44,16 +45,15 @@ def collect_frequencies(
         return None
 
     words = text.split()
-    tokenized_words = []
     dict_of_freq = {}
 
     for word in words:
         freq = words.count(word)
-        word = prepare_word(word, start_of_word, end_of_word)
-        if word is None:
+        prepared_word = prepare_word(word, start_of_word, end_of_word)
+        if not prepared_word:
             return None
-        tokenized_words.append(word)
-        dict_of_freq.update({word:freq})
+        dict_of_freq.update({prepared_word:freq})
+
     return dict_of_freq
 
 def count_tokens_pairs(
@@ -228,8 +228,8 @@ def tokenize_word(
         if not n_gramm in sorted_vocab:
             draft = draft.replace(n_gramm, str(vocabulary[unknown_token]) + ' ')
 
-    draft = draft.split()
-    encoded = [int(num) for num in draft]
+    encoded_list = draft.split()
+    encoded = [int(num) for num in encoded_list]
     return encoded
 
 
@@ -245,7 +245,7 @@ def load_vocabulary(vocab_path: str) -> dict[str, int] | None:
     with open(vocab_path, 'r', encoding='utf-8' ) as file:
         vocabulary = json.load(file)
 
-    if not vocabulary:
+    if not isinstance(vocabulary, dict):
         return None
 
     return vocabulary
@@ -317,12 +317,12 @@ def calculate_precision(
         return None
 
     matches = 0.0
-    reference = set(reference)
+    reference_set = set(reference)
 
-    for n_gram in reference:
+    for n_gram in reference_set:
         if n_gram in actual:
             matches += 1
-    value_of_precision = matches / len(reference)
+    value_of_precision = matches / len(reference_set)
 
     return value_of_precision
 
