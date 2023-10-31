@@ -1,4 +1,4 @@
-# pylint: disable=too-few-public-methods
+'''# pylint: disable=too-few-public-methods
 """
 Programming 2023
 Seminar 5
@@ -175,21 +175,24 @@ print('*' * 15 + ' TASKS ' + '*' * 15)
 
 # Task 1
 # easy level
-# class ...:
-#
-#     def __init__(...):
-#         ...
+class Deadline:
+
+     def __init__(self):
+         print("Oh, no! It is another deadline!")
 
 # fill the gaps so that the next line prints: "Oh, no! It is another deadline!"
-# deadline = Deadline()
+deadline = Deadline()
 
 
 #  Task 2
 # easy level
-# class ...:
-#
-#     def ...:
-#         ...
+class Student:
+
+     def __init__(self, name: str, age: int):
+         self.name = name
+         self.age = age
+         print("Hello! My name is {self.name}")
+
 
 # fill the gaps so that the next lines print the corresponding messages
 # student1 = Student('Marina', 1)  # Hello! My name is Marina, I'm in year 1
@@ -198,57 +201,72 @@ print('*' * 15 + ' TASKS ' + '*' * 15)
 
 # Task 3
 # easy level
-# class Insect:
+#  class Insect:
 #
-#     def __init__(...):
-#         ...
+#      def __init__(self, name: str, legs: int):
+#          self.name = name
+#          self.legs = legs
 #
-#     def introduce(self):
-#         print(f'Hi! My name is {self.name} and I have {self.legs} legs')
-
-# bee = Insect('Bee', 6)
-# bee.introduce()  # Hi! My name is Bee and I have 6 legs
+#      def introduce(self):
+#          print(f'Hi! My name is {self.name} and I have {self.legs} legs')
 #
-# spider = Insect('Spider', 8)
-# spider.introduce()  # Hi! My name is Spider and I have 8 legs
+#  bee = Insect('Bee', 6)
+#  bee.introduce()  # Hi! My name is Bee and I have 6 legs
+#
+#  spider = Insect('Spider', 8)
+#  spider.introduce()  # Hi! My name is Spider and I have 8 legs
 
 
 # Task 4
 # medium level
-# class Student:
-#     """
-#     If I have less than three deadlines, my mood is Good!
-#     If I have from 3 to 5 deadlines, my mood is So-so...
-#     If I have more than 5 deadlines, my mood is Bad!!!
-#     """
+class Student:
+
+    def __init__(self, deadlines: int ):
+        self.deadlines = deadlines
+        print(deadlines)
+
+    def mood(self):
+        if self.deadlines < 3:
+           print("Good")
+        if 3< self.deadlines <5:
+           print("So-so")
+        if self.deadlines > 5:
+           print("Bad")
 
 
-# implement a class so that the following code works
-# student = Student(2)
-# print(student.mood())  # Good
-# student.deadlines = 4
-# print(student.mood())  # So-so
-# student.deadlines = 1000
-# print(student.mood())  # Bad
+    """
+    If I have less than three deadlines, my mood is Good!
+    If I have from 3 to 5 deadlines, my mood is So-so...
+    If I have more than 5 deadlines, my mood is Bad!!!
+    """
+
+
+#implement a class so that the following code works
+student = Student(2)
+print(student.mood())  # Good
+student.deadlines = 4
+print(student.mood())  # So-so
+student.deadlines = 1000
+print(student.mood())  # Bad
 
 # Task 5
 # medium level
-# class Square:
-#
-#     def __init__(self, side_length: float) -> None:
-#         ...
-#
-#     def get_area(self) -> float:
-#         ...
-#
-#     def get_perimeter(self) -> float:
-#         ...
+class Square:
 
-# square1 = Square(side_length=2)
-# print(square1.get_area(), square1.get_perimeter())  # 4 8
-#
-# square2 = Square(side_length=5.12)
-# print(square2.get_area(), square2.get_perimeter())  # 26.2144 20.48
+    def __init__(self, side_length: float) -> None:
+        self.side_length = side_length
+
+    def get_area(self) -> float:
+        print(self.side_length**2)
+
+    def get_perimeter(self) -> float:
+        print(self.side_length*4)
+
+square1 = Square(side_length=2)
+print(square1.get_area(), square1.get_perimeter())  # 4 8
+
+square2 = Square(side_length=5.12)
+print(square2.get_area(), square2.get_perimeter())  # 26.2144 20.48
 
 
 # Task 6
@@ -259,7 +277,22 @@ print('*' * 15 + ' TASKS ' + '*' * 15)
 # What methods should be present? What attributes should be added?
 # Create such a class and demonstrate its instantiating for at least two different subjects.
 
-# class ???:
-#     """
-#     A class to represent a learning discipline studied in HSE
-#     """
+class Hse:
+
+    def __init__(self, name:str, credits:int, name_of_prepod:str):
+        self.name = name
+        self.credits = credits
+        self.name_of_prepod = name_of_prepod
+
+
+    def notification(self):
+        print("You have {self.name} today!!!!!!")
+
+hse1 = Hse("Zelievarenie", 7, "teacher")
+print(hse1.notification())
+
+
+    # """
+    # A class to represent a learning discipline studied in HSE
+    # """
+'''

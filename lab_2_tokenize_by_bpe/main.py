@@ -14,10 +14,29 @@ def prepare_word(
     :param end_of_word: a token that signifies the end of word
     :return: preprocessed word
     """
+    if not (
+            isinstance(raw_word, str)
+            and isinstance(start_of_word, str | None)
+            and isinstance(end_of_word, str | None)
+    ):
+        return None
+
+    tuple_1 = []
+
+    if start_of_word is not None:
+        tuple_1.append(start_of_word)
+
+    for token in raw_word:
+        tuple_1.append(token)
+
+    if end_of_word is not None:
+        tuple_1.append(end_of_word)
+
+    return tuple(tuple_1)
 
 
 def collect_frequencies(
-    text: str, start_of_word: str | None, end_of_word: str
+        text: str, start_of_word: str | None, end_of_word: str
 ) -> dict[tuple[str, ...], int] | None:
     """
     Counts number of occurrences of each word
@@ -26,10 +45,28 @@ def collect_frequencies(
     :param end_of_word: a token that signifies the end of word
     :return: dictionary in the form of <preprocessed word: number of occurrences>
     """
+    if not (
+            isinstance(text, str)
+            and isinstance(start_of_word, str | None)
+            and isinstance(end_of_word, str)
+    ):
+        return None
 
+    collection = text.split(' ')
+    freq = {}
+
+    for i in collection:
+        prepared_word = prepare_word(i, start_of_word, end_of_word)
+
+        if prepared_word is None:
+            return None
+
+        freq.update({prepared_word: collection.count(i)})
+
+    return freq
 
 def count_tokens_pairs(
-    word_frequencies: dict[tuple[str, ...], int]
+        word_frequencies: dict[tuple[str, ...], int]
 ) -> dict[tuple[str, str], int] | None:
     """
     Counts number of occurrences of each pair of subsequent tokens
@@ -39,7 +76,7 @@ def count_tokens_pairs(
 
 
 def merge_tokens(
-    word_frequencies: dict[tuple[str, ...], int], pair: tuple[str, str]
+        word_frequencies: dict[tuple[str, ...], int], pair: tuple[str, str]
 ) -> dict[tuple[str, ...], int] | None:
     """
     Updates word frequency dictionary by replacing a pair of token with a merged one
@@ -50,7 +87,7 @@ def merge_tokens(
 
 
 def train(
-    word_frequencies: dict[tuple[str, ...], int] | None, num_merges: int
+        word_frequencies: dict[tuple[str, ...], int] | None, num_merges: int
 ) -> dict[tuple[str, ...], int] | None:
     """
     Creates required number of new tokens by merging existing ones
@@ -61,7 +98,7 @@ def train(
 
 
 def get_vocabulary(
-    word_frequencies: dict[tuple[str, ...], int], unknown_token: str
+        word_frequencies: dict[tuple[str, ...], int], unknown_token: str
 ) -> dict[str, int] | None:
     """
     Establishes correspondence between tokens and its integer identifier
@@ -72,7 +109,9 @@ def get_vocabulary(
 
 
 def decode(
-    encoded_text: list[int] | None, vocabulary: dict[str, int] | None, end_of_word_token: str | None
+        encoded_text: list[int] | None,
+        vocabulary: dict[str, int] | None,
+        end_of_word_token: str | None
 ) -> str | None:
     """
     Translates encoded sequence into decoded one
@@ -84,7 +123,8 @@ def decode(
 
 
 def tokenize_word(
-    word: tuple[str, ...], vocabulary: dict[str, int], end_of_word: str | None, unknown_token: str
+        word: tuple[str, ...], vocabulary: dict[str, int],
+        end_of_word: str | None, unknown_token: str
 ) -> list[int] | None:
     """
     Splits word into tokens
@@ -105,11 +145,11 @@ def load_vocabulary(vocab_path: str) -> dict[str, int] | None:
 
 
 def encode(
-    original_text: str,
-    vocabulary: dict[str, int] | None,
-    start_of_word_token: str | None,
-    end_of_word_token: str | None,
-    unknown_token: str,
+        original_text: str,
+        vocabulary: dict[str, int] | None,
+        start_of_word_token: str | None,
+        end_of_word_token: str | None,
+        unknown_token: str,
 ) -> list[int] | None:
     """
     Translates decoded sequence into encoded one
@@ -132,7 +172,7 @@ def collect_ngrams(text: str, order: int) -> list[tuple[str, ...]] | None:
 
 
 def calculate_precision(
-    actual: list[tuple[str, ...]], reference: list[tuple[str, ...]]
+        actual: list[tuple[str, ...]], reference: list[tuple[str, ...]]
 ) -> float | None:
     """
     Compares two sequences by virtue of Precision metric
