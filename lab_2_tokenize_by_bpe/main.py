@@ -401,8 +401,8 @@ def geo_mean(precisions: list[float], max_order: int) -> float | None:
         return 0
 
     product = 1
-    for p in precisions:
-        product *= p
+    for precision in precisions:
+        product *= precision
 
     return math.pow(product, 1 / max_order)
 
@@ -442,21 +442,3 @@ def calculate_bleu(actual: str | None, reference: str, max_order: int = 3) -> fl
         return None
 
     return 100 * geo_mean_value
-
-    # precisions_list = []
-    #
-    # for i in range(1, max_order + 1):
-    #     n_grams_actual = collect_ngrams(actual, i)
-    #     n_grams_reference = collect_ngrams(reference, i)
-    #     if not n_grams_actual or not n_grams_reference:
-    #         return None
-    #
-    #     precision = calculate_precision(n_grams_actual, n_grams_reference)
-    #     if not precision:
-    #         return None
-    #     precisions_list.append(precision)
-    #
-    # bleu_metric = geo_mean(precisions_list, max_order)
-    #
-    # return bleu_metric * 100
-
