@@ -12,14 +12,15 @@ def main() -> None:
     Launches an implementation
     """
     assets_path = Path(__file__).parent / 'assets'
-    with open(assets_path / 'text.txt', 'r', encoding='utf-8') as text_file:
-        text = text_file.read()
+    with open(assets_path / 'text.txt', 'r', encoding='utf-8') as text:
+        text = text.read()
 
-    with open(assets_path / 'secrets/secret_3.txt', 'r', encoding='utf-8') as secret_file:
-        encoded_text = secret_file.read()
+    with open(assets_path / 'secrets/secret_3.txt', 'r', encoding='utf-8') as encoded_text:
+        encoded_text = encoded_text.read()
 
     word_frequencies = collect_frequencies(text, None, '</s>')
     word_frequencies = train(word_frequencies, 100)
+
     if word_frequencies:
         vocabulary = get_vocabulary(word_frequencies, '<unk>')
         encoded_text = [int(num) for num in encoded_text.split()]
@@ -27,13 +28,15 @@ def main() -> None:
         print(result)
         assert result, "Encoding is not working"
 
-    with open(assets_path / 'for_translation_ru_raw.txt', 'r', encoding='utf-8') as file:
-        predicted_ru = file.read()
+    with open(assets_path / 'for_translation_ru_raw.txt', 'r', encoding='utf-8') as predicted_ru:
+        predicted_ru = predicted_ru.read()
+
     vocabulary_adv = load_vocabulary('assets/vocab.json')
     if not vocabulary_adv:
         return None
-    with open(assets_path / 'for_translation_ru_encoded.txt', 'r', encoding='utf-8') as file:
-        reference_ru = file.read()
+
+    with open(assets_path / 'for_translation_ru_encoded.txt', 'r', encoding='utf-8') as reference_ru:
+        reference_ru = reference_ru.read()
 
     predicted_ru = encode(predicted_ru, vocabulary_adv, '\u2581', None, '<unk>')
     if not predicted_ru:
