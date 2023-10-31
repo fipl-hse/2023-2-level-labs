@@ -35,8 +35,8 @@ def main() -> None:
     if not vocabulary_adv:
         return None
 
-    with open(assets_path / 'for_translation_ru_encoded.txt', 'r', encoding='utf-8') as reference_ru:
-        reference_ru = reference_ru.read()
+    with open(assets_path / 'for_translation_ru_encoded.txt', 'r', encoding='utf-8') as file:
+        reference_ru = file.read()
 
     predicted_ru = encode(predicted_ru, vocabulary_adv, '\u2581', None, '<unk>')
     if not predicted_ru:

@@ -263,11 +263,11 @@ def tokenize_word(
         if token in word_str:
             word_str_copy = word_str_copy.replace(token, ' ' + str(vocabulary[token]) + ' ')
 
-    for unk in word_str:
-        if unk not in vocabulary_list:
-            word_str_copy = word_str_copy.replace(unk, ' ' + str(vocabulary[unknown_token]) + ' ')
+    for token in word_str:
+        if token not in vocabulary_list:
+            word_str_copy = word_str_copy.replace(token, ' ' + str(vocabulary[unknown_token]) + ' ')
 
-    str_encoded = word_str_copy.split('  ')
+    str_encoded = word_str_copy.split()
 
     for number in str_encoded:
         encoded.append(int(number))
