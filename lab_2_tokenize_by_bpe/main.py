@@ -62,9 +62,10 @@ def count_tokens_pairs(
     pair_dict = {}
     for word in word_frequencies:
         for i in range(len(word) - 1):
-            if not (word[i], word[i + 1]) in pair_dict:
-                pair_dict[(word[i], word[i + 1])] = 0
-            pair_dict[(word[i], word[i + 1])] += 1 * word_frequencies[word]
+            pair = (word[i], word[i + 1])
+            if pair not in pair_dict:
+                pair_dict[pair] = 0
+            pair_dict[pair] += word_frequencies[word]
     return pair_dict
 
 
@@ -144,14 +145,10 @@ def get_vocabulary(
     for word in word_frequencies:
         for word_part in word:
             tokens.append(word_part)
-            for symbol in word_part:
-                if symbol not in tokens:
-                    tokens.append(symbol)
-    tokens.sort(key=lambda x: (-len(x), str(x[0])))
-    id_clues = {}
-    for i in range(len(tokens)):
-        id_clues[tokens[i]] = i
-    return id_clues
+            tokens.extend(word_part)
+    unique_tokens = set(tokens)
+    sorted_tokens = sorted(unique_tokens, key=lambda x: (-len(x), str(x[0])))
+    return {token: i for i, token in enumerate(sorted_tokens)}
 
 
 def decode(
