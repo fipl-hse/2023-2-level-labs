@@ -19,11 +19,11 @@ def prepare_word(
         (isinstance(end_of_word, str) or end_of_word is None)):
         return None
     preprocessed_word = []
-    if start_of_word != None:
+    if start_of_word is not None:
         preprocessed_word.append(start_of_word)
     for token in raw_word:
         preprocessed_word.append(token)
-    if end_of_word != None:
+    if end_of_word is not None:
         preprocessed_word.append(end_of_word)
     return tuple(preprocessed_word)
 
@@ -46,7 +46,7 @@ def collect_frequencies(
     listed_text = text.split(" ")
     for word in listed_text:
         preprocessed_word = prepare_word(word, start_of_word, end_of_word)
-        if preprocessed_word == None:
+        if preprocessed_word is None:
             return None
         if preprocessed_word not in freq_dictionary:
             freq_dictionary[preprocessed_word] = 0
@@ -64,16 +64,12 @@ def count_tokens_pairs(
     """
     if not isinstance(word_frequencies, dict):
         return None
-    listed_combinations = []
     combination_frequencies = {}
     for word in word_frequencies:
-        for i, token in enumerate(word):
-            if (i + 1) < len(word):
-                listed_combinations.append((token, word[i + 1]))
-    for combination in listed_combinations:
-        if combination not in combination_frequencies:
-            combination_frequencies[combination] = 0
-        combination_frequencies[combination] += 1
+        for i in range(0, len(word) - 1):
+            if (word[i], word[i + 1]) not in combination_frequencies:
+                combination_frequencies[(word[i], word[i + 1])] = 0
+            combination_frequencies[(word[i], word[i + 1])] += 1
     return combination_frequencies
 
 
