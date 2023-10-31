@@ -93,7 +93,7 @@ def run_coverage_collection(lab_path: Path, artifacts_path: Path,
         mark = f' and mark{target_score}'
 
     res_process = _run_console_tool(str(python_exe_path), '-m', 'coverage',
-                                    'run', '--source', f'{lab_path.name}',
+                                    'run', '--include', f'{lab_path.name}/main.py',
                                     '-m', 'pytest', '-m',
                                     f'{lab_path.name}{mark}',
                                     debug=True,
