@@ -109,37 +109,23 @@ def train(
     if (not (isinstance(word_frequencies, dict) or word_frequencies is None) or not
         isinstance(num_merges, int)):
         return None
-    token_pairs = count_tokens_pairs(word_frequencies)
-    while (num_merges > 0) and len(token_pairs) > 0:
-        num_merges -= 1
-        max_freq = 0
-        max_pairs = []
-        for freq in token_pairs.values():
-            if freq > max_freq:
-                max_freq = freq
-        for pair in token_pairs:
-            if token_pairs[pair] == max_freq:
-                max_pairs.append(pair)
-        if len(max_pairs) > 1:
-            long_pair = ""
-            for pair in max_pairs:
-                if len("".join(pair)) > len(long_pair):
-                    long_pair = pair
-            long_pairs = []
-            for pair in max_pairs:
-                if len(pair) == len(long_pair):
-                    long_pairs.append(pair)
-            if len(long_pairs) > 1:
-                pair_to_merge = min(long_pairs)
-                del token_pairs[pair_to_merge]
-            else:
-                pair_to_merge = long_pairs[0]
-                del token_pairs[pair_to_merge]
-        else:
-            pair_to_merge = max_pairs[0]
-            del token_pairs[pair_to_merge]
-        word_frequencies = merge_tokens(word_frequencies, pair_to_merge)
-    return word_frequencies
+    while (num_merges > 0):
+        token_pairs = count_tokens_pairs(word_frequencies)
+        if token_pairs is None:
+            return None
+        if pair_freq != {}:
+            sorted_dict = dict(sorted(token_pairs.items(),
+                               key=lambda item: (-item[1], -len("".join(item[0])), 
+                                                                 "".join(item[0]))))
+                for key in sorted_dict.keys():
+                    word_frequencies = merge_tokens(word_frequencies, key)
+                    if word_frequencies is None:
+                        return None
+                    num_merges -= 1
+                    break
+                continue
+            break
+        return word_frequencies
 
 
 def get_vocabulary(
