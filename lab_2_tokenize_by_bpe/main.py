@@ -144,7 +144,6 @@ def train(
         return None
     return new_dict
 
-
 def get_vocabulary(
     word_frequencies: dict[tuple[str, ...], int], unknown_token: str
 ) -> dict[str, int] | None:
