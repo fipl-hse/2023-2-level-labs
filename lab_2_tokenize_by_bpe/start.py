@@ -35,15 +35,15 @@ def main() -> None:
     if not vocabulary_adv:
         return None
 
-    with open(assets_path / 'for_translation_ru_encoded.txt', 'r', encoding='utf-8') as file:
-        reference_ru = file.read()
+    with open(assets_path / 'for_translation_ru_encoded.txt', 'r', encoding='utf-8') as ref_ru:
+        ref_ru = ref_ru.read()
 
     predicted_ru = encode(predicted_ru, vocabulary_adv, '\u2581', None, '<unk>')
     if not predicted_ru:
         return None
 
-    reference_ru = reference_ru.split()
-    for pred_token, actual_token in zip(predicted_ru, reference_ru):
+    ref_ru = ref_ru.split()
+    for pred_token, actual_token in zip(predicted_ru, ref_ru):
         if pred_token != actual_token:
             print(pred_token, actual_token)
 
