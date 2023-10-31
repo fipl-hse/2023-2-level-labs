@@ -65,11 +65,11 @@ def count_tokens_pairs(
     if not isinstance(word_frequencies, dict):
         return None
     combination_frequencies = {}
-    for word in word_frequencies:
+    for word, freq in word_frequencies.items():
         for i in range(0, len(word) - 1):
             if (word[i], word[i + 1]) not in combination_frequencies:
                 combination_frequencies[(word[i], word[i + 1])] = 0
-            combination_frequencies[(word[i], word[i + 1])] += 1
+            combination_frequencies[(word[i], word[i + 1])] += freq
     return combination_frequencies
 
 
