@@ -21,7 +21,8 @@ def prepare_word(
     ):
         return None
 
-    return tuple(([start_of_word] if start_of_word else []) + list(raw_word) + ([end_of_word] if end_of_word else []))
+    return tuple(([start_of_word] if start_of_word else []) +\
+                 list(raw_word) + ([end_of_word] if end_of_word else []))
 
 
 def collect_frequencies(
