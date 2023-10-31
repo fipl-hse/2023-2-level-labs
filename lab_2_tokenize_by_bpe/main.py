@@ -162,10 +162,12 @@ def decode(
     inverted_vocabulary = {value: token for token, value in vocabulary.items()}
     decoding = ''
     for number in encoded_text:
-        token = inverted_vocabulary[number]
-        if end_of_word_token is not None and end_of_word_token in token:
-            token = token.replace(end_of_word_token, ' ')
-        decoding += token
+        for key in inverted_vocabulary.keys():
+            if key == number:
+                token = inverted_vocabulary[number]
+                if end_of_word_token is not None and end_of_word_token in token:
+                    token = token.replace(end_of_word_token, ' ')
+                decoding += token
     return decoding
 
 def tokenize_word(
