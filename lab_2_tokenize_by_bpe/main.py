@@ -85,16 +85,26 @@ def merge_tokens(
     new_dict = {}
     for word in word_frequencies.keys():
         word_as_list = list(word)
-        new_dict[word] = word_frequencies[word]
-        for i in range(len(word_as_list)-1):
+        for i in range(len(word)-1):
             current_pair = tuple([word[i], word[i+1]])
             if current_pair == pair:
-                word_as_list.remove(pair[0])
-                word_as_list.remove(pair[1])
+                word_as_list[i] = pair[0]+pair[1]
+                word_as_list.remove(word[i+1])
         word_as_tuple = tuple(word_as_list)
-        del new_dict[word]
         new_dict[word_as_tuple] = word_frequencies[word]
     return new_dict
+
+
+print(merge_tokens({
+    ('I', 't', "'", 's', '</s>'): 1,
+    ('f', 'a', 'r', ',', '</s>'): 1,
+    ('f', 'a', 'r', 't', 'h', 'e', 'r', ',', '</s>'): 1,
+    ('f', 'a', 'r', 't', 'h', 'e', 's', 't', '</s>'): 1,
+    ('a', 'n', 'd', '</s>'): 1,
+    ('o', 'l', 'd', ',', '</s>'): 1,
+    ('o', 'l', 'd', 'e', 'r', ',', '</s>'): 1,
+    ('o', 'l', 'd', 'e', 's', 't', '</s>'): 1
+}, (',', '</s>')))
 
 
 def train(
@@ -107,6 +117,8 @@ def train(
     :return: dictionary in the form of <preprocessed word: number of occurrences>
     """
     if (not isinstance(word_frequencies, dict) and word_frequencies is not None) or not isinstance(num_merges, int):
+        return None
+    if word_frequencies is None:
         return None
     dict_of_token_pairs = count_tokens_pairs(word_frequencies)
     list_of_max_token_pairs = []
