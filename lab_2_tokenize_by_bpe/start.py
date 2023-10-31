@@ -47,10 +47,10 @@ def main() -> None:
         if pred_token != actual_token:
             print(pred_token, actual_token)
 
-    with open(assets_path / 'for_translation_en_encoded.txt', 'r', encoding='utf-8') as file:
-        encoded_en = file.read().split()
-    with open(assets_path / 'for_translation_en_raw.txt', 'r', encoding='utf-8') as file:
-        reference_en = file.read()
+    with open(assets_path / 'for_translation_en_encoded.txt', 'r', encoding='utf-8') as encoded_en:
+        encoded_en = encoded_en.read().split()
+    with open(assets_path / 'for_translation_en_raw.txt', 'r', encoding='utf-8') as reference_en:
+        reference_en = reference_en.read()
 
     encoded_en = [int(i) for i in encoded_en]
     decoded_en = decode(encoded_en, vocabulary_adv, None)
