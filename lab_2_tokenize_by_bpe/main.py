@@ -65,7 +65,7 @@ def count_tokens_pairs(
     :return: dictionary in the form of <token pair: number of occurrences>
     """
     if not isinstance(word_frequencies, dict):
-       return None
+        return None
 
     freq_of_pairs = {}
 
@@ -90,7 +90,7 @@ def merge_tokens(
     if not isinstance(word_frequencies, dict) \
         or not isinstance(pair, tuple):
         return None
-    
+
     processed_dict = {}
     couple_of_items = pair[0] + pair[1]
 
@@ -135,7 +135,7 @@ def train(
         word_frequencies = merge_tokens(word_frequencies, sorted_pair[0])
         if not word_frequencies:
             return None
-        num_merges -= 1 
+        num_merges -= 1
     return word_frequencies
 
 def get_vocabulary(
@@ -194,7 +194,7 @@ def decode(
                 if end_of_word_token in token:
                     end_index = len(end_of_word_token)
                     decoded_sequence += end_of_word_token[end_index:] + ' '
-                else: 
+                else:
                     decoded_sequence += token
             else:
                 decoded_sequence += token
@@ -226,7 +226,7 @@ def tokenize_word(
 
     for n_gramm in raw_word:
         if not n_gramm in sorted_vocab:
-            draft = draft.replace(n_gramm, str(vocabulary[unknown_token]) + ' ') 
+            draft = draft.replace(n_gramm, str(vocabulary[unknown_token]) + ' ')
 
     draft = draft.split()
     encoded = [int(num) for num in draft]
@@ -279,12 +279,12 @@ def encode(
         tuple_of_words = prepare_word(word, start_of_word_token, end_of_word_token)
         if not tuple_of_words:
             return None
-        list_of_word_ident = tokenize_word(tuple_of_words, vocabulary, end_of_word_token, unknown_token)
-        if not list_of_word_ident:
+        word_idents = tokenize_word(tuple_of_words, vocabulary, end_of_word_token, unknown_token)
+        if not word_idents:
             return None
-        list_of_ident += list_of_word_ident
+        list_of_ident += word_idents
 
-    return list_of_ident 
+    return list_of_ident
 
 def collect_ngrams(text: str, order: int) -> list[tuple[str, ...]] | None:
     """
@@ -297,7 +297,7 @@ def collect_ngrams(text: str, order: int) -> list[tuple[str, ...]] | None:
         return None
 
     list_of_n_gramms = []
-    for index, el in enumerate(text):
+    for index in range(0, len(text)):
         word_slice = text[index: index + order]
         if len(word_slice) == order:
             list_of_n_gramms.append(tuple(el for el in word_slice))
@@ -322,9 +322,9 @@ def calculate_precision(
     for n_gram in reference:
         if n_gram in actual:
             matches += 1
-    value_of_Precision = matches / len(reference)
+    value_of_precision = matches / len(reference)
 
-    return value_of_Precision
+    return value_of_precision
 
 def geo_mean(precisions: list[float], max_order: int) -> float | None:
     """
@@ -356,7 +356,7 @@ def calculate_bleu(actual: str | None, reference: str, max_order: int = 3) -> fl
     :return: value of BLEU metric
     """
     if not isinstance(actual, str) or not isinstance(reference, str) \
-        or not max_order == 3:
+        or max_order != 3:
         return None
     actual_ngrams = []
     expected_ngrams = []
@@ -379,5 +379,5 @@ def calculate_bleu(actual: str | None, reference: str, max_order: int = 3) -> fl
     average_geo_mean = geo_mean(precisions, max_order)
     if average_geo_mean is None:
         return None
-    
+
     return average_geo_mean * 100
