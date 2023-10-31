@@ -49,6 +49,7 @@ def main() -> None:
     with open(assets_path / 'for_translation_en_raw.txt', 'r', encoding='utf-8') as file:
         reference_en = file.read()
 
+    encoded_en = [int(i) for i in encoded_en]
     decoded_en = decode(encoded_en, vocabulary_adv, None)
     if not decoded_en:
         return None
@@ -58,7 +59,6 @@ def main() -> None:
     if not bleu:
         return None
     print(bleu)
-    return bleu
 
 
 if __name__ == "__main__":
