@@ -21,7 +21,7 @@ def prepare_word(
     if not isinstance(end_of_word, str) and end_of_word is not None:
         return None
 
-    if not start_of_word and not end_of_word:
+    if not (start_of_word and end_of_word):
         return tuple(list(raw_word))
     if not end_of_word:
         return tuple([start_of_word] + list(raw_word))
@@ -67,15 +67,13 @@ def count_tokens_pairs(
         return None
 
     result_dic = {}
-    for pair in word_frequencies.items():
-        word = pair[0]
-        count = pair[1]
+    for word, freq in word_frequencies.items():
         for i in range(len(word) - 1):
             token1 = word[i]
             token2 = word[i + 1]
             if not result_dic.get((token1, token2)):
                 result_dic[(token1, token2)] = 0
-            result_dic[(token1, token2)] += count
+            result_dic[(token1, token2)] += freq
 
     return result_dic
 
@@ -95,16 +93,14 @@ def merge_tokens(
         return None
 
     new_word_freq = {}
-    for pairs in word_frequencies.items():
-        word = pairs[0]
-        count = pairs[1]
+    for word, freq in word_frequencies.items():
         new_word = []
         for i in range(len(word) - 1):
             if word[i] == pair[0] and word[i + 1] == pair[1]:
                 new_word.append((pair[0] + pair[1]))
             else:
                 new_word.append(word[i])
-        new_word_freq[tuple(new_word)] = count
+        new_word_freq[tuple(new_word)] = freq
 
     return new_word_freq
 
