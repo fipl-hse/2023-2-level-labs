@@ -3,6 +3,7 @@ Lab 2
 BPE and machine translation evaluation
 """
 import json
+import math
 
 
 def prepare_word(
@@ -253,18 +254,24 @@ def tokenize_word(
         return None
 
     word_str = ''.join(word)
-    tokens_list = list(vocabulary.keys())
-    tokens_list = sorted(tokens_list, key=lambda x: (-len(x), x))
-    encoded_word = []
+    word_str_copy = ''.join(word)
+    vocabulary_list = list(vocabulary.keys())
+    vocabulary_list = sorted(vocabulary_list, key=lambda x: (-len(x), x))
+    encoded = []
 
-    for token in tokens_list:
+    for token in vocabulary_list:
         if token in word_str:
-            encoded_word.append(vocabulary[token])
-            word_str = word_str.replace(token, '')
-    if len(word_str) > 0:
-        encoded_word.append(vocabulary['<unk>'])
+            word_str_copy = word_str_copy.replace(token, ' ' + str(vocabulary[token]) + ' ')
 
-    return encoded_word
+    for unk in word_str:
+        if unk not in vocabulary_list:
+            word_str_copy = word_str_copy.replace(unk, ' ' + str(vocabulary[unknown_token]) + ' ')
+
+    str_encoded = word_str_copy.split('  ')
+
+    for number in str_encoded:
+        encoded.append(int(number))
+    return encoded
 
 
 def load_vocabulary(vocab_path: str) -> dict[str, int] | None:
@@ -311,23 +318,20 @@ def encode(
         return None
 
     text_list = original_text.split()
-    prepared_words = []
+    token_ids = []
+
     for word in text_list:
         prepared_word = prepare_word(word, start_of_word_token, end_of_word_token)
         if not prepared_word:
             return None
 
-        prepared_words.append(prepared_word)
-
-    encoded_text_large = []
-    for word_tokens in prepared_words:
-        tokenized_word = tokenize_word(word_tokens, vocabulary, end_of_word_token, unknown_token)
+        tokenized_word = tokenize_word(prepared_word, vocabulary, end_of_word_token, unknown_token)
         if not tokenized_word:
             return None
 
-        encoded_text_large.extend(tokenized_word)
+        token_ids.extend(tokenized_word)
 
-    return encoded_text_large
+    return token_ids
 
 
 def collect_ngrams(text: str, order: int) -> list[tuple[str, ...]] | None:
@@ -337,6 +341,19 @@ def collect_ngrams(text: str, order: int) -> list[tuple[str, ...]] | None:
     :param order: required number of elements in a single n-gram
     :return: sequence of n-grams
     """
+    if not (
+        isinstance(text, str) and isinstance(order, int)
+    ):
+        return None
+
+    tokens = list(text)
+    n_grams = []
+
+    for i in range(len(tokens) - order + 1):
+        n_gram = (tokens[i: i + order])
+        n_grams.append(tuple(n_gram))
+
+    return n_grams
 
 
 def calculate_precision(
@@ -348,6 +365,23 @@ def calculate_precision(
     :param reference: expected sequence of n-grams
     :return: value of Precision metric
     """
+    if not (
+        isinstance(actual, list)
+        and isinstance(reference, list)
+    ):
+        return None
+
+    if len(reference) == 0:
+        return 0
+
+    reference_unique = set(reference)
+    counter_correct = 0
+
+    for n_gram in reference_unique:
+        if n_gram in actual:
+            counter_correct += 1
+
+    return counter_correct / len(reference_unique)
 
 
 def geo_mean(precisions: list[float], max_order: int) -> float | None:
@@ -357,6 +391,20 @@ def geo_mean(precisions: list[float], max_order: int) -> float | None:
     :param max_order: maximum length of n-gram considered
     :return: value of geometric mean of Precision metric
     """
+    if not (
+        isinstance(precisions, list)
+        and isinstance(max_order, int)
+    ):
+        return None
+
+    if any(precision <= 0 for precision in precisions):
+        return 0
+
+    product = 1
+    for p in precisions:
+        product *= p
+
+    return math.pow(product, 1 / max_order)
 
 
 def calculate_bleu(actual: str | None, reference: str, max_order: int = 3) -> float | None:
@@ -367,3 +415,48 @@ def calculate_bleu(actual: str | None, reference: str, max_order: int = 3) -> fl
     :param max_order: max length of n-gram to consider for comparison
     :return: value of BLEU metric
     """
+    if not (
+        isinstance(actual, str) and isinstance(reference, str)
+        and isinstance(max_order, int)
+    ):
+        return None
+
+    precisions = []
+
+    for order in range(1, max_order + 1):
+        actual_order_ngrams = collect_ngrams(actual, order)
+        reference_order_ngrams = collect_ngrams(reference, order)
+
+        if actual_order_ngrams is None or reference_order_ngrams is None:
+            return None
+
+        precision = calculate_precision(actual_order_ngrams, reference_order_ngrams)
+
+        if not precision:
+            return None
+
+        precisions.append(precision)
+
+    geo_mean_value = geo_mean(precisions, max_order)
+    if not geo_mean_value:
+        return None
+
+    return 100 * geo_mean_value
+
+    # precisions_list = []
+    #
+    # for i in range(1, max_order + 1):
+    #     n_grams_actual = collect_ngrams(actual, i)
+    #     n_grams_reference = collect_ngrams(reference, i)
+    #     if not n_grams_actual or not n_grams_reference:
+    #         return None
+    #
+    #     precision = calculate_precision(n_grams_actual, n_grams_reference)
+    #     if not precision:
+    #         return None
+    #     precisions_list.append(precision)
+    #
+    # bleu_metric = geo_mean(precisions_list, max_order)
+    #
+    # return bleu_metric * 100
+
