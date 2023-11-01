@@ -16,14 +16,14 @@ def main() -> None:
         text = file.read()
 
     with open(assets_path / 'secrets/secret_3.txt', 'r', encoding='utf-8') as file:
-        encoded_text = [int(num) for num in file.read().split()]
+        encoded = [int(num) for num in file.read().split()]
 
     word_frequencies = collect_frequencies(text, None, '</s>')
     word_frequencies = train(word_frequencies, 100)
 
     if word_frequencies:
         vocabulary = get_vocabulary(word_frequencies, '<unk>')
-        result = decode(encoded_text, vocabulary, '</s>')
+        result = decode(encoded, vocabulary, '</s>')
         print(result)
         assert result, "Encoding is not working"
 
