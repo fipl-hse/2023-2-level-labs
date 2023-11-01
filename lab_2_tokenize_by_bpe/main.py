@@ -94,20 +94,17 @@ def merge_tokens(
     preprocessed_freq = {}
 
     for key, frequency in word_frequencies.items():
-        if str(pair)[1:-2] in str(key):
-            pair_indexes = []
-            for token_index in range(len(key) - 1):
-                tokens = (key[token_index], key[token_index + 1])
-                if tokens == pair:
-                    pair_indexes.append(token_index)
+        pair_indexes = []
+        for token_index in range(len(key) - 1):
+            tokens = (key[token_index], key[token_index + 1])
+            if tokens == pair:
+                pair_indexes.append(token_index)
 
-            saved_tokens = list(key)
-            for index in pair_indexes:
-                saved_tokens[index:index + 2] = [''.join(pair)]
+        saved_tokens = list(key)
+        for index in pair_indexes:
+            saved_tokens[index:index + 2] = [''.join(pair)]
 
-            preprocessed_freq[tuple(saved_tokens)] = frequency
-        else:
-            preprocessed_freq[key] = frequency
+        preprocessed_freq[tuple(saved_tokens)] = frequency
 
     return preprocessed_freq
 
@@ -141,7 +138,6 @@ def train(
         if not word_frequencies:
             return None
 
-        token_pairs.pop(preferred_pair)
         token_pairs = count_tokens_pairs(word_frequencies)
         if not token_pairs:
             return None
@@ -285,11 +281,11 @@ def load_vocabulary(vocab_path: str) -> dict[str, int] | None:
 
 
 def encode(
-        original_text: str,
-        vocabulary: dict[str, int] | None,
-        start_of_word_token: str | None,
-        end_of_word_token: str | None,
-        unknown_token: str,
+    original_text: str,
+    vocabulary: dict[str, int] | None,
+    start_of_word_token: str | None,
+    end_of_word_token: str | None,
+    unknown_token: str,
 ) -> list[int] | None:
     """
     Translates decoded sequence into encoded one
@@ -339,7 +335,7 @@ def collect_ngrams(text: str, order: int) -> list[tuple[str, ...]] | None:
 
 
 def calculate_precision(
-        actual: list[tuple[str, ...]], reference: list[tuple[str, ...]]
+    actual: list[tuple[str, ...]], reference: list[tuple[str, ...]]
 ) -> float | None:
     """
     Compares two sequences by virtue of Precision metric
@@ -349,7 +345,7 @@ def calculate_precision(
     """
     if not isinstance(actual, list) or not isinstance(reference, list):
         return None
-    if len(actual) == 0:
+    if not actual:
         return 0.0
 
     unique_reference = set(reference)
@@ -412,4 +408,4 @@ def calculate_bleu(actual: str | None, reference: str, max_order: int = 3) -> fl
     mean = geo_mean(precisions, max_order)
     if mean is None:
         return None
-    return float(mean) * 100
+    return 100.0 * mean
