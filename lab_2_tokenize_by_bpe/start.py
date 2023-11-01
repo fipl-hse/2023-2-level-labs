@@ -48,14 +48,14 @@ def main() -> None:
     with open(assets_path / 'for_translation_en_encoded.txt', 'r', encoding='utf-8') as file:
         encoded = [int(num) for num in file.read().split()]
     with open(assets_path / 'for_translation_en_raw.txt', 'r', encoding='utf-8') as file:
-        reference = file.read()
+        reference_en = file.read()
 
     decoded_en = decode(encoded, vocabulary, None)
     if not decoded_en:
         return None
 
     decoded_en = decoded_en.replace('\u2581', ' ')
-    bleu = calculate_bleu(decoded_en, reference)
+    bleu = calculate_bleu(decoded_en, reference_en)
     if not bleu:
         return None
     print(bleu)
