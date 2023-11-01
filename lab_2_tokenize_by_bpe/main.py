@@ -89,22 +89,9 @@ def merge_tokens(
             current_pair = tuple([word[i], word[i+1]])
             if current_pair == pair:
                 word_as_list[i] = pair[0]+pair[1]
-                word_as_list.remove(word[i+1])
-        word_as_tuple = tuple(word_as_list)
-        new_dict[word_as_tuple] = word_frequencies[word]
+                word_as_list.remove(word_as_list[i+1])
+        new_dict[tuple(word_as_list)] = word_frequencies[word]
     return new_dict
-
-
-print(merge_tokens({
-    ('I', 't', "'", 's', '</s>'): 1,
-    ('f', 'a', 'r', ',', '</s>'): 1,
-    ('f', 'a', 'r', 't', 'h', 'e', 'r', ',', '</s>'): 1,
-    ('f', 'a', 'r', 't', 'h', 'e', 's', 't', '</s>'): 1,
-    ('a', 'n', 'd', '</s>'): 1,
-    ('o', 'l', 'd', ',', '</s>'): 1,
-    ('o', 'l', 'd', 'e', 'r', ',', '</s>'): 1,
-    ('o', 'l', 'd', 'e', 's', 't', '</s>'): 1
-}, (',', '</s>')))
 
 
 def train(
