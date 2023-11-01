@@ -102,7 +102,7 @@ def merge_tokens(
             word_pair = tuple([word[i], word[i+1]])
             if pair == word_pair:
                 new_word[i] = word[i] + word[i + 1]
-                new_word.remove(word[i + 1])
+                new_word.pop(i + 1)
         new_word_freq[tuple(new_word)] = word_frequencies[word]
 
     return new_word_freq
@@ -121,11 +121,31 @@ def train(
             and isinstance(num_merges, int)
     ):
         return None
-    for i in word_frequencies:
+
+    count_pairs = count_tokens_pairs(word_frequencies)
+    if count_pairs is None:
+        return None
+    if num_merges > len(count_pairs):
+        num_merges = len(count_pairs)
+
+    for i in range(num_merges):
+        most_freq = max(count_pairs.values())
+        pair_list = [key for key, value in count_pairs.items() if value == most_freq]
+        joined_pair = [''.join(pair) for pair in pair_list]
+
+        maximum = max(len(pair) for pair in joined_pair)
+        max_len_pairs = [pair for pair in pair_list if len(''.join(pair)) == maximum]
+
+        pair = sorted(max_len_pairs)[0]
+
+        word_frequencies = merge_tokens(word_frequencies, pair)
+        if word_frequencies is None:
+            return None
         count_pairs = count_tokens_pairs(word_frequencies)
-        
+        if count_pairs is None:
+            return None
 
-
+    return word_frequencies
 
 
 def get_vocabulary(
