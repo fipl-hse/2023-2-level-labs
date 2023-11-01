@@ -31,14 +31,14 @@ def main() -> None:
     with open(assets_path / 'for_translation_ru_raw.txt', 'r', encoding='utf-8') as file:
         predicted_ru = file.read()
 
-    vocabulary_adv = load_vocabulary('assets/vocab.json')
-    if not vocabulary_adv:
+    vocabulary = load_vocabulary('assets/vocab.json')
+    if not vocabulary:
         return None
 
     with open(assets_path / 'for_translation_ru_encoded.txt', 'r', encoding='utf-8') as file:
         ref_ru = file.read()
 
-    predicted_ru = encode(predicted_ru, vocabulary_adv, '\u2581', None, '<unk>')
+    predicted_ru = encode(predicted_ru, vocabulary, '\u2581', None, '<unk>')
     if not predicted_ru:
         return None
 
@@ -53,7 +53,7 @@ def main() -> None:
         reference_en = file.read()
 
     encoded_en = [int(i) for i in encoded_en]
-    decoded_en = decode(encoded_en, vocabulary_adv, None)
+    decoded_en = decode(encoded_en, vocabulary, None)
     if not decoded_en:
         return None
 
