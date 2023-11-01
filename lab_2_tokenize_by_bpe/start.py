@@ -21,6 +21,9 @@ def main() -> None:
             secret_text = text_file.read()
         vocabulary = get_vocabulary(train_text, '<unk>')
         decoding_list = []
+        for number in secret_text.split(' '):
+            decoding_list.append(int(number))
+
 
 
 if __name__ == "__main__":
