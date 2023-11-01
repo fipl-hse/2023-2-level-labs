@@ -3,6 +3,8 @@ Lab 2
 BPE and machine translation evaluation
 """
 import json
+import math
+
 
 def prepare_word(
     raw_word: str, start_of_word: str | None, end_of_word: str | None
@@ -21,7 +23,7 @@ def prepare_word(
     ):
         return None
 
-    return tuple(([start_of_word] if start_of_word else []) +\
+    return tuple(([start_of_word] if start_of_word else []) +
                  list(raw_word) + ([end_of_word] if end_of_word else []))
 
 
@@ -64,10 +66,11 @@ def count_tokens_pairs(
     """
     if not isinstance(word_frequencies, dict):
         return None
+
     pairs = {}
     for word in word_frequencies:
         for i in range(len(word)-1):
-            pair = tuple([word[i], word[i+1]])
+            pair = (word[i], word[i+1])
             if pair not in pairs:
                 pairs[pair] = 0
             pairs[pair] += word_frequencies[word]
@@ -128,22 +131,19 @@ def train(
     for i in range(num_merges):
         maximum = max(count_of_pairs.values())
 
-        local_maximums = [list(key) for key in count_of_pairs if count_of_pairs[key] == maximum]
-        max_length = max(len(''.join(tokens)) for tokens in local_maximums)
+        local_maximums = [key for key in count_of_pairs if count_of_pairs[key] == maximum]
+        local_maximums = sorted(local_maximums, key=lambda x: (-len(''.join(x)), x))
+        pair = local_maximums[0]
 
-        longest_pairs = [p for p in local_maximums if len(''.join(p)) == max_length]
-        pair = sorted(longest_pairs)[0]
-
-        merged_freq = merge_tokens(word_frequencies, tuple(pair))
-        if merged_freq is None:
+        word_frequencies = merge_tokens(word_frequencies, pair)
+        if word_frequencies is None:
             return None
 
-        word_frequencies = merged_freq
         count_of_pairs = count_tokens_pairs(word_frequencies)
         if count_of_pairs is None:
             return None
 
-    return merged_freq
+    return word_frequencies
 
 
 def get_vocabulary(
@@ -228,11 +228,13 @@ def tokenize_word(
     voc_keys = vocabulary.keys()
     encoded = []
     word = ''.join(word)
+
     for index, token in enumerate(voc_keys):
         while token in word:
             position = word[:word.find(token)].count(' ')
             encoded.insert(position, index)
-            word = word.replace(token, ' ',1)
+            word = word.replace(token, ' ', 1)
+
     for index, element in enumerate(word):
         if element != ' ':
             encoded.insert(index, vocabulary['<unk>'])
@@ -256,6 +258,7 @@ def load_vocabulary(vocab_path: str) -> dict[str, int] | None:
 
     return profile
 
+
 def encode(
     original_text: str,
     vocabulary: dict[str, int] | None,
@@ -272,6 +275,26 @@ def encode(
     :param unknown_token: token that signifies unknown sequence
     :return: list of token identifiers
     """
+    if not (
+        isinstance(original_text, str) and
+        isinstance(vocabulary, dict) and
+        isinstance(unknown_token, str) and
+        (isinstance(end_of_word_token, str) or end_of_word_token is None) and
+        (isinstance(start_of_word_token, str) or start_of_word_token is None)
+    ):
+        return None
+    words = original_text.split()
+    encoded_text = []
+    for word in words:
+        prepared = prepare_word(word, start_of_word_token, end_of_word_token)
+        if not prepared:
+            return None
+        tokenized = tokenize_word(prepared, vocabulary, end_of_word_token, unknown_token)
+        if not tokenized:
+            return None
+        encoded_text += tokenized
+
+    return encoded_text
 
 
 def collect_ngrams(text: str, order: int) -> list[tuple[str, ...]] | None:
@@ -281,6 +304,13 @@ def collect_ngrams(text: str, order: int) -> list[tuple[str, ...]] | None:
     :param order: required number of elements in a single n-gram
     :return: sequence of n-grams
     """
+    if not (
+        isinstance(text, str) and
+        isinstance(order, int)
+    ):
+        return None
+    ngrams = [tuple(text[i:i + order]) for i in range(len(text) - order + 1)]
+    return ngrams
 
 
 def calculate_precision(
@@ -292,6 +322,16 @@ def calculate_precision(
     :param reference: expected sequence of n-grams
     :return: value of Precision metric
     """
+    if not (
+        isinstance(actual, list) and
+        isinstance(reference, list)
+    ):
+        return None
+
+    if not actual:
+        return 0
+
+    return len(set(actual) & set(reference)) / len(set(reference))
 
 
 def geo_mean(precisions: list[float], max_order: int) -> float | None:
@@ -301,6 +341,15 @@ def geo_mean(precisions: list[float], max_order: int) -> float | None:
     :param max_order: maximum length of n-gram considered
     :return: value of geometric mean of Precision metric
     """
+    if not (
+        isinstance(precisions, list) and
+        isinstance(max_order, int)
+    ):
+        return None
+    if max_order < 0 or not all(precisions):
+        return 0
+    summa_ln = sum(math.log(x) for x in precisions)
+    return math.exp(summa_ln / max_order)
 
 
 def calculate_bleu(actual: str | None, reference: str, max_order: int = 3) -> float | None:
@@ -311,3 +360,27 @@ def calculate_bleu(actual: str | None, reference: str, max_order: int = 3) -> fl
     :param max_order: max length of n-gram to consider for comparison
     :return: value of BLEU metric
     """
+    if not (
+        isinstance(actual, str) and
+        isinstance(reference, str) and
+        isinstance(max_order, int)
+    ):
+        return None
+
+    precisions = []
+    for n in range(max_order):
+        ngrams_actual = collect_ngrams(actual, n + 1)
+        ngrams_reference = collect_ngrams(reference, n + 1)
+        if not ngrams_actual or not ngrams_reference:
+            return None
+
+        precision = calculate_precision(ngrams_actual, ngrams_reference)
+        if not precision:
+            return None
+        precisions.append(precision)
+
+    geometric_mean = geo_mean(precisions, max_order)
+    if not geometric_mean:
+        return None
+
+    return geometric_mean * 100
