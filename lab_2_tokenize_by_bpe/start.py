@@ -1,9 +1,11 @@
 """
 BPE Tokenizer starter
 """
+import json
 from pathlib import Path
 
-from lab_2_tokenize_by_bpe.main import collect_frequencies, decode, get_vocabulary, train
+from lab_2_tokenize_by_bpe.main import calculate_bleu, collect_frequencies, decode, \
+    encode, get_vocabulary, train
 
 
 def main() -> None:
@@ -23,6 +25,28 @@ def main() -> None:
         result = decode(secret, vocabulary, '</s>')
         print(result)
         assert result, "Encoding is not working"
+
+    with open(assets_path / 'for_translation_ru_raw.txt', 'r', encoding='utf-8') as file:
+        predicted = file.read()
+    with open(assets_path / 'vocab.json', 'r', encoding='utf-8') as file:
+        vocabulary = json.load(file)
+    with open(assets_path / 'for_translation_ru_encoded.txt', 'r', encoding='utf-8') as file:
+        actual = file.read()
+
+    encoded = encode(predicted, vocabulary, '\u2581', None, '<unk>')
+    if [int(token) for token in actual.split()] == encoded:
+        print("Encoding is successful!")
+
+    with open(assets_path / 'for_translation_en_encoded.txt', 'r', encoding='utf-8') as file:
+        encoded_en = file.read()
+    with open(assets_path / 'for_translation_en_raw.txt', 'r', encoding='utf-8') as file:
+        decoded_en = file.read()
+
+    decoded = decode([int(num) for num in encoded_en.split()], vocabulary, None)
+    decoded = decoded.replace('\u2581', ' ')
+    bleu = calculate_bleu(decoded, decoded_en)
+
+    print(bleu)
 
 
 if __name__ == "__main__":
