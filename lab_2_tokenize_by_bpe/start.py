@@ -33,7 +33,8 @@ def main() -> None:
     with open(assets_path / 'for_translation_ru_encoded.txt', 'r', encoding='utf-8') as file:
         actual = file.read()
 
-    if [int(token) for token in actual.split()] == encode(predicted, vocabulary, '\u2581', None, '<unk>'):
+    if [int(token) for token in actual.split()] == encode(
+            predicted, vocabulary, '\u2581', None, '<unk>'):
         print("Encoding is successful!")
 
     with open(assets_path / 'for_translation_en_encoded.txt', 'r', encoding='utf-8') as file:
