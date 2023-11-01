@@ -48,14 +48,14 @@ def collect_frequencies(
         return None
 
     freq_dict = {}
-    text = text.split()
+    splited_text = text.split()
 
-    for word in text:
+    for word in splited_text:
         processed_word = prepare_word(word, start_of_word, end_of_word)
         if processed_word is None:
             return None
 
-        freq_dict[processed_word] = text.count(word)
+        freq_dict[processed_word] = splited_text.count(word)
 
     return freq_dict
 
@@ -102,16 +102,13 @@ def merge_tokens(
     merged_pair = f"{pair[0]}{pair[1]}"
 
     for word in word_frequencies.keys():
-        if merged_pair in "".join(word):
-            list_word = list(word)
-            for i in range(len(word) - 1):
-                token_pair = f"{word[i]}{word[i + 1]}"
-                if token_pair == merged_pair:
-                    list_word[i + 1] = merged_pair
-                    list_word.pop(i)
-            merged_tokens[tuple(list_word)] = word_frequencies[word]
-        else:
-            merged_tokens[word] = word_frequencies[word]
+        list_word = list(word)
+        for i in range(len(word) - 1):
+            token_pair = f"{word[i]}{word[i + 1]}"
+            if token_pair == merged_pair:
+                list_word[i + 1] = merged_pair
+                list_word.pop(i)
+        merged_tokens[tuple(list_word)] = word_frequencies[word]
 
     return merged_tokens
 
@@ -129,7 +126,7 @@ def train(
             and isinstance(num_merges, int)):
         return None
     trained = word_frequencies
-    while num_merges > 0:
+    for n in range(num_merges):
         pairs = count_tokens_pairs(trained)
         if not pairs:
             break
@@ -140,7 +137,6 @@ def train(
         trained = merge_tokens(trained, most_freq_pairs[0][0])
         if not trained:
             return None
-        num_merges -= 1
     return trained
 
 
