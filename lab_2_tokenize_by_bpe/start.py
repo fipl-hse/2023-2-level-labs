@@ -1,7 +1,7 @@
 """
 BPE Tokenizer starter
 """
-from main import load_vocabulary, encode, decode, calculate_bleu
+from lab_2_tokenize_by_bpe.main import calculate_bleu, decode, encode, load_vocabulary
 
 
 def main() -> None:
@@ -18,8 +18,12 @@ def main() -> None:
     decoded_response = decode(model_response, vocabulary, None)
     with open('./assets/for_translation_en_raw.txt', encoding='utf-8') as ideal_file:
         ideal_translation = ideal_file.read()
-    result = calculate_bleu(decoded_response.replace('\u2581', ' '), ideal_translation)
+    if decoded_response:
+        result = calculate_bleu(decoded_response.replace('\u2581', ' '), ideal_translation)
+    else:
+        result = None
     assert result, "Encoding is not working"
+    print(result)
 
 
 if __name__ == "__main__":
