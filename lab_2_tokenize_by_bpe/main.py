@@ -126,7 +126,7 @@ def train(
             and isinstance(num_merges, int)):
         return None
     trained = word_frequencies
-    for n in range(num_merges):
+    for merge in range(num_merges):
         pairs = count_tokens_pairs(trained)
         if not pairs:
             break
@@ -158,13 +158,10 @@ def get_vocabulary(
     for word in word_frequencies:
         for token in word:
             tokens.append(token)
-            for symbol in token:
-                if symbol not in tokens:
-                    tokens.append(symbol)
+            tokens.extend(token)
 
-    tokens = sorted(tokens, key = lambda x: (-len(x), str(x[0])))
-
-    return {tokens[i] : i for i in range(len(tokens))}
+    tokens = sorted(set(tokens), key = lambda x: (-len(x), str(x[0])))
+    return {token : i for i, token in enumerate(tokens)}
 
 
 def decode(
@@ -185,17 +182,16 @@ def decode(
     ):
         return None
 
-    decoded_text = ""
+    inverted_vocab = {value: token for token, value in vocabulary.items()}
+    decoded_text = ''
     for num in encoded_text:
-        tokens = [key for key in vocabulary if vocabulary[key] == num]
-        for token in tokens:
-            if end_of_word_token:
-                if end_of_word_token in token:
-                    decoded_text += token[:-4] + " "
-                else:
-                    decoded_text += token
-            else:
-                decoded_text += token
+        for key in inverted_vocab.keys():
+            if key != num:
+                continue
+            token = inverted_vocab[num]
+            if end_of_word_token is not None and end_of_word_token in token:
+                token = token.replace(end_of_word_token, ' ')
+            decoded_text += token
     return decoded_text
 
 
