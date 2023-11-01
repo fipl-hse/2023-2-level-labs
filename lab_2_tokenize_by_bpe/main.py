@@ -82,26 +82,16 @@ def merge_tokens(
        or not isinstance(pair, tuple)):
         return None
     new_dict = {}
-    for word in word_frequencies:
-        new_word = []
-        ''' Alternative variation with a switch:
-        second_merged = False
-        for i in range(len(word)):
-            if second_merged:
-                second_merged = False
-                continue
-            if word[i] == pair[0] and word[i + 1] == pair[1]:
-                new_word.append(pair[0] + pair[1])
-                second_merged = True
-            else:
-                new_word.append(word[i])'''
-        for i in range(len(word)):
-            if word[i - 1] == pair[0] and word[i] == pair[1]:
-                del new_word[-1]
-                new_word.append(pair[0] + pair[1])
-            else:
-                new_word.append(word[i])
-        new_dict[tuple(new_word)] = word_frequencies[word]
+    merged_pair = ''.join(pair)
+    for word, freq in word_frequencies.items():
+        merging_word = list(word)
+        for i, token in enumerate(merging_word[:-1]):
+            if (token, merging_word[i + 1]) == pair:
+                merging_word[i + 1] = ''
+                merging_word[i] = merged_pair
+        while '' in merging_word:
+            merging_word.remove('')
+        new_dict[tuple(merging_word)] = freq
     return new_dict
 
 
