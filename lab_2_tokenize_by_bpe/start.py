@@ -16,14 +16,13 @@ def main() -> None:
         text = file.read()
 
     with open(assets_path / 'secrets/secret_3.txt', 'r', encoding='utf-8') as file:
-        encoded_text = file.read().split()
+        encoded_text = [int(num) for num in file.read().split()]
 
     word_frequencies = collect_frequencies(text, None, '</s>')
     word_frequencies = train(word_frequencies, 100)
 
     if word_frequencies:
         vocabulary = get_vocabulary(word_frequencies, '<unk>')
-        encoded_text = [int(num) for num in encoded_text]
         result = decode(encoded_text, vocabulary, '</s>')
         print(result)
         assert result, "Encoding is not working"
@@ -47,11 +46,10 @@ def main() -> None:
             print(pred_token, actual_token)
 
     with open(assets_path / 'for_translation_en_encoded.txt', 'r', encoding='utf-8') as file:
-        encoded = file.read().split()
+        encoded = [int(num) for num in file.read().split()]
     with open(assets_path / 'for_translation_en_raw.txt', 'r', encoding='utf-8') as file:
         reference = file.read()
 
-    encoded = [int(i) for i in encoded]
     decoded_en = decode(encoded, vocabulary, None)
     if not decoded_en:
         return None

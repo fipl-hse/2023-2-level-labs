@@ -267,9 +267,8 @@ def tokenize_word(
             encoded = encoded.replace(token, f'{vocabulary[unknown_token]} ')
 
     encoded_list = encoded.split()
-    encoded_list = [int(index) for index in encoded_list]
 
-    return encoded_list
+    return [int(index) for index in encoded_list]
 
 
 def load_vocabulary(vocab_path: str) -> dict[str, int] | None:
