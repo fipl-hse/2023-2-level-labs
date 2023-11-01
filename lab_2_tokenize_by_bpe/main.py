@@ -137,10 +137,12 @@ def train(
             pair_list.sort()
             pair_to_merge = max(pair_list, key=lambda x: len(x[0] + x[1]))
 
-            word_frequencies = merge_tokens(word_frequencies, pair_to_merge)
+            if isinstance(word_frequencies, dict):
+                word_frequencies = merge_tokens(word_frequencies, pair_to_merge)
 
             pair_dict.pop(pair_to_merge)
-            pair_dict = count_tokens_pairs(word_frequencies)
+            if isinstance(word_frequencies, dict):
+                pair_dict = count_tokens_pairs(word_frequencies)
             if pair_dict is None:
                 return None
 
@@ -177,7 +179,8 @@ def get_vocabulary(
 
 
 def decode(
-        encoded_text: list[int] | None, vocabulary: dict[str, int] | None, end_of_word_token: str | None
+        encoded_text: list[int] | None, vocabulary: dict[str, int] | None
+        , end_of_word_token: str | None
 ) -> str | None:
     """
     Translates encoded sequence into decoded one
@@ -186,7 +189,9 @@ def decode(
     :param end_of_word_token: an end-of-word token
     :return: decoded sequence
     """
-    if not isinstance(encoded_text, list) or not isinstance(vocabulary, dict):
+    if not isinstance(encoded_text, list) and encoded_text is not None:
+        return None
+    if not isinstance(vocabulary, dict):
         return None
     if not isinstance(end_of_word_token, str) and end_of_word_token is not None:
         return None
@@ -194,27 +199,26 @@ def decode(
     decoded_text = ''
     for identifier in encoded_text:
         for token in vocabulary:
-            if end_of_word_token is not None:
-                if vocabulary[token] == identifier and end_of_word_token in token:
-                    new_token = ''
-                    for element in token:
-                        if element not in end_of_word_token:
-                            new_token += element
-                        if element in end_of_word_token:
-                            break
-                    decoded_text += new_token
-                    decoded_text += ' '
-                elif vocabulary[token] == identifier and end_of_word_token not in token:
-                    decoded_text += token
-            else:
-                if vocabulary[token] == identifier:
-                    decoded_text += token
+            if end_of_word_token is None and vocabulary[token] == identifier:
+                decoded_text += token
+            elif vocabulary[token] == identifier and end_of_word_token in token:
+                new_token = ''
+                for element in token:
+                    if element not in end_of_word_token:
+                        new_token += element
+                    if element in end_of_word_token:
+                        break
+                decoded_text += new_token
+                decoded_text += ' '
+            elif vocabulary[token] == identifier and end_of_word_token not in token:
+                decoded_text += token
 
     return decoded_text
 
 
 def tokenize_word(
-        word: tuple[str, ...], vocabulary: dict[str, int], end_of_word: str | None, unknown_token: str
+        word: tuple[str, ...], vocabulary: dict[str, int]
+        , end_of_word: str | None, unknown_token: str
 ) -> list[int] | None:
     """
     Splits word into tokens

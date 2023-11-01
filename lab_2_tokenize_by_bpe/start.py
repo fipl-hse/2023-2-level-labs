@@ -15,9 +15,10 @@ def main() -> None:
         text = text_file.read()
 
     word_frequencies = main_py.collect_frequencies(text, None, '</s>')
-    vocabulary = main_py.get_vocabulary(word_frequencies, '<unk>')
+    if isinstance(word_frequencies, dict):
+        vocabulary = main_py.get_vocabulary(word_frequencies, '<unk>')
 
-    with open(assets_path / 'secrets' / 'secret_1.txt', 'r') as secret_file:
+    with open(assets_path / 'secrets' / 'secret_1.txt', 'r', encoding='utf-8') as secret_file:
         secret = secret_file.read()
 
     result = main_py.decode(secret.split(' '), vocabulary, '</s>')
