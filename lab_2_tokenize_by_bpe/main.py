@@ -79,10 +79,9 @@ def merge_tokens(
     if not isinstance(word_frequencies, dict) or not isinstance(pair, tuple):
         return None
     dictionary = {}
-    united = f'{pair[0]}{pair[1]}'
+    united = ''.join(pair)
     for symbols in word_frequencies.keys():
         new_symbols = list(symbols)
-        i = 0
         for i in range(len(symbols)-1):
             if (symbols[i], symbols[i+1]) == pair:
                 new_symbols[i] = united
@@ -105,11 +104,11 @@ def train(
     if not isinstance(word_frequencies, dict) or not isinstance(num_merges, int):
         return None
     nums = 0
-    while nums != num_merges:
+    while nums < num_merges:
         pairs = count_tokens_pairs(word_frequencies)
         if pairs is None:
             return None
-        if pairs == {}:
+        if len(pairs) == 0:
             break
         dictionary = sorted(pairs.items(), key=lambda a: (-a[1], -len(''.join(a[0])), ''.join(a[0])))
         word_frequencies = merge_tokens(word_frequencies, tuple(dictionary[0][0]))
@@ -117,7 +116,6 @@ def train(
         if word_frequencies is None:
             return None
     return word_frequencies
-
 
 
 def get_vocabulary(
