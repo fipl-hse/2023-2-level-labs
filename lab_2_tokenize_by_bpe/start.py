@@ -4,6 +4,7 @@ BPE Tokenizer starter
 from pathlib import Path
 from main import collect_frequencies, count_tokens_pairs, train
 
+
 def main() -> None:
     """
     Launches an implementation
@@ -18,6 +19,7 @@ def main() -> None:
     print(result2)
     print(train(result2, 100))
     assert result2, "Encoding is not working"
+
 
 if __name__ == "__main__":
     main()
