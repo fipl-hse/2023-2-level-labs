@@ -51,8 +51,8 @@ def main() -> None:
     with open(assets_path / 'for_translation_en_raw.txt', 'r', encoding='utf-8') as file:
         reference = file.read()
 
-    encoded_en = [int(i) for i in encoded_en]
-    decoded_en = decode(encoded_en, vocabulary, None)
+    encoded = [int(i) for i in encoded]
+    decoded_en = decode(encoded, vocabulary, None)
     if not decoded_en:
         return None
 
