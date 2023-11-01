@@ -6,7 +6,7 @@ from typing import Tuple
 
 
 def prepare_word(
-        raw_word: str, start_of_word: str | None, end_of_word: str | None
+    raw_word: str, start_of_word: str | None, end_of_word: str | None
 ) -> tuple[str, ...] | None:
     """
     Tokenizes word into unigrams and appends end-of-word token
@@ -28,7 +28,7 @@ def prepare_word(
 
 
 def collect_frequencies(
-        text: str, start_of_word: str | None, end_of_word: str
+    text: str, start_of_word: str | None, end_of_word: str
 ) -> dict[tuple[str, ...], int] | None:
     """
     Counts number of occurrences of each word
@@ -49,7 +49,7 @@ def collect_frequencies(
 
 
 def count_tokens_pairs(
-        word_frequencies: dict[tuple[str, ...], int]
+    word_frequencies: dict[tuple[str, ...], int]
 ) -> dict[tuple[str, str], int] | None:
     """
     Counts number of occurrences of each pair of subsequent tokens
@@ -62,7 +62,7 @@ def count_tokens_pairs(
     tokens_pair_dict = {}
 
     for word in word_frequencies:
-        for i in range(len(word) - 1): #, token_pair in enumerate(word[:-1]):
+        for i in range(len(word) - 1):
             token_pair = (word[i], word[i + 1])
             if token_pair not in tokens_pair_dict:
                 tokens_pair_dict[token_pair] = 0
@@ -72,7 +72,7 @@ def count_tokens_pairs(
 
 
 def merge_tokens(
-        word_frequencies: dict[tuple[str, ...], int], pair: tuple[str, str]
+    word_frequencies: dict[tuple[str, ...], int], pair: tuple[str, str]
 ) -> dict[tuple[str, ...], int] | None:
     """
     Updates word frequency dictionary by replacing a pair of token with a merged one

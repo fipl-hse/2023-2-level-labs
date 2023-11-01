@@ -12,17 +12,17 @@ Data Type: Lists
 # lists are iterable
 
 # Create a list
-example = [1, 2, 3]
+# example = [1, 2, 3]
 #print(example)
 
 # List concatenation, the original list doesn't change
-first_list = example + [2, 3, 4]
+#first_list = example + [2, 3, 4]
 #print(example)
 #print(first_list)
 
 # List changes
-example.append(2)
-example.extend([2, 3, 4])
+#example.append(2)
+#example.extend([2, 3, 4])
 #print(example)
 
 # List copy
