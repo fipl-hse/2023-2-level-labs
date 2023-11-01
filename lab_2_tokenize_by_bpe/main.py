@@ -18,21 +18,12 @@ def prepare_word(
             or not (isinstance(start_of_word, str) or start_of_word is None) \
             or not (isinstance(end_of_word, str) or end_of_word is None):
         return None
-    tokens = [char for char in raw_word]
+    tokens = [el for el in raw_word]
     if start_of_word:
         tokens.insert(0, start_of_word)
     if end_of_word:
         tokens.append(end_of_word)
     return tuple(tokens)
-# def prepare_word(
-#         raw_word: str, start_of_word: str | None, end_of_word: str | None
-# ) -> tuple[str, ...] | None:
-#    if not isinstance(raw_word, str) \
-#            or not (isinstance(start_of_word, str) or start_of_word is None) \
-#            or not (isinstance(end_of_word, str) or end_of_word is None):
-#       return None
-#    tokens = [char for char in raw_word]
-#    return tuple([start_of_word, *tokens, end_of_word])
 
 
 def collect_frequencies(
@@ -70,12 +61,12 @@ def count_tokens_pairs(
     if not isinstance(word_frequencies, dict):
         return None
     pairs_dict = {}
-    for key in word_frequencies:
+    for key, frequency in word_frequencies.items():
         for ind in range(len(key) - 1):
             pair = (key[ind], key[ind + 1])
             if pair not in pairs_dict:
                 pairs_dict[pair] = 0
-            pairs_dict[pair] += 1
+            pairs_dict[pair] += frequency
     return pairs_dict
 
 
@@ -91,7 +82,18 @@ def merge_tokens(
     if not isinstance(word_frequencies, dict) or not isinstance(pair, tuple):
         return None
     merged_dict = {}
-
+    pair_str = ''.join(pair)
+    for key, frequency in word_frequencies.items():
+        if pair_str in ''.join(key):
+            new_key = list(key)
+            for index in range(len(key) - 1):
+                if (key[index], key[index + 1]) == pair:
+                    new_key[index] = pair_str
+                    new_key.pop(index + 1)
+            merged_dict[tuple(new_key)] = frequency
+        else:
+            merged_dict[key] = frequency
+    return merged_dict
 
 
 def train(
