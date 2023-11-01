@@ -43,10 +43,12 @@ def collect_frequencies(
        or not isinstance(end_of_word, str)):
         return None
     words = text.split()
-    freq_dict = {prepare_word(word, start_of_word, end_of_word): words.count(word)
-                 for word in set(words)}
-    if None in freq_dict:
-        return None
+    freq_dict = {}
+    for word in set(words):
+        preprocessed_word = prepare_word(word, start_of_word, end_of_word)
+        if not preprocessed_word:
+            return None
+        freq_dict[preprocessed_word] = words.count(word)
     return freq_dict
 
 
@@ -110,6 +112,8 @@ def train(
         return None
     merged_text = word_frequencies
     for merge_counter in range(num_merges):
+        if not merged_text:
+            return None
         tokens = count_tokens_pairs(merged_text)
         if not tokens:
             break
@@ -227,7 +231,7 @@ def encode(
     :return: list of token identifiers
     """
     if (not isinstance(original_text, str)
-            or not isinstance(vocabulary, dict | None)
+            or not isinstance(vocabulary, dict)
             or not isinstance(start_of_word_token, str | None)
             or not isinstance(end_of_word_token, str | None)
             or not isinstance(unknown_token, str)):
@@ -300,7 +304,7 @@ def calculate_bleu(actual: str | None, reference: str, max_order: int = 3) -> fl
     :param max_order: max length of n-gram to consider for comparison
     :return: value of BLEU metric
     """
-    if (not isinstance(actual, str | None)
+    if (not isinstance(actual, str)
        or not isinstance(reference, str)
        or not isinstance(max_order, int)):
         return None
