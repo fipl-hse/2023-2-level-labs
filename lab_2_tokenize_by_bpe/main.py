@@ -19,9 +19,10 @@ def prepare_word(
         not isinstance(start_of_word, str | None) or
         not isinstance(end_of_word, str | None)):
         return None
-    word = list(raw_word)
+    word = []
     if start_of_word is not None:
-        word.insert(0, start_of_word)
+        word.append(start_of_word)
+    word.extend(list(raw_word))
     if end_of_word is not None:
         word.insert(len(word) + 1, end_of_word)
     return tuple(word)
@@ -41,13 +42,11 @@ def collect_frequencies(
         not isinstance(end_of_word, str) or
         not isinstance(start_of_word, str | None)):
         return None
-    text_list = []
-    for word in text.split():
-        if prepare_word(word, start_of_word, end_of_word) is None:
-            return None
-        text_list.append(prepare_word(word, start_of_word, end_of_word))
+    text_list = [prepare_word(word, start_of_word, end_of_word) for word in text.split()]
     w_freq = {}
     for word in text_list:
+        if word is None:
+            return None
         w_freq[word] = text_list.count(word)
     return w_freq
 
@@ -112,19 +111,22 @@ def train(
         not isinstance(num_merges, int)):
         return None
     tokens_freq = count_tokens_pairs(word_frequencies)
-    if tokens_freq is None:
+    if not tokens_freq:
         return None
     if num_merges > len(tokens_freq):
         num_merges = len(tokens_freq)
-    m_f_pairs = [key for key, value in tokens_freq.items() if value == max(tokens_freq.values())]
-    len_max = max(len(''.join(pair)) for pair in m_f_pairs)
-    longest_pairs = sorted([pair for pair in m_f_pairs if len_max == len(''.join(pair))])
-    word_frequencies = merge_tokens(word_frequencies, longest_pairs[0])
-    if not word_frequencies:
-        return None
-    if num_merges == 1:
-        return word_frequencies
-    return train(word_frequencies, num_merges - 1)
+    for merge in range(num_merges):
+        m_f_pairs = [key for key, value in tokens_freq.items() if value == max(tokens_freq.values())]
+        len_max = max(len(''.join(pair)) for pair in m_f_pairs)
+        longest_pairs = sorted([pair for pair in m_f_pairs if len_max == len(''.join(pair))])
+        word_frequencies = merge_tokens(word_frequencies, longest_pairs[0])
+        if not word_frequencies:
+            return None
+        tokens_freq.pop(longest_pairs[0])
+        tokens_freq = count_tokens_pairs(word_frequencies)
+        if not tokens_freq:
+            return None
+    return word_frequencies
 
 
 def get_vocabulary(
@@ -146,11 +148,11 @@ def get_vocabulary(
             tokens.add(token)
         for symbol in ''.join(word):
             tokens.add(symbol)
-    tokens = list(tokens)
+    tokens_set = list(tokens)
     tokens_by_length = []
-    max_length = max(len(token) for token in tokens)
+    max_length = max(len(token) for token in tokens_set)
     while max_length != 0:
-        tokens_by_length.extend(sorted([token for token in tokens if len(token) == max_length]))
+        tokens_by_length.extend(sorted([token for token in tokens_set if len(token) == max_length]))
         max_length -= 1
     idents = {}
     for i, token in enumerate(tokens_by_length):
@@ -257,7 +259,7 @@ def encode(
     :return: list of token identifiers
     """
     if (not isinstance(original_text, str) or
-        not isinstance(vocabulary, dict | None) or
+        not isinstance(vocabulary, dict) or
         not isinstance(start_of_word_token, str | None) or
         not isinstance(end_of_word_token, str | None) or
         not isinstance(unknown_token, str)):
@@ -266,10 +268,10 @@ def encode(
     encoded_text = []
     for word in text_list:
         word_prepared = prepare_word(word, start_of_word_token, end_of_word_token)
-        if word_prepared is None:
+        if not word_prepared:
             return None
         word_encoded = tokenize_word(word_prepared, vocabulary, end_of_word_token, unknown_token)
-        if word_encoded is None:
+        if not word_encoded:
             return None
         encoded_text.extend(word_encoded)
     return encoded_text
@@ -325,12 +327,12 @@ def geo_mean(precisions: list[float], max_order: int) -> float | None:
     if (not isinstance(precisions, list) or
         not isinstance(max_order, int)):
         return None
-    product = 1
+    product = 1.
     for order in range(max_order):
         if precisions[order] < 0:
             return 0
         product *= precisions[order]
-    return product ** (1 / max_order)
+    return float(product ** (1 / max_order))
 
 
 def calculate_bleu(actual: str | None, reference: str, max_order: int = 3) -> float | None:
@@ -341,7 +343,7 @@ def calculate_bleu(actual: str | None, reference: str, max_order: int = 3) -> fl
     :param max_order: max length of n-gram to consider for comparison
     :return: value of BLEU metric
     """
-    if (not isinstance(actual, str | None) or
+    if (not isinstance(actual, str) or
         not isinstance(reference, str) or
         not isinstance(max_order, int)):
         return None
