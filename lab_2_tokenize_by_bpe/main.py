@@ -43,7 +43,8 @@ def collect_frequencies(
        or not isinstance(end_of_word, str)):
         return None
     words = text.split()
-    freq_dict = {prepare_word(word, start_of_word, end_of_word): words.count(word) for word in set(words)}
+    freq_dict = {prepare_word(word, start_of_word, end_of_word): words.count(word)
+                 for word in set(words)}
     if None in freq_dict:
         return None
     return freq_dict
@@ -108,11 +109,12 @@ def train(
        or not isinstance(num_merges, int)):
         return None
     merged_text = word_frequencies
-    for n in range(num_merges):
+    for merge_counter in range(num_merges):
         tokens = count_tokens_pairs(merged_text)
         if not tokens:
             break
-        top_tokens = sorted(tokens.items(), key=lambda x: (-x[1], -len(''.join(x[0])), str(x[0]).lower()))
+        top_tokens = sorted(tokens.items(),
+                            key=lambda x: (-x[1], -len(''.join(x[0])), str(x[0]).lower()))
         merged_text = merge_tokens(merged_text, top_tokens[0][0])
         if not merged_text:
             return None
@@ -156,7 +158,8 @@ def decode(
        or not isinstance(end_of_word_token, str | None)):
         return None
     decoded_text = ''
-    reverse_vocabulary = {pair[1]: (pair[0].replace(end_of_word_token, ' ') if end_of_word_token else pair[0])
+    reverse_vocabulary = {pair[1]: (pair[0].replace(end_of_word_token, ' ') if end_of_word_token
+                                    else pair[0])
                           for pair in vocabulary.items()}
     for code in encoded_text:
         decoded_text += reverse_vocabulary[code]
