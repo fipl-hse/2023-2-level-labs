@@ -1,9 +1,10 @@
 """
 BPE Tokenizer starter
 """
+from pathlib import Path
 from lab_2_tokenize_by_bpe.main import (collect_frequencies, decode,
                                         get_vocabulary, train)
-from pathlib import Path
+
 
 def main() -> None:
     """
@@ -22,6 +23,7 @@ def main() -> None:
     result = decode(secret_list, vocabulary, '</s>')
     print(result)
     assert result, "Encoding is not working"
+
 
 if __name__ == "__main__":
     main()

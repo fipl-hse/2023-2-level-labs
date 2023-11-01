@@ -18,12 +18,12 @@ def prepare_word(
             or not isinstance(start_of_word, str | None)
             or not isinstance(end_of_word, str | None)):
         return None
-    raw_word = list(raw_word)
+    new_word = list(raw_word)
     if end_of_word:
-        raw_word.append(end_of_word)
+        new_word.append(end_of_word)
     if start_of_word:
-        raw_word.insert(0, start_of_word)
-    return tuple(raw_word)
+        new_word.insert(0, start_of_word)
+    return tuple(new_word)
 
 
 def collect_frequencies(
@@ -147,8 +147,8 @@ def get_vocabulary(
     tokens_list.add(unknown_token)
     alphabetical = sorted(tokens_list)
     length_sorted = sorted(alphabetical, key=len, reverse=True)
-    for index, token in enumerate(length_sorted):
-        identifier_dict[token] = index
+    for index, new_token in enumerate(length_sorted):
+        identifier_dict[new_token] = index
     return identifier_dict
 
 
