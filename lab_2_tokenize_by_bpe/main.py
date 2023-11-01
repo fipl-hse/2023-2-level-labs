@@ -106,7 +106,6 @@ def merge_tokens(
     return merged_dictionary
 
 
-
 def train(
     word_frequencies: dict[tuple[str, ...], int] | None, num_merges: int
 ) -> dict[tuple[str, ...], int] | None:
