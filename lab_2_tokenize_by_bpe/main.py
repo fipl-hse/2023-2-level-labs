@@ -279,7 +279,8 @@ def encode(
     if not isinstance(original_text, str) or not isinstance(
             vocabulary, dict) or not (isinstance(
             start_of_word_token, str) or start_of_word_token is None) or not (isinstance(
-            end_of_word_token, str) or end_of_word_token is None) or not isinstance(unknown_token, str):
+            end_of_word_token, str) or end_of_word_token is None) or not isinstance(
+            unknown_token, str):
         return None
 
     encoded = []
