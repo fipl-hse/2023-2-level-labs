@@ -126,7 +126,8 @@ def train(
     :param num_merges: required number of new tokens
     :return: dictionary in the form of <preprocessed word: number of occurrences>
     """
-    if not isinstance(word_frequencies, dict) or not isinstance(num_merges, int):
+    if not (isinstance(word_frequencies, dict) and isinstance(num_merges, int)
+    ):
         return None
 
     while num_merges > 0:
@@ -148,6 +149,8 @@ def train(
                                            key=lambda x: (-len(''.join(x)), x))
             best_pair = max_occurrence_tokens[0]
             word_frequencies = merge_tokens(word_frequencies, best_pair)
+            if not word_frequencies:
+                return None
 
         if not word_frequencies:
             return None
