@@ -2,7 +2,7 @@
 Lab 2
 BPE and machine translation evaluation
 """
-
+import json
 
 def prepare_word(
     raw_word: str, start_of_word: str | None, end_of_word: str | None
@@ -218,6 +218,25 @@ def tokenize_word(
     :param unknown_token: token that signifies unknown sequence
     :return: list of token identifiers
     """
+    if not (
+        isinstance(word, tuple) and
+        isinstance(vocabulary, dict) and
+        isinstance(unknown_token, str) and
+        (isinstance(end_of_word, str) or end_of_word is None)
+    ):
+        return None
+    voc_keys = vocabulary.keys()
+    encoded = []
+    word = ''.join(word)
+    for index, token in enumerate(voc_keys):
+        while token in word:
+            position = word[:word.find(token)].count(' ')
+            encoded.insert(position, index)
+            word = word.replace(token, ' ',1)
+    for index, element in enumerate(word):
+        if element != ' ':
+            encoded.insert(index, vocabulary['<unk>'])
+    return encoded
 
 
 def load_vocabulary(vocab_path: str) -> dict[str, int] | None:
@@ -226,7 +245,16 @@ def load_vocabulary(vocab_path: str) -> dict[str, int] | None:
     :param vocab_path: path to the saved vocabulary
     :return: dictionary in the form of <token: identifier>
     """
+    if not isinstance(vocab_path, str):
+        return None
 
+    with open(vocab_path, 'r', encoding='utf-8') as f:
+        profile = json.load(f)
+
+    if not isinstance(profile, dict):
+        return None
+
+    return profile
 
 def encode(
     original_text: str,
