@@ -163,11 +163,12 @@ def decode(
     decoding = ''
     for number in encoded_text:
         for key in inverted_vocabulary.keys():
-            if key == number:
-                token = inverted_vocabulary[number]
-                if end_of_word_token is not None and end_of_word_token in token:
-                    token = token.replace(end_of_word_token, ' ')
-                decoding += token
+            if key != number:
+                continue
+            token = inverted_vocabulary[number]
+            if end_of_word_token is not None and end_of_word_token in token:
+                token = token.replace(end_of_word_token, ' ')
+            decoding += token
     return decoding
 
 def tokenize_word(
