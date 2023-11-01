@@ -79,7 +79,8 @@ def count_tokens_pairs(
             token = word_tokens[i]
             next_token = word_tokens[i + 1]
             pair = (token, next_token)
-            pair_frequency_dict[pair] = pair_frequency_dict.get(pair, 0) + word_frequencies[word_tokens]
+            pair_frequency_dict[pair] = \
+                pair_frequency_dict.get(pair, 0) + word_frequencies[word_tokens]
 
     return pair_frequency_dict
 
@@ -143,7 +144,8 @@ def train(
                 if pair_frequency_dict[pair] == max_occurrence:
                     max_occurrence_tokens.append(pair)
 
-            max_occurrence_tokens = sorted(max_occurrence_tokens, key=lambda x: (-len(''.join(x)), x))
+            max_occurrence_tokens = sorted(max_occurrence_tokens,
+                                           key=lambda x: (-len(''.join(x)), x))
             best_pair = max_occurrence_tokens[0]
             word_frequencies = merge_tokens(word_frequencies, best_pair)
 
