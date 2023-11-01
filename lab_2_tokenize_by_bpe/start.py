@@ -12,11 +12,11 @@ def main() -> None:
     Launches an implementation
     """
     assets_path = Path(__file__).parent / 'assets'
-    with open(assets_path / 'text.txt', 'r', encoding='utf-8') as text:
-        text = text.read()
+    with open(assets_path / 'text.txt', 'r', encoding='utf-8') as file:
+        text = file.read()
 
-    with open(assets_path / 'secrets/secret_3.txt', 'r', encoding='utf-8') as encoded_text:
-        encoded_text = encoded_text.read()
+    with open(assets_path / 'secrets/secret_3.txt', 'r', encoding='utf-8') as file:
+        encoded_text = file.read()
 
     word_frequencies = collect_frequencies(text, None, '</s>')
     word_frequencies = train(word_frequencies, 100)
@@ -28,15 +28,15 @@ def main() -> None:
         print(result)
         assert result, "Encoding is not working"
 
-    with open(assets_path / 'for_translation_ru_raw.txt', 'r', encoding='utf-8') as predicted_ru:
-        predicted_ru = predicted_ru.read()
+    with open(assets_path / 'for_translation_ru_raw.txt', 'r', encoding='utf-8') as file:
+        predicted_ru = file.read()
 
     vocabulary_adv = load_vocabulary('assets/vocab.json')
     if not vocabulary_adv:
         return None
 
-    with open(assets_path / 'for_translation_ru_encoded.txt', 'r', encoding='utf-8') as ref_ru:
-        ref_ru = ref_ru.read()
+    with open(assets_path / 'for_translation_ru_encoded.txt', 'r', encoding='utf-8') as file:
+        ref_ru = file.read()
 
     predicted_ru = encode(predicted_ru, vocabulary_adv, '\u2581', None, '<unk>')
     if not predicted_ru:
@@ -47,10 +47,10 @@ def main() -> None:
         if pred_token != actual_token:
             print(pred_token, actual_token)
 
-    with open(assets_path / 'for_translation_en_encoded.txt', 'r', encoding='utf-8') as encoded_en:
-        encoded_en = encoded_en.read().split()
-    with open(assets_path / 'for_translation_en_raw.txt', 'r', encoding='utf-8') as reference_en:
-        reference_en = reference_en.read()
+    with open(assets_path / 'for_translation_en_encoded.txt', 'r', encoding='utf-8') as file:
+        encoded_en = file.read().split()
+    with open(assets_path / 'for_translation_en_raw.txt', 'r', encoding='utf-8') as file:
+        reference_en = file.read()
 
     encoded_en = [int(i) for i in encoded_en]
     decoded_en = decode(encoded_en, vocabulary_adv, None)

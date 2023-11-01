@@ -254,23 +254,21 @@ def tokenize_word(
         return None
 
     word_str = ''.join(word)
-    word_str_copy = ''.join(word)
-    vocabulary_list = list(vocabulary.keys())
+    encoded = ''.join(word)
+    vocabulary_list = list(vocabulary)
     vocabulary_list = sorted(vocabulary_list, key=lambda x: (-len(x), x))
-    encoded = []
 
     for token in vocabulary_list:
         if token in word_str:
-            word_str_copy = word_str_copy.replace(token, ' ' + str(vocabulary[token]) + ' ')
+            encoded = encoded.replace(token, f'{vocabulary[token]} ')
 
     for token in word_str:
-        if token not in vocabulary_list:
-            word_str_copy = word_str_copy.replace(token, ' ' + str(vocabulary[unknown_token]) + ' ')
+        if token not in vocabulary:
+            encoded = encoded.replace(token, f'{vocabulary[unknown_token]} ')
 
-    str_encoded = word_str_copy.split()
+    encoded = encoded.split()
+    encoded = [int(index) for index in encoded]
 
-    for number in str_encoded:
-        encoded.append(int(number))
     return encoded
 
 
@@ -400,7 +398,7 @@ def geo_mean(precisions: list[float], max_order: int) -> float | None:
     if any(precision <= 0 for precision in precisions):
         return 0
 
-    product = 1
+    product = 1.0
     for precision in precisions:
         product *= precision
 
