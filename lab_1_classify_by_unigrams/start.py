@@ -15,11 +15,7 @@ def main() -> None:
     with open("assets/texts/de.txt", "r", encoding="utf-8") as file_to_read_de:
         de_text = file_to_read_de.read()
     with open("assets/texts/unknown.txt", "r", encoding="utf-8") as file_to_read_unk:
-        de_text = file_to_read_de.read()
-    with open("assets/texts/unknown.txt", "r", encoding="utf-8") as file_to_read_unk:
         unknown_text = file_to_read_unk.read()
-    result = None
-    assert result, "Detection result is None"
 
     json_paths = ['assets/profiles/de.json',
                   'assets/profiles/en.json',
@@ -37,7 +33,6 @@ def main() -> None:
         print_report(result)
 
     assert result, "Detection result is None"
-
 
 if __name__ == "__main__":
     main()

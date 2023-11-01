@@ -14,6 +14,7 @@ def tokenize(text: str) -> list[str] | None:
     """
     if not isinstance(text, str):
         return None
+
     return [token.lower() for token in text if token.isalpha()]
 
 
@@ -66,6 +67,7 @@ def calculate_mse(predicted: list, actual: list) -> float | None:
             and len(predicted) == len(actual)
     ):
         return None
+
     sum_diff = 0
     for freq_value in zip(predicted, actual):
         sum_diff += (freq_value[0] - freq_value[1]) ** 2
@@ -130,7 +132,7 @@ def detect_language(
 
     if not (isinstance(profile_1_metric, float)
             and isinstance(profile_2_metric, float)
-            ):
+    ):
         return None
 
     if profile_1_metric > profile_2_metric:
@@ -158,7 +160,6 @@ def load_profile(path_to_file: str) -> dict | None:
 
     return profile
 
-
 def preprocess_profile(profile: dict) -> dict[str, str | dict] | None:
     """
     Preprocesses profile for a loaded language
@@ -167,10 +168,10 @@ def preprocess_profile(profile: dict) -> dict[str, str | dict] | None:
     with relative frequencies without unnecessary ngrams
     """
     if not (isinstance(profile, dict)
-            and 'name' in profile
-            and 'freq' in profile
-            and 'n_words' in profile
-            ):
+        and 'name' in profile
+        and 'freq' in profile
+        and 'n_words' in profile
+    ):
         return None
 
     unigram_profile = {'name': profile['name'], 'freq': {}}
@@ -222,7 +223,7 @@ def detect_language_advanced(unknown_profile: dict[str, str | dict[str, float]],
     """
     if not (isinstance(unknown_profile, dict)
             and isinstance(known_profiles, list)
-            ):
+    ):
         return None
 
     detected_language = [(profile['name'], compare_profiles(profile, unknown_profile))
