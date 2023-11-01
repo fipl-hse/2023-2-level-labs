@@ -118,14 +118,13 @@ def train(
     """
     if not isinstance(word_frequencies, dict) or not isinstance(num_merges, int):
         return None
+    dict_with_pairs = count_tokens_pairs(word_frequencies)
 
-    for i in range(num_merges):
-        dict_with_pairs = count_tokens_pairs(word_frequencies)
+    if not dict_with_pairs:
+        return None
+    merges = min(num_merges, len(dict_with_pairs))
 
-        if not dict_with_pairs:
-            return None
-        if num_merges > len(dict_with_pairs):
-            num_merges = len(dict_with_pairs)
+    for i in range(merges):
 
         max_values = max(dict_with_pairs.values())
         pairs_max_values = [i for i in dict_with_pairs if dict_with_pairs[i] == max_values]
@@ -137,6 +136,11 @@ def train(
         word_frequencies = merge_tokens(word_frequencies, sorted_pairs[0])
 
         if not word_frequencies:
+            return None
+
+        dict_with_pairs = count_tokens_pairs(word_frequencies)
+
+        if not dict_with_pairs:
             return None
 
     return word_frequencies
