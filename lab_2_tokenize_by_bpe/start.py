@@ -17,7 +17,7 @@ def main() -> None:
     word_freq = main_file.collect_frequencies(text, None, '</s>')
     print(main_file.train(word_freq, 100))
 
-    # result = lab_2_tokenize_by_bpe.main.collect_frequencies(text, None, '</s>')
+    # result = main_file.train(word_freq, 100)
     # assert result, "Encoding is not working"
 
 

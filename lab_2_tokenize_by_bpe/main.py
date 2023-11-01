@@ -21,13 +21,13 @@ def prepare_word(
     if not isinstance(end_of_word, str) and end_of_word is not None:
         return None
 
-    if not (start_of_word and end_of_word):
-        return tuple(list(raw_word))
-    if not end_of_word:
-        return tuple([start_of_word] + list(raw_word))
-    if not start_of_word:
-        return tuple(list(raw_word) + [end_of_word])
-    return tuple([start_of_word] + list(raw_word) + [end_of_word])
+    tokens = []
+    if start_of_word is not None:
+        tokens.append(start_of_word)
+    tokens.extend(list(raw_word))
+    if end_of_word is not None:
+        tokens.append(end_of_word)
+    return tuple(tokens)
 
 def collect_frequencies(
     text: str, start_of_word: str | None, end_of_word: str
@@ -46,11 +46,11 @@ def collect_frequencies(
 
     dict_of_freq = {}
     words = text.split()
-    for word in set(words):
-        prepr_word = prepare_word(word, start_of_word, end_of_word)
-        if prepr_word is None:
+    prepr_words = [prepare_word(word, start_of_word, end_of_word) for word in words]
+    for word in set(prepr_words):
+        if word is None:
             return None
-        dict_of_freq[prepr_word] = words.count(word)
+        dict_of_freq[word] = prepr_words.count(word)
 
     return dict_of_freq
 
@@ -67,13 +67,13 @@ def count_tokens_pairs(
         return None
 
     result_dic = {}
-    for word, freq in word_frequencies.items():
+    for word in word_frequencies:
         for i in range(len(word) - 1):
             token1 = word[i]
             token2 = word[i + 1]
             if not result_dic.get((token1, token2)):
                 result_dic[(token1, token2)] = 0
-            result_dic[(token1, token2)] += freq
+            result_dic[(token1, token2)] += word_frequencies[word]
 
     return result_dic
 
@@ -92,15 +92,20 @@ def merge_tokens(
             not isinstance(pair, tuple)):
         return None
 
-    new_word_freq = {}
+    new_word_freq = word_frequencies.copy()
     for word, freq in word_frequencies.items():
-        new_word = []
-        for i in range(len(word) - 1):
-            if word[i] == pair[0] and word[i + 1] == pair[1]:
-                new_word.append((pair[0] + pair[1]))
-            else:
-                new_word.append(word[i])
-        new_word_freq[tuple(new_word)] = freq
+        if pair[0] and pair[1] in word:
+            new_word = []
+            for i in range(len(word) - 1):
+                if word[i] == pair[1] and word[i - 1] == pair[0]:
+                    pass
+                elif word[i] == pair[0] and word[i + 1] == pair[1]:
+                    new_word.append((pair[0] + pair[1]))
+                else:
+                    new_word.append(word[i])
+
+            value = new_word_freq.pop(word)
+            new_word_freq[tuple(new_word)] = value
 
     return new_word_freq
 
@@ -124,20 +129,20 @@ def train(
     num_merges = min(num_merges, len(dict_pairs))
 
     for iteration in range(num_merges):
-        max_value = max(dict_pairs.values())
-        value_list = [key for key, value in dict_pairs.items() if value == max_value]
+        if dict_pairs != {}:
+            max_value = max(dict_pairs.values())
+            value_list = [key for key, value in dict_pairs.items() if value == max_value]
 
-        max_len = max(len(''.join(pair)) for pair in value_list)
-        len_list = [pair for pair in value_list if len(''.join(pair)) == max_len]
+            max_len = max(len(''.join(pair)) for pair in value_list)
+            len_list = [pair for pair in value_list if len(''.join(pair)) == max_len]
 
-        word_frequencies = merge_tokens(word_frequencies, sorted(len_list)[0])
-        if word_frequencies is None:
-            return None
+            word_frequencies = merge_tokens(word_frequencies, sorted(len_list)[0])
+            if word_frequencies is None:
+                return None
 
-        #dict_pairs.pop(sorted(len_list)[0])
-        dict_pairs = count_tokens_pairs(word_frequencies)
-        if dict_pairs is None:
-            return None
+            dict_pairs = count_tokens_pairs(word_frequencies)
+            if dict_pairs is None:
+                return None
 
     return word_frequencies
 
