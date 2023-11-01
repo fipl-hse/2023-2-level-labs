@@ -266,10 +266,10 @@ def tokenize_word(
         if token not in vocabulary:
             encoded = encoded.replace(token, f'{vocabulary[unknown_token]} ')
 
-    encoded = encoded.split()
-    encoded = [int(index) for index in encoded]
+    encoded_list = encoded.split()
+    encoded_list = [int(index) for index in encoded_list]
 
-    return encoded
+    return encoded_list
 
 
 def load_vocabulary(vocab_path: str) -> dict[str, int] | None:
