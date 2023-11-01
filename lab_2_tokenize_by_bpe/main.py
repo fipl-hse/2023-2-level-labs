@@ -136,19 +136,23 @@ def train(
         if num_merges > len(pair_frequency_dict):
             num_merges = len(pair_frequency_dict)
 
-        max_occurrence = max(pair_frequency_dict.values())
-        good_pairs = [pair for pair, frequency in pair_frequency_dict.items() if frequency == max_occurrence]
-        max_len = max(len(str(pair)) for pair in good_pairs)
-        long_pairs = [pair for pair in good_pairs if len(str(pair)) == max_len]
-        best_pair = sorted(long_pairs)
-        word_frequencies = merge_tokens(word_frequencies, best_pair[0])
+        for i in range(num_merges):
+            max_occurrence = max(pair_frequency_dict.values())
+            max_occurrence_tokens = []
+            for pair in pair_frequency_dict:
+                if pair_frequency_dict[pair] == max_occurrence:
+                    max_occurrence_tokens.append(pair)
+
+            max_occurrence_tokens = sorted(max_occurrence_tokens, key=lambda x: (-len(''.join(x)), x))
+            best_pair = max_occurrence_tokens[0]
+            word_frequencies = merge_tokens(word_frequencies, best_pair)
+
         if not word_frequencies:
             return None
 
         num_merges -= 1
 
     return word_frequencies
-
 
 def get_vocabulary(
     word_frequencies: dict[tuple[str, ...], int], unknown_token: str
@@ -166,14 +170,14 @@ def get_vocabulary(
         return None
 
     vocabulary = {}
-    not_good_list = set()
+    tokens = set()
     for tuples in word_frequencies.keys():
         for token in tuples:
-            not_good_list.add(token)
+            tokens.add(token)
             for symbol in token:
-                not_good_list.add(symbol)
-    not_good_list.add(unknown_token)
-    len_sorted = sorted(not_good_list, key=lambda x: (-len(x), x))
+                tokens.add(symbol)
+    tokens.add(unknown_token)
+    len_sorted = sorted(tokens, key=lambda x: (-len(x), x))
     for number, token in enumerate(len_sorted):
         vocabulary[token] = number
     return vocabulary
