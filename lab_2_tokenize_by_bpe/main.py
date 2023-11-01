@@ -45,10 +45,10 @@ def collect_frequencies(
         word_key = prepare_word(word, start_of_word, end_of_word)
         if word_key is None:
             return None
+        if word_key not in frequencies:
+            frequencies[word_key] = 0
         if word_key in frequencies:
             frequencies[word_key] += 1
-        else:
-            frequencies[word_key] = 1
     return frequencies
 
 
@@ -66,10 +66,9 @@ def count_tokens_pairs(
     for word in word_frequencies:
         for index, token in enumerate(word):
             if (index + 1) < len(word):
-                if (token, word[index + 1]) in token_pairs:
-                    token_pairs[(token, word[index + 1])] += 1
-                else:
-                    token_pairs[(token, word[index + 1])] = 1
+                if (token, word[index + 1]) not in token_pairs:
+                    token_pairs[(token, word[index + 1])] = 0
+                token_pairs[(token, word[index + 1])] += word_frequencies[word]
     return token_pairs
 
 
@@ -110,22 +109,20 @@ def train(
     """
     if not isinstance(word_frequencies, dict) or not isinstance(num_merges, int):
         return None
-    token_pairs = count_tokens_pairs(word_frequencies)
-    if not token_pairs:
-        return None
-    num_merges = min(num_merges, len(token_pairs))
-    for iteration in range(num_merges):
-        often_pair = [key for key, value in token_pairs.items() if value == max(token_pairs.values())]
-        longest = max(len(''.join(pair)) for pair in often_pair)
-        longest_pair = [pair for pair in often_pair if longest == len(''.join(pair))]
-        best_pair = sorted(longest_pair)[0]
-        word_frequencies = merge_tokens(word_frequencies, best_pair)
-        if not word_frequencies:
-            return None
-        token_pairs.pop(best_pair)
+    while num_merges > 0:
         token_pairs = count_tokens_pairs(word_frequencies)
         if not token_pairs:
             return None
+        num_merges = min(num_merges, len(token_pairs))
+        max_pair = max(token_pairs.values())
+        often_pair = [key for key, value in token_pairs.items() if value == max_pair]
+        longest = max(len(str(pair)) for pair in often_pair)
+        longest_pair = [pair for pair in often_pair if longest == len(str(pair))]
+        best_pairs = sorted(longest_pair)
+        word_frequencies = merge_tokens(word_frequencies, best_pairs[0])
+        if not word_frequencies:
+            return None
+        num_merges -= 1
     return word_frequencies
 
 
@@ -165,21 +162,24 @@ def decode(
     :param end_of_word_token: an end-of-word token
     :return: decoded sequence
     """
-    if (not isinstance(encoded_text, list | None)
-            or not isinstance(vocabulary, dict | None)
+    if (not isinstance(encoded_text, list)
+            or not isinstance(vocabulary, dict)
             or not isinstance(end_of_word_token, str | None)):
         return None
-    decode_list = []
+
+    decoded_list = []
     for number in encoded_text:
-        if number in vocabulary.values():
-            for token, value in vocabulary.items():
-                if value == number:
-                    decode_list.append(token)
-    if end_of_word_token in decode_list:
-        for index, token in enumerate(decode_list):
-            if token == end_of_word_token:
-                decode_list[index] = ' '
-    return ''.join(decode_list)
+        token_list = [token for token, value in vocabulary.items() if value == number]
+        for token in token_list:
+            if end_of_word_token:
+                if end_of_word_token in token:
+                    deleted_token = len(end_of_word_token)
+                    decoded_list += end_of_word_token[deleted_token:] + ' '
+                else:
+                    decoded_list.append(token)
+            else:
+                decoded_list.append(token)
+    return ''.join(decoded_list)
 
 
 def tokenize_word(
