@@ -122,22 +122,23 @@ def train(
     :param num_merges: required number of new tokens
     :return: dictionary in the form of <preprocessed word: number of occurrences>
     """
-    if (not isinstance(word_frequencies, dict | None)
-            or not isinstance(num_merges, int)):
+    if not(isinstance(word_frequencies, dict | None)
+            and isinstance(num_merges, int)):
         return None
-    trained = word_frequencies
+    #trained = word_frequencies
     for merge in range(num_merges):
-        pairs = count_tokens_pairs(trained)
+        pairs = count_tokens_pairs(word_frequencies)
         if not pairs:
             break
         most_freq_pairs = sorted(
             pairs.items(), key = lambda x:
             (-x[1], -len(''.join(x[0])), str(x[0]).lower())
         )
-        trained = merge_tokens(trained, most_freq_pairs[0][0])
-        if not trained:
+        word_frequencies = merge_tokens(word_frequencies, most_freq_pairs[0][0])
+        if not word_frequencies:
             return None
-    return trained
+        pairs = count_tokens_pairs(word_frequencies)
+    return word_frequencies
 
 
 def get_vocabulary(
