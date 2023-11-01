@@ -14,16 +14,18 @@ def prepare_word(
     :param end_of_word: a token that signifies the end of word
     :return: preprocessed word
     """
-    if not isinstance(raw_word, str) or (start_of_word is not None and
-                                         not isinstance(start_of_word, str)) or (
-            end_of_word is not None and not isinstance(end_of_word, str)):
+    if not (
+        isinstance(raw_word, str)
+        and (start_of_word is None or isinstance(start_of_word, str))
+        and (end_of_word is None or isinstance(end_of_word, str))
+    ):
         return None
     total_result = []
-    if start_of_word and start_of_word != "":
+    if start_of_word:
         total_result.append(start_of_word)
     for token in raw_word:
         total_result.append(token)
-    if end_of_word and end_of_word != "":
+    if end_of_word:
         total_result.append(end_of_word)
     return tuple(total_result)
 
@@ -46,9 +48,11 @@ def collect_frequencies(
     words = text.split()
     for word in words:
         preprocessed_word = prepare_word(word, start_of_word, end_of_word)
-        if not preprocessed_word:
+        if preprocessed_word is None:
             return None
-        freq_dict.update({preprocessed_word: words.count(word)})
+        if preprocessed_word not in freq_dict:
+            freq_dict[preprocessed_word] = 0
+        freq_dict[preprocessed_word] += 1
     return freq_dict
 
 
@@ -67,7 +71,7 @@ def count_tokens_pairs(
         for ind in range(len(word) - 1):
             token_pair = (word[ind], word[ind + 1])
             if token_pair not in pairs_of_tokens:
-                pairs_of_tokens[token_pair] = freq
+                pairs_of_tokens[token_pair] = 0
             pairs_of_tokens[token_pair] += freq
     return pairs_of_tokens
 
@@ -85,12 +89,9 @@ def merge_tokens(
         return None
     merged_dict = {}
     for word, freq in word_frequencies.items():
-        new_word = ''.join(word).replace(pair[0] + '' + pair[1], pair[0] + pair[1])
-        new_word_tupled = tuple(new_word.split())
-        if new_word_tupled not in merged_dict:
-            merged_dict[new_word_tupled] += freq
-        else:
-            merged_dict[new_word_tupled] = freq
+        new_word = [pair[0] + pair[1] if (word[i], word[i + 1]) == pair else word[i] for i in range(len(word) - 1)]
+        new_word.append(word[-1])
+        merged_dict[tuple(new_word)] = freq
     return merged_dict
 
 
