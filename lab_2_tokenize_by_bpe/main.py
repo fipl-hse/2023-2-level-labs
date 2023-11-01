@@ -20,10 +20,10 @@ def prepare_word(
             isinstance(end_of_word, str) or end_of_word is None):
         return None
     tokenized_word = []
-    if start_of_word is not None:
+    if start_of_word:
         tokenized_word.append(start_of_word)
-    tokenized_word.extend(element for element in raw_word)
-    if end_of_word is not None:
+    tokenized_word.extend(raw_word)
+    if end_of_word:
         tokenized_word.append(end_of_word)
     return tuple(tokenized_word)
 
@@ -93,9 +93,8 @@ def merge_tokens(
                     list_word[index] = ''
             if '' in list_word:
                 list_word.remove('')
-            merged_frequencies[tuple(list_word)] = count
-        else:
-            merged_frequencies[preprocessed_word] = count
+            preprocessed_word = tuple(list_word)
+        merged_frequencies[preprocessed_word] = count
     return merged_frequencies
 
 
@@ -118,7 +117,8 @@ def train(
             num_merges = len(pairs_of_tokens)
         pairs_max_values = ([token_pair for token_pair, frequency in pairs_of_tokens.items() if
                             frequency == max(pairs_of_tokens.values())])
-        sorted_pairs = sorted([pair for pair in pairs_max_values], key=lambda pair: (-len(str(pair)), pair))
+        sorted_pairs = (sorted(pairs_max_values,
+                               key=lambda pair: (-len(str(pair)), pair)))
         word_frequencies = merge_tokens(word_frequencies, sorted_pairs[0])
         if not word_frequencies:
             return None
@@ -190,22 +190,15 @@ def tokenize_word(
             or not isinstance(vocabulary, dict) or not isinstance(
             end_of_word, (str, type(None))) or not isinstance(unknown_token, str)):
         return None
-    tokens_identifiers = []
-    i = 0
-    while i < len(word):
-        max_length_token = ''
-        for j in range(len(word), i, -1):
-            current_token = "".join(word[i:j])
-            if current_token in vocabulary and len(current_token) > len(max_length_token):
-                max_length_token = current_token
-        if max_length_token:
-            tokens_identifiers.append(vocabulary[max_length_token])
-            i += len(max_length_token)
-        else:
-            if unknown_token in vocabulary:
-                tokens_identifiers.append(vocabulary[unknown_token])
-            i += 1
-    return tokens_identifiers
+    word_str = ''.join(word)
+    sorted_tokens = sorted(list(vocabulary.keys()), key=lambda x: (-len(x), x))
+    for token in sorted_tokens:
+        if token in ''.join(word):
+            word_str = word_str.replace(token, str(vocabulary[token]) + ' ')
+    for symbol in ''.join(word):
+        if symbol not in sorted_tokens:
+            word_str = word_str.replace(symbol, str(vocabulary[unknown_token]) + ' ')
+    return [int(identifier) for identifier in word_str.split()]
 
 
 def load_vocabulary(vocab_path: str) -> dict[str, int] | None:
@@ -303,8 +296,7 @@ def geo_mean(precisions: list[float], max_order: int) -> float | None:
     all_precision = 1.0
     for precision in precisions:
         all_precision *= precision
-    geometric_mean = all_precision**(1.0 / max_order)
-    return geometric_mean
+    return float(all_precision**(1.0 / max_order))
 
 
 def calculate_bleu(actual: str | None, reference: str, max_order: int = 3) -> float | None:
@@ -315,7 +307,8 @@ def calculate_bleu(actual: str | None, reference: str, max_order: int = 3) -> fl
     :param max_order: max length of n-gram to consider for comparison
     :return: value of BLEU metric
     """
-    if not isinstance(actual, str) or not isinstance(reference, str) or not isinstance(max_order, int):
+    if (not isinstance(actual, str) or not isinstance(reference, str)
+            or not isinstance(max_order, int)):
         return None
     all_ngrams_actual = []
     all_ngrams_reference = []
