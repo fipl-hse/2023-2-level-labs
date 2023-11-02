@@ -141,6 +141,20 @@ def get_vocabulary(
     :param unknown_token: a token to signify an unknown token
     :return: dictionary in the form of <token: identifier>
     """
+    if not isinstance(word_frequencies, dict) or not isinstance(unknown_token, str):
+        return None
+    listed_tokens = set()
+    token_identifier_dict = {}
+    for word in word_frequencies:
+        for token in word:
+            listed_tokens.add(token)
+            for element in token:
+                listed_tokens.add(element)
+    listed_tokens.add(unknown_token)
+    sorted_tokens = sorted(listed_tokens, key=lambda x: (-len(x), x))
+    for i, token in enumerate(sorted_tokens):
+        token_identifier_dict[token] = i
+    return token_identifier_dict
 
 
 def decode(
@@ -153,6 +167,19 @@ def decode(
     :param end_of_word_token: an end-of-word token
     :return: decoded sequence
     """
+    if (not (isinstance(encoded_text, list) or encoded_text is None) or not 
+        (isinstance(vocabulary, dict) or vocabulary is None) or not 
+        (isinstance(end_of_word_token, str) or end_of_word_token is None)):
+        return None
+    decoded_tokens = []
+    for i in encoded_text:
+        for token, token_i in vocabulary.items():
+            if token_i == i and end_of_word_token is not None:
+                decoded_tokens.append(' ' if token == end_of_word_token else token)
+            if vocabulary[token] == i and end_of_word_token is None:
+                decoded_tokens.append('' if token == end_of_word_token else token)
+    decoded_text = ''.join(decoded_tokens)
+    return decoded_text
 
 
 def tokenize_word(
