@@ -105,6 +105,22 @@ def train(
     :param num_merges: required number of new tokens
     :return: dictionary in the form of <preprocessed word: number of occurrences>
     """
+    if not isinstance(word_frequencies, dict) or not isinstance(num_merges, int):
+        return None
+    while num_merges != 0:
+        token_pairs = count_tokens_pairs(word_frequencies)
+        if not token_pairs:
+            return None
+        frequent_pair = max(token_pairs.values())
+        new_pairs = [key for key, value in token_pairs.items() if value == frequent_pair]
+        longest = max(len(''.join(token)) for token in new_pairs)
+        longest_token = [token for token in new_pairs if len(''.join(token)) == longest]
+        final_token = sorted(longest_token)[0]
+        word_frequencies = merge_tokens(word_frequencies, final_token)
+        if not word_frequencies:
+            return None
+        num_merges -= 1
+    return word_frequencies
 
 
 def get_vocabulary(
@@ -116,6 +132,21 @@ def get_vocabulary(
     :param unknown_token: a token to signify an unknown token
     :return: dictionary in the form of <token: identifier>
     """
+    if not isinstance(word_frequencies, dict) or not isinstance(unknown_token, str):
+        return None
+    tokens = set()
+    tokens.add(unknown_token)
+    for keys in word_frequencies.keys():
+        for token in keys:
+            tokens.add(token)
+            for symbol in token:
+                tokens.add(symbol)
+    tokens = sorted(tokens)
+    tokens.sort(key=len, reverse=True)
+    ident_tokens = {}
+    for index, tok in enumerate(tokens):
+        ident_tokens[tok] = index
+    return ident_tokens
 
 
 def decode(
@@ -128,6 +159,19 @@ def decode(
     :param end_of_word_token: an end-of-word token
     :return: decoded sequence
     """
+    if not isinstance(encoded_text, list) or not\
+            isinstance(vocabulary, dict) or not\
+            all((isinstance(key, str) and isinstance(value, int))for key, value in vocabulary.items()) or not\
+            isinstance(end_of_word_token, str) or end_of_word_token is None:
+        return None
+    decoded = ''
+    for ident in encoded_text:
+        for key, value in vocabulary.items():
+            if ident == value:
+                decoded += key
+    decoded = decoded.replace(end_of_word_token, ' ')
+    return decoded
+
 
 
 def tokenize_word(
