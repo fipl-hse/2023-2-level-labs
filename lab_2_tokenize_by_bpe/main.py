@@ -95,7 +95,7 @@ def merge_tokens(
     couple_of_items = pair[0] + pair[1]
 
     for word, freq in word_frequencies.items():
-        if f"'{pair[0]}', '{pair[1]}'" in str(word):
+        if couple_of_items in ''.join(word):
             list_of_tokens = list(word)
             for index in range(len(list_of_tokens) - 1):
                 if (word[index] + word[index + 1]) == couple_of_items:
