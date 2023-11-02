@@ -3,7 +3,8 @@ BPE Tokenizer starter
 """
 import json
 from pathlib import Path
-from lab_2_tokenize_by_bpe.main import (calculate_bleu, decode, encode)
+
+from lab_2_tokenize_by_bpe.main import calculate_bleu, decode, encode
 
 
 def main() -> None:
@@ -22,7 +23,8 @@ def main() -> None:
 
     encode_pred = encode(ru_raw, vocabulary, '\u2581', None, '<unk>')
     correct_tokens = [token for token in encode_pred if token in map(int, ru_encoded.split())]
-    print(f"Файл закодирован правильно на {(len(correct_tokens) / len(encode_pred)*100)}%")
+    if correct_tokens:
+        print(f"Файл закодирован правильно на {(len(list(correct_tokens)) / len(encode_pred)*100)}%")
 
     with open(assets_path / 'for_translation_en_encoded.txt', 'r', encoding='utf-8') as file:
         encoded_en = file.read()
