@@ -17,14 +17,10 @@ def main() -> None:
         text = text_file.read()
     with open(assets_path / 'secrets/secret_1.txt', 'r', encoding='utf-8') as text_file:
         secret = text_file.read()
-    word_frequencies = collect_frequencies(text, None, '</s>')
-    massive_merge = train(word_frequencies, 100)
+    massive_merge = train(collect_frequencies(text, None, '</s>'), 100)
     assert isinstance(massive_merge, dict)
     vocab = get_vocabulary(massive_merge, '<unk>')
-    secret_prepared = []
-    for num in secret.split():
-        secret_prepared.append(int(num))
-    result = decode(secret_prepared, vocab, '</s>')
+    result = decode([int(num) for num in secret.split()], vocab, '</s>')
     print(result)
     assert result, "Encoding is not working"
     with open(assets_path / 'for_translation_ru_raw.txt', 'r', encoding='utf-8') as text_file:
@@ -36,10 +32,7 @@ def main() -> None:
     with open(assets_path / 'for_translation_en_raw.txt', 'r', encoding='utf-8') as text_file:
         good_translation = text_file.read()
     encoded_text_f_t = encode(text_for_translation, vocabulary, '\u2581', None, '<unk>')
-    en_text_prepared = []
-    for num in encoded_en_text.split():
-        en_text_prepared.append(int(num))
-    decoded_en_text = decode(en_text_prepared, vocabulary, None)
+    decoded_en_text = decode([int(num) for num in encoded_en_text.split()], vocabulary, None)
     decoded_en_text = decoded_en_text.replace('\u2581', ' ')
     comparison = calculate_bleu(decoded_en_text, good_translation)
     print(comparison)
