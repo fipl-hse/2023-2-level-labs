@@ -92,9 +92,7 @@ def merge_tokens(
             for i in range(len(listed_word) - 1):
                 if (listed_word[i], listed_word[i + 1]) == pair:
                     listed_word[i + 1] = pair[0] + pair[1]
-                    listed_word[i] = ''
-            if '' in listed_word:
-                listed_word.remove('')
+                    listed_word.pop(i)
             word = tuple(listed_word)
         merged_frequencies[word] = freq
     return merged_frequencies
