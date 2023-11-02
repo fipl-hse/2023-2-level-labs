@@ -148,7 +148,9 @@ def train(
     for i in range(num_merges):
         max_freq = max(token_pairs_dict.values())
 
-        max_freq_tokens = list(filter(lambda pair: token_pairs_dict[pair] == max_freq, token_pairs_dict))
+        max_freq_tokens = [key for key, value in token_pairs_dict.items() if value == max_freq]
+
+        # max_freq_tokens = list(filter(lambda x: token_pairs_dict[x] == max_freq, token_pairs_dict))
 
         max_freq_tokens = sorted(max_freq_tokens, key=lambda x: (-len(''.join(x)), x))
         token_pair = max_freq_tokens[0]
