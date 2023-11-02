@@ -125,20 +125,19 @@ def train(
     num_merges = min(num_merges, len(dict_pairs))
 
     for iteration in range(num_merges):
-        if dict_pairs != {}:
-            max_value = max(dict_pairs.values())
-            value_list = [key for key, value in dict_pairs.items() if value == max_value]
+        max_value = max(dict_pairs.values())
+        value_list = [key for key, value in dict_pairs.items() if value == max_value]
 
-            max_len = max(len(''.join(pair)) for pair in value_list)
-            len_list = [pair for pair in value_list if len(''.join(pair)) == max_len]
+        max_len = max(len(''.join(pair)) for pair in value_list)
+        len_list = [pair for pair in value_list if len(''.join(pair)) == max_len]
 
-            word_frequencies = merge_tokens(word_frequencies, sorted(len_list)[0])
-            if word_frequencies is None:
-                return None
+        word_frequencies = merge_tokens(word_frequencies, sorted(len_list)[0])
+        if word_frequencies is None:
+            return None
 
-            dict_pairs = count_tokens_pairs(word_frequencies)
-            if dict_pairs is None:
-                return None
+        dict_pairs = count_tokens_pairs(word_frequencies)
+        if dict_pairs is None:
+            return None
 
     return word_frequencies
 
