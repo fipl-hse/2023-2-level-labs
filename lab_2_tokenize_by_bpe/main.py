@@ -51,8 +51,11 @@ def collect_frequencies(
 
     frequency_dict = {}
     text_list = text.split()
-    for word in text_list:
+    unique_words = set(text_list)
+
+    for word in unique_words:
         prepared_word = prepare_word(word, start_of_word, end_of_word)
+
         if not prepared_word:
             return None
 
@@ -106,20 +109,17 @@ def merge_tokens(
 
     for word_tokens in word_frequencies:
         word_tokens_list = list(word_tokens)
-        if second_token in word_tokens:
-            pair_token_index = []
-            for index in range(len(word_tokens) - 1):
-                token_pair = word_tokens[index: index + 2]
-                if token_pair == pair:
-                    pair_token_index.append(index)
 
+        pair_token_index = []
+        for index in range(len(word_tokens) - 1):
+            token_pair = word_tokens[index: index + 2]
+            if token_pair == pair:
+                pair_token_index.append(index)
+        if second_token in word_tokens:
             for pair_index in reversed(pair_token_index):
                 word_tokens_list[pair_index: pair_index + 2] = [''.join(pair)]
 
-            merged_dict[tuple(word_tokens_list)] = word_frequencies[word_tokens]
-
-        else:
-            merged_dict[word_tokens] = word_frequencies[word_tokens]
+        merged_dict[tuple(word_tokens_list)] = word_frequencies[word_tokens]
 
     return merged_dict
 
@@ -143,16 +143,14 @@ def train(
     if not token_pairs_dict:
         return None
 
-    if num_merges > len(token_pairs_dict):
-        num_merges = len(token_pairs_dict)
+    num_merges = min(num_merges, len(token_pairs_dict))
 
     for i in range(num_merges):
         max_freq = max(token_pairs_dict.values())
-        max_freq_tokens = []
 
-        for pair in token_pairs_dict:
-            if token_pairs_dict[pair] == max_freq:
-                max_freq_tokens.append(pair)
+        max_freq_tokens = list(filter(
+            lambda pair: token_pairs_dict[pair] == max_freq, token_pairs_dict)
+        )
 
         max_freq_tokens = sorted(max_freq_tokens, key=lambda x: (-len(''.join(x)), x))
         token_pair = max_freq_tokens[0]
@@ -226,9 +224,11 @@ def decode(
     decoded_text = ''
     for number in encoded_text:
         token = vocab_inverted[number]
-        if end_of_word_token and end_of_word_token in token:
-            token = token.replace(end_of_word_token, ' ')
+
         decoded_text += token
+
+    if end_of_word_token:
+        decoded_text = decoded_text.replace(end_of_word_token, ' ')
 
     return decoded_text
 
