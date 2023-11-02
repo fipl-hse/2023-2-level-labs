@@ -189,7 +189,7 @@ def decode(
     :param end_of_word_token: an end-of-word token
     :return: decoded sequence
     """
-    if not isinstance(encoded_text, list):
+    if not isinstance(encoded_text, list) and encoded_text is not None:
         return None
     if not isinstance(vocabulary, dict):
         return None
@@ -199,12 +199,12 @@ def decode(
     decoded_text = ''
     inv_vocabulary = {v: k for k, v in vocabulary.items()}
 
-    if end_of_word_token is None:
+    if end_of_word_token is None and encoded_text is not None:
         for identifier in encoded_text:
             decoded_text += inv_vocabulary[identifier]
         return decoded_text
 
-    if end_of_word_token is not None:
+    if end_of_word_token is not None and encoded_text is not None:
         for identifier in encoded_text:
             if end_of_word_token in inv_vocabulary[identifier]:
                 new_token = ''
