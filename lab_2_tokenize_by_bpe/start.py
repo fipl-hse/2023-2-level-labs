@@ -15,11 +15,12 @@ def main() -> None:
         text = text_file.read()
 
     result = None
-    #print(collect_frequencies(text, None, '</s>'))
-    #print(count_tokens_pairs(collect_frequencies(text, None, '</s>')))
-    #print(merge_tokens(count_tokens_pairs(collect_frequencies(text, None, '</s>')), ("е", "л")))
+    print(collect_frequencies(text, None, '</s>'))
+    print(count_tokens_pairs(collect_frequencies(text, None, '</s>')))
+    print(merge_tokens(count_tokens_pairs(collect_frequencies(text, None, '</s>')), ("е", "л")))
     word_frequencies = collect_frequencies(text, None, '</s>')
     result = train(word_frequencies, 100)
+    print(result)
     assert result, "Encoding is not working"
 
 

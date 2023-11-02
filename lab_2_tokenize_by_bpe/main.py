@@ -92,7 +92,7 @@ def merge_tokens(
         for i, new_word in enumerate(word[:-1]):
             new_word = (word[i], word[i + 1])
             if new_word == pair:
-                word_list[i + 1] = pair[0] + pair[1]
+                word_list[i + 1] = ''.join(pair) #pair[0] + pair[1]
                 word_list.pop(i)
         merged_tokens_dict[tuple(word_list)] = word_frequencies[word]
 
@@ -120,7 +120,8 @@ def train(
             num_merges = len(dict_pairs)
 
         for i in range(num_merges):
-            max_value = max(word_frequencies.values())
+            dict_pairs = count_tokens_pairs(word_frequencies)
+            max_value = max(dict_pairs.values())
             max_values_list = [key for key, value in dict_pairs.items() if value == max_value]
 
             max_len = max(len(''.join(pair)) for pair in max_values_list)
@@ -178,11 +179,11 @@ def load_vocabulary(vocab_path: str) -> dict[str, int] | None:
 
 
 def encode(
-        original_text: str,
-        vocabulary: dict[str, int] | None,
-        start_of_word_token: str | None,
-        end_of_word_token: str | None,
-        unknown_token: str,
+    original_text: str,
+    vocabulary: dict[str, int] | None,
+    start_of_word_token: str | None,
+    end_of_word_token: str | None,
+    unknown_token: str,
 ) -> list[int] | None:
     """
     Translates decoded sequence into encoded one
@@ -205,7 +206,7 @@ def collect_ngrams(text: str, order: int) -> list[tuple[str, ...]] | None:
 
 
 def calculate_precision(
-        actual: list[tuple[str, ...]], reference: list[tuple[str, ...]]
+    actual: list[tuple[str, ...]], reference: list[tuple[str, ...]]
 ) -> float | None:
     """
     Compares two sequences by virtue of Precision metric
