@@ -13,6 +13,8 @@ def main() -> None:
     with open(assets_path / 'text.txt', 'r', encoding='utf-8') as text_file:
         text = text_file.read()
 
+    result = None
+    assert result, 'Encoding is not working'
     text_frequencies = collect_frequencies(text, None, '</s>')
     train_text = train(text_frequencies, 100)
     if train_text:
