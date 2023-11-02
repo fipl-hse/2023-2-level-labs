@@ -89,7 +89,7 @@ def merge_tokens(
             list_word = list(preprocessed_word)
             for index in range(len(list_word) - 1):
                 if (list_word[index], list_word[index + 1]) == pair:
-                    list_word[index + 1] = pair[0] + pair[1]
+                    list_word[index + 1] = ''.join(pair)
                     list_word[index] = ''
             if '' in list_word:
                 list_word.remove('')
@@ -143,7 +143,7 @@ def get_vocabulary(
         for token in tuples:
             tokens_list.add(token)
             for element in token:
-                tokens_list.add(element)
+                tokens_list.update(element)
     tokens_list.add(unknown_token)
     sorted_tokens = sorted(tokens_list, key=lambda x: (-len(x), x))
     for index, token in enumerate(sorted_tokens):
