@@ -38,11 +38,11 @@ def collect_frequencies(
     if not isinstance(text, str) or not isinstance(start_of_word, str | None) or not isinstance(end_of_word, str):
         return None
     freq_dictionary = {}
-    for i in text.split():
-        preprocessed_word = prepare_word(i, start_of_word, end_of_word)
+    for word in text.split():
+        preprocessed_word = prepare_word(word, start_of_word, end_of_word)
         if not preprocessed_word:
             return None
-        freq_dictionary.update({preprocessed_word: text.split().count(i)})
+        freq_dictionary.update({preprocessed_word: text.split().count(word)})
     return freq_dictionary
 
 
