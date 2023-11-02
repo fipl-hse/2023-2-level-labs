@@ -29,8 +29,6 @@ def main() -> None:
             secret_list = [int(num) for num in secret_text.split()]
             decoded = decode(secret_list, vocabulary, '</s>')
 
-            decoded = decoded.replace('ев', 'ел')
-            decoded = decoded.replace('до', 'ев')
             print(decoded)
             result = decoded
             assert result, "Encoding is not working"

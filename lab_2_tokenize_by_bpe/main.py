@@ -195,25 +195,20 @@ def decode(
             or not (isinstance(end_of_word_token, str) or end_of_word_token is None):
         return None
 
-    encoded_dict = {}
-    for index, num in enumerate(encoded_text):
-        if num not in encoded_dict:
-            encoded_dict[num] = []
-        encoded_dict[num].append(index)
+    decoded = ''
 
-    decoded_text = [''] * len(encoded_text)
+    for num in encoded_text:
+        added_token = ''
+        for token, identifier in vocabulary.items():
+            if identifier == num:
+                added_token = token
+                break
 
-    for token, identifier in vocabulary.items():
-        if end_of_word_token and end_of_word_token in token and identifier in encoded_dict:
-            space_indexes = encoded_dict[identifier]
-            for space_index in space_indexes:
-                decoded_text[space_index] = token[:-4] + ' '
-        elif identifier in encoded_dict:
-            indexes = encoded_dict[identifier]
-            for index in indexes:
-                decoded_text[index] = token
+        if end_of_word_token is not None and end_of_word_token in added_token:
+            added_token = added_token[:-len(end_of_word_token)] + ' '
+        decoded += added_token
 
-    return ''.join(decoded_text)
+    return decoded
 
 
 def tokenize_word(
@@ -233,28 +228,25 @@ def tokenize_word(
             or not isinstance(unknown_token, str):
         return None
 
-    if end_of_word is not None and (end_of_word not in vocabulary):
-        tokens = sorted(list(vocabulary) + [end_of_word], key=len, reverse=True)
-    else:
-        tokens = sorted(list(vocabulary), key=len, reverse=True)
-
     word_str = ''.join([str(el) for el in word])
-    tokens = [token for token in tokens if token in word_str]
+    tokens = [token for token in vocabulary if token in word_str]
+    if end_of_word is not None and end_of_word in word_str and end_of_word not in tokens:
+        tokens.append(end_of_word)
+    tokens.sort(key=len, reverse=True)
     word_list = list(word)
 
     encoded = [-1] * len(word)
     for token in tokens:
         count_token = word_str.count(token)
         for start_index in range(len(word_list)):
-            for end_index in range(start_index + 1, len(word_list)+1):
-                possible_token = ''.join(word_list[start_index:end_index])
-                if possible_token == token:
-                    encoded[start_index:end_index] = [vocabulary[token]]
-                    word_list[start_index:end_index] = [token]
-                    count_token -= 1
+            end_index = start_index + len(token)
+            possible_token = ''.join(word_list[start_index:end_index])
+            if possible_token == token:
+                encoded[start_index:end_index] = [vocabulary[token]]
+                word_list[start_index:end_index] = [token]
+                count_token -= 1
+                if count_token == 0:
                     break
-            if count_token == 0:
-                break
 
     if -1 in encoded:
         for index, num in enumerate(encoded):
