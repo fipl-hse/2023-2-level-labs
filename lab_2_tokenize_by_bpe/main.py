@@ -16,8 +16,10 @@ def prepare_word(
     """
     if not (
         isinstance(raw_word, str) and
-        isinstance(start_of_word, str | None) and
-        isinstance(end_of_word, str | None)
+        (isinstance(start_of_word, str) or
+         start_of_word is None) and
+        (isinstance(end_of_word, str) or
+         end_of_word is None)
     ):
         return None
     tokens = [token for token in raw_word]
@@ -40,19 +42,19 @@ def collect_frequencies(
     """
     if not (
         isinstance(text, str) and
-        isinstance(start_of_word, str | None) and
+        (isinstance(start_of_word, str) or
+         start_of_word is None) and
         isinstance(end_of_word, str)
     ):
         return None
     list_of_tokens = text.split(' ')
     word_frequencies = {}
     for word in list_of_tokens:
-        if not prepare_word(word, start_of_word, end_of_word):
-            return None
         key = prepare_word(word, start_of_word, end_of_word)
+        if not key:
+            return None
         word_frequencies[key] = list_of_tokens.count(word)
     return word_frequencies
-    #return {prepare_word(word, start_of_word, end_of_word): list_of_tokens.count(word) for word in list_of_tokens}
 
 
 def count_tokens_pairs(
