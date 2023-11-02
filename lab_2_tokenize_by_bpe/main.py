@@ -101,18 +101,15 @@ def merge_tokens(
         return None
 
     merged_tokens_dict = {}
+    for word in word_frequencies:
+        list_word = list(word)
+        for i in range(len(word)-1):
+            two_tokens = tuple([word[i], word[i+1]])
+            if two_tokens == pair:
+                list_word[i + 1] = ''.join(pair)
+                list_word.pop(i)
 
-    for word in word_frequencies.keys():
-        if ''.join(pair) in ''.join(word):
-            list_word = list(word)
-            for i in range(len(word) - 1):
-                new_key = (word[i], word[i + 1])
-                if new_key == pair:
-                    list_word[i + 1] = ''.join(pair)
-                    list_word.pop(i)
-            merged_tokens_dict[tuple(list_word)] = word_frequencies[word]
-        else:
-            merged_tokens_dict[word] = word_frequencies[word]
+        merged_tokens_dict[tuple(list_word)] = word_frequencies[word]
 
     return merged_tokens_dict
 
@@ -210,9 +207,10 @@ def decode(
     decoded_text = str()
     for number in encoded_text:
         token = vocabulary_inverted[number]
-        if end_of_word_token and end_of_word_token in token:
-            token = token.replace(end_of_word_token, ' ')
-        decoded_text += token
+        if token == end_of_word_token:
+            decoded_text += ' '
+        else:
+            decoded_text += token
 
     return decoded_text
 
