@@ -222,8 +222,9 @@ def tokenize_word(
     for symbol in ''.join(word):
         if symbol not in tokens_by_length:
             word_str = word_str.replace(symbol, ' ' + str(vocabulary[unknown_token]) + ' ')
-    for ind in word_str.split('  '):
-        word_encoded.append(int(ind))
+    for ind in word_str.split(' '):
+        if ind != '':
+            word_encoded.append(int(ind))
     return word_encoded
 
 
