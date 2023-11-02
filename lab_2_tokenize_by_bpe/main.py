@@ -93,9 +93,9 @@ def merge_tokens(
         return None
 
     new_word_freq = word_frequencies.copy()
-    for word, freq in word_frequencies.items():
-        if pair[0] and pair[1] in word:
-            new_word = []
+    for word in word_frequencies:
+        new_word = []
+        if pair[0] in word and pair[1] in word:
             for i in range(len(word) - 1):
                 if word[i] == pair[1] and word[i - 1] == pair[0]:
                     pass
