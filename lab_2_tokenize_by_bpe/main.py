@@ -139,19 +139,16 @@ def train(
     ):
         return None
 
-    token_pairs_dict = count_tokens_pairs(word_frequencies)
-    if not token_pairs_dict:
+    token_pairs = count_tokens_pairs(word_frequencies)
+    if not token_pairs:
         return None
 
-    num_merges = min(num_merges, len(token_pairs_dict))
+    num_merges = min(num_merges, len(token_pairs))
 
     for i in range(num_merges):
-        max_freq = max(token_pairs_dict.values())
+        max_freq = max(token_pairs.values())
 
-        max_freq_tokens = [key for key, value in token_pairs_dict.items() if value == max_freq]
-
-        # max_freq_tokens = list(filter(lambda x: token_pairs_dict[x] == max_freq, token_pairs_dict))
-
+        max_freq_tokens = [key for key, value in token_pairs.items() if value == max_freq]
         max_freq_tokens = sorted(max_freq_tokens, key=lambda x: (-len(''.join(x)), x))
         token_pair = max_freq_tokens[0]
 
@@ -160,8 +157,8 @@ def train(
         if not word_frequencies:
             return None
 
-        token_pairs_dict = count_tokens_pairs(word_frequencies)
-        if not token_pairs_dict:
+        token_pairs = count_tokens_pairs(word_frequencies)
+        if not token_pairs:
             return None
 
     if not word_frequencies:
