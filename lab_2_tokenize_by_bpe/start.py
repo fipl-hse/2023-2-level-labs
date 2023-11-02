@@ -19,8 +19,9 @@ def main() -> None:
     trained = train(collect_frequencies(text, None, "</s>"), 100)
     if trained:
         vocabulary = get_vocabulary(train(collect_frequencies(text, None, "</s>"), 100), '<unk>')
-        result = decode([int(el) for el in encoded_text.split()], vocabulary, '</s>')
-        assert result, "Encoding is not working"
+        if vocabulary:
+            result = decode([int(el) for el in encoded_text.split()], vocabulary, '</s>')
+            assert result, "Encoding is not working"
 
 
 if __name__ == "__main__":
