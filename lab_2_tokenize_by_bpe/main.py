@@ -22,7 +22,7 @@ def prepare_word(
         return None
 
     word = list(raw_word)
-    if start_of_word is not None:
+    if start_of_word:
         word.insert(0, start_of_word)
     if end_of_word:
         word.append(end_of_word)
@@ -99,7 +99,7 @@ def merge_tokens(
         return None
 
     merged_tokens = {}
-    merged_pair = f"{pair[0]}{pair[1]}"
+    merged_pair = "".join(pair)
 
     for word in word_frequencies.keys():
         list_word = list(word)
@@ -125,8 +125,8 @@ def train(
     if not(isinstance(word_frequencies, dict)
             and isinstance(num_merges, int)):
         return None
-    #trained = word_frequencies
-    for merge in range(num_merges):
+
+    for num in range(num_merges):
         pairs = count_tokens_pairs(word_frequencies)
         if not pairs:
             break
