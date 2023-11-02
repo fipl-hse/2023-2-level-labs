@@ -47,8 +47,7 @@ def collect_frequencies(
             return None
         if word_key not in frequencies:
             frequencies[word_key] = 0
-        if word_key in frequencies:
-            frequencies[word_key] += 1
+        frequencies[word_key] += 1
     return frequencies
 
 
@@ -142,8 +141,7 @@ def get_vocabulary(
     for token in word_frequencies:
         for letter in token:
             tokens_list.add(letter)
-            for symbol in letter:
-                tokens_list.add(symbol)
+            tokens_list.update(symbol for symbol in letter)
     tokens_list.add(unknown_token)
     alphabetical = sorted(tokens_list)
     length_sorted = sorted(alphabetical, key=len, reverse=True)
@@ -166,7 +164,6 @@ def decode(
             or not isinstance(vocabulary, dict)
             or not isinstance(end_of_word_token, str | None)):
         return None
-
     decoded_list = []
     for number in encoded_text:
         token_list = [token for token, value in vocabulary.items() if value == number]
@@ -174,7 +171,7 @@ def decode(
             if end_of_word_token:
                 if end_of_word_token in token:
                     deleted_token = len(end_of_word_token)
-                    decoded_list += end_of_word_token[deleted_token:] + ' '
+                    decoded_list += token[deleted_token:] + ' '
                 else:
                     decoded_list.append(token)
             else:
