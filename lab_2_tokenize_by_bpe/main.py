@@ -96,6 +96,7 @@ def merge_tokens(
         new_dict[tuple(word_as_list)] = word_frequencies[word]
     return new_dict
 
+
 def train(
     word_frequencies: dict[tuple[str, ...], int] | None, num_merges: int
 ) -> dict[tuple[str, ...], int] | None:
@@ -139,6 +140,22 @@ def get_vocabulary(
     :param unknown_token: a token to signify an unknown token
     :return: dictionary in the form of <token: identifier>
     """
+    if not isinstance(word_frequencies, dict) or not isinstance(unknown_token, str):
+        return None
+    new_dict = {}
+    list_of_tokens = [unknown_token]
+    for word in word_frequencies:
+        for token in word:
+            list_of_tokens.append(token)
+            for letter in token:
+                list_of_tokens.append(letter)
+    set_of_tokens = set(list_of_tokens)
+    set_of_tokens = sorted(set_of_tokens)
+    set_of_tokens = sorted(set_of_tokens, key=len, reverse=True)
+    for i, token in enumerate(set_of_tokens):
+        if token not in new_dict:
+            new_dict[token] = i
+    return new_dict
 
 
 def decode(
