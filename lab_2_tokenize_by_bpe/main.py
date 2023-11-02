@@ -305,7 +305,7 @@ def geo_mean(precisions: list[float], max_order: int) -> float | None:
     if not isinstance(precisions, list) or\
             not isinstance(max_order, int):
         return None
-    num = 1
+    num = 1.0
     for oder in range(max_order):
         if precisions[oder] < 0:
             return 0.0
@@ -320,4 +320,10 @@ def calculate_bleu(actual: str | None, reference: str, max_order: int = 3) -> fl
     :param max_order: max length of n-gram to consider for comparison
     :return: value of BLEU metric
     """
+    if not isinstance(actual, str) or\
+        not isinstance(reference, str) or\
+            not isinstance(max_order, int):
+        return None
+
+
 
