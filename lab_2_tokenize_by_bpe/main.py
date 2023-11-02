@@ -324,6 +324,29 @@ def calculate_bleu(actual: str | None, reference: str, max_order: int = 3) -> fl
         not isinstance(reference, str) or\
             not isinstance(max_order, int):
         return None
+    actual_ngrams = []
+    reference_ngrams = []
+    result_of_precision = []
+    for order in range(max_order):
+        a_ngrams = collect_ngrams(actual, order + 1)
+        r_ngrams = collect_ngrams(reference, order + 1)
+        if a_ngrams is None or r_ngrams is None:
+            return None
+        actual_ngrams.append(a_ngrams)
+        reference_ngrams.append(r_ngrams)
+    for a_ngrams, r_ngrams in zip(actual_ngrams, reference_ngrams):
+        precision = calculate_precision(a_ngrams, r_ngrams)
+        if precision is None:
+            return None
+        result_of_precision.append(precision)
+    bleu = geo_mean(result_of_precision, max_order)
+    if bleu is None:
+        return None
+    return bleu * 100
+
+
+
+
 
 
 
