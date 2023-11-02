@@ -343,10 +343,3 @@ def calculate_bleu(actual: str | None, reference: str, max_order: int = 3) -> fl
     if bleu is None:
         return None
     return bleu * 100
-
-
-
-
-
-
-
