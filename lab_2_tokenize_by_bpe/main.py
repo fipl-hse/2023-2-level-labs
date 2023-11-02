@@ -15,8 +15,8 @@ def prepare_word(
     :return: preprocessed word
     """
     if not (isinstance(raw_word, str)
-            and (isinstance(start_of_word, str) or start_of_word is None)
-            and (isinstance(end_of_word, str) or end_of_word is None)):
+            and (isinstance(start_of_word, (str | None)))
+            and (isinstance(end_of_word, (str | None)))):
         return None
     tokens = [el for el in raw_word]
     if start_of_word:
@@ -38,7 +38,7 @@ def collect_frequencies(
     """
     if not (isinstance(end_of_word, str)
             and isinstance(text, str)
-            and (isinstance(start_of_word, str) or start_of_word is None)):
+            and (isinstance(start_of_word, (str | None)))):
         return None
     frequency = {}
     words = text.split()
@@ -107,7 +107,7 @@ def train(
     """
     if not (isinstance(word_frequencies, dict) and isinstance(num_merges, int)):
         return None
-    while num_merges != 0:
+    while num_merges > 0:
         token_pairs = count_tokens_pairs(word_frequencies)
         if not token_pairs:
             return None
@@ -161,7 +161,7 @@ def decode(
     """
     if not (isinstance(encoded_text, list)
             and isinstance(vocabulary, dict)
-            and (isinstance(end_of_word_token, str) or end_of_word_token is None)):
+            and (isinstance(end_of_word_token, (str | None)))):
         return None
     decoded = ''
     for ident in encoded_text:
