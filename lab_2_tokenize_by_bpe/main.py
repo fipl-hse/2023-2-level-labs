@@ -41,12 +41,12 @@ def collect_frequencies(
             or not (isinstance(start_of_word, str) or start_of_word is None):
         return None
     frequency = {}
-    text = text.split()
-    for words in text:
-        prepared_words = prepare_word(words, start_of_word, end_of_word)
+    words = text.split()
+    for word in words:
+        prepared_words = prepare_word(word, start_of_word, end_of_word)
         if not prepared_words:
             return None
-        frequency.update({prepared_words: text.count(words)})
+        frequency.update({prepared_words: words.count(word)})
     return frequency
 
 
@@ -141,10 +141,10 @@ def get_vocabulary(
             tokens.add(token)
             for symbol in token:
                 tokens.add(symbol)
-    tokens = sorted(tokens)
-    tokens.sort(key=len, reverse=True)
+    new_tokens = sorted(tokens)
+    new_tokens.sort(key=len, reverse=True)
     ident_tokens = {}
-    for index, tok in enumerate(tokens):
+    for index, tok in enumerate(new_tokens):
         ident_tokens[tok] = index
     return ident_tokens
 
