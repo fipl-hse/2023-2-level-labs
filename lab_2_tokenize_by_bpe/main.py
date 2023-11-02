@@ -226,7 +226,7 @@ def tokenize_word(
         return None
     voc_keys = vocabulary.keys()
     encoded = []
-    word = ''.join(word)
+    word = ''.join(list(word))
 
     for index, token in enumerate(voc_keys):
         while token in word:
