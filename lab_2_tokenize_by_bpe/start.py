@@ -1,6 +1,7 @@
 """
 BPE Tokenizer starter
 """
+
 from pathlib import Path
 from main import collect_frequencies, train
 
