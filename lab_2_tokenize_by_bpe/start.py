@@ -15,10 +15,9 @@ def main() -> None:
         text = text_file.read()
 
     word_freq = main_file.collect_frequencies(text, None, '</s>')
-    print(main_file.train(word_freq, 100))
 
-    # result = main_file.train(word_freq, 100)
-    # assert result, "Encoding is not working"
+    result = main_file.train(word_freq, 100)
+    assert result, "Encoding is not working"
 
 
 if __name__ == "__main__":
