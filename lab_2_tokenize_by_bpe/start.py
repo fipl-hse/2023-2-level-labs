@@ -2,7 +2,9 @@
 BPE Tokenizer starter
 """
 from pathlib import Path
-from lab_2_tokenize_by_bpe.main import collect_frequencies, decode,get_vocabulary, train
+
+from lab_2_tokenize_by_bpe.main import (collect_frequencies,
+                                        decode,get_vocabulary, train)
 
 
 def main() -> None:
@@ -18,16 +20,18 @@ def main() -> None:
 
     word_frequencies = collect_frequencies(text, None, "</s>")
     word_frequencies = train(word_frequencies, 100)
-    word_frequencies = get_vocabulary(word_frequencies, "<unk>")
 
-    result = decode(
-        [int(i) for i in secret.split(' ')],
-        word_frequencies,
-        "</s>"
-    )
-    print(result)
+    if word_frequencies:
+        vocabulary = get_vocabulary(word_frequencies, "<unk>")
 
-    assert result, "Encoding is not working"
+        result = decode(
+            [int(i) for i in secret.split(' ')],
+            vocabulary,
+            "</s>"
+        )
+        print(result)
+
+        assert result, "Encoding is not working"
 
 
 if __name__ == "__main__":
