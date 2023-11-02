@@ -162,8 +162,7 @@ def get_vocabulary(
 
     for tuple_tokens in word_frequencies.keys():
         for word in tuple_tokens:
-            unique_tokens.add(word)
-            unique_tokens.update(set(token for token in word))
+            unique_tokens.update(tuple_tokens, word)
 
     unique_tokens.add(unknown_token)
     lex_sorted = sorted(unique_tokens)
