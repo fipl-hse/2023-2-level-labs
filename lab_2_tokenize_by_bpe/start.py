@@ -23,8 +23,9 @@ def main() -> None:
 
     encode_pred = encode(ru_raw, vocabulary, '\u2581', None, '<unk>')
     correct_tokens = [token for token in encode_pred if token in map(int, ru_encoded.split())]
-    if correct_tokens:
-        print(f"Файл закодирован правильно на {(len(list(correct_tokens)) / len(encode_pred)*100)}%")
+    if correct_tokens and encode_pred:
+        print((f"Файл закодирован правильно на "
+               f"{(len(list(correct_tokens)) / len(list(encode_pred))*100)}%"))
 
     with open(assets_path / 'for_translation_en_encoded.txt', 'r', encoding='utf-8') as file:
         encoded_en = file.read()
@@ -33,7 +34,9 @@ def main() -> None:
 
     decoded_text = decode([int(num) for num in encoded_en.split()], vocabulary, None)
     decoded_text = decoded_text.replace('\u2581', ' ')
-    print(f'BLUE = {calculate_bleu(decoded_text, en_raw)}')
+    result = calculate_bleu(decoded_text, en_raw)
+    print(f'BLUE = {result}')
+    assert result, "Encoding is not working"
 
 
 if __name__ == "__main__":
