@@ -1,22 +1,16 @@
 """
-Natural Language Generation starter
+Generation by NGrams starter
 """
-from pathlib import Path
-from typing import Optional
-
-
-def open_text_file(path_to_open: Path) -> Optional[str]:
-    """
-    Opens text file
-    :param path_to_open: path for file opening
-    :return: text of file
-    """
 
 
 def main() -> None:
     """
-    Launches an implementation
+    Launches an implementation.
+
+    In any case returns, None is returned
     """
+    with open("./assets/Harry_Potter.txt", "r", encoding="utf-8") as text_file:
+        text = text_file.read()
     result = None
     assert result
 
