@@ -219,6 +219,7 @@ def decode(
                 decoded_text += inv_vocabulary[identifier]
         return decoded_text
 
+    return None
 
 def tokenize_word(
         word: tuple[str, ...], vocabulary: dict[str, int]
