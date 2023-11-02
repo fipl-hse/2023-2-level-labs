@@ -60,7 +60,7 @@ def count_tokens_pairs(
         return None
 
     pair_freq = {}
-    for word in word_frequencies:
+    for word in word_frequencies.keys():
         pair_freq = {(word[i], word[i + 1]): word_frequencies[word] for i in range(len(word) - 1)}
     #    for i in range(len(word) - 1):
     #        pair = (word[i], word[i + 1])
