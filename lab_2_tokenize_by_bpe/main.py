@@ -69,11 +69,10 @@ def count_tokens_pairs(
     result_dic = {}
     for word in word_frequencies:
         for i in range(len(word) - 1):
-            token1 = word[i]
-            token2 = word[i + 1]
-            if not result_dic.get((token1, token2)):
-                result_dic[(token1, token2)] = 0
-            result_dic[(token1, token2)] += word_frequencies[word]
+            pair = word[i:i + 2]
+            if not result_dic.get(pair):
+                result_dic[pair] = 0
+            result_dic[pair] += word_frequencies[word]
 
     return result_dic
 
@@ -92,20 +91,17 @@ def merge_tokens(
             not isinstance(pair, tuple)):
         return None
 
-    new_word_freq = word_frequencies.copy()
+    new_word_freq = {}
     for word in word_frequencies:
-        new_word = []
+        new_word = list(word)
         if pair[0] in word and pair[1] in word:
             for i in range(len(word) - 1):
-                if word[i] == pair[1] and word[i - 1] == pair[0]:
-                    pass
-                elif word[i] == pair[0] and word[i + 1] == pair[1]:
-                    new_word.append((pair[0] + pair[1]))
-                else:
-                    new_word.append(word[i])
+                current_pair = tuple([word[i], word[i+1]])
+                if current_pair == pair:
+                    new_word.pop(i+1)
+                    new_word[i] = pair[0] + pair[1]
 
-            value = new_word_freq.pop(word)
-            new_word_freq[tuple(new_word)] = value
+        new_word_freq[tuple(new_word)] = word_frequencies[word]
 
     return new_word_freq
 
