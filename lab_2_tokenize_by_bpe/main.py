@@ -45,7 +45,7 @@ def collect_frequencies(
     dict_frequencies = {}
 
     splitted_text = text.split()
-    for i in splitted_text:
+    for i in set(splitted_text):
         word = prepare_word(i, start_of_word, end_of_word)
         if not word:
             return None
@@ -90,20 +90,19 @@ def merge_tokens(
         return None
     dict_merged_tokens = {}
     for i in word_frequencies:
-        if f"'{pair[0]}', '{pair[1]}'" in str(i):
-            list_word = list(i)
+        list_word = list(i)
 
-            for index in range(len(list_word) - 1):
-                if (i[index], i[index + 1]) == pair:
-                    list_word[index + 1] = pair[0] + pair[1]
-                    list_word[index] = ''
+        for index in range(len(list_word) - 1):
+            if (i[index], i[index + 1]) == pair:
+                list_word[index + 1] = pair[0] + pair[1]
+                list_word[index] = ''
 
-            if '' in list_word:
-                list_word.remove('')
-
+        if '' in list_word:
+            list_word.remove('')
             dict_merged_tokens.update({tuple(list_word): word_frequencies[i]})
         else:
             dict_merged_tokens.update({i: word_frequencies[i]})
+
     return dict_merged_tokens
 
 
@@ -164,8 +163,7 @@ def get_vocabulary(
     for tuple_tokens in word_frequencies.keys():
         for word in tuple_tokens:
             unique_tokens.add(word)
-            for token in word:
-                unique_tokens.add(token)
+            unique_tokens.update(set(token for token in word))
 
     unique_tokens.add(unknown_token)
     lex_sorted = sorted(unique_tokens)
@@ -197,13 +195,10 @@ def decode(
         token_list = [key for key in vocabulary if vocabulary[key] == identifier]
 
         for token in token_list:
-            if end_of_word_token:
-                if end_of_word_token in token:
-                    decoded += token[:-len(end_of_word_token)] + ' '
-                else:
-                    decoded += token
-            else:
-                decoded += token
+            decoded += token
+
+    if end_of_word_token:
+        decoded = decoded.replace(end_of_word_token, ' ')
 
     return decoded
 
