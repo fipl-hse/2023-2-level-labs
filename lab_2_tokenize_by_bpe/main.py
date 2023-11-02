@@ -50,7 +50,7 @@ def collect_frequencies(
     freq_dict = {}
     splited_text = text.split()
 
-    for word in splited_text:
+    for word in set(splited_text):
         processed_word = prepare_word(word, start_of_word, end_of_word)
         if processed_word is None:
             return None
@@ -104,7 +104,7 @@ def merge_tokens(
     for word in word_frequencies.keys():
         list_word = list(word)
         for i in range(len(word) - 1):
-            token_pair = f"{word[i]}{word[i + 1]}"
+            token_pair = "".join((word[i], word[i + 1]))
             if token_pair == merged_pair:
                 list_word[i + 1] = merged_pair
                 list_word.pop(i)
