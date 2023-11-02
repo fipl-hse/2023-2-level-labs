@@ -110,21 +110,21 @@ def train(
     if (not isinstance(word_frequencies, dict) or
         not isinstance(num_merges, int)):
         return None
-    tokens_freq = count_tokens_pairs(word_frequencies)
-    if not tokens_freq:
+    tokens_fr = count_tokens_pairs(word_frequencies)
+    if not tokens_fr:
         return None
-    if num_merges > len(tokens_freq):
-        num_merges = len(tokens_freq)
+    if num_merges > len(tokens_fr):
+        num_merges = len(tokens_fr)
     for merge in range(num_merges):
-        m_f_pairs = [key for key, value in tokens_freq.items() if value == max(tokens_freq.values())]
+        m_f_pairs = [key for key, value in tokens_fr.items() if value == max(tokens_fr.values())]
         len_max = max(len(''.join(pair)) for pair in m_f_pairs)
         longest_pairs = sorted([pair for pair in m_f_pairs if len_max == len(''.join(pair))])
         word_frequencies = merge_tokens(word_frequencies, longest_pairs[0])
         if not word_frequencies:
             return None
-        tokens_freq.pop(longest_pairs[0])
-        tokens_freq = count_tokens_pairs(word_frequencies)
-        if not tokens_freq:
+        tokens_fr.pop(longest_pairs[0])
+        tokens_fr = count_tokens_pairs(word_frequencies)
+        if not tokens_fr:
             return None
     return word_frequencies
 
