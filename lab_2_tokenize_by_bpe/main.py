@@ -107,28 +107,29 @@ def train(
         return None
     if word_frequencies is None:
         return None
-    # list_of_max_token_pairs = []
+    list_of_max_token_pairs = []
     while num_merges > 0:
         dict_of_token_pairs = count_tokens_pairs(word_frequencies)
         if dict_of_token_pairs is None:
             return None
         num_merges = min(num_merges, len(dict_of_token_pairs))
-        # temp_list_of_max_token_pairs = []
+        temp_list_of_max_token_pairs = []
+        list_of_max_token_pairs = []
         max_token_pair = max(dict_of_token_pairs.values())
-        # for token_pair in dict_of_token_pairs:
-        #    if dict_of_token_pairs[token_pair] == max_token_pair:
-        #        temp_list_of_max_token_pairs.append(token_pair)
-        temp_list_of_max_token_pairs = [token_pair for token_pair, item in dict_of_token_pairs.items()
-                                        if item == max_token_pair]
+        for token_pair in dict_of_token_pairs:
+            if dict_of_token_pairs[token_pair] == max_token_pair:
+                temp_list_of_max_token_pairs.append(token_pair)
         max_token_pair_length = max(len(str(token_pair)) for token_pair in temp_list_of_max_token_pairs)
-        list_of_max_token_pairs = [token_pair for token_pair in temp_list_of_max_token_pairs
-                                   if len(str(token_pair)) == max_token_pair_length]
-        a_list_of_max_token_pairs = sorted(list_of_max_token_pairs)
+
+        for token_pair in temp_list_of_max_token_pairs:
+            if len(str(token_pair)) == max_token_pair_length:
+                list_of_max_token_pairs.append(token_pair)
+        sorted_list_of_max_token_pairs = sorted(list_of_max_token_pairs)
         # temp_list_of_max_token_pairs.sort(key=lambda x: (-len(x), x))
         # for temp_token_pair in temp_list_of_max_token_pairs:
         #    if len(list_of_max_token_pairs) < num_merges:
         #        list_of_max_token_pairs.append(temp_token_pair)
-        word_frequencies = merge_tokens(word_frequencies, a_list_of_max_token_pairs[0])
+        word_frequencies = merge_tokens(word_frequencies, sorted_list_of_max_token_pairs[0])
         num_merges -= 1
         if word_frequencies is None:
             return None
