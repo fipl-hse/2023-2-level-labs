@@ -163,7 +163,7 @@ def decode(
     inverted_vocabulary = {value: token for token, value in vocabulary.items()}
     decoding = ''
     for number in encoded_text:
-        for key in inverted_vocabulary.keys():
+        for key in inverted_vocabulary:
             if key != number:
                 continue
             token = inverted_vocabulary[number]
