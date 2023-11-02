@@ -163,16 +163,19 @@ def get_vocabulary(
 
     tokens_list = [unknown_token]
     for word in word_frequencies:
-        tokens_list.append(word[0])
-        for token in word[0]:
-            if token not in tokens_list:
-                tokens_list.append(token)
+        for token in word:
+            tokens_list.append(token)
+            prep_word = prepare_word(token, None, None)
+            if prep_word is None:
+                return None
+            tokens_list += list(prep_word)
 
-    tokens_list.sort()
-    tokens_list.sort(key=len, reverse=True)
+    tokens_set = set(tokens_list)
+    alph_sorted = sorted(tokens_set)
+    tokens_sorted = sorted(alph_sorted, key=len, reverse=True)
 
     tokens_dict = {}
-    for index, token in enumerate(tokens_list):
+    for index, token in enumerate(tokens_sorted):
         tokens_dict[token] = index
 
     return tokens_dict
@@ -189,7 +192,7 @@ def decode(
     :param end_of_word_token: an end-of-word token
     :return: decoded sequence
     """
-    if not isinstance(encoded_text, list) and encoded_text is not None:
+    if not isinstance(encoded_text, list):
         return None
     if not isinstance(vocabulary, dict):
         return None
@@ -199,12 +202,12 @@ def decode(
     decoded_text = ''
     inv_vocabulary = {v: k for k, v in vocabulary.items()}
 
-    if end_of_word_token is None and encoded_text is not None:
+    if end_of_word_token is None:
         for identifier in encoded_text:
             decoded_text += inv_vocabulary[identifier]
         return decoded_text
 
-    if end_of_word_token is not None and encoded_text is not None:
+    if end_of_word_token is not None:
         for identifier in encoded_text:
             if end_of_word_token in inv_vocabulary[identifier]:
                 new_token = ''
