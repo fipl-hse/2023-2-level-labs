@@ -5,7 +5,7 @@ BPE and machine translation evaluation
 
 
 def prepare_word(
-    raw_word: str, start_of_word: str | None, end_of_word: str | None
+        raw_word: str, start_of_word: str | None, end_of_word: str | None
 ) -> tuple[str, ...] | None:
     """
     Tokenizes word into unigrams and appends end-of-word token
@@ -31,7 +31,7 @@ def prepare_word(
 
 
 def collect_frequencies(
-    text: str, start_of_word: str | None, end_of_word: str
+        text: str, start_of_word: str | None, end_of_word: str
 ) -> dict[tuple[str, ...], int] | None:
     """
     Counts number of occurrences of each word
@@ -197,23 +197,27 @@ def decode(
         return None
 
     decoded_text = ''
-    for identifier in encoded_text:
-        for token in vocabulary:
-            if end_of_word_token is None and vocabulary[token] == identifier:
-                decoded_text += token
-            elif vocabulary[token] == identifier and end_of_word_token in token:
+    inv_vocabulary = {v: k for k, v in vocabulary.items()}
+
+    if end_of_word_token is None:
+        for identifier in encoded_text:
+            decoded_text += inv_vocabulary[identifier]
+        return decoded_text
+
+    elif end_of_word_token is not None:
+        for identifier in encoded_text:
+            if end_of_word_token in inv_vocabulary[identifier]:
                 new_token = ''
-                for element in token:
+                for element in inv_vocabulary[identifier]:
                     if element not in end_of_word_token:
                         new_token += element
                     if element in end_of_word_token:
                         break
                 decoded_text += new_token
                 decoded_text += ' '
-            elif vocabulary[token] == identifier and end_of_word_token not in token:
-                decoded_text += token
-
-    return decoded_text
+            elif end_of_word_token not in inv_vocabulary[identifier]:
+                decoded_text += inv_vocabulary[identifier]
+        return decoded_text
 
 
 def tokenize_word(
