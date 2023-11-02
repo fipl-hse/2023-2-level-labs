@@ -204,7 +204,7 @@ def decode(
             decoded_text += inv_vocabulary[identifier]
         return decoded_text
 
-    elif end_of_word_token is not None:
+    if end_of_word_token is not None:
         for identifier in encoded_text:
             if end_of_word_token in inv_vocabulary[identifier]:
                 new_token = ''
