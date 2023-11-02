@@ -39,7 +39,7 @@ def collect_frequencies(
     :return: dictionary in the form of <preprocessed word: number of occurrences>
     """
     if (not isinstance(text, str) or not
-        (isinstance(start_of_word, str) or start_of_word is None) or not 
+        (isinstance(start_of_word, str) or start_of_word is None) or not
         isinstance(end_of_word, str)):
         return None
     freq_dictionary = {}
@@ -109,8 +109,7 @@ def train(
     :param num_merges: required number of new tokens
     :return: dictionary in the form of <preprocessed word: number of occurrences>
     """
-    if (not (isinstance(word_frequencies, dict) or word_frequencies is None) or not
-        isinstance(num_merges, int)):
+    if not isinstance(word_frequencies, dict) or not isinstance(num_merges, int):
         return None
     while num_merges > 0:
         token_pairs = count_tokens_pairs(word_frequencies)
@@ -164,9 +163,8 @@ def decode(
     :param end_of_word_token: an end-of-word token
     :return: decoded sequence
     """
-    if (not (isinstance(encoded_text, list) or encoded_text is None) or not
-        (isinstance(vocabulary, dict) or vocabulary is None) or not
-        (isinstance(end_of_word_token, str) or end_of_word_token is None)):
+    if not isinstance(encoded_text, list) or not isinstance(vocabulary, dict) or not (isinstance(
+            end_of_word_token, str) or end_of_word_token is None):
         return None
     decoded_tokens = []
     for i in encoded_text:
