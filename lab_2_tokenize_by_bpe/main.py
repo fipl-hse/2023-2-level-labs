@@ -189,7 +189,7 @@ def decode(
     :param end_of_word_token: an end-of-word token
     :return: decoded sequence
     """
-    if not isinstance(encoded_text, list) and encoded_text is not None:
+    if not isinstance(encoded_text, list):
         return None
     if not isinstance(vocabulary, dict):
         return None
