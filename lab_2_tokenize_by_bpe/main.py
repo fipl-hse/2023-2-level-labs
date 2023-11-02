@@ -187,10 +187,13 @@ def get_vocabulary(
             all_tokens.append(i)
             prepared_word = prepare_word(i, None, None)
 
+            if prepared_word is None:
+                return None
+
             all_tokens += list(prepared_word)
 
-    all_tokens = set(all_tokens)
-    all_tokens_sort = sorted(all_tokens, key=lambda x: (-len(x), x))
+    unic_tokens = set(all_tokens)
+    all_tokens_sort = sorted(unic_tokens, key=lambda x: (-len(x), x))
     int_arr = {i: num_id for num_id, i in enumerate(all_tokens_sort)}
 
     return int_arr
