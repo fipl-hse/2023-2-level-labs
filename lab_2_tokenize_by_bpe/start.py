@@ -26,13 +26,13 @@ def main() -> None:
 
     #print(list(map(int, actual_encoded.split()))) #1071, 13763, ...
     #print(encoded_text)  #21, 746, 70, ...
-    # print(list(vocabulary.keys())[1071], list(vocabulary.keys())[13763], list(vocabulary.keys())[699])
-    # print(list(vocabulary.keys())[21], list(vocabulary.keys())[746], list(vocabulary.keys())[70], list(vocabulary.keys())[6])
+    # print(list(vocabulary.keys())[1071], list(vocabulary.keys())[13763])
+    # print(list(vocabulary.keys())[21], list(vocabulary.keys())[746])
     # На самом деле кодируется строка правильно, но в данном нам словаре ключи не идут по обыванию,
     # поэтому, я думаю, что происходит данное расхождение у encoded_text и actual_encoded
     with open(assets_path / 'for_translation_en_encoded.txt', 'r', encoding='utf-8') as file:
-        encoded_precisions = file.read()
-    encoded_precisions = list(map(int, encoded_precisions.split()))
+        precisions = file.read()
+    encoded_precisions = list(map(int, precisions.split()))
     decoded_precisions = decode(encoded_precisions, vocabulary, None)
     if decoded_precisions:
         decoded_precisions = decoded_precisions.replace('\u2581', ' ')
