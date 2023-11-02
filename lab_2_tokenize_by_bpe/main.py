@@ -226,15 +226,15 @@ def tokenize_word(
         return None
     voc_keys = vocabulary.keys()
     encoded = []
-    word = ''.join(list(word))
+    word_str = ''.join(word)
 
     for index, token in enumerate(voc_keys):
-        while token in word:
-            position = word[:word.find(token)].count(' ')
+        while token in word_str:
+            position = word_str[:word_str.find(token)].count(' ')
             encoded.insert(position, index)
-            word = word.replace(token, ' ', 1)
+            word_str = word_str.replace(token, ' ', 1)
 
-    for index, element in enumerate(word):
+    for index, element in enumerate(word_str):
         if element != ' ':
             encoded.insert(index, vocabulary['<unk>'])
     return encoded
@@ -367,9 +367,9 @@ def calculate_bleu(actual: str | None, reference: str, max_order: int = 3) -> fl
         return None
 
     precisions = []
-    for order in range(max_order):
-        ngrams_actual = collect_ngrams(actual, order + 1)
-        ngrams_reference = collect_ngrams(reference, order + 1)
+    for order in range(1, max_order + 1):
+        ngrams_actual = collect_ngrams(actual, order)
+        ngrams_reference = collect_ngrams(reference, order)
         if not ngrams_actual or not ngrams_reference:
             return None
 
