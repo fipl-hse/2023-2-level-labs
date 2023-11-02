@@ -15,6 +15,10 @@ def main() -> None:
         text = text_file.read()
 
     word_frequencies = main_py.collect_frequencies(text, None, '</s>')
+    token_pairs = main_py.count_tokens_pairs(word_frequencies)
+    num_merges = len(token_pairs)
+    word_frequencies = main_py.train(word_frequencies, num_merges)
+
     if isinstance(word_frequencies, dict):
         vocabulary = main_py.get_vocabulary(word_frequencies, '<unk>')
 
