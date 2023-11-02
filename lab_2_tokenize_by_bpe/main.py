@@ -44,7 +44,7 @@ def collect_frequencies(
     words = text.split()
     for word in words:
         prepared_words = prepare_word(word, start_of_word, end_of_word)
-        if not prepared_words:
+        if prepared_words is None:
             return None
         frequency[prepared_words] = words.count(word)
     return frequency
@@ -105,9 +105,9 @@ def train(
     :param num_merges: required number of new tokens
     :return: dictionary in the form of <preprocessed word: number of occurrences>
     """
-    if not (isinstance(word_frequencies, dict) and isinstance(num_merges, int)):
+    if not (isinstance(word_frequencies, (dict | None)) and isinstance(num_merges, int)):
         return None
-    while num_merges > 0:
+    while num_merges != 0:
         token_pairs = count_tokens_pairs(word_frequencies)
         if not token_pairs:
             return None

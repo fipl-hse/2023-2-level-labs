@@ -18,11 +18,12 @@ def main() -> None:
         encoded_text = text_file.read().split()
         encoded_list = [int(el) for el in encoded_text]
         word_frequencies = train(collect_frequencies(text, None, '</s>'), 100)
-        if word_frequencies:
-            vocabulary = get_vocabulary(word_frequencies, '<unk>')
-            result = decode(encoded_list, vocabulary, '</s>')
-            print(result)
-            assert result, "Encoding is not working"
+        if not word_frequencies:
+            return None
+        vocabulary = get_vocabulary(word_frequencies, '<unk>')
+        result = decode(encoded_list, vocabulary, '</s>')
+        print(result)
+        assert result, "Encoding is not working"
 
 
 if __name__ == "__main__":
