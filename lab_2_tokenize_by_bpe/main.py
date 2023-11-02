@@ -26,6 +26,7 @@ def prepare_word(
 
     if start_of_word:
         tokens_list.insert(0, start_of_word)
+
     if end_of_word:
         tokens_list.append(end_of_word)
     return tuple(tokens_list)
