@@ -4,6 +4,7 @@ BPE and machine translation evaluation
 """
 import json
 
+
 def prepare_word(
     raw_word: str, start_of_word: str | None, end_of_word: str | None
 ) -> tuple[str, ...] | None:
