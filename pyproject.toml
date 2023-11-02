@@ -30,7 +30,7 @@ no_implicit_optional = true
 check_untyped_defs = true
 warn_return_any = true
 show_error_codes = true
-warn_unused_ignores = true
+warn_unused_ignores = false
 
 # simplifications
 disable_error_code = [
@@ -69,3 +69,31 @@ order_by_type = true
 remove_redundant_aliases = true
 group_by_package = true
 force_alphabetical_sort_within_sections = true
+
+[tool.doc8]
+allow-long-titles = true
+max-line-length = 100
+ignore = ['D004']
+ignore-path = [
+    'venv*',
+    'build/'
+]
+
+[tool.pydocstyle]
+convention = 'google'
+add-select = ['D213']
+add-ignore = [
+    'D212',
+    'D200'
+]
+
+[tool.flake8]
+max-line-length = 100
+exclude = [
+    'venv*',
+    'build/'
+]
+application_import_names = ['config']
+select = ['I']
+count = true
+
