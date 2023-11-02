@@ -148,8 +148,7 @@ def get_vocabulary(
             for element in token:
                 listed_tokens.add(element)
     listed_tokens.add(unknown_token)
-    listed_tokens = list(listed_tokens)
-    sorted_tokens = sorted(listed_tokens, key=lambda x: (-len(x), x))
+    sorted_tokens = sorted(list(listed_tokens), key=lambda x: (-len(x), x))
     for i, token in enumerate(sorted_tokens):
         token_identifier_dict[token] = i
     return token_identifier_dict
