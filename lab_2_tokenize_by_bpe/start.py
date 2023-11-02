@@ -18,13 +18,12 @@ def main() -> None:
     word_frequencies = main_py.train(word_frequencies, 100)
 
     secret = []
-    vocabulary = {}
+    vocabulary = None
     if word_frequencies is not None:
         with open(assets_path / 'secrets' / 'secret_2.txt', 'r', encoding='utf-8') as secret_file:
             secret_str = secret_file.read()
-        if vocabulary is not None:
-            vocabulary = main_py.get_vocabulary(word_frequencies, '<unk>')
-            secret = [int(num) for num in secret_str.split(' ')]
+        vocabulary = main_py.get_vocabulary(word_frequencies, '<unk>')
+        secret = [int(num) for num in secret_str.split(' ')]
 
     result = main_py.decode(secret, vocabulary, '</s>')
     print(result)
