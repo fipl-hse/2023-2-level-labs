@@ -54,8 +54,6 @@ first_test = [1, 2, 3, [1, 2, 3]]
 
 # Task 1:
 # easy level
-
-
 def count_evens(nums: list) -> int:
     """
     Return the number of even ints in the given array.
