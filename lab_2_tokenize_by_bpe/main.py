@@ -22,7 +22,6 @@ def prepare_word(
     if not (isinstance(end_of_word, str))\
             or (end_of_word) is None:
         return None
-
     tokens_list = list(raw_word)
 
     if start_of_word:
