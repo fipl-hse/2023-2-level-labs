@@ -44,7 +44,7 @@ def collect_frequencies(
         word = prepare_word(i, start_of_word, end_of_word)
         if not word:
             return None
-        final_dictionary.update({word: text.split().count(i)})
+        final_dictionary[word] = text.split().count(i)
     return final_dictionary
 
 
@@ -86,11 +86,11 @@ def merge_tokens(
     for elem in word_frequencies:
         list_with_words = list(elem)
         if pair_indexes in str(elem):
-            for symbol in range(len(elem) - 1):
-                if (elem[symbol] + elem[symbol + 1]) == pair[0] + pair[1]:
-                    list_with_words[symbol + 1] = ''.join(pair)
-                    list_with_words.pop(symbol)
-        dict_with_tokens.update({tuple(list_with_words): word_frequencies[elem]})
+            for index in range(len(elem) - 1):
+                if (elem[index] + elem[index + 1]) == pair[0] + pair[1]:
+                    list_with_words[index + 1] = ''.join(pair)
+                    list_with_words.pop(index)
+        dict_with_tokens[tuple(list_with_words)] = word_frequencies[elem]
     return dict_with_tokens
 
 
@@ -103,6 +103,23 @@ def train(
     :param num_merges: required number of new tokens
     :return: dictionary in the form of <preprocessed word: number of occurrences>
     """
+    if not (isinstance(word_frequencies, dict)
+            and isinstance(num_merges, int)):
+        return None
+    while num_merges > 0:
+        pairs = count_tokens_pairs(word_frequencies)
+        if not pairs:
+            return None
+        num_merges = min(num_merges, len(pairs))
+        max_value = max(pairs.values())
+        good_pairs = [pair for pair, freq in pairs.items() if freq == max_value]
+        maximum_len = max(len(''.join(pair)) for pair in good_pairs)
+        the_longest_pairs = [pair for pair in good_pairs if len(''.join(pair)) == maximum_len]
+        word_frequencies = merge_tokens(word_frequencies, (sorted(the_longest_pairs)[0]))
+        if not word_frequencies:
+            return None
+        num_merges -= 1
+    return word_frequencies
 
 
 def get_vocabulary(
