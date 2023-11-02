@@ -2,7 +2,9 @@
 BPE Tokenizer starter
 """
 from pathlib import Path
+
 from lab_2_tokenize_by_bpe.main import calculate_bleu, decode, encode, load_vocabulary
+
 
 def main() -> None:
     """
