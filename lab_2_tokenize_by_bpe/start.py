@@ -31,8 +31,18 @@ def main() -> None:
         text_for_translation = text_file.read()
     with open(assets_path / 'vocab.json', 'r', encoding='utf-8') as text_file:
         vocabulary = json.load(text_file)
+    with open(assets_path / 'for_translation_en_encoded.txt', 'r', encoding='utf-8') as text_file:
+        encoded_en_text = text_file.read()
+    with open(assets_path / 'for_translation_en_raw.txt', 'r', encoding='utf-8') as text_file:
+        good_translation = text_file.read()
     encoded_text_f_t = encode(text_for_translation, vocabulary, '\u2581', None, '<unk>')
-    print(encoded_text_f_t)
+    en_text_prepared = []
+    for num in encoded_en_text.split():
+        en_text_prepared.append(int(num))
+    decoded_en_text = decode(en_text_prepared, vocabulary, None)
+    decoded_en_text = decoded_en_text.replace('\u2581', ' ')
+    comparison = calculate_bleu(decoded_en_text, good_translation)
+    print(comparison)
 
 
 if __name__ == "__main__":
