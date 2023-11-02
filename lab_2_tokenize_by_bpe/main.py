@@ -89,12 +89,13 @@ def merge_tokens(
     for word, freq in word_frequencies.items():
         if ''.join(pair) in ''.join(word):
             listed_word = list(word)
-            for i in range(len(listed_word) - 1):
+            i = 0
+            while i < len(listed_word) - 1:
                 if (listed_word[i], listed_word[i + 1]) == pair:
                     listed_word[i + 1] = pair[0] + pair[1]
-                    listed_word[i] = ''
-            if '' in listed_word:
-                listed_word.remove('')
+                    listed_word.pop(i)
+                else:
+                    i += 1
             word = tuple(listed_word)
         merged_frequencies[word] = freq
     return merged_frequencies
