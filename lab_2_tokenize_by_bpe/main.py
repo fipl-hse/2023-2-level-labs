@@ -40,15 +40,15 @@ def collect_frequencies(
             not isinstance(start_of_word, str | None) or \
             not isinstance(end_of_word, str):
         return None
-        split_text = text.split()
-        tokens_dictionary = {}
-        for token in split_text:
-            split_word = prepare_word(token, start_of_word, end_of_word)
-            if split_word is None:
-                return None
-            if split_word not in tokens_dictionary:
-                tokens_dictionary[split_word] = split_text.count(token)
-        return tokens_dictionary
+    split_text = text.split()
+    tokens_dictionary = {}
+    for token in split_text:
+        split_word = prepare_word(token, start_of_word, end_of_word)
+        if split_word is None:
+            return None
+        if split_word not in tokens_dictionary:
+            tokens_dictionary[split_word] = split_text.count(token)
+    return tokens_dictionary
 
 
 def count_tokens_pairs(
