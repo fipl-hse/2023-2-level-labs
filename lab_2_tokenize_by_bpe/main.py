@@ -102,8 +102,7 @@ def merge_tokens(
                 new_word.pop(i+1)
                 new_word[i] = pair[0] + pair[1]
 
-        new_word = tuple(new_word)
-        new_word_frequencies[new_word] = word_frequencies[word]
+        new_word_frequencies[tuple(new_word)] = word_frequencies[word]
 
     return new_word_frequencies
 
@@ -368,9 +367,9 @@ def calculate_bleu(actual: str | None, reference: str, max_order: int = 3) -> fl
         return None
 
     precisions = []
-    for n in range(max_order):
-        ngrams_actual = collect_ngrams(actual, n + 1)
-        ngrams_reference = collect_ngrams(reference, n + 1)
+    for order in range(max_order):
+        ngrams_actual = collect_ngrams(actual, order + 1)
+        ngrams_reference = collect_ngrams(reference, order + 1)
         if not ngrams_actual or not ngrams_reference:
             return None
 
