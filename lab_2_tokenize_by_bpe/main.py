@@ -121,8 +121,8 @@ def train(
         for token_pair in temp_list_of_max_token_pairs:
             if len(str(token_pair)) == max_token_pair_length:
                 list_of_max_token_pairs.append(token_pair)
-        sorted_list_of_max_token_pairs = sorted(list_of_max_token_pairs)
-        word_frequencies = merge_tokens(word_frequencies, sorted_list_of_max_token_pairs[0])
+        list_of_max_token_pairs.sort(key=lambda x: (-len(x), x))
+        word_frequencies = merge_tokens(word_frequencies, list_of_max_token_pairs[0])
         num_merges -= 1
         if word_frequencies is None:
             return None
