@@ -84,18 +84,16 @@ def merge_tokens(
         return None
     new_dict = {}
     for word in word_frequencies.keys():
-        if ''.join(pair) not in ''.join(word):
-            new_dict[word] = word_frequencies[word]
-        else:
-            word_as_list = list(word)
-            for i in range(len(word)-1):
-                current_pair = tuple([word[i], word[i+1]])
-                if current_pair == pair:
-                    word_as_list[i] = ''.join(pair)
-                    word_as_list.pop(i+1)
-            new_dict[tuple(word_as_list)] = word_frequencies[word]
+        word_as_list = list(word)
+        for i in range(len(word)-1):
+            current_pair = tuple([word[i], word[i+1]])
+            if current_pair == pair:
+                word_as_list[i] = pair[0]+pair[1]
+                word_as_list[i+1] = ''
+            if '' in word_as_list:
+                word_as_list.remove('')
+        new_dict[tuple(word_as_list)] = word_frequencies[word]
     return new_dict
-
 
 def train(
     word_frequencies: dict[tuple[str, ...], int] | None, num_merges: int
