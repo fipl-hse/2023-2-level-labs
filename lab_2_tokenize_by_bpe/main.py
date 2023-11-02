@@ -98,7 +98,9 @@ def merge_tokens(
         for index in range(len(word) - 1):
             if (word[index], word[index + 1]) == pair:
                 new_word[index] = merged_pair
-                new_word.remove(new_word[index + 1])
+                new_word[index + 1] = ''
+            if "" in new_word:
+                new_word.remove("")
         new_word_freq[tuple(new_word)] = freq
     return new_word_freq
 
@@ -117,6 +119,27 @@ def train(
         isinstance(num_merges, int)
     ):
         return None
+    tokens_pairs = count_tokens_pairs(word_frequencies)
+    if not tokens_pairs:
+        return None
+    for iteration in range(min(len(tokens_pairs), num_merges)):
+        max_freq = max(tokens_pairs.values())
+        max_freq_tokens = []
+        for pair in tokens_pairs:
+            if tokens_pairs[pair] == max_freq:
+                max_freq_tokens.append(pair)
+        max_len = max([len(pair[0] + pair[1]) for pair in max_freq_tokens])
+        max_len_tokens = []
+        for pair in max_freq_tokens:
+            if max_len == len(pair[0] + pair[1]):
+                max_len_tokens.append(pair)
+        word_frequencies = merge_tokens(word_frequencies, sorted(max_len_tokens)[0])
+        if not word_frequencies:
+            return None
+        tokens_pairs = count_tokens_pairs(word_frequencies)
+        if not tokens_pairs:
+            return None
+    return word_frequencies
 
 
 def get_vocabulary(
