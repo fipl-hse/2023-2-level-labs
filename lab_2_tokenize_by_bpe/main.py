@@ -5,7 +5,7 @@ BPE and machine translation evaluation
 
 
 def prepare_word(
-        raw_word: str, start_of_word: str | None, end_of_word: str | None
+    raw_word: str, start_of_word: str | None, end_of_word: str | None
 ) -> tuple[str, ...] | None:
     """
     Tokenizes word into unigrams and appends end-of-word token
@@ -14,22 +14,21 @@ def prepare_word(
     :param end_of_word: a token that signifies the end of word
     :return: preprocessed word
     """
-    if not isinstance(raw_word, str) \
-            or not isinstance(start_of_word and end_of_word, (str | None)):
+    if isinstance(raw_word, str) and isinstance(start_of_word and end_of_word, (str | None)):
+        if start_of_word is not None and end_of_word is not None:
+            return tuple([start_of_word, *list(raw_word), end_of_word])
+        if start_of_word is None and end_of_word is None:
+            return tuple([*list(raw_word)])
+        if start_of_word is None and end_of_word is not None:
+            return tuple([*list(raw_word), end_of_word])
+        if end_of_word is None and start_of_word is not None:
+            return tuple([start_of_word, *list(raw_word)])
         return None
-    if start_of_word is not None and end_of_word is not None:
-        return tuple([start_of_word, *list(raw_word), end_of_word])
-    if start_of_word is None and end_of_word is None:
-        return tuple([*list(raw_word)])
-    if start_of_word is None and end_of_word is not None:
-        return tuple([*list(raw_word), end_of_word])
-    if end_of_word is None and start_of_word is not None:
-        return tuple([start_of_word, *list(raw_word)])
     return None
 
 
 def collect_frequencies(
-        text: str, start_of_word: str | None, end_of_word: str
+    text: str, start_of_word: str | None, end_of_word: str
 ) -> dict[tuple[str, ...], int] | None:
     """
     Counts number of occurrences of each word
@@ -55,7 +54,7 @@ def collect_frequencies(
 
 
 def count_tokens_pairs(
-        word_frequencies: dict[tuple[str, ...], int]
+    word_frequencies: dict[tuple[str, ...], int]
 ) -> dict[tuple[str, str], int] | None:
     """
     Counts number of occurrences of each pair of subsequent tokens
@@ -75,7 +74,7 @@ def count_tokens_pairs(
 
 
 def merge_tokens(
-        word_frequencies: dict[tuple[str, ...], int], pair: tuple[str, str]
+    word_frequencies: dict[tuple[str, ...], int], pair: tuple[str, str]
 ) -> dict[tuple[str, ...], int] | None:
     """
     Updates word frequency dictionary by replacing a pair of token with a merged one
@@ -85,7 +84,7 @@ def merge_tokens(
     """
     if not isinstance(word_frequencies, dict) or not isinstance(pair, tuple):
         return None
-    str_pair = pair[0] + pair[1]
+    str_pair = "".join(pair)
     new_dict = {}
     for word, freq in word_frequencies.items():
         new_word = list(word)
@@ -100,7 +99,7 @@ def merge_tokens(
 
 
 def train(
-        word_frequencies: dict[tuple[str, ...], int] | None, num_merges: int
+    word_frequencies: dict[tuple[str, ...], int] | None, num_merges: int
 ) -> dict[tuple[str, ...], int] | None:
     """
     Creates required number of new tokens by merging existing ones
@@ -115,7 +114,7 @@ def train(
         pair_freq = count_tokens_pairs(word_frequencies)
         if pair_freq is None:
             return None
-        if pair_freq != {}:
+        if not len(pair_freq) == 0:
             sorted_dict = dict(
                 sorted(pair_freq.items(),
                        key=lambda item: (-item[1], -len("".join(item[0])), "".join(item[0]))))
@@ -131,7 +130,7 @@ def train(
 
 
 def get_vocabulary(
-        word_frequencies: dict[tuple[str, ...], int], unknown_token: str
+    word_frequencies: dict[tuple[str, ...], int], unknown_token: str
 ) -> dict[str, int] | None:
     """
     Establishes correspondence between tokens and its integer identifier
@@ -157,9 +156,7 @@ def get_vocabulary(
 
 
 def decode(
-        encoded_text: list[int] | None,
-        vocabulary: dict[str, int] | None,
-        end_of_word_token: str | None
+    encoded_text: list[int] | None, vocabulary: dict[str, int] | None, end_of_word_token: str | None
 ) -> str | None:
     """
     Translates encoded sequence into decoded one
