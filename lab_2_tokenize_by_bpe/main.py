@@ -2,7 +2,7 @@
 Lab 2
 BPE and machine translation evaluation
 """
-
+import json
 
 def prepare_word(
     raw_word: str, start_of_word: str | None, end_of_word: str | None
@@ -182,7 +182,25 @@ def tokenize_word(
     :param unknown_token: token that signifies unknown sequence
     :return: list of token identifiers
     """
-
+    if not isinstance(word, tuple) or\
+        not isinstance(vocabulary, dict) or\
+        not (isinstance(end_of_word, str) or end_of_word is None) or\
+            not isinstance(unknown_token, str):
+        return None
+    string_word = ''.join(word)
+    res_string = ''.join(word)
+    sorted_vocabulary = sorted(list(vocabulary.keys()), key=lambda item: (-len(item), item))
+    for token in sorted_vocabulary:
+        if token in string_word:
+            res_string = res_string.replace(token, str(vocabulary[token]) + ' ')
+    for symbol in string_word:
+        if symbol not in sorted_vocabulary:
+            res_string = res_string.replace(symbol, str(vocabulary[unknown_token]) + ' ')
+    result_of_encoding = res_string.split()
+    encoded_list = []
+    for number in result_of_encoding:
+        encoded_list.append(int(number))
+    return encoded_list
 
 def load_vocabulary(vocab_path: str) -> dict[str, int] | None:
     """
@@ -190,6 +208,13 @@ def load_vocabulary(vocab_path: str) -> dict[str, int] | None:
     :param vocab_path: path to the saved vocabulary
     :return: dictionary in the form of <token: identifier>
     """
+    if not isinstance(vocab_path, str):
+        return None
+    with open(vocab_path, 'r', encoding='utf-8') as file:
+        vocabulary = json.load(file)
+    if not isinstance(vocabulary, dict):
+        return None
+    return vocabulary
 
 
 def encode(
@@ -208,7 +233,25 @@ def encode(
     :param unknown_token: token that signifies unknown sequence
     :return: list of token identifiers
     """
-
+    if not isinstance(original_text, str) or\
+        not isinstance(vocabulary, dict) or\
+        not (isinstance(start_of_word_token, str)
+             or start_of_word_token is None) or\
+        not (isinstance(end_of_word_token, str)
+             or end_of_word_token is None) or\
+            not isinstance(unknown_token, str):
+        return None
+    split_text = original_text.split()
+    list_of_indexes = []
+    for word in split_text:
+        prepared_word = prepare_word(word, start_of_word_token, end_of_word_token)
+        if prepared_word is None:
+            return None
+        tokens_indexes = tokenize_word(prepared_word, vocabulary, end_of_word_token, unknown_token)
+        if tokens_indexes is None:
+            return None
+        list_of_indexes.extend(tokens_indexes)
+    return list_of_indexes
 
 def collect_ngrams(text: str, order: int) -> list[tuple[str, ...]] | None:
     """
