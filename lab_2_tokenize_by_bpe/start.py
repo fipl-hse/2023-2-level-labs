@@ -17,8 +17,6 @@ def main() -> None:
         encoded_text = text_file.read()
 
     train = train(collect_frequencies(text, None, "</s>"), 100)
-        if not train:
-            return
     vocabulary = get_vocabulary(train, '<unk>')
     result = decode([int(el) for el in encoded_text.split()], vocabulary, '</s>')
     assert result, "Encoding is not working"
