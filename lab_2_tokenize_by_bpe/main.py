@@ -76,12 +76,11 @@ def count_tokens_pairs(
         tokens = list(word)
         for i in range(len(tokens) - 1):
             token_pair = (tokens[i], tokens[i + 1])
-
-        if token_pair not in token_pairs:
-            token_pairs[token_pair] = count
-        else:
-            token_pairs[token_pair] += count
-        return token_pairs
+            if token_pair not in token_pairs:
+                token_pairs[token_pair] = count
+            else:
+                token_pairs[token_pair] += count
+    return token_pairs
 
 
 def merge_tokens(
