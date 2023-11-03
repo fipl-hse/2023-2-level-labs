@@ -17,10 +17,10 @@ def prepare_word(
     if not isinstance(raw_word, str):
         return None
     if not (isinstance(start_of_word, str))\
-            or (start_of_word) is None:
+            and (start_of_word) is not None:
         return None
     if not (isinstance(end_of_word, str))\
-            or (end_of_word) is None:
+            and (end_of_word) is not None:
         return None
     tokens_list = list(raw_word)
 
@@ -42,8 +42,24 @@ def collect_frequencies(
     :param end_of_word: a token that signifies the end of word
     :return: dictionary in the form of <preprocessed word: number of occurrences>
     """
+    if not isinstance(text, str):
+        return None
+    if not (isinstance(start_of_word, str))\
+        or start_of_word is None:
+        return None
+    if not isinstance(end_of_word, str):
+        None
 
+    dict_freq = {}
+    words = text.split()
+    for word in words:
+        prep_word = prepare_word(word, start_of_word, end_of_word)
+        freq = words.count(word)
+        if not prep_word:
+            return None
+        dict_freq.update({prep_word:freq})
 
+    return dict_freq
 def count_tokens_pairs(
     word_frequencies: dict[tuple[str, ...], int]
 ) -> dict[tuple[str, str], int] | None:
