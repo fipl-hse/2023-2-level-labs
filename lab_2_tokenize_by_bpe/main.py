@@ -39,12 +39,11 @@ def collect_frequencies(
     :param end_of_word: a token that signifies the end of word
     :return: dictionary in the form of <preprocessed word: number of occurrences>
     """
-        if not isinstance(text, str)
-            or not isinstance(end_of_word, str)
-            or not (isinstance(start_of_word, str)
-            or start_of_word is None)
-        ):
-            return None
+    if (not isinstance(text, str) or not
+    isinstance(end_of_word, str) or not
+    isinstance(start_of_word, str) or
+            start_of_word is None):
+        return None
 
     frequencies = {}
     words = text.split()
@@ -71,6 +70,14 @@ def count_tokens_pairs(
     :param word_frequencies: dictionary in the form of <preprocessed word: number of occurrences>
     :return: dictionary in the form of <token pair: number of occurrences>
     """
+    # if not isinstance(word_frequencies, dict):
+    #     return None
+    #
+    # token_pairs = {}
+    # for word, count in word_frequencies.items():
+    #     token = list(word)
+    #     for i in range(len(tokens)) -1):
+    #         token_pairs =
 
 
 def merge_tokens(
