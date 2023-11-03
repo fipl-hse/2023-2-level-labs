@@ -168,6 +168,21 @@ def decode(
     :param end_of_word_token: an end-of-word token
     :return: decoded sequence
     """
+    if (not isinstance(encoded_text, list) or not isinstance(vocabulary, dict)
+            or not (isinstance(end_of_word_token, str) or (end_of_word_token is None))):
+        return None
+    list_of_tokens = []
+    new_dict = []
+    for i in encoded_text:
+        for token, value in vocabulary.items():
+            if value == i:
+                list_of_tokens.append(token)
+        for token in list_of_tokens:
+            if end_of_word_token is not None and end_of_word_token == token:
+                list_of_tokens[list_of_tokens.index(token)] = ' '
+            else:
+                new_dict.append(token)
+    return ''.join(list_of_tokens)
 
 
 def tokenize_word(
