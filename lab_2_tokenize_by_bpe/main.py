@@ -21,10 +21,9 @@ def prepare_word(
     ):
         return None
     tokens = []
-    for element in raw_word:
-        tokens.append(element)
     if start_of_word:
         tokens.insert(0, start_of_word)
+    tokens.extend(list(raw_word))
     if end_of_word:
         tokens.append(end_of_word)
     preprocessed_word = tuple(tokens)
@@ -101,7 +100,7 @@ def merge_tokens(
         for i in range(len(word)-1):
             word_pair = tuple([word[i], word[i+1]])
             if pair == word_pair:
-                new_word[i] = word[i] + word[i + 1]
+                new_word[i] = ''.join([word[i], word[i + 1]])
                 new_word.pop(i + 1)
         new_word_freq[tuple(new_word)] = word_frequencies[word]
 
@@ -157,7 +156,25 @@ def get_vocabulary(
     :param unknown_token: a token to signify an unknown token
     :return: dictionary in the form of <token: identifier>
     """
+    if not (isinstance(word_frequencies, dict)
+            and isinstance(unknown_token, str)
+    ):
+        return None
+    identifiers = {}
+    tokens = set()
+    for word in word_frequencies:
+        for token in word:
+            tokens.update(word)
+            tokens.update(token)
 
+    tokens.add(unknown_token)
+    lex_sorted_tokens = sorted(tokens)
+    sorted_tokens = sorted(lex_sorted_tokens, key=len, reverse=True)
+
+    for index, element in enumerate(sorted_tokens):
+        identifiers[element] = index
+
+    return identifiers
 
 def decode(
     encoded_text: list[int] | None, vocabulary: dict[str, int] | None, end_of_word_token: str | None
@@ -169,6 +186,22 @@ def decode(
     :param end_of_word_token: an end-of-word token
     :return: decoded sequence
     """
+    if not (isinstance(encoded_text, list)
+            and isinstance(vocabulary, dict)
+            and (end_of_word_token is None or isinstance(end_of_word_token, str))
+    ):
+        return None
+    decoded_tokens = []
+    for identifier in encoded_text:
+        for key, value in vocabulary.items():
+            if value == identifier:
+                decoded_tokens.append(key)
+    decoded_text = ''.join(decoded_tokens)
+
+    if end_of_word_token:
+        decoded_text = decoded_text.replace(end_of_word_token, ' ')
+
+    return decoded_text
 
 
 def tokenize_word(
