@@ -14,7 +14,8 @@ def prepare_word(
     :param end_of_word: a token that signifies the end of word
     :return: preprocessed word
     """
-    if (not isinstance(raw_word, str) or not (isinstance(start_of_word, str) or start_of_word is None)
+    if (not isinstance(raw_word, str) or not (isinstance(start_of_word, str)
+                                              or start_of_word is None)
             or not (isinstance(end_of_word, str) or end_of_word is None)):
         return None
     list_of_tokens = []
@@ -37,7 +38,8 @@ def collect_frequencies(
     :param end_of_word: a token that signifies the end of word
     :return: dictionary in the form of <preprocessed word: number of occurrences>
     """
-    if (not isinstance(text, str) or (not isinstance(start_of_word, str) and start_of_word is not None)
+    if (not isinstance(text, str) or (not isinstance(start_of_word, str)
+                                      and start_of_word is not None)
             or not isinstance(end_of_word, str)):
         return None
     dict_of_frequencies = {}
@@ -121,7 +123,8 @@ def train(
         for token_pair in dict_of_token_pairs:
             if dict_of_token_pairs[token_pair] == max_token_pair:
                 temp_list_of_max_token_pairs.append(token_pair)
-        max_token_pair_length = max(len(str(token_pair)) for token_pair in temp_list_of_max_token_pairs)
+        max_token_pair_length = max(len(str(token_pair))
+                                    for token_pair in temp_list_of_max_token_pairs)
         for token_pair in temp_list_of_max_token_pairs:
             if len(str(token_pair)) == max_token_pair_length:
                 list_of_max_token_pairs.append(token_pair)
