@@ -145,16 +145,15 @@ def get_vocabulary(
     if not isinstance(word_frequencies, dict) or not isinstance(unknown_token, str):
         return None
     new_dict = {}
-    list_of_tokens = [unknown_token]
+    list_of_tokens = set(unknown_token)
     for word in word_frequencies:
         for token in word:
-            list_of_tokens.append(token)
+            list_of_tokens.add(token)
             for letter in token:
-                list_of_tokens.append(letter)
-    set_of_tokens = set(list_of_tokens)
-    set_of_tokens = sorted(set_of_tokens)
-    set_of_tokens = sorted(set_of_tokens, key=len, reverse=True)
-    for i, token in enumerate(set_of_tokens):
+                list_of_tokens.add(letter)
+    sorted_list_of_tokens = sorted(list_of_tokens)
+    sorted_list_of_tokens_2 = sorted(sorted_list_of_tokens, key=len, reverse=True)
+    for i, token in enumerate(sorted_list_of_tokens_2):
         if token not in new_dict:
             new_dict[token] = i
     return new_dict
