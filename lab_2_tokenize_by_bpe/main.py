@@ -144,6 +144,8 @@ def get_vocabulary(
     """
     if not isinstance(word_frequencies, dict) or not isinstance(unknown_token, str):
         return None
+    if word_frequencies is None:
+        return None
     new_dict = {}
     list_of_tokens = set(unknown_token)
     for word in word_frequencies:
