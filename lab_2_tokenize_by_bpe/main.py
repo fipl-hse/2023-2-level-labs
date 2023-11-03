@@ -16,16 +16,18 @@ def prepare_word(
     :param end_of_word: a token that signifies the end of word
     :return: preprocessed word
     """
-    if not isinstance(raw_word, str) or not (isinstance(
-            start_of_word, str) or start_of_word is None) or not (
-            isinstance(end_of_word, str) or end_of_word is None):
+    if not isinstance(raw_word, str) or \
+            not (isinstance(start_of_word, str) or start_of_word is None) or \
+            not (isinstance(end_of_word, str) or end_of_word is None):
         return None
-    list_of_tokens = list(raw_word)
-    if end_of_word:
-        list_of_tokens.append(end_of_word)
+
+    tokens = []
     if start_of_word:
-        list_of_tokens.insert(0, start_of_word)
-    return tuple(list_of_tokens)
+        tokens.append(start_of_word)
+    tokens.extend(list(raw_word))
+    if end_of_word:
+        tokens.append(end_of_word)
+    return tuple(tokens)
 
 
 def collect_frequencies(
@@ -38,20 +40,20 @@ def collect_frequencies(
     :param end_of_word: a token that signifies the end of word
     :return: dictionary in the form of <preprocessed word: number of occurrences>
     """
-    if not isinstance(text, str) or not isinstance(end_of_word, str) or not (
-            isinstance(start_of_word, str) or start_of_word is None):
+    if not isinstance(text, str) or not isinstance(end_of_word, str) or \
+            not (isinstance(start_of_word, str) or start_of_word is None):
         return None
 
-    dict_frequencies = {}
+    words = text.split()
+    prepared_words = [prepare_word(word, start_of_word, end_of_word) for word in words]
 
-    splitted_text = text.split()
-    for i in set(splitted_text):
-        word = prepare_word(i, start_of_word, end_of_word)
-        if not word:
+    freq = {}
+    for word in set(prepared_words):
+        if word is None:
             return None
-        dict_frequencies[word] = splitted_text.count(i)
+        freq[word] = prepared_words.count(word)
 
-    return dict_frequencies
+    return freq
 
 
 def count_tokens_pairs(
@@ -65,16 +67,15 @@ def count_tokens_pairs(
     if not isinstance(word_frequencies, dict):
         return None
 
-    dict_with_pairs = {}
+    seq_freq = {}
+    for key in word_frequencies:
+        for token_index in range(len(key) - 1):
+            tokens = (key[token_index], key[token_index + 1])
+            if tokens not in seq_freq:
+                seq_freq[tokens] = 0
+            seq_freq[tokens] += word_frequencies[key]
 
-    for word in word_frequencies:
-        for index in range(len(word) - 1):
-            pair = (word[index], word[index + 1])
-            if pair not in dict_with_pairs:
-                dict_with_pairs[pair] = 0
-            dict_with_pairs[pair] += word_frequencies[word]
-
-    return dict_with_pairs
+    return seq_freq
 
 
 def merge_tokens(
@@ -86,24 +87,26 @@ def merge_tokens(
     :param pair: a pair of tokens to be merged
     :return: dictionary in the form of <preprocessed word: number of occurrences>
     """
-    if not isinstance(word_frequencies, dict) or not isinstance(pair, tuple):
+    if not isinstance(word_frequencies, dict) or \
+            not isinstance(pair, tuple):
         return None
-    dict_merged_tokens = {}
-    for i in word_frequencies:
-        list_word = list(i)
 
-        for index in range(len(list_word) - 1):
-            if (i[index], i[index + 1]) == pair:
-                list_word[index + 1] = pair[0] + pair[1]
-                list_word[index] = ''
+    preprocessed_freq = {}
 
-        if '' in list_word:
-            list_word.remove('')
-            dict_merged_tokens.update({tuple(list_word): word_frequencies[i]})
-        else:
-            dict_merged_tokens.update({i: word_frequencies[i]})
+    for key, frequency in word_frequencies.items():
+        pair_indexes = []
+        for token_index in range(len(key) - 1):
+            tokens = (key[token_index], key[token_index + 1])
+            if tokens == pair:
+                pair_indexes.append(token_index)
 
-    return dict_merged_tokens
+        saved_tokens = list(key)
+        for index in pair_indexes:
+            saved_tokens[index:index + 2] = [''.join(pair)]
+
+        preprocessed_freq[tuple(saved_tokens)] = frequency
+
+    return preprocessed_freq
 
 
 def train(
@@ -117,29 +120,26 @@ def train(
     """
     if not isinstance(word_frequencies, dict) or not isinstance(num_merges, int):
         return None
-    dict_with_pairs = count_tokens_pairs(word_frequencies)
 
-    if not dict_with_pairs:
+    token_pairs = count_tokens_pairs(word_frequencies)
+    if not token_pairs:
         return None
-    merges = min(num_merges, len(dict_with_pairs))
+    num_merges = min(num_merges, len(token_pairs))
 
-    for i in range(merges):
+    for iteration in range(num_merges):
+        occur_max = max(token_pairs.values())
+        pair_max_occur = [key for key, value in token_pairs.items() if value == occur_max]
 
-        max_values = max(dict_with_pairs.values())
-        pairs_max_values = [i for i in dict_with_pairs if dict_with_pairs[i] == max_values]
+        len_max = max(len(''.join(pair)) for pair in pair_max_occur)
+        pair_max_len = [pair for pair in pair_max_occur if len_max == len(''.join(pair))]
 
-        max_len = max(len(str(pair)) for pair in pairs_max_values)
-        pairs_max_len = [i for i in pairs_max_values if len(str(i)) == max_len]
-
-        sorted_pairs = sorted(pairs_max_len)
-        word_frequencies = merge_tokens(word_frequencies, sorted_pairs[0])
-
+        preferred_pair = sorted(pair_max_len)[0]
+        word_frequencies = merge_tokens(word_frequencies, preferred_pair)
         if not word_frequencies:
             return None
 
-        dict_with_pairs = count_tokens_pairs(word_frequencies)
-
-        if not dict_with_pairs:
+        token_pairs = count_tokens_pairs(word_frequencies)
+        if not token_pairs:
             return None
 
     return word_frequencies
@@ -154,26 +154,29 @@ def get_vocabulary(
     :param unknown_token: a token to signify an unknown token
     :return: dictionary in the form of <token: identifier>
     """
-    if not isinstance(word_frequencies, dict) or not isinstance(unknown_token, str):
+    if not isinstance(word_frequencies, dict) \
+            or not isinstance(unknown_token, str):
         return None
 
-    dict_ident = {}
-    unique_tokens = set()
+    words = [unknown_token]
 
-    for tuple_tokens in word_frequencies.keys():
-        for word in tuple_tokens:
-            unique_tokens.update(tuple_tokens, word)
+    for tokens in word_frequencies:
+        for token in tokens:
+            words.append(token)
+            tokenized_word = prepare_word(token, None, None)
+            if not tokenized_word:
+                return None
+            words += list(tokenized_word)
 
-    unique_tokens.add(unknown_token)
-    lex_sorted = sorted(unique_tokens)
-    len_sorted = sorted(lex_sorted, key=len, reverse=True)
-    index = 0
+    unique_words = set(words)
+    alphabetical_order = sorted(unique_words)
+    len_alp_sorted = sorted(alphabetical_order, key=len, reverse=True)
 
-    for token in len_sorted:
-        dict_ident[token] = index
-        index += 1
+    identifiers = {}
+    for index, word in enumerate(len_alp_sorted):
+        identifiers[word] = index
 
-    return dict_ident
+    return identifiers
 
 
 def decode(
@@ -186,18 +189,24 @@ def decode(
     :param end_of_word_token: an end-of-word token
     :return: decoded sequence
     """
-    if not isinstance(encoded_text, list) or not isinstance(vocabulary, dict) or not (isinstance(
-            end_of_word_token, str) or end_of_word_token is None):
+    if not isinstance(encoded_text, list) \
+            or not all(isinstance(el, int) for el in encoded_text) \
+            or not isinstance(vocabulary, dict) \
+            or not (isinstance(end_of_word_token, str) or end_of_word_token is None):
         return None
+
     decoded = ''
-    for identifier in encoded_text:
-        token_list = [key for key in vocabulary if vocabulary[key] == identifier]
 
-        for token in token_list:
-            decoded += token
+    for num in encoded_text:
+        added_token = ''
+        for token, identifier in vocabulary.items():
+            if identifier == num:
+                added_token = token
+                break
 
-    if end_of_word_token:
-        decoded = decoded.replace(end_of_word_token, ' ')
+        if end_of_word_token is not None and end_of_word_token in added_token:
+            added_token = added_token[:-len(end_of_word_token)] + ' '
+        decoded += added_token
 
     return decoded
 
@@ -214,27 +223,37 @@ def tokenize_word(
     :param unknown_token: token that signifies unknown sequence
     :return: list of token identifiers
     """
-    if not isinstance(word, tuple) or not isinstance(vocabulary, dict) or not (isinstance(
-            end_of_word, str) or end_of_word is None) or not isinstance(unknown_token, str):
+    if not isinstance(word, tuple) or not isinstance(vocabulary, dict) \
+            or not (isinstance(end_of_word, str) or end_of_word is None) \
+            or not isinstance(unknown_token, str):
         return None
 
-    word_copy = ''.join(word)
-    sorted_vocabulary = sorted(list(vocabulary.keys()), key=lambda x: (-len(x), x))
-    result = []
+    word_str = ''.join([str(el) for el in word])
+    tokens = [token for token in vocabulary if token in word_str]
+    if end_of_word is not None and end_of_word in word_str and end_of_word not in tokens:
+        tokens.append(end_of_word)
+    tokens.sort(key=len, reverse=True)
+    word_list = list(word)
 
-    for key in sorted_vocabulary:
-        while key in word_copy:
-            index = word_copy.count(' ', 0, word_copy.find(key))
-            result.insert(index, vocabulary[key])
-            word_copy = word_copy.replace(key, ' ', 1)
+    encoded = [-1] * len(word)
+    for token in tokens:
+        count_token = word_str.count(token)
+        for start_index in range(len(word_list)):
+            end_index = start_index + len(token)
+            possible_token = ''.join(word_list[start_index:end_index])
+            if possible_token == token:
+                encoded[start_index:end_index] = [vocabulary[token]]
+                word_list[start_index:end_index] = [token]
+                count_token -= 1
+                if count_token == 0:
+                    break
 
-    for unk in word_copy:
-        if unk != ' ':
-            index = word_copy.find(unk)
-            word_copy = word_copy.replace(unk, ' ')
-            result.insert(index, vocabulary[unknown_token])
+    if -1 in encoded:
+        for index, num in enumerate(encoded):
+            if num == -1:
+                encoded[index] = vocabulary[unknown_token]
 
-    return result
+    return encoded
 
 
 def load_vocabulary(vocab_path: str) -> dict[str, int] | None:
@@ -246,13 +265,11 @@ def load_vocabulary(vocab_path: str) -> dict[str, int] | None:
     if not isinstance(vocab_path, str):
         return None
 
-    with open(vocab_path, 'r', encoding='utf-8') as f:
-        vocab = json.load(f)
-
-    if not isinstance(vocab, dict):
+    with open(vocab_path, 'r', encoding='utf-8') as file:
+        vocabulary = json.load(file)
+    if not vocabulary:
         return None
-
-    return vocab
+    return dict(vocabulary)
 
 
 def encode(
@@ -271,24 +288,22 @@ def encode(
     :param unknown_token: token that signifies unknown sequence
     :return: list of token identifiers
     """
-    if not isinstance(original_text, str) or not isinstance(
-            vocabulary, dict) or not (isinstance(
-            start_of_word_token, str) or start_of_word_token is None) or not (isinstance(
-            end_of_word_token, str) or end_of_word_token is None) or not isinstance(
-            unknown_token, str):
+    if not isinstance(original_text, str) or not isinstance(vocabulary, dict) \
+            or not (isinstance(start_of_word_token, str) or start_of_word_token is None) \
+            or not (isinstance(end_of_word_token, str) or end_of_word_token is None) \
+            or not isinstance(unknown_token, str):
         return None
 
     encoded = []
-    split_text = original_text.split()
-
-    for word in split_text:
-        prepared = prepare_word(word, start_of_word_token, end_of_word_token)
-        if not prepared:
+    text_words = original_text.split()
+    for word in text_words:
+        prepared_word = prepare_word(word, start_of_word_token, end_of_word_token)
+        if not prepared_word:
             return None
-        result = tokenize_word(prepared, vocabulary, end_of_word_token, unknown_token)
-        if not result:
+        tokens = tokenize_word(prepared_word, vocabulary, end_of_word_token, unknown_token)
+        if not tokens:
             return None
-        encoded.extend(result)
+        encoded.extend(tokens)
 
     return encoded
 
@@ -304,8 +319,9 @@ def collect_ngrams(text: str, order: int) -> list[tuple[str, ...]] | None:
         return None
 
     n_grams = []
-    for index in range(len(text) + 1 - order):
-        n_grams.append(tuple(text[index: index + order]))
+    text_length = len(text)
+    for index in range(text_length + 1 - order):
+        n_grams.append(tuple(text[index:index + order]))
 
     return n_grams
 
@@ -321,15 +337,15 @@ def calculate_precision(
     """
     if not isinstance(actual, list) or not isinstance(reference, list):
         return None
+    if not actual:
+        return 0.0
 
-    unique_ngrams = set(reference)
-    matches = 0
-
-    for n_gram in unique_ngrams:
-        if n_gram in actual:
-            matches += 1
-
-    return matches / len(unique_ngrams)
+    unique_reference = set(reference)
+    true_positive = 0
+    for token in unique_reference:
+        if token in actual:
+            true_positive += 1
+    return float(true_positive / len(unique_reference))
 
 
 def geo_mean(precisions: list[float], max_order: int) -> float | None:
@@ -342,14 +358,14 @@ def geo_mean(precisions: list[float], max_order: int) -> float | None:
     if not isinstance(precisions, list) or not isinstance(max_order, int):
         return None
 
-    summation = float(0)
-
+    mean_geometric = 0.0
     for order in range(max_order):
+        if not isinstance(precisions[order], (float, int)):
+            return None
         if precisions[order] < 0:
             return 0
-        summation += math.log(precisions[order])
-
-    return math.exp(1 / max_order * summation)
+        mean_geometric += math.log(precisions[order])
+    return float(math.e ** (mean_geometric / max_order))
 
 
 def calculate_bleu(actual: str | None, reference: str, max_order: int = 3) -> float | None:
@@ -360,31 +376,28 @@ def calculate_bleu(actual: str | None, reference: str, max_order: int = 3) -> fl
     :param max_order: max length of n-gram to consider for comparison
     :return: value of BLEU metric
     """
-    if not isinstance(actual, str) or not isinstance(
-            reference, str) or max_order != 3:
+    if not isinstance(actual, str) or not isinstance(reference, str) \
+            or not isinstance(max_order, int):
         return None
 
     actual_ngrams = []
     reference_ngrams = []
-
     for order in range(max_order):
-        actual_ngram = collect_ngrams(actual, order + 1)
-        reference_ngram = collect_ngrams(reference, order + 1)
-        if actual_ngram is None or reference_ngram is None:
+        actual_collected = collect_ngrams(actual, order + 1)
+        reference_collected = collect_ngrams(reference, order + 1)
+        if not actual_collected or not reference_collected:
             return None
-        actual_ngrams.append(actual_ngram)
-        reference_ngrams.append(reference_ngram)
+        actual_ngrams.append(actual_collected)
+        reference_ngrams.append(reference_collected)
 
     precisions = []
-
-    for i, j in zip(actual_ngrams, reference_ngrams):
-        precision = calculate_precision(i, j)
+    for actual_ngram, reference_ngram in zip(actual_ngrams, reference_ngrams):
+        precision = calculate_precision(actual_ngram, reference_ngram)
         if precision is None:
             return None
-        precisions.append(precision)
+        precisions.append(float(precision))
 
-    average = geo_mean(precisions, max_order)
-    if average is None:
+    mean = geo_mean(precisions, max_order)
+    if mean is None:
         return None
-
-    return average * 100
+    return 100.0 * mean
