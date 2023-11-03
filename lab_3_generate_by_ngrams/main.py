@@ -353,7 +353,7 @@ class BeamSearchTextGenerator:
     Class for text generation with BeamSearch.
 
     Attributes:
-        _language_models (tuple[NGramLanguageModel]): Language models for next token prediction
+        _language_model (tuple[NGramLanguageModel]): Language models for next token prediction
         _text_processor (NGramLanguageModel): A TextProcessor instance to handle text processing
         _beam_width (NGramLanguageModel): Beam width parameter for generation
         beam_searcher (NGramLanguageModel): Searcher instances for each language model
@@ -413,6 +413,7 @@ class NGramLanguageModelReader:
     Attributes:
         _json_path (str): Local path to assets file
         _eow_token (str): Special token for text processor
+        _text_processor (TextProcessor): A TextProcessor instance to handle text processing
     """
 
     def __init__(self, json_path: str, eow_token: str) -> None:
@@ -452,6 +453,10 @@ class NGramLanguageModelReader:
 class BackOffGenerator:
     """
     Language model for back-off based text generation.
+
+    Attributes:
+        _language_models (dict[int, NGramLanguageModel]): Language models for next token prediction
+        _text_processor (NGramLanguageModel): A TextProcessor instance to handle text processing
     """
 
     def __init__(
