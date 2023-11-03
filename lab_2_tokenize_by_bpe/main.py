@@ -150,14 +150,14 @@ def get_vocabulary(
     if word_frequencies is None:
         return None
     new_dict = {}
-    list_of_tokens = set()
+    set_of_tokens = set()
     for word in word_frequencies:
         for token in word:
-            list_of_tokens.add(token)
+            set_of_tokens.add(token)
             for letter in token:
-                list_of_tokens.add(letter)
-    list_of_tokens.add(unknown_token)
-    sorted_list_of_tokens = sorted(list_of_tokens)
+                set_of_tokens.add(letter)
+    set_of_tokens.add(unknown_token)
+    sorted_list_of_tokens = sorted(set_of_tokens)
     sorted_list_of_tokens_2 = sorted(sorted_list_of_tokens, key=len, reverse=True)
     for i, token in enumerate(sorted_list_of_tokens_2):
         if token not in new_dict:
