@@ -14,17 +14,14 @@ def prepare_word(
     :param end_of_word: a token that signifies the end of word
     :return: preprocessed word
     """
-    if isinstance(raw_word, str) and isinstance(start_of_word and end_of_word, (str | None)):
-        if start_of_word is not None and end_of_word is not None:
-            return tuple([start_of_word, *list(raw_word), end_of_word])
-        if start_of_word is None and end_of_word is None:
-            return tuple([*list(raw_word)])
-        if start_of_word is None and end_of_word is not None:
-            return tuple([*list(raw_word), end_of_word])
-        if end_of_word is None and start_of_word is not None:
-            return tuple([start_of_word, *list(raw_word)])
+    if not isinstance(raw_word, str) or not isinstance(start_of_word and end_of_word, (str | None)):
         return None
-    return None
+    word = list(raw_word)
+    if start_of_word is not None:
+        word.insert(0, start_of_word)
+    if end_of_word is not None:
+        word.append(end_of_word)
+    return tuple(word)
 
 
 def collect_frequencies(
@@ -114,18 +111,14 @@ def train(
         pair_freq = count_tokens_pairs(word_frequencies)
         if pair_freq is None:
             return None
-        if not len(pair_freq) == 0:
-            sorted_dict = dict(
-                sorted(pair_freq.items(),
-                       key=lambda item: (-item[1], -len("".join(item[0])), "".join(item[0]))))
-            for k in sorted_dict.keys():
-                word_frequencies = merge_tokens(word_frequencies, k)
-                if word_frequencies is None:
-                    return None
-                merges_count += 1
-                break
-            continue
-        break
+        if len(pair_freq) == 0:
+            break
+        sorted_pairs = sorted(pair_freq.items(),
+                             key=lambda item: (-item[1], -len("".join(item[0])), "".join(item[0])))
+        word_frequencies = merge_tokens(word_frequencies, sorted_pairs[0][0])
+        if word_frequencies is None:
+            return None
+        merges_count += 1
     return word_frequencies
 
 
@@ -175,8 +168,10 @@ def decode(
             if code == value:
                 decoded_list.append(k)
     decoded_text = "".join(decoded_list)
-    final_text = decoded_text.replace('</s>', ' ')
-    return final_text
+    if end_of_word_token is not None:
+        final_text = decoded_text.replace(end_of_word_token, ' ')
+        return final_text
+    return decoded_text
 
 
 def tokenize_word(
@@ -202,11 +197,11 @@ def load_vocabulary(vocab_path: str) -> dict[str, int] | None:
 
 
 def encode(
-        original_text: str,
-        vocabulary: dict[str, int] | None,
-        start_of_word_token: str | None,
-        end_of_word_token: str | None,
-        unknown_token: str,
+    original_text: str,
+    vocabulary: dict[str, int] | None,
+    start_of_word_token: str | None,
+    end_of_word_token: str | None,
+    unknown_token: str,
 ) -> list[int] | None:
     """
     Translates decoded sequence into encoded one
@@ -229,7 +224,7 @@ def collect_ngrams(text: str, order: int) -> list[tuple[str, ...]] | None:
 
 
 def calculate_precision(
-        actual: list[tuple[str, ...]], reference: list[tuple[str, ...]]
+    actual: list[tuple[str, ...]], reference: list[tuple[str, ...]]
 ) -> float | None:
     """
     Compares two sequences by virtue of Precision metric
