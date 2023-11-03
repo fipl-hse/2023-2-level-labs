@@ -19,7 +19,7 @@ def main() -> None:
     encoded_list = [int(el) for el in encoded_text]
     word_frequencies = train(collect_frequencies(text, None, '</s>'), 100)
     if not word_frequencies:
-        return None
+        return
     vocabulary = get_vocabulary(word_frequencies, '<unk>')
     result = decode(encoded_list, vocabulary, '</s>')
     print(result)
