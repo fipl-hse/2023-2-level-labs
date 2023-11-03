@@ -64,9 +64,8 @@ def count_tokens_pairs(
         for j in range(len(i) - 1):
             pair = (i[j], i[j + 1])
             if pair not in dictionary:
-                dictionary[pair] = word_frequencies[i]
-            else:
-                dictionary[pair] += word_frequencies[i]
+                dictionary[pair] = 0
+            dictionary[pair] += word_frequencies[i]
     return dictionary
 
 
