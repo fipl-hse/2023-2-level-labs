@@ -21,6 +21,7 @@ def main() -> None:
     vocabulary = get_vocabulary(dict_train, '<unk>')
     encoded_list = [int(coded) for coded in encoded_text.split()]
     result = decode(encoded_list, vocabulary, '</s>')
+    print(result)
     assert result, "Encoding is not working"
 
 

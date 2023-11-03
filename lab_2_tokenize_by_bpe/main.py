@@ -5,7 +5,7 @@ BPE and machine translation evaluation
 
 
 def prepare_word(
-        raw_word: str, start_of_word: str | None, end_of_word: str | None
+    raw_word: str, start_of_word: str | None, end_of_word: str | None
 ) -> tuple[str, ...] | None:
     """
     Tokenizes word into unigrams and appends end-of-word token
@@ -20,18 +20,16 @@ def prepare_word(
             and (end_of_word is None or isinstance(end_of_word, str))
     ):
         return None
-    total_result = []
+    total_result = list(raw_word)
     if start_of_word:
-        total_result.append(start_of_word)
-    for token in raw_word:
-        total_result.append(token)
+        total_result.insert(0, start_of_word)
     if end_of_word:
         total_result.append(end_of_word)
     return tuple(total_result)
 
 
 def collect_frequencies(
-        text: str, start_of_word: str | None, end_of_word: str
+    text: str, start_of_word: str | None, end_of_word: str
 ) -> dict[tuple[str, ...], int] | None:
     """
     Counts number of occurrences of each word
@@ -57,7 +55,7 @@ def collect_frequencies(
 
 
 def count_tokens_pairs(
-        word_frequencies: dict[tuple[str, ...], int]
+    word_frequencies: dict[tuple[str, ...], int]
 ) -> dict[tuple[str, str], int] | None:
     """
     Counts number of occurrences of each pair of subsequent tokens
@@ -77,7 +75,7 @@ def count_tokens_pairs(
 
 
 def merge_tokens(
-        word_frequencies: dict[tuple[str, ...], int], pair: tuple[str, str]
+    word_frequencies: dict[tuple[str, ...], int], pair: tuple[str, str]
 ) -> dict[tuple[str, ...], int] | None:
     """
     Updates word frequency dictionary by replacing a pair of token with a merged one
@@ -103,7 +101,7 @@ def merge_tokens(
 
 
 def train(
-        word_frequencies: dict[tuple[str, ...], int] | None, num_merges: int
+    word_frequencies: dict[tuple[str, ...], int] | None, num_merges: int
 ) -> dict[tuple[str, ...], int] | None:
     """
     Creates required number of new tokens by merging existing ones
@@ -130,7 +128,7 @@ def train(
 
 
 def get_vocabulary(
-        word_frequencies: dict[tuple[str, ...], int], unknown_token: str
+    word_frequencies: dict[tuple[str, ...], int], unknown_token: str
 ) -> dict[str, int] | None:
     """
     Establishes correspondence between tokens and its integer identifier
