@@ -26,10 +26,9 @@ def prepare_word(
     tokens.extend(list(raw_word))
     if end_of_word:
         tokens.append(end_of_word)
-    preprocessed_word = tuple(tokens)
+    # preprocessed_word = tuple(tokens)
 
-    return preprocessed_word
-
+    return tuple(tokens)
 
 def collect_frequencies(
     text: str, start_of_word: str | None, end_of_word: str
