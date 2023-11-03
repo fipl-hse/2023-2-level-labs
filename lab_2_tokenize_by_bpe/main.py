@@ -47,12 +47,12 @@ def collect_frequencies(
     freq_dict = {}
     new_text = text.split()
     for preprocessed_word in new_text:
-        preprocessed_word = prepare_word(preprocessed_word, start_of_word, end_of_word)
-        if preprocessed_word is None:
+        prepared_word = prepare_word(preprocessed_word, start_of_word, end_of_word)
+        if prepared_word is None:
             return None
-        if preprocessed_word not in freq_dict:
-            freq_dict.update({preprocessed_word: new_text.count(preprocessed_word)})
-        freq_dict[preprocessed_word] += 1
+        if prepared_word not in freq_dict:
+            freq_dict[prepared_word] = 0
+        freq_dict[prepared_word] += 1
 
     return freq_dict
 
