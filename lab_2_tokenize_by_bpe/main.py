@@ -20,8 +20,8 @@ def prepare_word(
         or not (end_of_word is None or isinstance(end_of_word, str))
     ):
         return None
-    tokens = []
-    tokens.extend(list(raw_word))
+
+    tokens = list(raw_word)
     if start_of_word:
         tokens.insert(0, start_of_word)
     if end_of_word:
