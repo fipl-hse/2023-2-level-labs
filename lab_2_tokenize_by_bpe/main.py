@@ -116,7 +116,7 @@ def train(
             max_val = [numm for numm in pairs if pairs[numm] == max(pairs.values())]
             max_len = [numm for numm in max_val if len(str(numm)) == max(len(str(pair)) for pair in max_val)]
             word_frequencies = merge_tokens(word_frequencies, sorted(max_len)[0])
-        if not word_frequencies:
+        if word_frequencies is None:
             return None
         num_merges -= 1
     return word_frequencies
