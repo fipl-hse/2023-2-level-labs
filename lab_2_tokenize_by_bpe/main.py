@@ -61,6 +61,7 @@ def count_tokens_pairs(
     :param word_frequencies: dictionary in the form of <preprocessed word: number of occurrences>
     :return: dictionary in the form of <token pair: number of occurrences>
     """
+
     if not isinstance(word_frequencies, dict):
         return None
     dict_of_token_pairs = {}
