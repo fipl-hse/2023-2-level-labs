@@ -128,7 +128,7 @@ def train(
         for pair in tokens_pairs:
             if tokens_pairs[pair] == max_freq:
                 max_freq_tokens.append(pair)
-        max_len = max([len(pair[0] + pair[1]) for pair in max_freq_tokens])
+        max_len = max(len(pair[0] + pair[1]) for pair in max_freq_tokens)
         max_len_tokens = []
         for pair in max_freq_tokens:
             if max_len == len(pair[0] + pair[1]):
@@ -160,15 +160,12 @@ def get_vocabulary(
     for token in word_frequencies:
         for symbol in token:
             tokens.update(token, symbol)
-    print(tokens)
     tokens.add(unknown_token)
     sorted_tokens= sorted(sorted(tokens), key=len, reverse=True)
-    print(sorted)
     dict_ident = {}
     for index, token in enumerate(sorted_tokens):
         dict_ident[token] = index
     return dict_ident
-
 
 
 def decode(
