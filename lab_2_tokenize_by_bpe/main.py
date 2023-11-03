@@ -16,8 +16,8 @@ def prepare_word(
     """
     if (
         not isinstance(raw_word, str)
-        or (start_of_word is not None and not isinstance(start_of_word, str))
-        or (end_of_word is not None and not isinstance(end_of_word, str))
+        or not (start_of_word is None or isinstance(start_of_word, str))
+        or not (end_of_word is None or isinstance(end_of_word, str))
     ):
         return None
     tokens = []
@@ -26,9 +26,9 @@ def prepare_word(
     tokens.extend(list(raw_word))
     if end_of_word:
         tokens.append(end_of_word)
-    # preprocessed_word = tuple(tokens)
+    preprocessed_word = tuple(tokens)
 
-    return tuple(tokens)
+    return preprocessed_word
 
 def collect_frequencies(
     text: str, start_of_word: str | None, end_of_word: str
