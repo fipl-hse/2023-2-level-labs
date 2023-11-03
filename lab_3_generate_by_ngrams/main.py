@@ -42,17 +42,6 @@ class TextProcessor:
         In case any of methods used return None, None is returned.
         """
 
-    def _put(self, element: str) -> None:
-        """
-        Put an element into the storage, assign a unique id to it.
-
-        Args:
-            element (str): An element to put into storage
-
-        In case of corrupt input arguments or invalid argument length,
-        an element is not added to storage
-        """
-
     def get_id(self, element: str) -> Optional[int]:
         """
         Retrieve a unique identifier of an element.
@@ -65,6 +54,14 @@ class TextProcessor:
 
         In case of corrupt input arguments or arguments not included in storage,
         None is returned
+        """
+
+    def get_end_of_word_token(self) -> str:
+        """
+        Retrieve value stored in self._end_of_word_token attribute.
+
+        Returns:
+            str: EoW token
         """
 
     def get_token(self, element_id: int) -> Optional[str]:
@@ -97,6 +94,42 @@ class TextProcessor:
         In case any of methods used return None, None is returned.
         """
 
+    def _put(self, element: str) -> None:
+        """
+        Put an element into the storage, assign a unique id to it.
+
+        Args:
+            element (str): An element to put into storage
+
+        In case of corrupt input arguments or invalid argument length,
+        an element is not added to storage
+        """
+
+    def decode(self, encoded_corpus: tuple[int, ...]) -> Optional[str]:
+        """
+        Decode and postprocess encoded corpus by converting integer identifiers to string.
+
+        Special symbols are replaced with spaces (no multiple spaces in a row are allowed).
+        The first letter is capitalized, resulting sequence must end with a full stop.
+
+        Args:
+            encoded_corpus (tuple[int, ...]): A tuple of encoded tokens
+
+        Returns:
+            str: Resulting text
+
+        In case of corrupt input arguments, None is returned.
+        In case any of methods used return None, None is returned.
+        """
+
+    def fill_from_ngrams(self, content: dict) -> None:
+        """
+        Fill internal storage with letters from external JSON.
+
+        Args:
+            content (dict): ngrams from external JSON
+        """
+
     def _decode(self, corpus: tuple[int, ...]) -> Optional[tuple[str, ...]]:
         """
         Decode sentence by replacing ids with corresponding letters.
@@ -127,42 +160,6 @@ class TextProcessor:
         In case of corrupt input arguments, None is returned
         """
 
-    def decode(self, encoded_corpus: tuple[int, ...]) -> Optional[str]:
-        """
-        Decode and postprocess encoded corpus by converting integer identifiers to string.
-
-        Special symbols are replaced with spaces (no multiple spaces in a row are allowed).
-        The first letter is capitalized, resulting sequence must end with a full stop.
-
-        Args:
-            encoded_corpus (tuple[int, ...]): A tuple of encoded tokens
-
-        Returns:
-            str: Resulting text
-
-        In case of corrupt input arguments, None is returned.
-        In case any of methods used return None, None is returned.
-        """
-
-    def get_end_of_word_token(self) -> str:
-        """
-        Retrieve value stored in self._end_of_word_token attribute.
-
-        Returns:
-            str: EoW token
-        """
-
-    def fill_from_ngrams(self, content: dict) -> None:
-        """
-        Fill internal storage with letters from external JSON.
-
-        Args:
-            content (dict): ngrams from external JSON
-        """
-
-
-# 6
-
 
 class NGramLanguageModel:
     """
@@ -183,19 +180,20 @@ class NGramLanguageModel:
             n_gram_size (int): A size of n-grams to use for language modelling
         """
 
-    def _extract_n_grams(
-        self, encoded_corpus: tuple[int, ...]
-    ) -> Optional[tuple[tuple[int, ...], ...]]:
+    def get_n_gram_size(self) -> int:
         """
-        Split encoded sequence into n-grams.
-
-        Args:
-            encoded_corpus (tuple[int, ...]): A tuple of encoded tokens
+        Retrieve value stored in self._n_gram_size attribute.
 
         Returns:
-            tuple[tuple[int, ...], ...]: A tuple of extracted n-grams
+            int: Size of stored n_grams
+        """
 
-        In case of corrupt input arguments, None is returned
+    def set_n_grams(self, frequencies: dict) -> None:
+        """
+        Setter method for n-gram frequencies.
+
+        Args:
+            frequencies (dict): Computed in advance frequencies for n-grams
         """
 
     def build(self) -> int:
@@ -211,14 +209,6 @@ class NGramLanguageModel:
         1 is returned
         """
 
-    def get_n_gram_size(self) -> int:
-        """
-        Retrieve value stored in self._n_gram_size attribute.
-
-        Returns:
-            int: Size of stored n_grams
-        """
-
     def generate_next_token(self, sequence: tuple[int, ...]) -> Optional[dict]:
         """
         Retrieve tokens that can continue the given sequence along with their probabilities.
@@ -232,12 +222,19 @@ class NGramLanguageModel:
         In case of corrupt input arguments, None is returned
         """
 
-    def set_n_grams(self, frequencies: dict) -> None:
+    def _extract_n_grams(
+        self, encoded_corpus: tuple[int, ...]
+    ) -> Optional[tuple[tuple[int, ...], ...]]:
         """
-        Setter method for n-gram frequencies.
+        Split encoded sequence into n-grams.
 
         Args:
-            frequencies (dict): Computed in advance frequencies for n-grams
+            encoded_corpus (tuple[int, ...]): A tuple of encoded tokens
+
+        Returns:
+            tuple[tuple[int, ...], ...]: A tuple of extracted n-grams
+
+        In case of corrupt input arguments, None is returned
         """
 
 
@@ -409,54 +406,6 @@ class BeamSearchTextGenerator:
         """
 
 
-class BackOffGenerator:
-    """
-    Language model for back-off based text generation.
-    """
-
-    def __init__(
-        self,
-        language_models: tuple[NGramLanguageModel, ...],
-        text_processor: TextProcessor,
-    ):
-        """
-        Initializes an instance of BackOffGenerator.
-
-        Args:
-            language_models (tuple[NGramLanguageModel]): Language models to use for text generation
-            text_processor (TextProcessor): A TextProcessor instance to handle text processing
-        """
-
-    def _get_next_token(self, sequence_to_continue: tuple[int, ...]) -> Optional[dict[int, float]]:
-        """
-        Retrieve next tokens for sequence continuation.
-
-        Args:
-            sequence_to_continue (tuple[int, ...]): Sequence to continue
-
-        Returns:
-            Optional[dict[int, float]]: Next tokens for sequence
-            continuation
-
-        In case of corrupt input arguments return None.
-        """
-
-    def run(self, seq_len: int, prompt: str) -> Optional[str]:
-        """
-        Generate sequence based on NGram language model and prompt provided.
-
-        Args:
-            seq_len (int): Number of tokens to generate
-            prompt (str): Beginning of sequence
-
-        Returns:
-            str: Generated sequence
-
-        In case of corrupt input arguments or methods used return None,
-        None is returned
-        """
-
-
 class NGramLanguageModelReader:
     """
     Factory for loading language models ngrams from external JSON.
@@ -491,10 +440,58 @@ class NGramLanguageModelReader:
         In case of corrupt input arguments or unexpected behaviour of methods used, return 1.
         """
 
-    def get_text_processor(self) -> TextProcessor:
+    def get_text_processor(self) -> TextProcessor:  # type: ignore[empty-body]
         """
         Get method for the processor created for the current JSON file.
 
         Returns:
             TextProcessor: processor created for the current JSON file.
+        """
+
+
+class BackOffGenerator:
+    """
+    Language model for back-off based text generation.
+    """
+
+    def __init__(
+        self,
+        language_models: tuple[NGramLanguageModel, ...],
+        text_processor: TextProcessor,
+    ):
+        """
+        Initializes an instance of BackOffGenerator.
+
+        Args:
+            language_models (tuple[NGramLanguageModel]): Language models to use for text generation
+            text_processor (TextProcessor): A TextProcessor instance to handle text processing
+        """
+
+    def run(self, seq_len: int, prompt: str) -> Optional[str]:
+        """
+        Generate sequence based on NGram language model and prompt provided.
+
+        Args:
+            seq_len (int): Number of tokens to generate
+            prompt (str): Beginning of sequence
+
+        Returns:
+            str: Generated sequence
+
+        In case of corrupt input arguments or methods used return None,
+        None is returned
+        """
+
+    def _get_next_token(self, sequence_to_continue: tuple[int, ...]) -> Optional[dict[int, float]]:
+        """
+        Retrieve next tokens for sequence continuation.
+
+        Args:
+            sequence_to_continue (tuple[int, ...]): Sequence to continue
+
+        Returns:
+            Optional[dict[int, float]]: Next tokens for sequence
+            continuation
+
+        In case of corrupt input arguments return None.
         """
