@@ -161,11 +161,12 @@ def get_vocabulary(
         for symbol in token:
             tokens.update(token, symbol)
     tokens.add(unknown_token)
-    sorted_alphabet = sorted(tokens)
-    sorted_tokens = sorted(sorted_alphabet, key=len, reverse=True)
+    sorted_tokens = sorted(sorted(tokens), key=len, reverse=True)
     dict_ident = {}
-    for index, token in enumerate(sorted_tokens):
-        dict_ident[token] = index
+    ident = 0
+    for token in sorted_tokens:
+        dict_ident[token] = ident
+        ident += 1
     return dict_ident
 
 
