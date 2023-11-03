@@ -193,7 +193,7 @@ def decode(
         if end_of_word_token:
             if end_of_word_token in decoded_sequence:
                 decoded_sequence = decoded_sequence.replace(end_of_word_token, ' ')
-                
+
     return decoded_sequence
 
 def tokenize_word(
