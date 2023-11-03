@@ -96,6 +96,7 @@ csv
 culture
 cup
 damping
+data
 dataset
 de
 decode
@@ -175,6 +176,7 @@ frequencies
 frequency
 from
 ftty
+full-text
 func
 generate
 geo
