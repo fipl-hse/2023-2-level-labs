@@ -3,7 +3,7 @@ BPE Tokenizer starter
 """
 
 from pathlib import Path
-from main import collect_frequencies, get_vocabulary, train
+from lab_2_tokenize_by_bpe.main import collect_frequencies, train
 
 
 def main() -> None:
@@ -15,16 +15,10 @@ def main() -> None:
         text = text_file.read()
 
     result = None
-    assert result, 'Encoding is not working'
-    text_frequencies = collect_frequencies(text, None, '</s>')
-    train_text = train(text_frequencies, 100)
-    if train_text:
-        with open(assets_path / 'secrets' / 'secret_1.txt', 'r', encoding='utf-8') as text_file:
-            secret_text = text_file.read()
-        vocabulary = get_vocabulary(train_text, '<unk>')
-        decoding_list = []
-        for number in secret_text.split(' '):
-            decoding_list.append(int(number))
+    word_freq = collect_frequencies(text, None, '</s>')
+    result = train(word_freq, 100)
+    print(result)
+    assert result, "Encoding is not working"
 
 
 
