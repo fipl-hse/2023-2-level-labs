@@ -18,6 +18,13 @@ for LAB_NAME in $LABS; do
         --target_code_path ./build/stubs/${LAB_NAME}/main.py
 
   check_if_failed
+
+  python ./config/generate_stubs/run_generator.py \
+        --source_code_path ${LAB_NAME}/start.py \
+        --target_code_path ./build/stubs/${LAB_NAME}/start.py
+
+  check_if_failed
+
 done
 
 if [[ ${FAILED} -eq 1 ]]; then
