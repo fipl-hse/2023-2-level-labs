@@ -121,7 +121,7 @@ def train(
             num_merges = len(pairs_of_tokens)
         max_prevalence = max(pairs_of_tokens.values())
         prev_pairs = [pair for pair in pairs_of_tokens if pairs_of_tokens[pair] == max_prevalence]
-        result = sorted(prev_pairs, key=lambda max_prev_pair: (-len(str(max_prev_pair)), max_prev_pair))
+        result = sorted(prev_pairs, key=lambda max_pr_pair: (-len(str(max_pr_pair)), max_pr_pair))
         word_frequencies = merge_tokens(word_frequencies, result[0])
         if not word_frequencies:
             return None
@@ -155,7 +155,7 @@ def get_vocabulary(
 
 
 def decode(
-        encoded_text: list[int] | None, vocabulary: dict[str, int] | None, end_of_word_token: str | None
+    encoded_text: list[int] | None, vocabulary: dict[str, int] | None, end_of_word_token: str | None
 ) -> str | None:
     """
     Translates encoded sequence into decoded one
@@ -181,7 +181,7 @@ def decode(
 
 
 def tokenize_word(
-        word: tuple[str, ...], vocabulary: dict[str, int], end_of_word: str | None, unknown_token: str
+    word: tuple[str, ...], vocabulary: dict[str, int], end_of_word: str | None, unknown_token: str
 ) -> list[int] | None:
     """
     Splits word into tokens
@@ -202,11 +202,11 @@ def load_vocabulary(vocab_path: str) -> dict[str, int] | None:
 
 
 def encode(
-        original_text: str,
-        vocabulary: dict[str, int] | None,
-        start_of_word_token: str | None,
-        end_of_word_token: str | None,
-        unknown_token: str,
+    original_text: str,
+    vocabulary: dict[str, int] | None,
+    start_of_word_token: str | None,
+    end_of_word_token: str | None,
+    unknown_token: str,
 ) -> list[int] | None:
     """
     Translates decoded sequence into encoded one
@@ -229,7 +229,7 @@ def collect_ngrams(text: str, order: int) -> list[tuple[str, ...]] | None:
 
 
 def calculate_precision(
-        actual: list[tuple[str, ...]], reference: list[tuple[str, ...]]
+    actual: list[tuple[str, ...]], reference: list[tuple[str, ...]]
 ) -> float | None:
     """
     Compares two sequences by virtue of Precision metric
