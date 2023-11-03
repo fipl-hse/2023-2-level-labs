@@ -15,8 +15,9 @@ def main() -> None:
         text = text_file.read()
     freq_dict = collect_frequencies(text, None, '</s>')
     merged_dict = train(freq_dict, 100)
-    print(merged_dict)
-    assert merged_dict, "Encoding is not working"
+    result = merged_dict
+    print(result)
+    assert result, "Encoding is not working"
 
 
 if __name__ == "__main__":
