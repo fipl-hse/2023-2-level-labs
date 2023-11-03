@@ -14,6 +14,7 @@ def prepare_word(
     :param end_of_word: a token that signifies the end of word
     :return: preprocessed word
     """
+
     if (
         not isinstance(raw_word, str)
         or not (start_of_word is None or isinstance(start_of_word, str))
