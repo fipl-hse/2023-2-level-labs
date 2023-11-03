@@ -81,14 +81,12 @@ def merge_tokens(
     if not isinstance(word_frequencies, dict) or not isinstance(pair, tuple):
         return None
     dict_with_tokens = {}
-    pair_indexes = f"'{pair[0]}', '{pair[1]}'"
     for elem in word_frequencies:
         list_with_words = list(elem)
-        if pair_indexes in str(elem):
-            for index in range(len(elem) - 1):
-                if (elem[index] + elem[index + 1]) == pair[0] + pair[1]:
-                    list_with_words[index + 1] = ''.join(pair)
-                    list_with_words.pop(index)
+        for index in range(len(list_with_words) - 1):
+            if (elem[index] + elem[index + 1]) == pair[0] + pair[1]:
+                list_with_words[index + 1] = ''.join(pair)
+                list_with_words.pop(index)
         dict_with_tokens[tuple(list_with_words)] = word_frequencies[elem]
     return dict_with_tokens
 
