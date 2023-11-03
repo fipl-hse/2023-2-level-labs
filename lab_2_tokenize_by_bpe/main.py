@@ -85,12 +85,13 @@ def merge_tokens(
     new_dict = {}
     for word, freq in word_frequencies.items():
         new_word = list(word)
+        pair_indexes = []
         for i in range(1, len(word)):
             if (word[i - 1], word[i]) == pair:
-                new_word[i - 1] = str_pair
-                new_word[i] = ""
-        if "" in new_word:
-            new_word.remove("")
+                pair_indexes.append(i-1)
+        if pair[1] in word:
+            for i in reversed(pair_indexes):
+                new_word[i:i+2] = [str_pair]
         new_dict.update({tuple(new_word): freq})
     return new_dict
 
