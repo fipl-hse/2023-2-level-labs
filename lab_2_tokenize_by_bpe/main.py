@@ -163,10 +163,8 @@ def get_vocabulary(
     tokens.add(unknown_token)
     sorted_tokens = sorted(sorted(tokens), key=len, reverse=True)
     dict_ident = {}
-    ident = 0
-    for token in sorted_tokens:
-        dict_ident[token] = ident
-        ident += 1
+    for index, word in enumerate(sorted_tokens):
+        dict_ident[word] = index
     return dict_ident
 
 
