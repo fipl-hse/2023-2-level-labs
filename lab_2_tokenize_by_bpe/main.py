@@ -18,7 +18,7 @@ def prepare_word(
             or not (isinstance(start_of_word, str) or start_of_word is None)\
             or not (isinstance(end_of_word, str) or end_of_word is None):
         return None
-    tokens = [el for el in raw_word]
+    tokens = list(raw_word)
     if start_of_word:
         tokens.insert(0, start_of_word)
     if end_of_word:
@@ -113,7 +113,7 @@ def train(
             return None
         num_merges = min(num_merges, len(token_pairs))
         frequent_pair = max(token_pairs.values())
-        new_pairs = [key for key in token_pairs.keys() if token_pairs[key] == frequent_pair]
+        new_pairs = [key for key, value in token_pairs.items() if value == frequent_pair]
         longest = max(len(''.join(token)) for token in new_pairs)
         longest_token = [token for token in new_pairs if len(''.join(token)) == longest]
         final_token = sorted(longest_token)[0]

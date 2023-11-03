@@ -23,7 +23,7 @@ def main() -> None:
     vocabulary = get_vocabulary(word_frequencies, '<unk>')
     result = decode(encoded_list, vocabulary, '</s>')
     print(result)
-        assert result, "Encoding is not working"
+    assert result, "Encoding is not working"
 
 
 if __name__ == "__main__":
