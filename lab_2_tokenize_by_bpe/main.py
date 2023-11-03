@@ -20,15 +20,12 @@ def prepare_word(
             (isinstance(end_of_word, str) or end_of_word is None)
     ):
         return None
-    tokens = []
-    for el in raw_word:
-        tokens.append(el)
+    tokens = list(raw_word)
     if start_of_word:
         tokens.insert(0, start_of_word)
     if end_of_word:
         tokens.append(end_of_word)
-    symbols = tuple(tokens)
-    return symbols
+    return tuple(tokens)
 
 
 def collect_frequencies(
@@ -100,7 +97,7 @@ def merge_tokens(
             tokens = (el[i], el[i + 1])
             if tokens == pair:
                 el_list.pop(i + 1)
-                el_list[i] = pair[0] + pair[1]
+                el_list[i] = ''.join([el[i], el[i + 1]])
         el_list = tuple(el_list)
         merged_dictionary[el_list] = word_frequencies[el]
     return merged_dictionary
@@ -115,6 +112,28 @@ def train(
     :param num_merges: required number of new tokens
     :return: dictionary in the form of <preprocessed word: number of occurrences>
     """
+    if not (
+            isinstance(word_frequencies, dict) and
+            isinstance(num_merges, int)
+    ):
+        return None
+    count_of_pairs = count_tokens_pairs(word_frequencies)
+    if count_of_pairs is None:
+        return None
+    num_merges = min(num_merges, len(count_of_pairs))
+    for i in range(num_merges):
+        max_value = max(count_of_pairs.values())
+        max_freq_values = [key for key in count_of_pairs if count_of_pairs[key] == max_value]
+        max_length = max(len(''.join(pair)) for pair in max_freq_values)
+        longest_pairs = sorted([pair for pair in max_freq_values if len(''.join(pair)) == max_length])
+        pair = longest_pairs[0]
+        word_frequencies = merge_tokens(word_frequencies, pair)
+        if word_frequencies is None:
+            return None
+        count_of_pairs = count_tokens_pairs(word_frequencies)
+        if count_of_pairs is None:
+            return None
+    return word_frequencies
 
 
 def get_vocabulary(
