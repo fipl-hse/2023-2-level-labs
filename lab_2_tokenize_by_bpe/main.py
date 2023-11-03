@@ -42,16 +42,16 @@ def collect_frequencies(
         (isinstance(start_of_word, str) or start_of_word is None) or not
         isinstance(end_of_word, str)):
         return None
-    freq_dictionary = {}
+    frequency_dictionary = {}
     listed_text = text.split(" ")
     for word in listed_text:
         preprocessed_word = prepare_word(word, start_of_word, end_of_word)
         if preprocessed_word is None:
             return None
-        if preprocessed_word not in freq_dictionary:
-            freq_dictionary[preprocessed_word] = 0
-        freq_dictionary[preprocessed_word] += 1
-    return freq_dictionary
+        if preprocessed_word not in frequency_dictionary:
+            frequency_dictionary[preprocessed_word] = 0
+        frequency_dictionary[preprocessed_word] += 1
+    return frequency_dictionary
 
 
 def count_tokens_pairs(
