@@ -70,8 +70,7 @@ def count_tokens_pairs(
     pair_frequencies = {}
     for word, freq in word_frequencies.items():
         for i in range(len(word)-1):
-            tokens_pair = word[i], word[i+1]
-            tokens_pair = tuple(tokens_pair)
+            tokens_pair = (word[i], word[i+1])
             if tokens_pair not in pair_frequencies:
                 pair_frequencies[tokens_pair] = 0
             pair_frequencies[tokens_pair] += freq
