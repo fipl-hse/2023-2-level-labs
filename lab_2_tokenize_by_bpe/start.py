@@ -15,8 +15,6 @@ def main() -> None:
         text = text_file.read()
     word_frequencies = main_bpe.collect_frequencies(text, None, '</s>')
     word_frequencies = main_bpe.train(word_frequencies, 100)
-    secret_list = []
-    vocabulary = {}
     if word_frequencies is not None:
         with open(assets_path / 'secrets/secret_1.txt', 'r', encoding='utf-8') as file:
             secret = file.read()
