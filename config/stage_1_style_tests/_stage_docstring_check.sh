@@ -21,7 +21,7 @@ for LAB_NAME in $LABS; do
  check_if_failed
 
  echo "Running pydocstyle for ${filename}"
- python -m pydocstyle --config ./config/stage_1_style_tests/.pydocstyle ${filename}
+ python -m pydocstyle ${filename}
  check_if_failed
 done
 
