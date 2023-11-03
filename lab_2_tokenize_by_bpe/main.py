@@ -158,8 +158,7 @@ def get_vocabulary(
     for key in word_frequencies:
         for word in key:
             diff_tokens.add(word)
-            for token in word:
-                diff_tokens.add(token)
+            diff_tokens.update(token for token in word)
 
     alphabetic_sorting = sorted(diff_tokens)
     len_sorting = sorted(alphabetic_sorting, key = len, reverse = True )
@@ -190,14 +189,11 @@ def decode(
         list_for_token = [key for key, value in vocabulary.items() if value == ident]
 
         for token in list_for_token:
-            if end_of_word_token:
-                if end_of_word_token in token:
-                    end_index = len(end_of_word_token)
-                    decoded_sequence += end_of_word_token[end_index:] + ' '
-                else:
-                    decoded_sequence += token
-            else:
-                decoded_sequence += token
+            decoded_sequence += token
+        if end_of_word_token:
+            if end_of_word_token in decoded_sequence:
+                decoded_sequence = decoded_sequence.replace(end_of_word_token, ' ')
+                
     return decoded_sequence
 
 def tokenize_word(
