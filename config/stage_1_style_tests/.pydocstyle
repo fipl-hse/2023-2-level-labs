@@ -1,4 +1,0 @@
-[pydocstyle]
-convention = google
-add-select = D213
-add-ignore = D212
