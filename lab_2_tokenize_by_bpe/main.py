@@ -166,11 +166,9 @@ def get_vocabulary(
     for tuple_word in word_frequencies:
         for word in tuple_word:
             all_tokens.append(word)
-            prepared_word = prepare_word(word, None, None)
-            if not prepared_word:
-                return None
-            all_tokens += list(prepared_word)
-    sorted_token_set = sorted(set(all_tokens), key=lambda x: (-len(x), x))
+            all_tokens += list(word)
+    all_tokens = set(all_tokens)
+    sorted_token_set = sorted(list(all_tokens), key=lambda x: (-len(x), x))
 
     for index, element in enumerate(sorted_token_set):
         identificators[element] = index
@@ -197,12 +195,12 @@ def decode(
 
     decoded = ''
     voc_keys = list(vocabulary.keys())
-    for token in encoded_text:
-        symbol = voc_keys[token]
-        if symbol == end_of_word_token:
-            decoded += ' '
-        else:
-            decoded += symbol
+    for encoded_token in encoded_text:
+        symbol = voc_keys[encoded_token]
+        decoded += symbol
+
+    if end_of_word_token:
+        decoded = decoded.replace(end_of_word_token, ' ')
     return decoded
 
 
@@ -236,7 +234,7 @@ def tokenize_word(
 
     for index, element in enumerate(word_str):
         if element != ' ':
-            encoded.insert(index, vocabulary['<unk>'])
+            encoded.insert(index, vocabulary[unknown_token])
     return encoded
 
 
