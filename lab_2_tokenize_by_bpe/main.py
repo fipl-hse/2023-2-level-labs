@@ -170,6 +170,8 @@ def decode(
             if num == value:
                 decoded_list.append(key)
     decoded_text = ''.join(decoded_list)
+    if end_of_word_token:
+        decoded_text = decoded_text.replace(end_of_word_token, ' ')
     return decoded_text.strip()
 
 
