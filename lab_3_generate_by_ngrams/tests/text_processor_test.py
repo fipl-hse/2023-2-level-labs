@@ -280,9 +280,6 @@ class TextProcessorTest(unittest.TestCase):
             self.assertEqual(expected, actual)
 
     @pytest.mark.lab_3_generate_by_ngrams
-    @pytest.mark.mark4
-    @pytest.mark.mark6
-    @pytest.mark.mark8
     @pytest.mark.mark10
     def test_text_processor_fill_from_ngrams(self):
         """
@@ -297,9 +294,6 @@ class TextProcessorTest(unittest.TestCase):
         self.assertEqual(expected, text_processor._storage)
 
     @pytest.mark.lab_3_generate_by_ngrams
-    @pytest.mark.mark4
-    @pytest.mark.mark6
-    @pytest.mark.mark8
     @pytest.mark.mark10
     def test_text_processor_fill_from_ngrams_invalid_inputs(self):
         """
