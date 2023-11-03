@@ -21,11 +21,11 @@ def main() -> None:
         return
     vocab = get_vocabulary(trained_dict, '<unk>')
     if not vocab:
-        return None
+        return
     encoded_list = [int(code) for code in encoded_text.split()]
     result = decode(encoded_list, vocab, '</s>')
     if not result:
-        return None
+        return
     print(result)
     assert result, "Encoding is not working"
 
