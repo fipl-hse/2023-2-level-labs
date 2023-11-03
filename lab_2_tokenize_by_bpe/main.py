@@ -98,14 +98,19 @@ def merge_tokens(
         new_word = []
         if pair[0] in word and pair[1] in word:
             for index, token in enumerate(word):
-                if token == pair[1] and word[index - 1] == pair[0]:
-                    pass
-                elif token != pair[0]:
-                    new_word.append(token)
-                elif token == pair[0] and word[index + 1] != pair[1]:
-                    new_word.append(token)
-                elif token == pair[0] and word[index + 1] == pair[1]:
+                if token == pair[0] and word[index + 1] == pair[1]:
                     new_word.append(pair[0] + pair[1])
+                elif token == pair[1] and word[index - 1] == pair[0]:
+                    pass
+                else:
+                    new_word.append(token)
+
+                # elif token != pair[0]:
+                    # new_word.append(token)
+                # elif token == pair[0] and word[index + 1] != pair[1]:
+                    # new_word.append(token)
+                # elif token == pair[0] and word[index + 1] == pair[1]:
+                    # new_word.append(pair[0] + pair[1])
 
             value = word_freq_updated.pop(word)
             word_freq_updated[tuple(new_word)] = value

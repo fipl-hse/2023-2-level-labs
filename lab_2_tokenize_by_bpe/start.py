@@ -22,8 +22,8 @@ def main() -> None:
     if word_frequencies is not None:
         with open(assets_path / 'secrets' / 'secret_2.txt', 'r', encoding='utf-8') as secret_file:
             secret_str = secret_file.read()
-        vocabulary = main_py.get_vocabulary(word_frequencies, '<unk>')
         secret = [int(num) for num in secret_str.split(' ')]
+        vocabulary = main_py.get_vocabulary(word_frequencies, '<unk>')
 
     result = main_py.decode(secret, vocabulary, '</s>')
     print(result)
