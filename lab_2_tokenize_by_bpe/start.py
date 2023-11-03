@@ -17,11 +17,10 @@ def main() -> None:
         encoded_text = text_file.read()
     dict_train = train(collect_frequencies(text, start_of_word=None, end_of_word='</s>'), 100)
     if not dict_train:
-        return None
+        return
     vocabulary = get_vocabulary(dict_train, '<unk>')
     encoded_list = [int(coded) for coded in encoded_text.split()]
     result = decode(encoded_list, vocabulary, '</s>')
-    print(result)
     assert result, "Encoding is not working"
 
 
