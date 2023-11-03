@@ -135,13 +135,17 @@ def get_vocabulary(
     """
     if not isinstance(word_frequencies, dict) or not isinstance(unknown_token, str):
         return None
-    unique_tokens = set()
-    for word in word_frequencies.keys():
-        unique_tokens.update(word)
-    sorted_tokens = sorted(unique_tokens, key=lambda uni_token: (-len(uni_token), uni_token))
-    ident_dict = {unknown_token: 0}
+    ident_dict = {}
+    tokens = set()
+    for word_tuples in word_frequencies.keys():
+        for word in word_tuples:
+            tokens.add(word)
+            for token in word:
+                tokens.add(token)
+    tokens.add(unknown_token)
+    sorted_tokens = sorted(list(tokens), key=lambda uni_token: (-len(uni_token), uni_token))
     for ind, token in enumerate(sorted_tokens):
-        ident_dict[token] = ind + 1
+        ident_dict[token] = ind
     return ident_dict
 
 
