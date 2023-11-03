@@ -167,8 +167,8 @@ def get_vocabulary(
         for word in tuple_word:
             all_tokens.append(word)
             all_tokens += list(word)
-    all_tokens = set(all_tokens)
-    sorted_token_set = sorted(list(all_tokens), key=lambda x: (-len(x), x))
+    all_tokens = list(set(all_tokens))
+    sorted_token_set = sorted(all_tokens, key=lambda x: (-len(x), x))
 
     for index, element in enumerate(sorted_token_set):
         identificators[element] = index
