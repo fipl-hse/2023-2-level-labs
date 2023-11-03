@@ -67,7 +67,7 @@ def count_tokens_pairs(
     for key in word_frequencies.keys():
         for i in range(len(key)-1):
             pair_as_tuple = (key[i], key[i+1])
-            if pair_as_tuple not in dict_of_token_pairs.keys():
+            if pair_as_tuple not in dict_of_token_pairs:
                 dict_of_token_pairs[pair_as_tuple] = word_frequencies[key]
             else:
                 dict_of_token_pairs[pair_as_tuple] += word_frequencies[key]
