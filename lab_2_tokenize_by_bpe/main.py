@@ -64,9 +64,10 @@ def count_tokens_pairs(
     pair_freq = {}
     for word in word_frequencies:
         for i in range(len(word) - 1):
-            if (word[i], word[i + 1]) not in pair_freq:
-                pair_freq[(word[i], word[i + 1])] = 0
-            pair_freq[(word[i], word[i + 1])] += word_frequencies[word]
+            pair = (word[i], word[i + 1])
+            if pair not in pair_freq:
+                pair_freq[pair] = 0
+            pair_freq[pair] += word_frequencies[word]
     return pair_freq
 
 
@@ -182,12 +183,13 @@ def decode(
                     decoded_text += token
             if vocabulary[token] == num and end_of_word_token is None:
                 if token == end_of_word_token:
-                    decoded_text += ''
+                    decoded_text += ' '
                 else:
                     decoded_text += token
     if end_of_word_token is not None:
         if end_of_word_token in decoded_text:
-            decoded_text.replace(end_of_word_token, ' ')
+            print(end_of_word_token)
+            decoded_text = decoded_text.replace(end_of_word_token, ' ')
     return decoded_text
 
 
