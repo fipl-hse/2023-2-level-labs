@@ -223,6 +223,21 @@ jobs:
         run: |
           bash config/stage_1_style_tests/_stage_docstring_check.sh
 
+  sphinx-build:
+    name: Sphinx build
+    runs-on: ubuntu-latest
+    timeout-minutes: 2
+    needs: [ install-dependencies ]
+
+    steps:
+      - uses: actions/checkout@v3
+      - name: Setup FIPL environment
+        uses: fipl-hse/setup-env-action@v0.9
+      - name: Build Sphinx project
+        if: ${{ env.REPOSITORY_TYPE == 'admin' }}
+        run: |
+          bash config/website/_stage_run_sphinx_build.sh
+
   requirements-check:
     name: Requirements check
     runs-on: ubuntu-latest
