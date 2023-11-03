@@ -1,8 +1,9 @@
 """
 BPE Tokenizer starter
 """
+
 from pathlib import Path
-from main import collect_frequencies, train, get_vocabulary
+from main import collect_frequencies, get_vocabulary, train
 
 
 def main() -> None:
