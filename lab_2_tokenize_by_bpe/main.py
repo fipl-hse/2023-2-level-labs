@@ -164,7 +164,7 @@ def get_vocabulary(
     sorted_tokens = sorted(sorted(tokens), key=len, reverse=True)
     dict_ident = {}
     for index, token in enumerate(sorted_tokens):
-        dict_ident[token] = index
+        dict_ident[str(token)] = index
     return dict_ident
 
 
