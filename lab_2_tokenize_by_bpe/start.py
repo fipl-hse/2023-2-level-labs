@@ -14,7 +14,7 @@ def main() -> None:
     with open(assets_path / 'text.txt', 'r', encoding='utf-8') as text_file:
         text = text_file.read()
 
-    result = train(collect_frequencies(text, None, '/s'))
+    result = train(collect_frequencies(text, None, '/s'), 100)
     print(result)
     assert result, "Encoding is not working"
 
