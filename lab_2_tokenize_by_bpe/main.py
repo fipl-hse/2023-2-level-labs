@@ -36,19 +36,17 @@ def collect_frequencies(
     :param end_of_word: a token that signifies the end of word
     :return: dictionary in the form of <preprocessed word: number of occurrences>
     """
-    if not isinstance(text, str) or \
-            not isinstance(start_of_word, str | None) or \
-            not isinstance(end_of_word, str):
+    if not isinstance(text, str) or not isinstance(end_of_word, str) or not (
+            isinstance(start_of_word, str) or start_of_word is None):
         return None
-    split_text = text.split()
-    tokens_dictionary = {}
-    for token in split_text:
-        split_word = prepare_word(token, start_of_word, end_of_word)
-        if split_word is None:
+    final_dictionary = {}
+    for i in text.split():
+        word = prepare_word(i, start_of_word, end_of_word)
+        if not word:
             return None
-        if split_word not in tokens_dictionary:
-            tokens_dictionary[split_word] = split_text.count(token)
-    return tokens_dictionary
+        final_dictionary[word] = text.split().count(i)
+    return final_dictionary
+
 
 
 def count_tokens_pairs(
@@ -119,7 +117,7 @@ def train(
             if word_frequencies is None:
                 return None
             num_merges -= 1
-        return word_frequencies
+    return word_frequencies
 
 
 def get_vocabulary(
