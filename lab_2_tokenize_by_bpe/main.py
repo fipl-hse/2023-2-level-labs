@@ -17,17 +17,17 @@ def prepare_word(
     if not isinstance(raw_word, str):
         return None
     if not (isinstance(start_of_word, str))\
-            or (start_of_word) is None:
+            or start_of_word is None:
         return None
     if not (isinstance(end_of_word, str))\
-            or (end_of_word) is None:
+            or end_of_word is None:
         return None
     tokens_list = list(raw_word)
 
-    if start_of_word:
+    if start_of_word is not None:
         tokens_list.insert(0, start_of_word)
 
-    if end_of_word:
+    if end_of_word is not None:
         tokens_list.append(end_of_word)
     return tuple(tokens_list)
 
