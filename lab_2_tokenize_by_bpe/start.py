@@ -13,10 +13,9 @@ def main() -> None:
     assets_path = Path(__file__).parent / 'assets'
     with open(assets_path / 'text.txt', 'r', encoding='utf-8') as text_file:
         text = text_file.read()
-
-    with open(assets_path/ 'secrets/secret_3.txt', 'r', encoding='utf-8') as text_file:
+    with open(assets_path / 'secrets/secret_3.txt', 'r', encoding='utf-8') as text_file:
         secret = text_file.read()
-    dict_of_freqs = collect_frequencies(text, None, '<s>')
+    dict_of_freqs = collect_frequencies(text, None, '</s>')
     merged_tokens = train(dict_of_freqs, 100)
     if merged_tokens:
         vocabulary = get_vocabulary(merged_tokens, '<unk>')
