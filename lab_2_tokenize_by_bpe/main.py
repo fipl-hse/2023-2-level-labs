@@ -24,7 +24,7 @@ def prepare_word(
         word.append(start_of_word)
     word.extend(list(raw_word))
     if end_of_word is not None:
-        word.insert(len(word) + 1, end_of_word)
+        word.append(end_of_word)
     return tuple(word)
 
 
@@ -144,10 +144,8 @@ def get_vocabulary(
     tokens = set()
     tokens.add(unknown_token)
     for word in word_frequencies:
-        for token in word:
-            tokens.add(token)
-        for symbol in ''.join(word):
-            tokens.add(symbol)
+        tokens.update(word)
+        tokens.update(''.join(word))
     tokens_set = list(tokens)
     tokens_by_length = []
     max_length = max(len(token) for token in tokens_set)
