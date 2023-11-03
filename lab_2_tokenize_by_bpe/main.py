@@ -89,8 +89,15 @@ def merge_tokens(
         return None
     merged_dict = {}
     for word, freq in word_frequencies.items():
-        new_word = [pair[0] + pair[1] if (word[i], word[i + 1]) == pair else word[i] for i in range(len(word) - 1)]
-        new_word.append(word[-1])
+        new_word = []
+        index_word = 0
+        while index_word < len(word):
+            if index_word < len(word) - 1 and (word[index_word], word[index_word + 1]) == pair:
+                new_word.append(pair[0] + pair[1])
+                index_word += 2
+            else:
+                new_word.append(word[index_word])
+                index_word += 1
         merged_dict[tuple(new_word)] = freq
     return merged_dict
 
@@ -114,9 +121,7 @@ def train(
             num_merges = len(pairs_of_tokens)
         max_prevalence = max(pairs_of_tokens.values())
         max_prev_pairs = [pair for pair in pairs_of_tokens if pairs_of_tokens[pair] == max_prevalence]
-        max_length = max([len(str(pair)) for pair in max_prev_pairs])
-        max_length_pairs = [pair for pair in max_prev_pairs if len(str(pair)) == max_length]
-        result = sorted(max_length_pairs)
+        result = sorted(max_prev_pairs, key=lambda max_prev_pair: (-len(str(max_prev_pair)), max_prev_pair))
         word_frequencies = merge_tokens(word_frequencies, result[0])
         if not word_frequencies:
             return None
@@ -159,20 +164,20 @@ def decode(
     :param end_of_word_token: an end-of-word token
     :return: decoded sequence
     """
-    if not (isinstance(encoded_text, list)
-            and not all(isinstance(char, int) for char in encoded_text)
-            and not isinstance(vocabulary, dict)
-            and not (isinstance(end_of_word_token, str) or end_of_word_token is None)):
+    if not (
+            isinstance(encoded_text, list) and
+            isinstance(vocabulary, dict) and
+            (isinstance(end_of_word_token, str) or end_of_word_token is None)
+    ):
         return None
-    decoded_list = []
+    decoded_text = ''
+    all_keys = list(vocabulary.keys())
     for num in encoded_text:
-        for key, value in vocabulary.items():
-            if num == value:
-                decoded_list.append(key)
-    decoded_text = ''.join(decoded_list)
-    if end_of_word_token:
+        char = all_keys[num]
+        decoded_text += char
+    if end_of_word_token is not None:
         decoded_text = decoded_text.replace(end_of_word_token, ' ')
-    return decoded_text.strip()
+    return decoded_text
 
 
 def tokenize_word(
