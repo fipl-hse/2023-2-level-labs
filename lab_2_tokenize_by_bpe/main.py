@@ -157,9 +157,9 @@ def get_vocabulary(
             for letter in token:
                 set_of_tokens.add(letter)
     set_of_tokens.add(unknown_token)
-    sorted_list_of_tokens = sorted(set_of_tokens)
-    sorted_list_of_tokens_2 = sorted(sorted_list_of_tokens, key=len, reverse=True)
-    for i, token in enumerate(sorted_list_of_tokens_2):
+    sorted_set_of_tokens = sorted(set_of_tokens)
+    sorted_set_of_tokens_2 = sorted(sorted_set_of_tokens, key=len, reverse=True)
+    for i, token in enumerate(sorted_set_of_tokens_2):
         if token not in new_dict:
             new_dict[token] = i
     return new_dict
