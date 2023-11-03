@@ -21,9 +21,9 @@ def prepare_word(
     ):
         return None
     tokens = []
+    tokens.extend(list(raw_word))
     if start_of_word:
         tokens.insert(0, start_of_word)
-    tokens.extend(list(raw_word))
     if end_of_word:
         tokens.append(end_of_word)
     preprocessed_word = tuple(tokens)
