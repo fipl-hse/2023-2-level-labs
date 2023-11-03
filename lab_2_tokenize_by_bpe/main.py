@@ -106,7 +106,7 @@ def train(
     :param num_merges: required number of new tokens
     :return: dictionary in the form of <preprocessed word: number of occurrences>
     """
-    if (not isinstance(word_frequencies, dict) and word_frequencies is not None) or not isinstance(num_merges, int):
+    if not isinstance(word_frequencies, dict) or not isinstance(num_merges, int):
         return None
     if word_frequencies is None:
         return None
@@ -151,9 +151,9 @@ def get_vocabulary(
             list_of_tokens.append(token)
             for letter in token:
                 list_of_tokens.append(letter)
-    list_of_tokens = sorted(list_of_tokens)
-    list_of_tokens = sorted(list_of_tokens, key=len, reverse=True)
     set_of_tokens = set(list_of_tokens)
+    set_of_tokens = sorted(set_of_tokens)
+    set_of_tokens = sorted(set_of_tokens, key=len, reverse=True)
     for i, token in enumerate(set_of_tokens):
         if token not in new_dict:
             new_dict[token] = i
