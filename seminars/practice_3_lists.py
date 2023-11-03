@@ -50,7 +50,6 @@ first_test = [1, 2, 3, [1, 2, 3]]
 # .reverse() – reverses the list in place
 # .copy() – returns a shallow copy of the list
 
-
 # TASKS
 
 # Task 1:
@@ -66,7 +65,6 @@ def count_evens(nums: list) -> int:
 # count_evens([2, 1, 2, 3, 4]) → 3
 # count_evens([2, 2, 0]) → 3
 # count_evens([1, 3, 5]) → 0
-
 
 # Task 2:
 # easy level

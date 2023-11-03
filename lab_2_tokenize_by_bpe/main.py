@@ -70,6 +70,7 @@ def count_tokens_pairs(
             if token_pair not in tokens_pair_dict:
                 tokens_pair_dict[token_pair] = 0
             tokens_pair_dict[token_pair] += word_frequencies[word]
+
     return tokens_pair_dict
 
 
@@ -121,6 +122,7 @@ def train(
 
         for i in range(num_merges):
             dict_pairs = count_tokens_pairs(word_frequencies)
+
             max_value = max(dict_pairs.values())
             max_values_list = [key for key, value in dict_pairs.items() if value == max_value]
 
