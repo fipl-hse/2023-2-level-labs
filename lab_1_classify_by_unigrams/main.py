@@ -89,6 +89,15 @@ def compare_profiles(
         return None
     unknown_freq = []
     compare_freq = []
+    # unknown_dict = unknown_profile['freq']
+    # unknown_dict_copy = unknown_dict.copy()
+    # unknown_dict.update(profile_to_compare['freq'])
+    # tokens = set(unknown_dict)
+    # for token in tokens:
+    #     unknown_freq.append(unknown_dict_copy.get(token, 0.0))
+    #     compare_freq.append(profile_to_compare['freq'].get(token, 0.0))
+    # mse = calculate_mse(unknown_freq, compare_freq)
+    # return mse
     unknown_tokens = set(unknown_profile['freq'].keys())
     compare_tokens = set(profile_to_compare['freq'].keys())
     tokens = unknown_tokens | compare_tokens
