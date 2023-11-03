@@ -17,7 +17,7 @@ def prepare_word(
     if (
         not isinstance(raw_word, str)
         or (start_of_word is not None and not isinstance(start_of_word, str))
-        or (end_of_word is not None and not (isinstance(end_of_word, str)))
+        or (end_of_word is not None and not isinstance(end_of_word, str))
     ):
         return None
     tokens = []
@@ -52,7 +52,7 @@ def collect_frequencies(
         preprocessed_word = prepare_word(preprocessed_word, start_of_word, end_of_word)
         if preprocessed_word is None:
             return None
-        if preprocessed_word not in freq_dict.keys():
+        if preprocessed_word not in freq_dict:
             freq_dict.update({preprocessed_word: text.count(preprocessed_word)})
         freq_dict[preprocessed_word] += 1
 
@@ -74,7 +74,7 @@ def count_tokens_pairs(
         for i in range(len(word)-1):
             tokens_pair = word[i], word[i+1]
             tokens_pair = tuple(tokens_pair)
-            if tokens_pair not in pair_frequencies.keys():
+            if tokens_pair not in pair_frequencies:
                 pair_frequencies[tokens_pair] = 0
             pair_frequencies[tokens_pair] += freq
 
