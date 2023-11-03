@@ -36,16 +36,22 @@ def collect_frequencies(
     :param end_of_word: a token that signifies the end of word
     :return: dictionary in the form of <preprocessed word: number of occurrences>
     """
-    if not isinstance(text, str) or not isinstance(end_of_word, str) or not (
-            isinstance(start_of_word, str) or start_of_word is None):
+    if not (
+            isinstance(text, str) and
+            (isinstance(start_of_word, str) or start_of_word is None) and
+            (isinstance(end_of_word, str))
+    ):
         return None
-    final_dictionary = {}
-    for i in text.split():
-        word = prepare_word(i, start_of_word, end_of_word)
-        if not word:
+    freq_dictionary = {}
+    words = text.split()
+    for word in words:
+        prepared_words = prepare_word(word, start_of_word, end_of_word)
+        if prepared_words is None:
             return None
-        final_dictionary[word] = text.split().count(i)
-    return final_dictionary
+        if prepared_words not in freq_dictionary:
+            freq_dictionary[prepared_words] = 0
+        freq_dictionary[prepared_words] += 1
+    return freq_dictionary
 
 
 
