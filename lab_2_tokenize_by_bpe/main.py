@@ -5,7 +5,7 @@ BPE and machine translation evaluation
 
 
 def prepare_word(
-    raw_word: str, start_of_word: str | None, end_of_word: str | None
+        raw_word: str, start_of_word: str | None, end_of_word: str | None
 ) -> tuple[str, ...] | None:
     """
     Tokenizes word into unigrams and appends end-of-word token
@@ -15,9 +15,9 @@ def prepare_word(
     :return: preprocessed word
     """
     if not (
-        isinstance(raw_word, str)
-        and (start_of_word is None or isinstance(start_of_word, str))
-        and (end_of_word is None or isinstance(end_of_word, str))
+            isinstance(raw_word, str)
+            and (start_of_word is None or isinstance(start_of_word, str))
+            and (end_of_word is None or isinstance(end_of_word, str))
     ):
         return None
     total_result = []
@@ -31,7 +31,7 @@ def prepare_word(
 
 
 def collect_frequencies(
-    text: str, start_of_word: str | None, end_of_word: str
+        text: str, start_of_word: str | None, end_of_word: str
 ) -> dict[tuple[str, ...], int] | None:
     """
     Counts number of occurrences of each word
@@ -57,7 +57,7 @@ def collect_frequencies(
 
 
 def count_tokens_pairs(
-    word_frequencies: dict[tuple[str, ...], int]
+        word_frequencies: dict[tuple[str, ...], int]
 ) -> dict[tuple[str, str], int] | None:
     """
     Counts number of occurrences of each pair of subsequent tokens
@@ -77,7 +77,7 @@ def count_tokens_pairs(
 
 
 def merge_tokens(
-    word_frequencies: dict[tuple[str, ...], int], pair: tuple[str, str]
+        word_frequencies: dict[tuple[str, ...], int], pair: tuple[str, str]
 ) -> dict[tuple[str, ...], int] | None:
     """
     Updates word frequency dictionary by replacing a pair of token with a merged one
@@ -103,7 +103,7 @@ def merge_tokens(
 
 
 def train(
-    word_frequencies: dict[tuple[str, ...], int] | None, num_merges: int
+        word_frequencies: dict[tuple[str, ...], int] | None, num_merges: int
 ) -> dict[tuple[str, ...], int] | None:
     """
     Creates required number of new tokens by merging existing ones
@@ -120,8 +120,8 @@ def train(
         if num_merges > len(pairs_of_tokens):
             num_merges = len(pairs_of_tokens)
         max_prevalence = max(pairs_of_tokens.values())
-        max_prev_pairs = [pair for pair in pairs_of_tokens if pairs_of_tokens[pair] == max_prevalence]
-        result = sorted(max_prev_pairs, key=lambda max_prev_pair: (-len(str(max_prev_pair)), max_prev_pair))
+        prev_pairs = [pair for pair in pairs_of_tokens if pairs_of_tokens[pair] == max_prevalence]
+        result = sorted(prev_pairs, key=lambda max_prev_pair: (-len(str(max_prev_pair)), max_prev_pair))
         word_frequencies = merge_tokens(word_frequencies, result[0])
         if not word_frequencies:
             return None
@@ -130,7 +130,7 @@ def train(
 
 
 def get_vocabulary(
-    word_frequencies: dict[tuple[str, ...], int], unknown_token: str
+        word_frequencies: dict[tuple[str, ...], int], unknown_token: str
 ) -> dict[str, int] | None:
     """
     Establishes correspondence between tokens and its integer identifier
@@ -155,7 +155,7 @@ def get_vocabulary(
 
 
 def decode(
-    encoded_text: list[int] | None, vocabulary: dict[str, int] | None, end_of_word_token: str | None
+        encoded_text: list[int] | None, vocabulary: dict[str, int] | None, end_of_word_token: str | None
 ) -> str | None:
     """
     Translates encoded sequence into decoded one
@@ -181,7 +181,7 @@ def decode(
 
 
 def tokenize_word(
-    word: tuple[str, ...], vocabulary: dict[str, int], end_of_word: str | None, unknown_token: str
+        word: tuple[str, ...], vocabulary: dict[str, int], end_of_word: str | None, unknown_token: str
 ) -> list[int] | None:
     """
     Splits word into tokens
@@ -229,7 +229,7 @@ def collect_ngrams(text: str, order: int) -> list[tuple[str, ...]] | None:
 
 
 def calculate_precision(
-    actual: list[tuple[str, ...]], reference: list[tuple[str, ...]]
+        actual: list[tuple[str, ...]], reference: list[tuple[str, ...]]
 ) -> float | None:
     """
     Compares two sequences by virtue of Precision metric
