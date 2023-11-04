@@ -137,6 +137,23 @@ def get_vocabulary(
     :param unknown_token: a token to signify an unknown token
     :return: dictionary in the form of <token: identifier>
     """
+    if not isinstance(word_frequencies, dict)\
+        or not isinstance(unknown_token, str):
+        return None
+    tok_list = set()
+    get_dict = {}
+    for tuples in word_frequencies.keys():
+        for word in tuples:
+            tok_list.add(word)
+            for token in word:
+                tok_list.add(token)
+    tok_list.add(unknown_token)
+    lex_sort = sorted(tok_list)
+    len_sort = sorted(lex_sort, key=len, reverse = True)
+    for index, token in enumerate(len_sort):
+        get_dict[token] = index
+    return get_dict
+
 
 
 def decode(
