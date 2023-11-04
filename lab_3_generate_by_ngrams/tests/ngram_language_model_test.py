@@ -71,6 +71,8 @@ class NGramLanguageModelTest(unittest.TestCase):
             self.assertAlmostEqual(self.ngram_frequencies[key], actual[key], places=4)
 
     @pytest.mark.lab_3_generate_by_ngrams
+    @pytest.mark.mark6
+    @pytest.mark.mark8
     @pytest.mark.mark10
     def test_ngram_language_model_set_n_grams(self):
         """
@@ -81,6 +83,8 @@ class NGramLanguageModelTest(unittest.TestCase):
         self.assertEqual(self.ngram_frequencies, language_model._n_gram_frequencies)
 
     @pytest.mark.lab_3_generate_by_ngrams
+    @pytest.mark.mark6
+    @pytest.mark.mark8
     @pytest.mark.mark10
     def test_ngram_language_model_set_n_grams_invalid_input(self):
         """
