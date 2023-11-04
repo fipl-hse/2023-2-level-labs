@@ -108,8 +108,26 @@ def train(
     :param num_merges: required number of new tokens
     :return: dictionary in the form of <preprocessed word: number of occurrences>
     """
-
-
+    if (not isinstance(word_frequencies, dict)
+            or not isinstance(num_merges, int)):
+        return None
+    while num_merges > 0:
+        tok_pairs = count_tokens_pairs(word_frequencies)
+        if not tok_pairs:
+            return None
+        num_merges = min(num_merges, len(tok_pairs))
+        the_biggest = max(tok_pairs.values())
+        com_pair = [key for key, value in tok_pairs.items()
+                    if value == the_biggest]
+        the_longest = max(len(str(pair)) for pair in com_pair)
+        the_longest_pair =[pair for pair in com_pair
+                           if the_longest == len(str(pair))]
+        lovely_pairs = sorted(the_longest_pair)
+        word_frequencies = merge_tokens(word_frequencies, lovely_pairs[0])
+        if not word_frequencies:
+            return None
+        num_merges -= 1
+    return word_frequencies
 def get_vocabulary(
     word_frequencies: dict[tuple[str, ...], int], unknown_token: str
 ) -> dict[str, int] | None:
