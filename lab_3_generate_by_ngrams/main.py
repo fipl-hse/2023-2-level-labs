@@ -45,7 +45,7 @@ class TextProcessor:
         """
         if not isinstance(text, str) or not text or not any(char.isalpha() for char in text):
             return None
-
+        self.text = text
         splited_text = text.split()
         final_text = []
         for word in splited_text:
@@ -85,6 +85,7 @@ class TextProcessor:
         Returns:
             str: EoW token
         """
+        return self._end_of_word_token
 
     def get_token(self, element_id: int) -> Optional[str]:
         """
@@ -179,6 +180,17 @@ class TextProcessor:
         In case of corrupt input arguments, None is returned.
         In case any of methods used return None, None is returned.
         """
+        if not isinstance(encoded_corpus, tuple) or encoded_corpus is None:
+            return None
+
+        decoded_text = self._decode(encoded_corpus)
+        if decoded_text is None:
+            return None
+        processed_text = self._postprocess_decoded_text(decoded_text)
+        if processed_text is None:
+            return None
+
+        return processed_text
 
     def fill_from_ngrams(self, content: dict) -> None:
         """
@@ -201,6 +213,20 @@ class TextProcessor:
         In case of corrupt input arguments, None is returned.
         In case any of methods used return None, None is returned.
         """
+        if not isinstance(corpus, tuple) or len(corpus) == 0:
+            return None
+
+        decoded_corpus = []
+        for element in range(len(corpus)):
+            decoded_element = self.get_token(corpus[element])
+            if decoded_element is None:
+                return None
+            decoded_corpus.append(decoded_element)
+        if not decoded_corpus:
+            return None
+
+        return tuple(decoded_corpus)
+
 
     def _postprocess_decoded_text(self, decoded_corpus: tuple[str, ...]) -> Optional[str]:
         """
@@ -217,6 +243,18 @@ class TextProcessor:
 
         In case of corrupt input arguments, None is returned
         """
+        if not isinstance(decoded_corpus, tuple) or len(decoded_corpus) == 0:
+            return None
+        decoded_corpus = list(decoded_corpus)
+        if decoded_corpus[-1] == "_":
+            decoded_corpus[-1] = "."
+        else:
+            decoded_corpus.append(".")
+
+        for token in range(len(decoded_corpus)):
+            if decoded_corpus[token] == "_":
+                decoded_corpus[token] = " "
+        return "".join(decoded_corpus).capitalize()
 
 
 class NGramLanguageModel:
