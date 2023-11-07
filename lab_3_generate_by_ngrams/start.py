@@ -14,9 +14,10 @@ def main() -> None:
         text = text_file.read()
     corpus = TextProcessor('_')
     encoded_text = corpus.encode(text)
-    decoded_text = corpus.decode(encoded_text)
+    result = corpus.decode(encoded_text)
     print(encoded_text)
-    print(decoded_text)
+    print(result)
+    assert result
 
 
 if __name__ == "__main__":
