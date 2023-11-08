@@ -289,6 +289,9 @@ class NGramLanguageModel:
             encoded_corpus (tuple): Encoded text
             n_gram_size (int): A size of n-grams to use for language modelling
         """
+        self._n_gram_size = n_gram_size
+        self._n_gram_frequencies = {}
+        self._encoded_corpus = encoded_corpus
 
     def get_n_gram_size(self) -> int:
         """
@@ -297,6 +300,7 @@ class NGramLanguageModel:
         Returns:
             int: Size of stored n_grams
         """
+        return self._n_gram_size
 
     def set_n_grams(self, frequencies: dict) -> None:
         """
@@ -318,6 +322,21 @@ class NGramLanguageModel:
         In case of corrupt input arguments or methods used return None,
         1 is returned
         """
+        if not (isinstance(self._encoded_corpus, tuple) and self._encoded_corpus):
+            return 1
+
+        ngrams = self._extract_n_grams(self._encoded_corpus)
+
+        if not ngrams:
+            return 1
+
+        for ngram in set(ngrams):
+            if not isinstance(ngram, tuple) or not (all(isinstance(num, int) for num in ngram)):
+                return 1
+
+            self._n_gram_frequencies[ngram] = ngrams.count(ngram) / len([occ for occ in ngrams if occ[:-1] == ngram[:-1]])
+
+        return 0
 
     def generate_next_token(self, sequence: tuple[int, ...]) -> Optional[dict]:
         """
@@ -331,6 +350,16 @@ class NGramLanguageModel:
 
         In case of corrupt input arguments, None is returned
         """
+        if not (isinstance(sequence, tuple) and sequence and len(sequence) >= self._n_gram_size - 1):
+            return None
+
+        tokens = {}
+        context = sequence[-self._n_gram_size + 1:]
+        for ngram, frequency in self._n_gram_frequencies.items():
+            if ngram[:self._n_gram_size - 1] == context:
+                tokens[ngram[self._n_gram_size - 1]] = frequency
+
+        return tokens
 
     def _extract_n_grams(
         self, encoded_corpus: tuple[int, ...]
@@ -346,6 +375,11 @@ class NGramLanguageModel:
 
         In case of corrupt input arguments, None is returned
         """
+        if not isinstance(self._encoded_corpus, tuple) or self._encoded_corpus is None:
+            return None
+
+        return [tuple(self._encoded_corpus[i:i + self._n_gram_size])
+                for i in range(len(self._encoded_corpus) - self._n_gram_size + 1)]
 
 
 class GreedyTextGenerator:
