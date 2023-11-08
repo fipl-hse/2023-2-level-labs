@@ -167,24 +167,19 @@ def decode(
     :return: decoded sequence
     """
     if not isinstance(encoded_text, list)\
-        or not isinstance(vocabulary, dict)\
-        or (not isinstance(end_of_word_token, str)\
-        or (end_of_word_token is None)):
+            or not isinstance(vocabulary, dict)\
+            or not (isinstance(end_of_word_token, str)\
+            or end_of_word_token is None):
         return None
     decoder = ''
-    wrong_voc = {value: token for token, value in vocabulary.items()}
-    for num in encoded_text:
-        for key in wrong_voc:
-            if key != num:
-                continue
-            token = wrong_voc[num]
-            if end_of_word_token is not None\
-            and end_of_word_token in token:
-                token = token.replace(end_of_word_token,' ')
-            decoder += token
+    for number in encoded_text:
+        tok_l = [tok for tok in vocabulary if vocabulary[tok] == number]
+        for tok in tok_l:
+            decoder += tok
+    if end_of_word_token:
+        decoder = decoder.replace(end_of_word_token, ' ')
+
     return decoder
-
-
 
 
 def tokenize_word(
