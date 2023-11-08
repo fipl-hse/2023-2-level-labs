@@ -14,7 +14,7 @@ def main() -> None:
         text = text_file.read()
     split_text = TextProcessor('_')
     encoding = split_text.encode(text)
-    result= split_text.decode(encoding)
+    result = split_text.decode(encoding)
     print('Encoding of the text:', encoding)
     print('Decoding of the text:', result)
     assert result
