@@ -137,7 +137,6 @@ class TextProcessor:
             tokens_ids = self.get_id(tokenized_text[i])
             if tokens_ids is None:
                 return None
-
             encoded_corpus.append(tokens_ids)
 
         if encoded_text is None:

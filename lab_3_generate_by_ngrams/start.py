@@ -13,7 +13,7 @@ def main() -> None:
         text = text_file.read()
     #result = None
     result = TextProcessor('_')
-    print(result._tokenize(text=text))
+    #print(result._tokenize(text=text))
     print(result.encode(text=text))
     assert result
 
