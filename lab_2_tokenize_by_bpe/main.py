@@ -142,7 +142,7 @@ def train(
         if not word_frequencies:
             return None
 
-        num_merges -= 1
+        num_merges -=  1
 
     return word_frequencies
 
