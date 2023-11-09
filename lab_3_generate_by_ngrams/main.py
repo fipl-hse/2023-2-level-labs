@@ -24,7 +24,7 @@ class TextProcessor:
             end_of_word_token (str): A token denoting word boundary
         """
         self._end_of_word_token = end_of_word_token
-        self._storage = {"_": 0}
+        self._storage = {end_of_word_token: 0}
 
     def _tokenize(self, text: str) -> Optional[tuple[str, ...]]:
         """
@@ -47,7 +47,7 @@ class TextProcessor:
             return None
 
         tokenized_text = []
-        lower_split_text = [token.lower() for token in text.split()]
+        lower_split_text = list(text.lower().split())
 
         for i in lower_split_text:
             word = list(''.join(token for token in i if token.isalpha()))
@@ -160,7 +160,7 @@ class TextProcessor:
             return None
 
         if element not in self._storage:
-            self._storage.update({element: len(self._storage)})
+            self._storage[element] = len(self._storage)
 
     def decode(self, encoded_corpus: tuple[int, ...]) -> Optional[str]:
         """
@@ -215,16 +215,16 @@ class TextProcessor:
         if not isinstance(corpus, tuple) or len(corpus) == 0:
             return None
 
-        r = []
+        decoded = []
         for i in corpus:
-            f = self.get_token(i)
+            token = self.get_token(i)
 
-            if f is None:
+            if token is None:
                 return None
 
-            r.append(f)
+            decoded.append(token)
 
-        return tuple(r)
+        return tuple(decoded)
 
     def _postprocess_decoded_text(self, decoded_corpus: tuple[str, ...]) -> Optional[str]:
         """
