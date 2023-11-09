@@ -90,7 +90,7 @@ class TextProcessor:
         Returns:
             str: EoW token
         """
-        return self.end_of_word_token
+        return self._end_of_word_token
 
     def get_token(self, element_id: int) -> Optional[str]:
         """
@@ -155,8 +155,8 @@ class TextProcessor:
         In case of corrupt input arguments or invalid argument length,
         an element is not added to storage
         """
-        if self.end_of_word_token not in self._storage:
-            self._storage[self.end_of_word_token] = 0
+        if self._end_of_word_token not in self._storage:
+            self._storage[self._end_of_word_token] = 0
 
         if isinstance(element, str) and len(element) == 1 and element not in self._storage:
             self._storage[element] = len(self._storage)
@@ -246,7 +246,7 @@ class TextProcessor:
         for index, token in enumerate(decoded_corpus):
             if index == 0:
                 postprocessed_text += token.upper()
-            elif token == self.end_of_word_token:
+            elif token == self._end_of_word_token:
                 if index == len(decoded_corpus) - 1:
                     postprocessed_text += '.'
                 else:
