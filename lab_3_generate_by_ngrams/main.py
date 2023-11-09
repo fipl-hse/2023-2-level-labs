@@ -23,6 +23,7 @@ class TextProcessor:
         Args:
             end_of_word_token (str): A token denoting word boundary
         """
+        self._end_of_word_token = end_of_word_token
 
         class TextProcessor:
             """
@@ -32,6 +33,8 @@ class TextProcessor:
                 _end_of_word_token (str): A token denoting word boundary
                 _storage (dict): Dictionary in the form of <token: identifier>
             """
+            self._end_of_word_token = end_of_word_token
+            self._storage = {self._end_of_word_token: 0}
 
             def init(self, end_of_word_token: str) -> None:
                 """
@@ -41,7 +44,6 @@ class TextProcessor:
                     end_of_word_token (str): A token denoting word boundary
                 """
                 self._end_of_word_token = end_of_word_token
-                self._storage = {self._end_of_word_token: 0}
 
     def _tokenize(self, text: str) -> Optional[tuple[str, ...]]:
         """
@@ -151,16 +153,10 @@ class TextProcessor:
         In case of corrupt input arguments or invalid argument length,
         an element is not added to storage
         """
-        if type(element) != str or len(element) != 1:
+        if not isinstance(element, str) or len(element) != 1:
             return None
-
-        element = element.lower()
-        if element in self._storage:
-            return self._storage[element]
-
-        new_id = len(self._storage)
-        self._storage[element] = new_id
-        return new_id
+        if element not in self._storage:
+            self._storage[element] = len(self._storage)
 
     def decode(self, encoded_corpus: tuple[int, ...]) -> Optional[str]:
         """
