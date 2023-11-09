@@ -79,7 +79,7 @@ class TextProcessor:
             else:
                 if len(word) > 0:
                     tokens.extend(list(word))
-                    tokens.append(self.end_of_word_token)
+                    tokens.append(self._end_of_word_token)
                     word = ''
                 if char.isspace():
                     continue
@@ -88,7 +88,7 @@ class TextProcessor:
 
         if len(word) > 0:
             tokens.extend(list(word))
-            tokens.append(self.end_of_word_token)
+            tokens.append(self._end_of_word_token)
 
         return tuple(tokens)
 
