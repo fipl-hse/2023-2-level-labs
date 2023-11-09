@@ -24,6 +24,25 @@ class TextProcessor:
             end_of_word_token (str): A token denoting word boundary
         """
 
+        class TextProcessor:
+            """
+            Handle text tokenization, encoding and decoding.
+
+            Attributes:
+                _end_of_word_token (str): A token denoting word boundary
+                _storage (dict): Dictionary in the form of <token: identifier>
+            """
+
+            def init(self, end_of_word_token: str) -> None:
+                """
+                Initialize an instance of LetterStorage.
+
+                Args:
+                    end_of_word_token (str): A token denoting word boundary
+                """
+                self._end_of_word_token = end_of_word_token
+                self._storage = {self._end_of_word_token: 0}
+
     def _tokenize(self, text: str) -> Optional[tuple[str, ...]]:
         """
         Tokenize text into unigrams, separating words with special token.
@@ -41,6 +60,34 @@ class TextProcessor:
         In case of corrupt input arguments, None is returned.
         In case any of methods used return None, None is returned.
         """
+        if not (isinstance(text, str)) or len(text) == 0:
+                return None
+        text = text.lower()
+        tokens = []
+        word = ''
+        punc = '''!()-[]{};:'"\,<>./?@#$%^&*_~1234567890'''
+        for i in text:
+            if i in punc:
+                text = text.replace(i, "")
+
+        for char in text:
+            if char.isalpha():
+                word += char
+            else:
+                if len(word) > 0:
+                    tokens.extend(list(word))
+                    tokens.append(self.end_of_word_token)
+                    word = ''
+                if char.isspace():
+                    continue
+                else:
+                    tokens.append(char)
+
+        if len(word) > 0:
+            tokens.extend(list(word))
+            tokens.append(self.end_of_word_token)
+
+        return tuple(tokens)
 
     def get_id(self, element: str) -> Optional[int]:
         """
@@ -104,6 +151,16 @@ class TextProcessor:
         In case of corrupt input arguments or invalid argument length,
         an element is not added to storage
         """
+        if type(element) != str or len(element) != 1:
+            return None
+
+        element = element.lower()
+        if element in self._storage:
+            return self._storage[element]
+
+        new_id = len(self._storage)
+        self._storage[element] = new_id
+        return new_id
 
     def decode(self, encoded_corpus: tuple[int, ...]) -> Optional[str]:
         """
