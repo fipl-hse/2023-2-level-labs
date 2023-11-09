@@ -55,8 +55,8 @@ class TextProcessor:
             else:
                 if index == 0:
                     pass
-                elif tokenized_text[-1] != self.end_of_word_token:
-                    tokenized_text.append(self.end_of_word_token)
+                elif tokenized_text[-1] != self._end_of_word_token:
+                    tokenized_text.append(self._end_of_word_token)
                 else:
                     pass
 
