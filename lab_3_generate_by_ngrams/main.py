@@ -23,7 +23,7 @@ class TextProcessor:
         Args:
             end_of_word_token (str): A token denoting word boundary
         """
-        self.end_of_word_token = end_of_word_token
+        self._end_of_word_token = end_of_word_token
         self._storage = {}
 
     def _tokenize(self, text: str) -> Optional[tuple[str, ...]]:
@@ -371,7 +371,7 @@ class NGramLanguageModel:
 
         n_grams_list = []
         for index, number in enumerate(encoded_corpus):
-            if index == len(encoded_corpus) - 1:
+            if index == len(encoded_corpus) - (self._n_gram_size - 1):
                 break
             n_gram = [number]
             for i in range(1, self._n_gram_size):
@@ -398,6 +398,8 @@ class GreedyTextGenerator:
             language_model (NGramLanguageModel): A language model to use for text generation
             text_processor (TextProcessor): A TextProcessor instance to handle text processing
         """
+        self._model = language_model
+        self._text_processor = text_processor
 
     def run(self, seq_len: int, prompt: str) -> Optional[str]:
         """
@@ -413,6 +415,33 @@ class GreedyTextGenerator:
         In case of corrupt input arguments or methods used return None,
         None is returned
         """
+        if not isinstance(seq_len, int) or not isinstance(prompt, str) or len(prompt) == 0:
+            return None
+
+        encoded_text_tuple = self._text_processor.encode(prompt)
+        if encoded_text_tuple is None:
+            return None
+        # context_len = self._model.get_n_gram_size() - 1
+        encoded_text_list = list(encoded_text_tuple)
+
+        for i in range(seq_len):
+            possible_tokens = self._model.generate_next_token(encoded_text_tuple)
+            if possible_tokens is None:
+                return prompt + '.'
+            if len(possible_tokens) == 0:
+                break
+            # max_value = sorted(list(possible_tokens.values()), reverse=True)[0]
+            # max_freq_tokens = [(key, value) for key, value in possible_tokens.items() if value == max_value]
+            possible_tokens_list = list(possible_tokens.items())
+            possible_tokens_list.sort(key=lambda x: x[0], reverse=True)
+            possible_tokens_list.sort(key=lambda x: x[1], reverse=True)
+
+            encoded_text_list.append(possible_tokens_list[0][0])
+            encoded_text_tuple = tuple(encoded_text_list)
+
+        decoded_text = self._text_processor.decode(encoded_text_tuple) + '.'
+
+        return decoded_text
 
 
 class BeamSearcher:
