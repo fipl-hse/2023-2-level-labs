@@ -47,13 +47,14 @@ def collect_frequencies(
 
     word_list = text.split()
     freq_dict = {}
+
     for word in word_list:
-        freq = word_list.count(word)
         prep_word = prepare_word(word, start_of_word, end_of_word)
         if prep_word is None:
             return None
         if prep_word not in freq_dict:
-            freq_dict.update({prep_word:freq})
+            freq_dict.update({prep_word:0})
+        freq_dict[prep_word] += 1
 
     return freq_dict
 def count_tokens_pairs(
