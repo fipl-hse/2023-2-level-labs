@@ -14,7 +14,8 @@ def prepare_word(
     :param end_of_word: a token that signifies the end of word
     :return: preprocessed word
     """
-    if raw_word == None:
+    if not isinstance(raw_word, str) or not isinstance(end_of_word, str | None) or not isinstance(start_of_word,
+                                                                                                  str | None):
         return None
 
     raw_tokens = [*raw_word]
@@ -69,16 +70,13 @@ def count_tokens_pairs(
 
     result = {}
 
-    for word in word_frequencies.keys():
-        if len(word) <= 1:
-            continue
-
+    for word, number in word_frequencies.items():
         for index, letter in enumerate(word[:-1]):
             pair = (word[index], word[index + 1])
             if pair not in result:
-                result[pair] = 1
+                result[pair] = number
             else:
-                result[pair] += 1
+                result[pair] += number
 
     return result
 
@@ -93,15 +91,25 @@ def merge_tokens(
     """
     if not isinstance(word_frequencies, dict) or not isinstance(pair, tuple):
         return None
-    if pair not in word_frequencies:
-        return None
 
-    old_value = word_frequencies[pair]
-    changed_pair = ("".join(filter(str.isalnum, pair)),)
-    word_frequencies.pop(pair)
-    word_frequencies[changed_pair] = old_value
+    narrowed_dict = word_frequencies.copy()
+    for key, value in word_frequencies.items():
+        if pair[0] and pair[1] in key:
+            changed_key = []
+            for f_index in [i for i, c in enumerate(key) if c == pair[0]]:
+                for s_index in [i for i, c in enumerate(key) if c == pair[1]]:
+                    if f_index - s_index != -1:
+                        continue
+                    else:
+                        pagination = lambda s, n: [s[i:i + n] for i in (range(0, len(s), n))]
+                        N = 1
+                        full_list = pagination("".join(pair), 100)
+                        the_pair = [tuple(full_list[n:n + N]) for n in range(0, len(full_list), N)]
+                        changed_key = tuple(key[:f_index]) + the_pair[0] + tuple(key[f_index + 2:])
+                    narrowed_dict.pop(key)
+                    narrowed_dict[tuple(changed_key)] = value
 
-    return word_frequencies
+    return narrowed_dict
 
 
 def train(
@@ -118,16 +126,25 @@ def train(
     if not isinstance(word_frequencies, dict) and word_frequencies != None:
         return None
 
-#    num_existed = 0
-#    while num_existed != num_merges:
-#        max_number = max(word_frequencies.values())
-#        prepared_pair = [p for p, v in word_frequencies.items() if v == max_number]
-#
-#        merge_tokens(word_frequencies, prepared_pair)
-#        num_existed += 1
-#        print(max_number)
-#
-#    return word_frequencies
+    num_existed = 0
+    while num_existed != num_merges:
+        pairs = count_tokens_pairs(word_frequencies)
+        max_number = max(pairs.values())
+        possible_pairs = [p for p, v in pairs.items() if v == max_number]
+
+        max_length = max(len(''.join(pair)) for pair in possible_pairs)
+        probable_pairs = [p for p in possible_pairs if len(''.join(p)) == max_length]
+        prepared_pair = sorted(probable_pairs)[0]
+
+        word_frequencies = merge_tokens(word_frequencies, prepared_pair)
+        if word_frequencies is None:
+            return None
+        num_existed += 1
+        print(max_number)
+        print(word_frequencies)
+
+    print(word_frequencies)
+    return word_frequencies
 
 
 def get_vocabulary(

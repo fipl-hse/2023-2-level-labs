@@ -17,8 +17,8 @@ def main() -> None:
     print(prepare_word('father', '</b>', '</s>'))
     print(collect_frequencies(text, None, '</s>'))
     print(count_tokens_pairs(collect_frequencies(text, None, '</s>')))
-    print(merge_tokens(count_tokens_pairs(collect_frequencies(text, None, '</s>')), ('и', 'м')))
-    #    print(train(count_tokens_pairs(collect_frequencies(text, None, '</s>')), 12))
+    print(merge_tokens(collect_frequencies(text, None, '</s>'), (',', '</s>')))
+    # print(train(collect_frequencies(text, None, '</s>'), 12))
     result = 1
     assert result, "Encoding is not working"
 
