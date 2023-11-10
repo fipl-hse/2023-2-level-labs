@@ -5,6 +5,7 @@ Beam-search and natural language generation evaluation
 """
 # pylint:disable=too-few-public-methods
 from typing import Optional
+import math
 
 
 class TextProcessor:
@@ -48,7 +49,7 @@ class TextProcessor:
 
         tokens = []
         for token in text.lower():
-            if token == ' ' and tokens[-1] != self._end_of_word_token:
+            if token.isspace() and tokens[-1] != self._end_of_word_token:
                 tokens.append(self._end_of_word_token)
             elif token.isalpha():
                 tokens.append(token)
@@ -388,24 +389,22 @@ class GreedyTextGenerator:
         encoded = self._text_processor.encode(prompt)
         if not (encoded and n_gram_size):
             return None
-        encoded_list = list(encoded)
 
         phrase = prompt
         for iteration in range(seq_len):
-            context = encoded[-n_gram_size + 1:]
-            tokens = self._model.generate_next_token(tuple(encoded_list[-n_gram_size + 1:]))
+            tokens = self._model.generate_next_token(encoded[-n_gram_size + 1:])
             if not tokens:
                 break
             max_freq = max(tokens.values())
             candidates_max = [candidate for candidate, freq in tokens.items()
                               if freq == max_freq]
-            encoded_list.append(sorted(candidates_max)[0])
-            best_candidate = self._text_processor.get_token(encoded_list[-1])
+            encoded = encoded + (sorted(candidates_max)[0],)
+            best_candidate = self._text_processor.get_token(encoded[-1])
             if not best_candidate:
                 return None
             phrase += best_candidate
 
-        text = self._text_processor.decode(tuple(encoded_list))
+        text = self._text_processor.decode(encoded)
         if not text:
             return None
         return text
@@ -428,6 +427,8 @@ class BeamSearcher:
             beam_width (int): Number of candidates to consider at each step
             language_model (NGramLanguageModel): A language model to use for next token prediction
         """
+        self._beam_width = beam_width
+        self._model = language_model
 
     def get_next_token(self, sequence: tuple[int, ...]) -> Optional[list[tuple[int, float]]]:
         """
@@ -448,6 +449,15 @@ class BeamSearcher:
 
         In case of corrupt input arguments or methods used return None.
         """
+        if not isinstance(sequence, tuple) or not sequence:
+            return None
+        tokens = self._model.generate_next_token(sequence)
+        if tokens is None:
+            return None
+        if not tokens:
+            return []
+        return sorted([(token, float(freq)) for token, freq in tokens.items()],
+                      key=lambda x: x[1], reverse=True)[:self._beam_width]
 
     def continue_sequence(
         self,
@@ -470,6 +480,16 @@ class BeamSearcher:
 
         In case of corrupt input arguments or unexpected behaviour of methods used return None.
         """
+        if not (isinstance(sequence, tuple) and isinstance(next_tokens, list)
+                and isinstance(sequence_candidates, dict) and sequence
+                and next_tokens and sequence_candidates and len(next_tokens) <= self._beam_width
+                and sequence in sequence_candidates):
+            return None
+
+        for (token, freq) in next_tokens:
+            sequence_candidates[sequence + (token,)] = sequence_candidates[sequence] - math.log(freq)
+        sequence_candidates.pop(sequence)
+        return sequence_candidates
 
     def prune_sequence_candidates(
         self, sequence_candidates: dict[tuple[int, ...], float]
@@ -485,6 +505,9 @@ class BeamSearcher:
 
         In case of corrupt input arguments return None.
         """
+        if not (isinstance(sequence_candidates, dict) and sequence_candidates):
+            return None
+        return dict(sorted([(seq, freq) for seq, freq in sequence_candidates.items()], key=lambda x: x[1], reverse=True)[:self._beam_width])
 
 
 class BeamSearchTextGenerator:
