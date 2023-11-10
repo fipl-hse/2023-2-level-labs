@@ -82,7 +82,7 @@ def count_tokens_pairs(
 
     for word, frequency in word_frequencies.items():
 
-        for letter_index in range(len(word)):
+        for letter_index in range(len(word) - 1):
 
             if word[letter_index] == '</s>':
                 continue
@@ -113,38 +113,22 @@ def merge_tokens(
         return None
 
     updated_word_frequencies = {}
-    list_of_keys = []
 
-    for word in word_frequencies.keys():
-        list_of_keys.append(list(word))
+    for word in word_frequencies:
+        word_in_list_type = list(word)
 
-    for key in list_of_keys:
+        for index in range(len(word_in_list_type) - 1):
+            if (word[index], word[index + 1]) == pair:
+                word_in_list_type[index + 1] = pair[0] + pair[1]
+                word_in_list_type[index] = 'extra_symbol'
 
-        letter_index = len(key) - 1
-        while letter_index:
-            if tuple(key[letter_index - 1] + key[letter_index]) == pair:
-                merged_pair = pair[0] + pair[1]
-                key[letter_index - 1] = merged_pair
-                key.pop(letter_index)
-            letter_index -= 1
-
-    for word_index in range(len(list_of_keys)):
-        if word_frequencies[word_index] !=
-
-
-
-
-
-
-    print(list_of_keys)
-    print(updated_word_frequencies)
-
+        if 'extra_symbol' in word_in_list_type:
+            word_in_list_type.remove('extra_symbol')
+            updated_word_frequencies.update({tuple(word_in_list_type): word_frequencies[word]})
+        else:
+            updated_word_frequencies.update({word: word_frequencies[word]})
 
     return updated_word_frequencies
-
-
-
-merge_tokens({('e','k', 'e', 'k', 'r') : 1, ('w','r','a','t') : 4, ('e','k','w','y'):1}, ('e','k'))
 
 
 def train(
@@ -156,7 +140,73 @@ def train(
     :param num_merges: required number of new tokens
     :return: dictionary in the form of <preprocessed word: number of occurrences>
     """
+    if not (
+            isinstance(word_frequencies, dict)
+            and isinstance(num_merges, int)
+    ):
+        return None
 
+    for _ in range(num_merges):
+
+        tokens_pairs_frequencies = count_tokens_pairs(word_frequencies)
+        if not tokens_pairs_frequencies:
+            return None
+
+        pair_to_merge_length = max(tokens_pairs_frequencies.values())
+
+        longest_keys = []
+        improved_longest_keys = []
+
+        for key, value in tokens_pairs_frequencies.items():
+            if value == pair_to_merge_length:
+                longest_keys.append(key)
+
+        for key in longest_keys:
+            for next_key in longest_keys:
+                if key == next_key:
+                    continue
+                for i in range(len(key) - 1):
+                    key_in_list_type = list(key)
+                    next_key_in_list_type = list(next_key)
+                    if (key_in_list_type[i] + key_in_list_type[i+1]) > (next_key_in_list_type[i] + next_key_in_list_type[i+1]):
+                        improved_longest_keys.append(key)
+                    else:
+                        improved_longest_keys.append(next_key)
+
+        print(longest_keys)
+        print(improved_longest_keys)
+
+        for key in range(len(longest_keys)):
+            for next_key in range(len(longest_keys)):
+                if longest_keys[key] == longest_keys[next_key]:
+                    continue
+                extra_pair = max(longest_keys[key], longest_keys[next_key])
+                if extra_pair == longest_keys[key]:
+                    longest_keys[key] = tuple('❌' * pair_to_merge_length)
+                elif extra_pair == longest_keys[next_key]:
+                    longest_keys[next_key] = tuple('❌' * pair_to_merge_length)
+
+        for i in longest_keys:
+            if i == tuple('❌' * pair_to_merge_length):
+                longest_keys.remove(i)
+
+        word_frequencies = merge_tokens(word_frequencies, longest_keys[0])
+        if not word_frequencies:
+            return None
+
+        tokens_pairs_frequencies = count_tokens_pairs(word_frequencies)
+        if not tokens_pairs_frequencies:
+            return None
+
+    return word_frequencies
+
+
+dict1 = collect_frequencies('про скупого сизого орла', None, '</s>')
+
+
+num1 = 4
+
+train(dict1, num1)
 
 def get_vocabulary(
     word_frequencies: dict[tuple[str, ...], int], unknown_token: str
