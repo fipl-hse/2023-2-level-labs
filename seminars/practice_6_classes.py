@@ -249,7 +249,7 @@
 # # print(square2.get_area(), square2.get_perimeter())  # 26.2144 20.48
 #
 #
-# # Task 6
+# # Task 6;
 # # hard level
 # # Imagine you have to create a class to represent a learning discipline.
 # # What information should it contain? The name of the subject? The name of the teacher?
