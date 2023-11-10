@@ -7,7 +7,6 @@ from pathlib import Path
 from typing import Optional
 
 import ast_comments
-import black
 from tap import Tap
 
 
@@ -143,11 +142,10 @@ def main() -> None:
     res_stub_path.parent.mkdir(parents=True, exist_ok=True)
 
     source_code = cleanup_code(Path(args.source_code_path))
-    formatted_code = black.format_str(source_code, mode=black.FileMode(line_length=82))
 
     with res_stub_path.open(mode='w', encoding='utf-8') as file:
         print(f'Writing to {res_stub_path}')
-        file.write(formatted_code)
+        file.write(source_code)
 
 
 if __name__ == '__main__':
