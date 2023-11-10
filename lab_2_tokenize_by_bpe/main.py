@@ -98,7 +98,7 @@ def merge_tokens(
     new_word_frequencies = {}
 
     for key, value in word_frequencies.items():
-        new_key = tuple(w.replace(pair[0], pair[1]))
+        new_key = tuple(new_word_frequencies.replace(pair[0], pair[1]))
         for word in key:
             value = new_word_frequencies[new_key]
 
@@ -120,8 +120,8 @@ def train(
     if word_frequencies is None:
         return None
 
-    merge_tokens = 0
-    while merge_tokens < num_merges:
+    merge_token = 0
+    while merge_token < num_merges:
         max_frequency = -1
         max_token_pair = None
         for token_pair, frequency in word_frequencies.items():
@@ -139,7 +139,7 @@ def train(
         del word_frequencies[max_token_pair[0]]
         del word_frequencies[max_token_pair[1]]
 
-        merge_tokens += 1
+        merge_token += 1
 
     return word_frequencies
 def get_vocabulary(
@@ -170,7 +170,8 @@ def get_vocabulary(
 
     return vocabulary
 def decode(
-        encoded_text: list[int] | None, vocabulary: dict[str, int] | None, end_of_word_token: str | None
+        encoded_text: list[int] | None, vocabulary: dict[str, int] | None,
+        end_of_word_token: str | None
 ) -> str | None:
     """
     Translates encoded sequence into decoded one
@@ -189,8 +190,7 @@ def decode(
             token = vocabulary[token_id]
             if token == end_of_word_token:
                 break
-            else:
-                decoded_text += token + ' '
+            decoded_text += token + ' '
         else:
             decoded_text += '<unk>'
 
@@ -198,7 +198,8 @@ def decode(
 
         return decoded_text
 def tokenize_word(
-        word: tuple[str, ...], vocabulary: dict[str, int], end_of_word: str | None, unknown_token: str
+        word: tuple[str, ...], vocabulary: dict[str, int], end_of_word: str | None,
+        unknown_token: str
 ) -> list[int] | None:
     """
     Splits word into tokens
