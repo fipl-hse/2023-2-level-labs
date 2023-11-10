@@ -26,26 +26,6 @@ class TextProcessor:
         self._end_of_word_token = end_of_word_token
         self._storage = {self._end_of_word_token: 0}
 
-        class TextProcessor:
-            """
-            Handle text tokenization, encoding and decoding.
-
-            Attributes:
-                _end_of_word_token (str): A token denoting word boundary
-                _storage (dict): Dictionary in the form of <token: identifier>
-            """
-            self._end_of_word_token = end_of_word_token
-            self._storage = {self._end_of_word_token: 0}
-
-            def init(self, end_of_word_token: str) -> None:
-                """
-                Initialize an instance of LetterStorage.
-
-                Args:
-                    end_of_word_token (str): A token denoting word boundary
-                """
-                self._end_of_word_token = end_of_word_token
-
     def _tokenize(self, text: str) -> Optional[tuple[str, ...]]:
         """
         Tokenize text into unigrams, separating words with special token.
@@ -79,7 +59,7 @@ class TextProcessor:
             else:
                 if len(word) > 0:
                     tokens.extend(list(word))
-                    tokens.append(self.end_of_word_token)
+                    tokens.append(self._end_of_word_token)
                     word = ''
                 if char.isspace():
                     continue
@@ -88,7 +68,7 @@ class TextProcessor:
 
         if len(word) > 0:
             tokens.extend(list(word))
-            tokens.append(self.end_of_word_token)
+            tokens.append(self._end_of_word_token)
 
         return tuple(tokens)
 
