@@ -123,27 +123,27 @@ def train(
     """
     if not isinstance(num_merges, int):
         return None
-    if not isinstance(word_frequencies, dict) and word_frequencies != None:
+    if not isinstance(word_frequencies, dict) and not isinstance(num_merges, int):
         return None
 
-    num_existed = 0
-    while num_existed != num_merges:
-        pairs = count_tokens_pairs(word_frequencies)
-        max_number = max(pairs.values())
-        possible_pairs = [p for p, v in pairs.items() if v == max_number]
+    the_pairs = count_tokens_pairs(word_frequencies)
+    if not the_pairs:
+        return None
+    num_merges = min(num_merges, len(the_pairs))
+    for num_merged in range(num_merges):
 
-        max_length = max(len(''.join(pair)) for pair in possible_pairs)
-        probable_pairs = [p for p in possible_pairs if len(''.join(p)) == max_length]
-        prepared_pair = sorted(probable_pairs)[0]
-
-        word_frequencies = merge_tokens(word_frequencies, prepared_pair)
-        if word_frequencies is None:
+        possible_pair = [k for k, value in the_pairs.items() if value == max(the_pairs.values())]
+        longest_pairs = max(len(''.join(pair)) for pair in possible_pair)
+        probable_pair = [pair for pair in possible_pair if longest_pairs == len(''.join(pair))]
+        prefered_pair = sorted(probable_pair)[0]
+        word_frequencies = merge_tokens(word_frequencies, prefered_pair)
+        if not word_frequencies:
             return None
-        num_existed += 1
-        print(max_number)
-        print(word_frequencies)
+        the_pairs.pop(prefered_pair)
+        the_pairs = count_tokens_pairs(word_frequencies)
+        if not the_pairs:
+            return None
 
-    print(word_frequencies)
     return word_frequencies
 
 
