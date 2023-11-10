@@ -143,7 +143,7 @@ def train(
     if not(
         isinstance(word_frequencies, dict)
         and isinstance(num_merges, int)
-        ):
+    ):
         return None
 
     if word_frequencies is None:
@@ -169,10 +169,13 @@ def train(
             if len(str(token_pair)) == max_token_pair_length:
                 list_of_max_token_pairs.append(token_pair)
         list_of_max_token_pairs.sort(key=lambda x: (-len(x), x))
+
         word_frequencies = merge_tokens(word_frequencies, list_of_max_token_pairs[0])
-        num_merges -= 1
         if word_frequencies is None:
             return None
+
+        num_merges -= 1
+
     return word_frequencies
 
 
