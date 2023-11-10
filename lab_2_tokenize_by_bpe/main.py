@@ -134,11 +134,11 @@ def train(
         possible_pair = [k for k, value in the_pairs.items() if value == max(the_pairs.values())]
         longest_pairs = max(len(''.join(pair)) for pair in possible_pair)
         probable_pair = [pair for pair in possible_pair if longest_pairs == len(''.join(pair))]
-        prefered_pair = sorted(probable_pair)[0]
-        word_frequencies = merge_tokens(word_frequencies, prefered_pair)
+
+        word_frequencies = merge_tokens(word_frequencies, sorted(probable_pair)[0])
         if not word_frequencies:
             return None
-        the_pairs.pop(prefered_pair)
+        the_pairs.pop(sorted(probable_pair)[0])
         the_pairs = count_tokens_pairs(word_frequencies)
         if not the_pairs:
             return None
