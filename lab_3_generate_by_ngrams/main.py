@@ -638,7 +638,6 @@ class NGramLanguageModelReader:
         with open(self._json_path, 'r', encoding='utf-8') as file:
             text = json.load(file)
         self._content = text
-        print(type(self._content))
         self._text_processor.fill_from_ngrams(self._content)
 
     def load(self, n_gram_size: int) -> Optional[NGramLanguageModel]:
