@@ -151,8 +151,24 @@ def get_vocabulary(
     :param unknown_token: a token to signify an unknown token
     :return: dictionary in the form of <token: identifier>
     """
+    if not isinstance(word_frequencies, dict) or not isinstance(unknown_token, str):
+        return None
+
+    tokens = []
+    for word in word_frequencies.keys():
+        tokens.extend(word)
+    tokens = list(set(tokens))
+
+    tokens.sort(key=lambda x: (-len(x), x))
+
+    if len(tokens)>1:
+        tokens.append('<START>')
+        tokens.append('<END>')
+
+    vocabulary = {token: i for i, token in enumerate(tokens)}
 
 
+    return vocabulary
 def decode(
         encoded_text: list[int] | None, vocabulary: dict[str, int] | None, end_of_word_token: str | None
 ) -> str | None:
