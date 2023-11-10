@@ -103,6 +103,8 @@ def merge_tokens(
             value = new_word_frequencies[new_key]
 
     return new_word_frequencies
+
+
 def train(
         word_frequencies: dict[tuple[str, ...], int] | None, num_merges: int
 ) -> dict[tuple[str, ...], int] | None:
@@ -112,9 +114,34 @@ def train(
     :param num_merges: required number of new tokens
     :return: dictionary in the form of <preprocessed word: number of occurrences>
     """
-    
+    if isinstance(word_frequencies, dict) or not isinstance(num_merges, int):
+        return None
 
+    if word_frequencies is None:
+        return None
 
+    merge_tokens = 0
+    while merge_tokens < num_merges:
+        max_frequency = -1
+        max_token_pair = None
+        for token_pair, frequency in word_frequencies.items():
+            if frequency > max_frequency or (frequency == max_frequency
+                                             and len(token_pair) > len(max_token_pair)):
+                max_frequency = frequency
+                max_token_pair = token_pair
+
+        if max_token_pair is None:
+            break
+
+        new_token = merge_tokens(max_token_pair[0], max_token_pair[1])
+        word_frequencies[new_token] = max_frequency
+
+        del word_frequencies[max_token_pair[0]]
+        del word_frequencies[max_token_pair[1]]
+
+        merge_tokens += 1
+
+    return word_frequencies
 def get_vocabulary(
         word_frequencies: dict[tuple[str, ...], int], unknown_token: str
 ) -> dict[str, int] | None:
