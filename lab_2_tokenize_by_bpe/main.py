@@ -20,9 +20,9 @@ def prepare_word(
         return None
 
     raw_tokens = list(raw_word)
-    if start_of_word != None:
+    if start_of_word is not None:
         raw_tokens.insert(0, start_of_word)
-    if end_of_word != None:
+    if end_of_word is not None:
         raw_tokens.append(end_of_word)
     return tuple(raw_tokens)
 
