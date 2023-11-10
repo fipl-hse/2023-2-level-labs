@@ -14,7 +14,9 @@ raw_word: str, start_of_word: str | None, end_of_word: str | None
     :param end_of_word: a token that signifies the end of word
     :return: preprocessed word
     """
-    if (not isinstance(raw_word, str) or not (isinstance(start_of_word, str) or start_of_word is None) or not (isinstance(end_of_word, str) or end_of_word is None)):
+    if (not isinstance(raw_word, str) or not (
+            isinstance(start_of_word, str) or start_of_word is None) or not (
+            isinstance(end_of_word, str) or end_of_word is None)):
         return None
     prepared_word = list(raw_word)
     if start_of_word:
@@ -34,7 +36,9 @@ text: str, start_of_word: str | None, end_of_word: str
     :param end_of_word: a token that signifies the end of word
     :return: dictionary in the form of <preprocessed word: number of occurrences>
     """
-    if not isinstance(end_of_word, str) or not isinstance(text, str) or not (isinstance(start_of_word, str) or start_of_word is None):
+    if not isinstance(end_of_word, str) or not isinstance(
+            text, str) or not (isinstance(
+        start_of_word, str) or start_of_word is None):
         return None
     frequency = {}
     words_list = text.split()
@@ -154,12 +158,14 @@ encoded_text: list[int] | None, vocabulary: dict[str, int] | None, end_of_word_t
     :param end_of_word_token: an end-of-word token
     :return: decoded_text sequence
     """
-    if not isinstance(encoded_text, list) or not isinstance(vocabulary, dict) or not (isinstance(end_of_word_token, str) or end_of_word_token is None):
+    if not isinstance(encoded_text, list) or not isinstance(
+            vocabulary, dict) or not (isinstance(
+        end_of_word_token, str) or end_of_word_token is None):
         return None
     decoded_text = ''
-    for el in encoded_text:
+    for item in encoded_text:
         for token, identifier in vocabulary.items():
-            if el == identifier:
+            if item == identifier:
                 decoded_text += token
     if end_of_word_token:
         decoded_text = decoded_text.replace(end_of_word_token, ' ')
@@ -168,7 +174,7 @@ encoded_text: list[int] | None, vocabulary: dict[str, int] | None, end_of_word_t
 
 
 def tokenize_word(
-        word: tuple[str, ...], vocabulary: dict[str, int], end_of_word: str | None, unknown_token: str
+word: tuple[str, ...], vocabulary: dict[str, int], end_of_word: str | None, unknown_token: str
 ) -> list[int] | None:
     """
     Splits word into tokens
