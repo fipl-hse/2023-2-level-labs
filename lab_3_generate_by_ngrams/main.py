@@ -620,6 +620,7 @@ class NGramLanguageModelReader:
         _json_path (str): Local path to assets file
         _eow_token (str): Special token for text processor
         _text_processor (TextProcessor): A TextProcessor instance to handle text processing
+        _content (dict): ngrams from external JSON
     """
 
     def __init__(self, json_path: str, eow_token: str) -> None:
@@ -637,6 +638,7 @@ class NGramLanguageModelReader:
         with open(self._json_path, 'r', encoding='utf-8') as file:
             text = json.load(file)
         self._content = text
+        print(type(self._content))
         self._text_processor.fill_from_ngrams(self._content)
 
     def load(self, n_gram_size: int) -> Optional[NGramLanguageModel]:
