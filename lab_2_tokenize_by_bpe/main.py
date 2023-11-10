@@ -74,9 +74,8 @@ def count_tokens_pairs(
         for index, letter in enumerate(word[:-1]):
             pair = (word[index], word[index + 1])
             if pair not in result:
-                result[pair] = number
-            else:
-                result[pair] += number
+                result[pair] = 0
+            result[pair] += number
 
     return result
 
