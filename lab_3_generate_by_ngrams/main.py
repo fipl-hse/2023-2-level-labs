@@ -150,7 +150,6 @@ class TextProcessor:
         if element not in self._storage:
             self._storage[element] = len(self._storage)
 
-
     def decode(self, encoded_corpus: tuple[int, ...]) -> Optional[str]:
         """
         Decode and postprocess encoded corpus by converting integer identifiers to string.
@@ -265,6 +264,7 @@ class NGramLanguageModel:
             encoded_corpus (tuple): Encoded text
             n_gram_size (int): A size of n-grams to use for language modelling
         """
+
 
     def get_n_gram_size(self) -> int:
         """
