@@ -27,7 +27,7 @@ def format_stub_file(res_stub_path: Path) -> None:
     """
     Autoformatting resulting stub
     """
-    res_process = _run_console_tool(str(choose_python_exe()), '-m', 'black',
+    res_process = _run_console_tool(str(choose_python_exe()), '-m', 'black', '-l', '100',
                                     str(res_stub_path),
                                     debug=False)
     if res_process.returncode != 0:
