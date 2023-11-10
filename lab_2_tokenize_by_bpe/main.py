@@ -114,7 +114,7 @@ def train(
     :param num_merges: required number of new tokens
     :return: dictionary in the form of <preprocessed word: number of occurrences>
     """
-    if isinstance(word_frequencies, dict) or not isinstance(num_merges, int):
+    if not isinstance(word_frequencies, dict) or not isinstance(num_merges, int):
         return None
 
     if word_frequencies is None:
