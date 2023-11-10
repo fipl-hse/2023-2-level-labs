@@ -53,9 +53,10 @@ class TextProcessor:
         for word in split_text:
             word = ''.join(letter for letter in word if letter.isalpha())
             word = list(word)
-            if word:
-                list_of_text += word
-                list_of_text.append(self._end_of_word_token)
+            if not word:
+                continue
+            list_of_text += word
+            list_of_text.append(self._end_of_word_token)
         for char in list_of_text:
             if char.isalpha():
                 list_of_letters.append(char)
