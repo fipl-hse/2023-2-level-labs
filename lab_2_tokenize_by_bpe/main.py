@@ -18,7 +18,7 @@ def prepare_word(
                                                                                                   str | None):
         return None
 
-    raw_tokens = [*raw_word]
+    raw_tokens = list(raw_word)
     if start_of_word != None:
         raw_tokens.insert(0, start_of_word)
     if end_of_word != None:
