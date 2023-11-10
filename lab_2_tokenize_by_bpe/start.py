@@ -14,7 +14,7 @@ def main() -> None:
     with open(assets_path / 'text.txt', 'r', encoding='utf-8') as text_file:
         text = text_file.read()
 
-    result = collect_frequencies(text, start_of_word=None, end_of_word='</s>')
+    result = None
     with open(assets_path / 'secrets' / 'secret_5.txt', 'r', encoding='utf-8') as text_file:
         encoded_text = text_file.read()
         trained_dict = train(collect_frequencies(text, start_of_word=None, end_of_word='/s'), 100)
