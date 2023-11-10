@@ -192,6 +192,7 @@ class TextProcessor:
         """
         if not isinstance(corpus, tuple) or corpus == ():
             return None
+        for
 
 
     def _postprocess_decoded_text(self, decoded_corpus: tuple[str, ...]) -> Optional[str]:
