@@ -392,6 +392,10 @@ class GreedyTextGenerator:
         In case of corrupt input arguments or methods used return None,
         None is returned
         """
+        if not isinstance(seq_len, int) or\
+            not isinstance(prompt, str) or\
+                len(prompt) == 0:
+            return None
 
 class BeamSearcher:
     """
