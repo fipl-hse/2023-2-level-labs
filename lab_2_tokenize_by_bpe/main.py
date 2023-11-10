@@ -5,7 +5,7 @@ BPE and machine translation evaluation
 
 
 def prepare_word(
-raw_word: str, start_of_word: str | None, end_of_word: str | None
+    raw_word: str, start_of_word: str | None, end_of_word: str | None
 ) -> tuple[str, ...] | None:
     """
     Tokenizes word into unigrams and appends end-of-word token
@@ -27,7 +27,7 @@ raw_word: str, start_of_word: str | None, end_of_word: str | None
 
 
 def collect_frequencies(
-text: str, start_of_word: str | None, end_of_word: str
+    text: str, start_of_word: str | None, end_of_word: str
 ) -> dict[tuple[str, ...], int] | None:
     """
     Counts number of occurrences of each word
@@ -51,7 +51,7 @@ text: str, start_of_word: str | None, end_of_word: str
 
 
 def count_tokens_pairs(
-word_frequencies: dict[tuple[str, ...], int]
+    word_frequencies: dict[tuple[str, ...], int]
 ) -> dict[tuple[str, str], int] | None:
     """
     Counts number of occurrences of each pair of subsequent tokens
@@ -71,7 +71,7 @@ word_frequencies: dict[tuple[str, ...], int]
 
 
 def merge_tokens(
-word_frequencies: dict[tuple[str, ...], int], pair: tuple[str, str]
+    word_frequencies: dict[tuple[str, ...], int], pair: tuple[str, str]
 ) -> dict[tuple[str, ...], int] | None:
     """
     Updates word frequency dictionary by replacing a pair of token with a merged one
@@ -97,7 +97,7 @@ word_frequencies: dict[tuple[str, ...], int], pair: tuple[str, str]
 
 
 def train(
-word_frequencies: dict[tuple[str, ...], int] | None, num_merges: int
+    word_frequencies: dict[tuple[str, ...], int] | None, num_merges: int
 ) -> dict[tuple[str, ...], int] | None:
     """
     Creates required number of new tokens by merging existing ones
@@ -124,7 +124,7 @@ word_frequencies: dict[tuple[str, ...], int] | None, num_merges: int
     return word_frequencies
 
 def get_vocabulary(
-word_frequencies: dict[tuple[str, ...], int], unknown_token: str
+    word_frequencies: dict[tuple[str, ...], int], unknown_token: str
 ) -> dict[str, int] | None:
     """
     Establishes correspondence between set_tokens and its integer identifier
@@ -149,7 +149,7 @@ word_frequencies: dict[tuple[str, ...], int], unknown_token: str
     return ident_tokens
 
 def decode(
-encoded_text: list[int] | None, vocabulary: dict[str, int] | None, end_of_word_token: str | None
+    encoded_text: list[int] | None, vocabulary: dict[str, int] | None, end_of_word_token: str | None
 ) -> str | None:
     """
     Translates encoded sequence into decoded_text one
@@ -174,7 +174,7 @@ encoded_text: list[int] | None, vocabulary: dict[str, int] | None, end_of_word_t
 
 
 def tokenize_word(
-word: tuple[str, ...], vocabulary: dict[str, int], end_of_word: str | None, unknown_token: str
+    word: tuple[str, ...], vocabulary: dict[str, int], end_of_word: str | None, unknown_token: str
 ) -> list[int] | None:
     """
     Splits word into tokens
