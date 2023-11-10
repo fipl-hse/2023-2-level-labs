@@ -23,6 +23,8 @@ class TextProcessor:
         Args:
             end_of_word_token (str): A token denoting word boundary
         """
+        self._end_of_word_token = end_of_word_token
+        self._storage = {'_': 0}
 
     def _tokenize(self, text: str) -> Optional[tuple[str, ...]]:
         """
@@ -41,7 +43,26 @@ class TextProcessor:
         In case of corrupt input arguments, None is returned.
         In case any of methods used return None, None is returned.
         """
+        if not isinstance(text,str):
+            return None
+        
+        tokenized_text = []
+        lowered_text = text.lower()
+        splitted_text = lowered_text.split()
 
+        for w in splitted_text:
+            word = [token for token in w if w.isalpha()]
+            tokenized_text.extend(word)
+            tokenized_text.append(self._end_of_word_token)
+        
+        if text[-1].isalnum():
+            del tokenized_text[-1]
+
+        if len(tokenized_text) == 0:
+            return None
+        
+        return tuple(tokenized_text)
+        
     def get_id(self, element: str) -> Optional[int]:
         """
         Retrieve a unique identifier of an element.
