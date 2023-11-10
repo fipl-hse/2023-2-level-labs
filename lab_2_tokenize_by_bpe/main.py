@@ -27,6 +27,7 @@ def prepare_word(
         tokens.append(end_of_word)
     return tuple(tokens)
 
+
 def collect_frequencies(
     text: str, start_of_word: str | None, end_of_word: str
 ) -> dict[tuple[str, ...], int] | None:
@@ -54,6 +55,7 @@ def collect_frequencies(
         freq_dictionary[prepared_words] += 1
     return freq_dictionary
 
+
 def count_tokens_pairs(
     word_frequencies: dict[tuple[str, ...], int]
 ) -> dict[tuple[str, str], int] | None:
@@ -72,6 +74,7 @@ def count_tokens_pairs(
                 pairs_dictionary[pairs] = 0
             pairs_dictionary[pairs] += word_frequencies[el]
     return pairs_dictionary
+
 
 def merge_tokens(
     word_frequencies: dict[tuple[str, ...], int], pair: tuple[str, str]
@@ -98,6 +101,7 @@ def merge_tokens(
         el_list = tuple(el_list)
         merged_dictionary[el_list] = word_frequencies[el]
     return merged_dictionary
+
 
 def train(
     word_frequencies: dict[tuple[str, ...], int] | None, num_merges: int
@@ -130,6 +134,7 @@ def train(
         if count_of_pairs is None:
             return None
     return word_frequencies
+
 
 def get_vocabulary(
     word_frequencies: dict[tuple[str, ...], int], unknown_token: str
