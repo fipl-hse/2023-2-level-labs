@@ -178,21 +178,6 @@ jobs:
         run: |
           bash config/stage_1_style_tests/_stage_run_flake8.sh
 
-  pymarkdownlnt-checks:
-    name: Pymarkdownlnt checks
-    runs-on: ubuntu-latest
-    timeout-minutes: 2
-    needs: [ install-dependencies ]
-
-    steps:
-      - uses: actions/checkout@v3
-      - name: Setup FIPL environment
-        uses: fipl-hse/setup-env-action@v0.9
-      - name: Pymarkdownlnt check
-        if: ${{ env.REPOSITORY_TYPE == 'admin' }}
-        run: |
-          bash config/stage_1_style_tests/_stage_run_pymarkdownlnt.sh
-
   doc8-checks:
     name: Doc8 checks
     runs-on: ubuntu-latest
