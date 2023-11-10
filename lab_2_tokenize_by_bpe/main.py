@@ -161,21 +161,6 @@ def train(
             if value == pair_to_merge_length:
                 longest_keys.append(key)
 
-        for key in longest_keys:
-            for next_key in longest_keys:
-                if key == next_key:
-                    continue
-                for i in range(len(key) - 1):
-                    key_in_list_type = list(key)
-                    next_key_in_list_type = list(next_key)
-                    if (key_in_list_type[i] + key_in_list_type[i+1]) > (next_key_in_list_type[i] + next_key_in_list_type[i+1]):
-                        improved_longest_keys.append(key)
-                    else:
-                        improved_longest_keys.append(next_key)
-
-        print(longest_keys)
-        print(improved_longest_keys)
-
         for key in range(len(longest_keys)):
             for next_key in range(len(longest_keys)):
                 if longest_keys[key] == longest_keys[next_key]:
