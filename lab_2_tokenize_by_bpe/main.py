@@ -140,58 +140,41 @@ def train(
     :param num_merges: required number of new tokens
     :return: dictionary in the form of <preprocessed word: number of occurrences>
     """
-    if not (
-            isinstance(word_frequencies, dict)
-            and isinstance(num_merges, int)
-    ):
+    if not(
+        isinstance(word_frequencies, dict)
+        and isinstance(num_merges, int)
+        ):
         return None
 
-    for _ in range(num_merges):
+    if word_frequencies is None:
+        return None
 
-        tokens_pairs_frequencies = count_tokens_pairs(word_frequencies)
-        if not tokens_pairs_frequencies:
+    while num_merges > 0:
+        token_pair_frequencies = count_tokens_pairs(word_frequencies)
+        if token_pair_frequencies is None:
             return None
 
-        pair_to_merge_length = max(tokens_pairs_frequencies.values())
+        num_merges = min(num_merges, len(token_pair_frequencies))
 
-        longest_keys = []
-        improved_longest_keys = []
+        temp_list_of_max_token_pairs = []
+        list_of_max_token_pairs = []
 
-        for key, value in tokens_pairs_frequencies.items():
-            if value == pair_to_merge_length:
-                longest_keys.append(key)
+        max_token_pair = max(token_pair_frequencies.values())
+        for token_pair in token_pair_frequencies:
+            if token_pair_frequencies[token_pair] == max_token_pair:
+                temp_list_of_max_token_pairs.append(token_pair)
+        max_token_pair_length = max(len(str(token_pair)) for token_pair in temp_list_of_max_token_pairs)
 
-        for key in range(len(longest_keys)):
-            for next_key in range(len(longest_keys)):
-                if longest_keys[key] == longest_keys[next_key]:
-                    continue
-                extra_pair = max(longest_keys[key], longest_keys[next_key])
-                if extra_pair == longest_keys[key]:
-                    longest_keys[key] = tuple('❌' * pair_to_merge_length)
-                elif extra_pair == longest_keys[next_key]:
-                    longest_keys[next_key] = tuple('❌' * pair_to_merge_length)
-
-        for i in longest_keys:
-            if i == tuple('❌' * pair_to_merge_length):
-                longest_keys.remove(i)
-
-        word_frequencies = merge_tokens(word_frequencies, longest_keys[0])
-        if not word_frequencies:
+        for token_pair in temp_list_of_max_token_pairs:
+            if len(str(token_pair)) == max_token_pair_length:
+                list_of_max_token_pairs.append(token_pair)
+        list_of_max_token_pairs.sort(key=lambda x: (-len(x), x))
+        word_frequencies = merge_tokens(word_frequencies, list_of_max_token_pairs[0])
+        num_merges -= 1
+        if word_frequencies is None:
             return None
-
-        tokens_pairs_frequencies = count_tokens_pairs(word_frequencies)
-        if not tokens_pairs_frequencies:
-            return None
-
     return word_frequencies
 
-
-dict1 = collect_frequencies('про скупого сизого орла', None, '</s>')
-
-
-num1 = 4
-
-train(dict1, num1)
 
 def get_vocabulary(
     word_frequencies: dict[tuple[str, ...], int], unknown_token: str
