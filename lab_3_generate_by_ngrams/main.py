@@ -498,7 +498,7 @@ class BeamSearcher:
         Remove those sequence candidates that do not make top-N most probable sequences.
 
         Args:
-            sequence_candidates (int): Current candidate sequences
+            sequence_candidates (dict[tuple[int, ...], float]): Current candidate sequences
 
         Returns:
             dict[tuple[int, ...], float]: Pruned sequences
@@ -618,7 +618,7 @@ class BackOffGenerator:
 
     Attributes:
         _language_models (dict[int, NGramLanguageModel]): Language models for next token prediction
-        _text_processor (NGramLanguageModel): A TextProcessor instance to handle text processing
+        _text_processor (TextProcessor): A TextProcessor instance to handle text processing
     """
 
     def __init__(
