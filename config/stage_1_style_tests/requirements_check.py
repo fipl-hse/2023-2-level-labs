@@ -3,11 +3,12 @@ Checks dependencies
 """
 import re
 import sys
+from pathlib import Path
 
 from config.constants import PROJECT_ROOT
 
 
-def get_paths() -> list:
+def get_paths() -> list[Path]:
     """
     Returns list of paths to non-python files
     """
@@ -18,7 +19,7 @@ def get_paths() -> list:
     return list_with_paths
 
 
-def get_requirements(path: list) -> list:
+def get_requirements(path: Path) -> list:
     """
     Returns a list of dependencies
     """
@@ -38,14 +39,17 @@ def check_dependencies(lines: list, compiled_pattern: re.Pattern) -> bool:
     """
     Checks that dependencies confirm to the template
     """
-    if sorted(lines) != lines:
-        print('Dependencies in requirements.txt do not conform to the template.')
+    expected = list(sorted(map(str.lower, lines)))
+    if expected != list(map(str.lower, lines)):
+        print('Dependencies in requirements.txt do not follow sorting rule.')
+        print('Expected:')
+        print('\n'.join(expected))
         return False
     for line in lines:
         if not re.search(compiled_pattern, line):
-            print('Dependencies in requirements.txt do not conform to the template.')
+            print('Specific dependency in requirements.txt do not conform to the template.')
+            print(line)
             return False
-    print('Dependencies in requirements.txt: OK.')
     return True
 
 
@@ -57,7 +61,10 @@ def main() -> None:
     compiled_pattern = compile_pattern()
     for path in paths:
         lines = get_requirements(path)
-        sys.exit(not check_dependencies(lines, compiled_pattern))
+        if not check_dependencies(lines, compiled_pattern):
+            sys.exit(1)
+        else:
+            print(f'{path.name} : OK.')
 
 
 if __name__ == '__main__':

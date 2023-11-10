@@ -8,7 +8,7 @@ echo 'Running flake8 check...'
 
 configure_script
 
-python -m flake8 --config ./config/stage_1_style_tests/.flake8 config seminars
+python -m flake8 config seminars
 
 FAILED=0
 LABS=$(get_labs)
@@ -19,7 +19,7 @@ for LAB_NAME in $LABS; do
 
   if [[ ${TARGET_SCORE} -gt 5 ]]; then
     echo "Running flake8 checks for marks 6, 8 and 10"
-    python -m flake8 --config ./config/stage_1_style_tests/.flake8 ${LAB_NAME}
+    python -m flake8 ${LAB_NAME}
   fi
 
   echo "Checking flake8 for lab ${LAB_NAME}"

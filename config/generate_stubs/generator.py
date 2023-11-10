@@ -37,7 +37,7 @@ def remove_implementation_from_function(original_declaration: ast.stmt,
     opening_files = []
     for decl in original_declaration.body:
         if isinstance(decl, ast.With):
-            if 'assets/texts' in ast.unparse(decl.items[0].context_expr.args[0]):  # type: ignore
+            if 'assets' in ast.unparse(decl.items[0].context_expr.args[0]):  # type: ignore
                 opening_files.append(decl)
 
         if isinstance(decl, ast.Assert):
