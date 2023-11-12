@@ -21,12 +21,10 @@ def prepare_word(
     ):
         return None
 
-    list_of_tokens = []
+    list_of_tokens = list(raw_word)
 
     if start_of_word is not None:
-        list_of_tokens.append(start_of_word)
-
-    list_of_tokens.extend(list(raw_word))
+        list_of_tokens.insert(0, start_of_word)
 
     if end_of_word is not None:
         list_of_tokens.append(end_of_word)
@@ -120,10 +118,10 @@ def merge_tokens(
         for index in range(len(word_in_list_type) - 1):
             if (word[index], word[index + 1]) == pair:
                 word_in_list_type[index + 1] = pair[0] + pair[1]
-                word_in_list_type[index] = 'extra_symbol'
+                word_in_list_type[index] = ''
 
-        if 'extra_symbol' in word_in_list_type:
-            word_in_list_type.remove('extra_symbol')
+        if '' in word_in_list_type:
+            word_in_list_type.remove('')
             updated_word_frequencies.update({tuple(word_in_list_type): word_frequencies[word]})
         else:
             updated_word_frequencies.update({word: word_frequencies[word]})
