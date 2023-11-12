@@ -107,8 +107,6 @@ class TextProcessor:
 
         return inverted_storage[element_id]
 
-        return token
-
     def encode(self, text: str) -> Optional[tuple[int, ...]]:
         """
         Encode text.
@@ -144,9 +142,6 @@ class TextProcessor:
 
             encoded_corpus.append(encoded_numbers)
 
-        if not encoded_text:
-            return None
-
         return tuple(encoded_corpus)
 
     def _put(self, element: str) -> None:
@@ -162,14 +157,8 @@ class TextProcessor:
         if not isinstance(element, str) or len(element) != 1:
             return None
 
-        if element in self._storage:
-            return self._storage[element]
-        key = len(self._storage)
-        while key <= len(self._storage):
-            if key not in self._storage.values():
-                self._storage[element] = key
-                break
-            key += 1
+        if element not in self._storage:
+            self._storage[element] = len(self._storage)
 
 
     def decode(self, encoded_corpus: tuple[int, ...]) -> Optional[str]:
@@ -224,7 +213,7 @@ class TextProcessor:
         In case of corrupt input arguments, None is returned.
         In case any of methods used return None, None is returned.
         """
-        if not isinstance(corpus, tuple) or len(corpus) == 0:
+        if not isinstance(corpus, tuple) or corpus is False:
             return None
 
         decoded_corpus = []
@@ -259,17 +248,18 @@ class TextProcessor:
         if not isinstance(decoded_corpus, tuple) or len(decoded_corpus) == 0:
             return None
 
-        text_string = ''
-        decoded_corpus = list(decoded_corpus)
-        decoded_corpus[-1] = '.'
-        for token in decoded_corpus:
-            if token == '_':
-                text_string += ' '
-            else:
-                text_string += token
+        text_list = []
+
+        for i in decoded_corpus:
+            text_list += i
+
+        if text_list[-1] == self._end_of_word_token:
+            text_list[-1] = '.'
+
+        text_string = ''.join(text_list)
+        text_string = text_string.replace(self._end_of_word_token, ' ')
 
         return text_string.capitalize()
-
 
 class NGramLanguageModel:
     """
@@ -334,7 +324,7 @@ class NGramLanguageModel:
             if not isinstance(ngram, tuple) or not (all(isinstance(num, int) for num in ngram)):
                 return 1
 
-            self._n_gram_frequencies[ngram] = ngrams.count(ngram) / len([occ for occ in ngrams if occ[:-1] == ngram[:-1]])
+            self._n_gram_frequencies[ngram] = ngrams.count(ngram) / len([occurence for occurence in ngrams if occurence[:-1] == ngram[:-1]])
 
         return 0
 
