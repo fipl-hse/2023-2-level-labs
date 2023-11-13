@@ -3,9 +3,9 @@ Lab 3.
 
 Beam-search and natural language generation evaluation
 """
+import math
 # pylint:disable=too-few-public-methods
 from typing import Optional
-import math
 
 
 class TextProcessor:
