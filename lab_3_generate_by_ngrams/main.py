@@ -51,7 +51,7 @@ class TextProcessor:
             if word.isalpha():
                 tokens.append(word)
                 alpha_cnt += 1
-            elif word == " " or tokens[-1] == self._end_of_word_token:
+            elif word == " " and tokens[-1] != self._end_of_word_token:
                 tokens.append(self._end_of_word_token)
         if not text[-1].isalnum():
             tokens.append(self._end_of_word_token)
@@ -72,7 +72,7 @@ class TextProcessor:
         In case of corrupt input arguments or arguments not included in storage,
         None is returned
         """
-        if not isinstance(element, str) or element is not in self._storage:
+        if not isinstance(element, str) or element not in self._storage:
             return None
         return self._storage[element]
 
@@ -97,11 +97,12 @@ class TextProcessor:
 
         In case of corrupt input arguments or arguments not included in storage, None is returned
         """
-        if not isinstance(element_id, int) or element_id not in self._storage:
+        if not isinstance(element_id, int) or element_id not in self._storage.values():
             return None
         for key, value in self._storage.items():
             if value == element_id:
                 return key
+        return None
 
     def encode(self, text: str) -> Optional[tuple[int, ...]]:
         """
@@ -167,10 +168,10 @@ class TextProcessor:
         if not isinstance(encoded_corpus, tuple) or not encoded_corpus:
             return None
         decoded = self._decode(encoded_corpus)
-        if not decoded:
+        if decoded is None:
             return None
         postprocessed = self._postprocess_decoded_text(decoded)
-        if not postprocessed:
+        if postprocessed is None:
             return None
         return postprocessed
 
@@ -223,14 +224,14 @@ class TextProcessor:
             return None
         result_text = ""
         for i, token in enumerate(decoded_corpus):
-            if token == "_" and i != len(decoded_corpus) - 1:
+            if token == self._end_of_word_token and i == len(decoded_corpus) - 1:
+                result_text += "."
+            elif token == self._end_of_word_token:
                 result_text += " "
             else:
                 result_text += token
-        result_text += "."
-        result_text.capitalize()
+        result_text = result_text.capitalize()
         return result_text
-
 
 
 class NGramLanguageModel:
