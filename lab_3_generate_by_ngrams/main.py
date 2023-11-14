@@ -313,7 +313,7 @@ class NGramLanguageModel:
         In case of corrupt input arguments, None is returned
         """
         if (not isinstance(sequence, tuple) or not sequence
-            or len(sequence) <= self._n_gram_size - 1):
+            or len(sequence) < self._n_gram_size - 1):
             return None
         context = sequence[-self._n_gram_size + 1:]
         predict = {}
@@ -361,6 +361,8 @@ class GreedyTextGenerator:
             language_model (NGramLanguageModel): A language model to use for text generation
             text_processor (TextProcessor): A TextProcessor instance to handle text processing
         """
+        self._model = language_model
+        self._text_processor = text_processor
 
     def run(self, seq_len: int, prompt: str) -> Optional[str]:
         """
@@ -376,6 +378,26 @@ class GreedyTextGenerator:
         In case of corrupt input arguments or methods used return None,
         None is returned
         """
+        if (not isinstance(seq_len, int) or
+            not isinstance(prompt, str) or not prompt):
+            return None
+        prompt_encoded = self._text_processor.encode(prompt)
+        n_gram_size = self._model.get_n_gram_size()
+        if not prompt_encoded or not n_gram_size:
+            return None
+        list_encoded = list(prompt_encoded)
+        for prediction in range(seq_len):
+            seq = tuple(list_encoded[-n_gram_size + 1:])
+            variants = self._model.generate_next_token(seq)
+            if not variants:
+                break
+            best_choice = sorted([pred for pred, freq in variants.items() if
+                                  freq == max(variants.values())])[0]
+            list_encoded.append(best_choice)
+        predicted = self._text_processor.decode(tuple(list_encoded))
+        if not predicted:
+            return None
+        return predicted
 
 
 class BeamSearcher:
