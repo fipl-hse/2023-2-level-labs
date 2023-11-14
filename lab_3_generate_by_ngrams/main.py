@@ -298,7 +298,6 @@ class NGramLanguageModel:
                         cnt_p2 += 1
                 cnt_p1 = n_grams.count(n_gram)
                 self._n_gram_frequencies.update({n_gram: cnt_p1 / cnt_p2})
-        print(self._n_gram_frequencies)
         return 0
 
     def generate_next_token(self, sequence: tuple[int, ...]) -> Optional[dict]:

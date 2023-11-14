@@ -21,13 +21,12 @@ def main() -> None:
     if decoded is None:
         return
     print(f"Results:\nEncoded text:\n{encoded[:200]}\nDecoded text:\n{decoded[:200]}")
-    result = decoded
-    n_gram_model = NGramLanguageModel(encoded_corpus=encoded[:400], n_gram_size=3)
+    n_gram_model = NGramLanguageModel(encoded_corpus=encoded[:200], n_gram_size=3)
     freqs = n_gram_model.build()
     if freqs is None:
         return
-    print(f"NGramModel builder:\n{freqs}")
     result = freqs
+    print(result)
     assert result
 
 
