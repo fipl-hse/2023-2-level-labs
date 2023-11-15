@@ -1,7 +1,7 @@
 """
 Generation by NGrams starter
 """
-from lab_3_generate_by_ngrams.main import TextProcessor
+from lab_3_generate_by_ngrams.main import TextProcessor, NGramLanguageModel
 
 def main() -> None:
     """
@@ -12,8 +12,11 @@ def main() -> None:
     with open("./assets/Harry_Potter.txt", "r", encoding="utf-8") as text_file:
         text = text_file.read()
     result = None
-    result = TextProcessor('_')
-    print(result.encode(text=text))
+    processor = TextProcessor('_')
+    encoded_text = processor.encode(text)
+    result = processor.decode(encoded_text)
+    print(encoded_text)
+    print(result)
     assert result
 
 

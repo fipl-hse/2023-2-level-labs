@@ -58,6 +58,9 @@ class TextProcessor:
         if not tokens:
             return None
 
+        if tokens.count(self._end_of_word_token) == len(tokens):
+            return None
+
         if not text[-1].isalnum:
             del tokens[-1]
 
@@ -200,10 +203,11 @@ class TextProcessor:
         if not isinstance(content, dict) or not content:
             return None
 
-        for key in content['freq']:
-            for element in key:
-                if element.isalpha():
-                    self._put(element)
+        for element in content['freq']:
+            for token in element:
+                if token.isalpha():
+                    self._put(token)
+        return None
 
     def _decode(self, corpus: tuple[int, ...]) -> Optional[tuple[str, ...]]:
         """
@@ -285,6 +289,9 @@ class NGramLanguageModel:
             encoded_corpus (tuple): Encoded text
             n_gram_size (int): A size of n-grams to use for language modelling
         """
+        self._encoded_corpus = encoded_corpus
+        self._n_gram_size = n_gram_size
+        self._n_gram_frequencies = {}
 
     def get_n_gram_size(self) -> int:
         """
@@ -293,6 +300,7 @@ class NGramLanguageModel:
         Returns:
             int: Size of stored n_grams
         """
+        return self._n_gram_size
 
     def set_n_grams(self, frequencies: dict) -> None:
         """
@@ -314,6 +322,18 @@ class NGramLanguageModel:
         In case of corrupt input arguments or methods used return None,
         1 is returned
         """
+        if not isinstance(self._encoded_corpus, tuple) or not self._encoded_corpus:
+            return 1
+
+        n_grams = self._extract_n_grams(self._encoded_corpus)
+        if not isinstance(n_grams, tuple) or not n_grams:
+            return 1
+
+        for n_gram in n_grams:
+            same_n_grams = n_grams.count(n_gram)
+            same_context_count = len([context for context in n_grams if context[:-1] == n_gram[:-1]])
+            self._n_gram_frequencies[n_gram] = same_n_grams/same_context_count
+        return 0
 
     def generate_next_token(self, sequence: tuple[int, ...]) -> Optional[dict]:
         """
@@ -342,7 +362,14 @@ class NGramLanguageModel:
 
         In case of corrupt input arguments, None is returned
         """
+        if not isinstance(encoded_corpus, tuple) or not encoded_corpus:
+            return None
 
+        list_n_grams = []
+        for i in range(len(encoded_corpus) - 1):
+            list_n_grams.append(tuple(encoded_corpus[i: i + self._n_gram_size]))
+
+        return tuple(list_n_grams)
 
 class GreedyTextGenerator:
     """
