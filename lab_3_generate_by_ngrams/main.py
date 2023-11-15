@@ -5,6 +5,7 @@ Beam-search and natural language generation evaluation
 """
 # pylint:disable=too-few-public-methods
 from typing import Optional
+import math
 
 
 class TextProcessor:
@@ -390,8 +391,25 @@ class GreedyTextGenerator:
         In case of corrupt input arguments or methods used return None,
         None is returned
         """
-
-
+        if not(isinstance(seq_len, int)
+               and isinstance(prompt, str) and prompt):
+            return None
+        encoded_prompt = self._text_processor.encode(prompt)
+        len_of_context = self._model.get_n_gram_size()
+        if not (encoded_prompt and len_of_context):
+            return None
+        continued_sequence = prompt
+        for i in range(seq_len):
+            next_tokens = self._model.generate_next_token(encoded_prompt[:-len_of_context + 1])
+            if not next_tokens:
+                break
+            max_freq = max(next_tokens.values())
+            next_token = next_tokens[max_freq]
+            continued_sequence += str(self._text_processor.decode(next_token))
+            encoded_prompt = encoded_prompt + next_token
+            if not continued_sequence:
+                return None
+        return continued_sequence
 
 class BeamSearcher:
     """
@@ -432,6 +450,21 @@ class BeamSearcher:
 
         In case of corrupt input arguments or methods used return None.
         """
+        if not(isinstance(sequence, tuple) and sequence):
+            return None
+        tokens = self._model.generate_next_token(sequence)
+        if tokens is None:
+            return None
+        if not tokens:
+            return []
+        list_of_token_pairs = []
+        for token, freq in tokens.items():
+            token_pair = (token, freq)
+            list_of_token_pairs.append(token_pair)
+        sorted_list_of_token_pairs = sorted(list_of_token_pairs, key=lambda x: x[1], reverse=True)
+        if len(sorted_list_of_token_pairs) <= self._beam_width:
+            return sorted_list_of_token_pairs
+        return sorted_list_of_token_pairs[:self._beam_width]
 
     def continue_sequence(
         self,
@@ -454,6 +487,19 @@ class BeamSearcher:
 
         In case of corrupt input arguments or unexpected behaviour of methods used return None.
         """
+        if not (isinstance(sequence, tuple) and sequence
+                and isinstance(next_tokens, list) and next_tokens
+                and isinstance(sequence_candidates, dict)
+                and sequence_candidates
+                and len(next_tokens) <= self._beam_width
+                and sequence in sequence_candidates):
+            return None
+        new_sequence_candidates = {}
+        for token_tuple in next_tokens:
+            new_sequence = sequence + (token_tuple[0],)
+            new_freq = sequence_candidates[sequence] - math.log(token_tuple[1])
+            new_sequence_candidates[new_sequence] = new_freq
+        return new_sequence_candidates
 
     def prune_sequence_candidates(
         self, sequence_candidates: dict[tuple[int, ...], float]
@@ -469,7 +515,13 @@ class BeamSearcher:
 
         In case of corrupt input arguments return None.
         """
-
+        if not(isinstance(sequence_candidates, dict)
+               and sequence_candidates):
+            return None
+        sorted_sequence_candidates = dict(sorted(sequence_candidates.items(), key=lambda x: x[1]))
+        while len(sorted_sequence_candidates) > self._beam_width:
+            sorted_sequence_candidates.popitem()
+        return sorted_sequence_candidates
 
 class BeamSearchTextGenerator:
     """
@@ -496,6 +548,10 @@ class BeamSearchTextGenerator:
             text_processor (TextProcessor): A TextProcessor instance to handle text processing
             beam_width (int): Beam width parameter for generation
         """
+        self._language_model = language_model
+        self._text_processor = text_processor
+        self._beam_width = beam_width
+        self.beam_searcher = BeamSearcher(self._beam_width, self._language_model)
 
     def run(self, prompt: str, seq_len: int) -> Optional[str]:
         """
