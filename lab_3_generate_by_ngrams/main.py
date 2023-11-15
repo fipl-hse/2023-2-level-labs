@@ -450,7 +450,7 @@ class GreedyTextGenerator:
             if not tokens:
                 break
 
-            max_freq_token = min(tokens, key=tokens.get())
+            max_freq_token = min(tokens, key=tokens.get(self))
             encoded_prompt += (max_freq_token,)
 
             seq_len -= 1
