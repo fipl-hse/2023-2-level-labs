@@ -250,12 +250,12 @@ class TextProcessor:
             list_tokens += i
 
         if list_tokens[-1] == self._end_of_word_token:
-            list_tokens[-1] = '.'
+            del list_tokens[-1]
 
         result = ''.join(list_tokens)
         result = result.replace(self._end_of_word_token, ' ')
 
-        return result.capitalize()
+        return result.capitalize() + '.'
 
 
 class NGramLanguageModel:
@@ -341,13 +341,13 @@ class NGramLanguageModel:
 
         if len(context) > len(sequence):
             return None
-        f = {}
+        tokens = {}
         sort_data = dict(sorted(self._n_gram_frequencies.items(), key=lambda x: (x[1], -x[0][0], -x[0][1])))
         for key in sort_data:
             if key[:self._n_gram_size-1] == context:
-                f.update({key[-1]: sort_data[key]})
+                tokens.update({key[-1]: sort_data[key]})
 
-        return f
+        return tokens
 
     def _extract_n_grams(
         self, encoded_corpus: tuple[int, ...]
@@ -408,6 +408,27 @@ class GreedyTextGenerator:
         In case of corrupt input arguments or methods used return None,
         None is returned
         """
+        if not isinstance(seq_len, int) or not isinstance(prompt, str):
+            return None
+
+        encoded = self._text_processor.encode(prompt)
+        ngram_size = self._model.get_n_gram_size()
+
+        if not encoded or not ngram_size:
+            return None
+
+        for i in range(seq_len):
+            next_candidate = self._model.generate_next_token(encoded[-ngram_size+1:])
+
+            if not next_candidate:
+                break
+
+            best_candidates = [key for key in next_candidate if next_candidate[key] == max(next_candidate.values())]
+            encoded += (best_candidates[0],)
+
+        decoded = self._text_processor.decode(encoded)
+
+        return decoded
 
 
 class BeamSearcher:
