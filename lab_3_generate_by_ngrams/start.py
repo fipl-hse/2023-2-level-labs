@@ -4,7 +4,6 @@ Generation by NGrams starter
 from lab_3_generate_by_ngrams.main import GreedyTextGenerator, NGramLanguageModel, TextProcessor
 
 
-
 def main() -> None:
     """
     Launches an implementation.
@@ -21,11 +20,6 @@ def main() -> None:
     greedy_text = GreedyTextGenerator(n_grams, split_text)
     result = greedy_text.run(51, 'Vernon')
     print(result)
-
-
-    #result = split_text.decode(encoding)
-    #print('Encoding of the text:', encoding)
-    #print('Decoding of the text:', result)
     assert result
 
 if __name__ == "__main__":
