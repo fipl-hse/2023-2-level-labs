@@ -14,7 +14,10 @@ def main() -> None:
     text_processor = main_py.TextProcessor(end_of_word_token='_')
     encoded_corpus = text_processor.encode(text)
     decoded_text = text_processor.decode(encoded_corpus)
-    result = decoded_text
+    language_model = main_py.NGramLanguageModel(encoded_corpus, 7)
+    greedy_generator = main_py.GreedyTextGenerator(language_model, text_processor)
+    generated_text = greedy_generator.run(51, 'Vernon')
+    result = generated_text
     print(result)
     assert result
 
