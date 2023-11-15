@@ -26,9 +26,7 @@ def calculate_frequencies(tokens: list[str] | None) -> dict[str, float] | None:
     if not (isinstance(tokens, list) and all(isinstance(token, str) for token in tokens)):
         return None
 
-    length = len(tokens)
-
-    return {token: (tokens.count(token) / length) for token in tokens}
+    return {token: (tokens.count(token) / len(tokens)) for token in tokens}
 
 
 def create_language_profile(language: str, text: str) -> dict[str, str | dict[str, float]] | None:
@@ -42,7 +40,7 @@ def create_language_profile(language: str, text: str) -> dict[str, str | dict[st
         return None
 
     frequencies = calculate_frequencies(tokenize(text))
-    if not isinstance(frequencies, dict):
+    if not frequencies:
         return None
 
     return {"name": language, "freq": frequencies}
@@ -61,9 +59,7 @@ def calculate_mse(predicted: list, actual: list) -> float | None:
     ):
         return None
 
-    summa = float(sum((p - a) ** 2 for p, a in zip(predicted, actual)))
-
-    return summa / len(predicted)
+    return float(sum((p - a) ** 2 for p, a in zip(predicted, actual))) / len(predicted)
 
 
 def compare_profiles(
@@ -86,14 +82,16 @@ def compare_profiles(
     ):
         return None
 
-    unknown_freq = unknown_profile['freq']
-    compare_freq = profile_to_compare['freq']
-    tokens = set(unknown_freq.keys()).union(compare_freq.keys())
+    unknown_tokens = set(unknown_profile.get('freq').keys())
+    compare_tokens = set(profile_to_compare.get('freq').keys())
+    all_tokens = unknown_tokens | compare_tokens
+    unknown_freq = []
+    compare_freq = []
+    for token in all_tokens:
+        unknown_freq.append(unknown_profile['freq'].get(token, 0))
+        compare_freq.append(profile_to_compare['freq'].get(token, 0))
 
-    unknown_freq_values = [unknown_freq.get(token, 0) for token in tokens]
-    compare_freq_values = [compare_freq.get(token, 0) for token in tokens]
-
-    return calculate_mse(unknown_freq_values, compare_freq_values)
+    return calculate_mse(unknown_freq, compare_freq)
 
 
 def detect_language(
@@ -115,28 +113,20 @@ def detect_language(
     ):
         return None
 
-    first_pair = compare_profiles(
-        unknown_profile,
-        profile_1
-    )
-    second_pair = compare_profiles(
-        unknown_profile,
-        profile_2
-    )
-    name_1 = str(profile_1['name'])
-    name_2 = str(profile_2['name'])
-    if isinstance(first_pair, float) and isinstance(second_pair, float):
-        if first_pair < second_pair:
-            return name_1
-        if second_pair < first_pair:
-            return name_2
-        if first_pair == second_pair:
-            if name_1 > name_2:
-                return name_2
-            if name_1 < name_2:
-                return name_1
+    profile_1_metric = compare_profiles(unknown_profile, profile_1)
+    profile_2_metric = compare_profiles(unknown_profile, profile_2)
 
-    return None
+    if not (isinstance(profile_1_metric, float)
+            and isinstance(profile_2_metric, float)
+    ):
+        return None
+
+    if profile_1_metric > profile_2_metric:
+        return str(profile_2['name'])
+    if profile_1_metric < profile_2_metric:
+        return str(profile_1['name'])
+
+    return [profile_1['name'], profile_2['name']].sort()
 
 
 def load_profile(path_to_file: str) -> dict | None:
