@@ -85,8 +85,8 @@ class TextProcessor:
 
         if element not in self._storage:
             return None
-        else:
-            return self._storage[element]
+
+        return self._storage[element]
 
     def get_end_of_word_token(self) -> str:
         """
@@ -115,8 +115,8 @@ class TextProcessor:
         storage_invert = {ident: token for token, ident in self._storage.items()}
         if element_id not in storage_invert:
             return None
-        else:
-            return storage_invert[element_id]
+
+        return storage_invert[element_id]
 
     def encode(self, text: str) -> Optional[tuple[int, ...]]:
         """
@@ -134,7 +134,7 @@ class TextProcessor:
         In case of corrupt input arguments, None is returned.
         In case any of methods used return None, None is returned.
         """
-        if not isinstance(text, str) or len(text) == 0:
+        if not (isinstance(text, str) and text):
             return None
 
         tokenized_text = self._tokenize(text)
@@ -167,6 +167,8 @@ class TextProcessor:
         if element not in self._storage:
             ident = len(self._storage)
             self._storage[element] = ident
+
+        return None
 
     def decode(self, encoded_corpus: tuple[int, ...]) -> Optional[str]:
         """
@@ -211,6 +213,8 @@ class TextProcessor:
             for token in n_gram:
                 if token.isalpha():
                     self._put(token.lower())
+
+        return None
 
     def _decode(self, corpus: tuple[int, ...]) -> Optional[tuple[str, ...]]:
         """
@@ -309,6 +313,8 @@ class NGramLanguageModel:
 
         self._n_gram_frequencies = frequencies
 
+        return None
+
     def build(self) -> int:
         """
         Fill attribute `_n_gram_frequencies` from encoded corpus.
@@ -334,7 +340,8 @@ class NGramLanguageModel:
             absolute_freq = n_grams.count(n_gram)
             context = n_gram[:-1]
             if context not in context_freq_dict:
-                context_freq_dict[context] = sum(1 for n_gram_1 in n_grams if n_gram_1[:-1] == context)
+                context_freq_dict[context] = sum(1 for n_gram_1 in n_grams
+                                                 if n_gram_1[:-1] == context)
             context_freq = context_freq_dict[context]
 
             self._n_gram_frequencies[n_gram] = absolute_freq / context_freq
@@ -443,10 +450,8 @@ class GreedyTextGenerator:
             if not tokens:
                 break
 
-            max_freq = max(tokens.values())
-            max_freq_tokens = [token for token, freq in tokens.items() if freq == max_freq]
-            max_freq_tokens = sorted(max_freq_tokens)
-            encoded_prompt += (max_freq_tokens[0],)
+            max_freq_token = min(tokens, key=tokens.get)
+            encoded_prompt += (max_freq_token,)
 
             seq_len -= 1
 
@@ -505,12 +510,12 @@ class BeamSearcher:
         if not tokens:
             return []
 
-        token_pairs = [(token, freq) for token, freq in tokens.items()]
+        token_pairs = list(tokens.items())
         token_pairs = sorted(token_pairs, key=lambda x: x[1], reverse=True)
         if len(token_pairs) <= self._beam_width:
             return token_pairs
-        else:
-            return token_pairs[:self._beam_width]
+
+        return token_pairs[:self._beam_width]
 
     def continue_sequence(
             self,
@@ -566,7 +571,7 @@ class BeamSearcher:
             return None
 
         if len(sequence_candidates) > self._beam_width:
-            candidates_pairs = [(seq, freq) for seq, freq in sequence_candidates.items()]
+            candidates_pairs = list(sequence_candidates.items())
             candidates_pairs = sorted(candidates_pairs, key=lambda x: (-x[1], x[0]))
             delete_seq = candidates_pairs[:self._beam_width]
 
@@ -635,9 +640,11 @@ class BeamSearchTextGenerator:
                 tokens = self.beam_searcher.get_next_token(sequence)
                 if not tokens:
                     return None
-                candidates_possible = self.beam_searcher.continue_sequence(sequence, tokens, sequence_copy)
+                candidates_possible = self.beam_searcher.continue_sequence(sequence,
+                                                                           tokens, sequence_copy)
                 if not candidates_possible:
-                    return self._text_processor.decode(sorted(tuple(sequence_candidates), key=lambda pair: pair[1])[0])
+                    return self._text_processor.decode(sorted(tuple(sequence_candidates),
+                                                              key=lambda pair: pair[1])[0])
 
             candidates_possible = self.beam_searcher.prune_sequence_candidates(sequence_copy)
             if not candidates_possible:
@@ -647,9 +654,6 @@ class BeamSearchTextGenerator:
 
         sorted_candidates = sorted(tuple(sequence_candidates), key=lambda x: x[1])
         decoded = self._text_processor.decode(sorted_candidates[0])
-
-        if not decoded:
-            return None
 
         return decoded
 
