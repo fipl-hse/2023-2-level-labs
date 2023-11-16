@@ -44,22 +44,17 @@ class TextProcessor:
         In case of corrupt input arguments, None is returned.
         In case any of methods used return None, None is returned.
         """
-        if not isinstance(text, str) or text == '':
+        if not isinstance(text, str) or not text:
             return None
-        for symbol in text:
-            if symbol == ' ':
-                text = text.replace(symbol, self._end_of_word_token)
-        if not text[-1].isalnum():
-            text = text.replace(text[-1], self._end_of_word_token)
         text_list = []
         for symbol in text.lower():
-            if symbol.isalpha() or symbol == self._end_of_word_token:
+            if symbol.isspace() and text_list[-1] != self._end_of_word_token:
+                text_list.append(self._end_of_word_token)
+            elif symbol.isalpha():
                 text_list.append(symbol)
-        for ind, symbol in enumerate(text_list):
-            if ind != len(text_list) - 1:
-                if symbol == self._end_of_word_token and text_list[ind + 1] == symbol:
-                    text_list.pop(ind + 1)
-        if not text_list:
+        if not text[-1].isalnum():
+            text_list.append(self._end_of_word_token)
+        if text_list.count(self._end_of_word_token) == len(text_list):
             return None
         return tuple(text_list)
 
@@ -447,14 +442,9 @@ class BeamSearcher:
             return None
         if not variants:
             return []
-        most_likely = sorted([pred for pred, freq in variants.items() if
-                              freq == max(variants.values())])[:self._beam_width]
-        m_l_with_freq = []
-        for symbol in most_likely:
-            for pred, freq in variants.items():
-                if symbol == pred:
-                    m_l_with_freq.append((symbol, freq))
-        return m_l_with_freq
+        most_likely = sorted([(token, float(freq)) for token, freq in variants.items()],
+                        key=lambda x: x[1], reverse=True)[:self._beam_width]
+        return most_likely
 
     def continue_sequence(
         self,
@@ -483,7 +473,7 @@ class BeamSearcher:
             len(next_tokens) > self._beam_width):
             return None
         for token in next_tokens:
-            sequence_candidates[sequence + tuple([token[0]])] =\
+            sequence_candidates[sequence + tuple([token[0]])] = \
                 sequence_candidates[sequence] - math.log(token[1])
         sequence_candidates.pop(sequence)
         return sequence_candidates
@@ -588,7 +578,7 @@ class BeamSearchTextGenerator:
                 return None
             sequence_candidates = best_choice
         for_decode = sorted([seq for seq, prob in sequence_candidates.items() if
-                               prob == min(sequence_candidates.values())])[0]
+                             prob == min(sequence_candidates.values())])[0]
         prompt_decoded = self._text_processor.decode(tuple(for_decode))
         if not prompt_decoded:
             return None
@@ -611,7 +601,10 @@ class BeamSearchTextGenerator:
         """
         if not isinstance(sequence_to_continue, tuple) or not sequence_to_continue:
             return None
-        return self.beam_searcher.get_next_token(sequence_to_continue)
+        next_token = self.beam_searcher.get_next_token(sequence_to_continue)
+        if not next_token:
+            return None
+        return next_token
 
 
 class NGramLanguageModelReader:

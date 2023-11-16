@@ -13,15 +13,18 @@ def main() -> None:
     """
     with open("./assets/Harry_Potter.txt", "r", encoding="utf-8") as text_file:
         text = text_file.read()
-    textprocessor = TextProcessor(end_of_word_token='_')
+    textprocessor = TextProcessor('_')
     encoded_text = textprocessor.encode(text)
     decoded_text = textprocessor.decode(encoded_text)
-    ngramlanguagemodel = NGramLanguageModel(encoded_text, n_gram_size=7)
-    greedytextgenerator = GreedyTextGenerator(ngramlanguagemodel, textprocessor)
+    ngramlanguagemodel = NGramLanguageModel(encoded_text[:100], 3)
+    result = ngramlanguagemodel.build()
+    print(result)
+    ngramlanguagemodel_2 = NGramLanguageModel(encoded_text, 7)
+    greedytextgenerator = GreedyTextGenerator(ngramlanguagemodel_2, textprocessor)
     predicted_text = greedytextgenerator.run(51, 'Vernon')
-    beamsearchtextgenerator = BeamSearchTextGenerator(ngramlanguagemodel, textprocessor, 7)
+    print(predicted_text)
+    beamsearchtextgenerator = BeamSearchTextGenerator(ngramlanguagemodel_2, textprocessor, 7)
     predicted_text_2 = beamsearchtextgenerator.run('Vernon', 56)
-    result = predicted_text
     print(predicted_text_2)
     assert result
 
