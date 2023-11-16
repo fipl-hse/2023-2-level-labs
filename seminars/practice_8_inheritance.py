@@ -1,4 +1,9 @@
-# pylint:disable=missing-module-docstring,too-few-public-methods
+"""
+Programming 2023
+Seminar 8
+Intoduction to class inheritance
+"""
+# pylint:disable=missing-class-docstring,too-few-public-methods
 # Vehicle
     # Attributes:
         # max_speed
