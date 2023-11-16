@@ -48,15 +48,15 @@ class TextProcessor:
         clear_text = ''
         for symbol in text.lower():
             if not symbol.isalpha() or symbol.isdigit():
-                symbol = self.end_of_word_token
+                symbol = self._end_of_word_token
             clear_text += symbol
         i = 0
         while i < len(clear_text) - 1:
-            if clear_text[i] == clear_text[i + 1] and clear_text[i] == self.end_of_word_token:
+            if clear_text[i] == clear_text[i + 1] and clear_text[i] == self._end_of_word_token:
                 clear_text = clear_text[:i] + clear_text[i + 1:]
                 i -= 1
             i += 1
-        if clear_text == self.end_of_word_token or not clear_text:
+        if clear_text == self._end_of_word_token or not clear_text:
             return None
         tokens = tuple(clear_text)
         return tokens
@@ -147,7 +147,7 @@ class TextProcessor:
         if not isinstance(element, str):
             return None
         if len(self._storage) == 0:
-            self._storage[self.end_of_word_token] = 0
+            self._storage[self._end_of_word_token] = 0
         if element not in self._storage:
             self._storage[element] = len(self._storage)
 
