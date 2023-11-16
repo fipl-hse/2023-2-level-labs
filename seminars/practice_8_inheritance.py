@@ -59,7 +59,7 @@ class Bicycle(Vehicle):
     # Methods:
         # move
 
-class Bicycle:
+class Aircraft:
     ...
 
 
