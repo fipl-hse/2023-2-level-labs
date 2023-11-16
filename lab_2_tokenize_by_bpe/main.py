@@ -161,6 +161,7 @@ def get_vocabulary(
         ident_dict[token] = ind
     return ident_dict
 
+
 def decode(
     encoded_text: list[int] | None, vocabulary: dict[str, int] | None, end_of_word_token: str | None
 ) -> str | None:
@@ -186,6 +187,8 @@ def decode(
     if end_of_word_token is not None:
         decoded_text = decoded_text.replace(end_of_word_token, ' ')
     return decoded_text
+
+
 def tokenize_word(
     word: tuple[str, ...], vocabulary: dict[str, int], end_of_word: str | None, unknown_token: str
 ) -> list[int] | None:
