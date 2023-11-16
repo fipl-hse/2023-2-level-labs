@@ -14,19 +14,16 @@ def main() -> None:
         text = text_file.read()
     text_processor = TextProcessor(end_of_word_token='_')
     encoded = text_processor.encode(text)
-    result = encoded
-    if encoded is None:
+    if encoded is None or not isinstance(encoded, tuple):
         return
     decoded = text_processor.decode(encoded)
     if decoded is None:
         return
-    print(f"Results:\nEncoded text:\n{encoded[:200]}\nDecoded text:\n{decoded[:200]}")
-    n_gram_model = NGramLanguageModel(encoded_corpus=encoded[:200], n_gram_size=3)
-    freqs = n_gram_model.build()
-    if freqs is None:
-        return
-    result = freqs
-    print(result)
+    print(f"Results:\nEncoded text:\n{encoded[:100]}\nDecoded text:\n{decoded[:100]}")
+    result = decoded
+    n_gram_model = NGramLanguageModel(encoded_corpus=encoded[:100], n_gram_size=3)
+    built_model = n_gram_model.build()
+    print(built_model)
     assert result
 
 
