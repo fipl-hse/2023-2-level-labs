@@ -46,12 +46,11 @@ class TextProcessor:
         """
         if not isinstance(text, str):
             return None
-        self.text = text
         text = text.lower()
         split_text = text.split()
         list_of_text = []
         for word in split_text:
-            word = list(''.join(letter for letter in word if letter.isalpha()))
+            word = [letter for letter in word if letter.isalpha()]
             if not word:
                 continue
             list_of_text += word
@@ -101,7 +100,7 @@ class TextProcessor:
 
         In case of corrupt input arguments or arguments not included in storage, None is returned
         """
-        if not isinstance(element_id, int) or\
+        if not isinstance(element_id, int) or \
                 element_id not in self._storage.values():
             return None
         for letter, index in self._storage.items():
@@ -124,15 +123,14 @@ class TextProcessor:
         In case of corrupt input arguments, None is returned.
         In case any of methods used return None, None is returned.
         """
-        if not isinstance(text, str) or len(text) == 0:
+        if not (isinstance(text, str) and text):
             return None
-        encoded_dictionary = {}
         encoded_corpus = []
         tokens = self._tokenize(text)
         if tokens is None:
             return None
         for token in tokens:
-            encoded_dictionary[token] = self._put(token)
+            self._put(token)
             token_id = self.get_id(token)
             if token_id is None:
                 return None
@@ -193,6 +191,8 @@ class TextProcessor:
             for token in element:
                 if token.isalpha():
                     self._put(token)
+                if token == ' ':
+                    self._put(self._end_of_word_token)
         return None
 
     def _decode(self, corpus: tuple[int, ...]) -> Optional[tuple[str, ...]]:
@@ -208,8 +208,8 @@ class TextProcessor:
         In case of corrupt input arguments, None is returned.
         In case any of methods used return None, None is returned.
         """
-        if not isinstance(corpus, tuple) or\
-                len(corpus) == 0:
+        if not (isinstance(corpus, tuple)
+                and corpus):
             return None
         decoded_corpus = []
         for index in corpus:
@@ -234,14 +234,12 @@ class TextProcessor:
 
         In case of corrupt input arguments, None is returned
         """
-        if not isinstance(decoded_corpus, tuple) or\
-                len(decoded_corpus) == 0:
+        if not (isinstance(decoded_corpus, tuple) and decoded_corpus):
             return None
         text_string = ''.join(list(decoded_corpus))
-        text = ' '.join(text_string.split('_'))
+        text = text_string.replace(self._end_of_word_token, ' ')
         text = text.capitalize().strip() + '.'
         return text
-
 
 class NGramLanguageModel:
     """
@@ -299,12 +297,11 @@ class NGramLanguageModel:
         In case of corrupt input arguments or methods used return None,
         1 is returned
         """
-        if not isinstance(self._encoded_corpus, tuple) or \
-                len(self._encoded_corpus) == 0:
+        if not (isinstance(self._encoded_corpus, tuple)
+                and self._encoded_corpus):
             return 1
         n_grams = self._extract_n_grams(self._encoded_corpus)
-        if not isinstance(n_grams, tuple) or \
-                len(n_grams) == 0:
+        if not (isinstance(n_grams, tuple) and n_grams):
             return 1
         for n_gram in set(n_grams):
             number_of_n_grams = n_grams.count(n_gram)
@@ -332,8 +329,8 @@ class NGramLanguageModel:
         next_tokens = {}
         context = sequence[- self._n_gram_size + 1:]
         for n_gram, freq in self._n_gram_frequencies.items():
-            if n_gram[: self._n_gram_size - 1] == context:
-                next_tokens[n_gram[self._n_gram_size - 1]] = freq
+            if n_gram[:- 1] == context:
+                next_tokens[n_gram[- 1]] = freq
         return next_tokens
 
     def _extract_n_grams(
@@ -398,18 +395,18 @@ class GreedyTextGenerator:
         len_of_context = self._model.get_n_gram_size()
         if not (encoded_prompt and len_of_context):
             return None
-        continued_sequence = prompt
         for i in range(seq_len):
-            next_tokens = self._model.generate_next_token(encoded_prompt[:-len_of_context + 1])
+            next_tokens = self._model.generate_next_token(encoded_prompt)
             if not next_tokens:
                 break
             max_freq = max(next_tokens.values())
             next_token = next_tokens[max_freq]
-            continued_sequence += str(self._text_processor.decode(next_token))
+            encoded_sequence = encoded_prompt + next_token
             encoded_prompt = encoded_prompt + next_token
-            if not continued_sequence:
+            if not encoded_sequence:
                 return None
-        return continued_sequence
+            decoded = self._text_processor.decode(encoded_sequence)
+            return decoded
 
 class BeamSearcher:
     """
@@ -462,8 +459,6 @@ class BeamSearcher:
             token_pair = (token, freq)
             list_of_token_pairs.append(token_pair)
         sorted_list_of_token_pairs = sorted(list_of_token_pairs, key=lambda x: x[1], reverse=True)
-        if len(sorted_list_of_token_pairs) <= self._beam_width:
-            return sorted_list_of_token_pairs
         return sorted_list_of_token_pairs[:self._beam_width]
 
     def continue_sequence(
@@ -494,12 +489,12 @@ class BeamSearcher:
                 and len(next_tokens) <= self._beam_width
                 and sequence in sequence_candidates):
             return None
-        new_sequence_candidates = {}
         for token_tuple in next_tokens:
             new_sequence = sequence + (token_tuple[0],)
             new_freq = sequence_candidates[sequence] - math.log(token_tuple[1])
-            new_sequence_candidates[new_sequence] = new_freq
-        return new_sequence_candidates
+            sequence_candidates[new_sequence] = new_freq
+        sequence_candidates.pop(sequence)
+        return sequence_candidates
 
     def prune_sequence_candidates(
         self, sequence_candidates: dict[tuple[int, ...], float]
