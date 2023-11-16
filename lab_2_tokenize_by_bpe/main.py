@@ -67,12 +67,12 @@ def count_tokens_pairs(
     if not isinstance(word_frequencies, dict):
         return None
     pairs_dictionary = {}
-    for el in word_frequencies:
-        for i in range(len(el) - 1):
-            pairs = (el[i], el[i + 1])
+    for elements in word_frequencies:
+        for i in range(len(elements) - 1):
+            pairs = (elements[i], elements[i + 1])
             if pairs not in pairs_dictionary:
                 pairs_dictionary[pairs] = 0
-            pairs_dictionary[pairs] += word_frequencies[el]
+            pairs_dictionary[pairs] += word_frequencies[elements]
     return pairs_dictionary
 
 
@@ -91,15 +91,15 @@ def merge_tokens(
     ):
         return None
     merged_dictionary = {}
-    for el in word_frequencies:
-        el_list = list(el)
-        for i in range(len(el) - 1):
-            tokens = (el[i], el[i + 1])
+    for elements in word_frequencies:
+        el_list = list(elements)
+        for i in range(len(elements) - 1):
+            tokens = (elements[i], elements[i + 1])
             if tokens == pair:
                 el_list.pop(i + 1)
-                el_list[i] = ''.join([el[i], el[i + 1]])
+                el_list[i] = ''.join([elements[i], elements[i + 1]])
         el_list = tuple(el_list)
-        merged_dictionary[el_list] = word_frequencies[el]
+        merged_dictionary[el_list] = word_frequencies[elements]
     return merged_dictionary
 
 
