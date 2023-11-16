@@ -116,6 +116,18 @@ class TextProcessor:
         In case of corrupt input arguments, None is returned.
         In case any of methods used return None, None is returned.
         """
+        if not isinstance(text, str):
+            return None
+        unigrams = self._tokenize(text)
+        if not unigrams:
+            return None
+        encoded = []
+        for symbol in unigrams:
+            self._put(symbol)
+            encoded.append(self.get_id(symbol))
+        if None in self._storage or None in encoded:
+            return None
+        return tuple(encoded)
 
     def _put(self, element: str) -> None:
         """
@@ -170,6 +182,14 @@ class TextProcessor:
         In case of corrupt input arguments, None is returned.
         In case any of methods used return None, None is returned.
         """
+        if not isinstance(corpus, tuple):
+            return None
+        decoded = []
+        for token_id in corpus:
+            decoded.append(self.get_token(token_id))
+        if None in decoded:
+            return None
+        return tuple(decoded)
 
     def _postprocess_decoded_text(self, decoded_corpus: tuple[str, ...]) -> Optional[str]:
         """
@@ -186,7 +206,10 @@ class TextProcessor:
 
         In case of corrupt input arguments, None is returned
         """
-
+        if not isinstance(decoded_corpus, tuple) or not decoded_corpus:
+            return None
+        text = ''.join(decoded_corpus).replace(self._end_of_word_token, ' ').capitalize().rstrip()
+        return f'{text}.'
 
 class NGramLanguageModel:
     """
