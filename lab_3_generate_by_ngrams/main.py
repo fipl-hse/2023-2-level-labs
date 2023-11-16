@@ -4,8 +4,8 @@ Lab 3.
 Beam-search and natural language generation evaluation
 """
 # pylint:disable=too-few-public-methods
-from typing import Optional
 import math
+from typing import Optional
 
 
 class TextProcessor:
@@ -98,7 +98,7 @@ class TextProcessor:
         """
         if not isinstance(element_id, int):
             return None
-        storage_inverted = {self._storage[symbol]: symbol for symbol in self._storage}
+        storage_inverted = {symbol: ind for ind, symbol in self._storage.items()}
         if element_id not in storage_inverted:
             return None
         return storage_inverted[element_id]
@@ -128,7 +128,10 @@ class TextProcessor:
             self._put(symbol)
         encoded_corpus = []
         for symbol in tokenized_text:
-            encoded_corpus.append(self.get_id(symbol))
+            ind = self.get_id(symbol)
+            if not isinstance(ind, int):
+                return None
+            encoded_corpus.append(ind)
         if None in encoded_corpus:
             return None
         return tuple(encoded_corpus)
@@ -147,6 +150,7 @@ class TextProcessor:
             return None
         if element not in self._storage:
             self._storage[element] = len(self._storage)
+        return None
 
     def decode(self, encoded_corpus: tuple[int, ...]) -> Optional[str]:
         """
@@ -199,7 +203,10 @@ class TextProcessor:
             return None
         decoded_corpus = []
         for num in corpus:
-            decoded_corpus.append(self.get_token(num))
+            letter = self.get_token(num)
+            if not isinstance(letter, str):
+                return None
+            decoded_corpus.append(letter)
         if None in decoded_corpus:
             return None
         return tuple(decoded_corpus)
@@ -468,9 +475,11 @@ class BeamSearcher:
         In case of corrupt input arguments or unexpected behaviour of methods used return None.
         """
         if (not isinstance(sequence, tuple) or not isinstance(next_tokens, list) or
-            not isinstance(sequence_candidates, dict) or not sequence or not next_tokens or
-            not sequence_candidates or sequence not in sequence_candidates or
-            len(next_tokens) > self._beam_width):
+            not isinstance(sequence_candidates, dict) or not sequence):
+            return None
+        if (not next_tokens or not sequence_candidates or
+           sequence not in sequence_candidates or
+           len(next_tokens) > self._beam_width):
             return None
         for token in next_tokens:
             sequence_candidates[sequence + tuple([token[0]])] = \
@@ -553,7 +562,7 @@ class BeamSearchTextGenerator:
         In case of corrupt input arguments or methods used return None,
         None is returned
         """
-        if not isinstance(prompt, str) or not str or not isinstance(seq_len, int) or seq_len <= 0:
+        if not isinstance(prompt, str) or not prompt or not isinstance(seq_len, int) or seq_len <= 0:
             return None
         prompt_encoded = self._text_processor.encode(prompt)
         if not prompt_encoded:
@@ -580,8 +589,6 @@ class BeamSearchTextGenerator:
         for_decode = sorted([seq for seq, prob in sequence_candidates.items() if
                              prob == min(sequence_candidates.values())])[0]
         prompt_decoded = self._text_processor.decode(tuple(for_decode))
-        if not prompt_decoded:
-            return None
         return prompt_decoded
 
     def _get_next_token(
