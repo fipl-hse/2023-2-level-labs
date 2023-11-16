@@ -645,8 +645,8 @@ class BeamSearchTextGenerator:
                 if tokens is None:
                     return None
 
-                continuation_candidates = self.beam_searcher.continue_sequence(sequence,
-                                                                               tokens, new_sequence_candidates)
+                continuation_candidates = self.beam_searcher.continue_sequence(
+                    sequence, tokens, new_sequence_candidates)
                 if not continuation_candidates:
                     return self._text_processor.decode(sorted(tuple(sequence_candidates),
                                                               key=lambda pair: pair[1])[0])
