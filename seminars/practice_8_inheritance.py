@@ -1,3 +1,4 @@
+# pylint:disable=missing-module-docstring,too-few-public-methods
 # Vehicle
     # Attributes:
         # max_speed
@@ -23,7 +24,7 @@ class Car:
     ...
 
 
-lada = ...
+LADA = ...
 
 
 # Bicycle
@@ -39,7 +40,7 @@ class Bicycle(Vehicle):
     ...
 
 
-stels = Bicycle('yellow', 30, 2)
+# stels = Bicycle('yellow', 30, 2)
 # print(stels.colour)
 # stels.move()
 # stels.freestyle()
