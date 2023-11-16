@@ -98,8 +98,7 @@ def merge_tokens(
             if tokens == pair:
                 el_list.pop(i + 1)
                 el_list[i] = ''.join([elements[i], elements[i + 1]])
-        el_list = tuple(el_list)
-        merged_dictionary[el_list] = word_frequencies[elements]
+        merged_dictionary[tuple(el_list)] = word_frequencies[elements]
     return merged_dictionary
 
 
