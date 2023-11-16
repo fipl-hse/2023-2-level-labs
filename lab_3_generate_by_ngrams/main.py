@@ -248,6 +248,9 @@ class NGramLanguageModel:
             encoded_corpus (tuple): Encoded text
             n_gram_size (int): A size of n-grams to use for language modelling
         """
+        self._encoded_corpus = encoded_corpus
+        self._n_gram_size = n_gram_size
+        self._n_gram_frequencies = {}
 
     def get_n_gram_size(self) -> int:
         """
@@ -256,6 +259,7 @@ class NGramLanguageModel:
         Returns:
             int: Size of stored n_grams
         """
+        return self._n_gram_size
 
     def set_n_grams(self, frequencies: dict) -> None:
         """
@@ -277,6 +281,24 @@ class NGramLanguageModel:
         In case of corrupt input arguments or methods used return None,
         1 is returned
         """
+        n_grams = self._extract_n_grams(encoded_corpus)
+        if not isinstance(n_grams, tuple) or not n_grams:
+            return 1
+        beginning_freq = {}
+        n_gram_freq = {}
+        for n_gram in n_grams:
+            if n_gram not in n_gram_freq:
+                n_gram_freq[n_gram] = 0
+            n_gram_freq[n_gram] += 1
+        for n_gram in n_grams:
+            if n_gram[:self._n_gram_size - 1] not in beginning_freq:
+                beginning_freq[n_gram[:self._n_gram_size - 1]] = 0
+            beginning_freq[n_gram[:self._n_gram_size - 1]] += 1
+        for n_gram, freq_n in n_gram_freq.items():
+            for beginning, freq_b in beginning_freq.items():
+                if beginning == n_gram[:self._n_gram_size - 1]:
+                    self._n_gram_frequencies[n_gram] = freq_n / freq_b
+        return 0
 
     def generate_next_token(self, sequence: tuple[int, ...]) -> Optional[dict]:
         """
@@ -290,6 +312,16 @@ class NGramLanguageModel:
 
         In case of corrupt input arguments, None is returned
         """
+        if not isinstance(sequence, tuple) or not sequence or self.n_gram_size > len(sequence):
+            return None
+        context_freq = {}
+        context = sequence[len(sequence) - (self._n_gram_size - 1):]
+        for n_gram in self._n_gram_frequencies:
+            if n_gram[:self._n_gram_size - 1] == context:
+                if n_gram not in context_freq:
+                    context_freq[n_gram] = 0
+                context_freq[n_gram] += 1
+        return context_freq
 
     def _extract_n_grams(
         self, encoded_corpus: tuple[int, ...]
@@ -305,7 +337,15 @@ class NGramLanguageModel:
 
         In case of corrupt input arguments, None is returned
         """
-
+        if not isinstance(encoded_corpus, tuple):
+            return None
+        n_grams = []
+        for i in range(len(encoded_corpus) - (self._n_gram_size - 1)):
+            n_gram = []
+            for k in range(self._n_gram_size):
+                n_gram.append(encoded_corpus[i + k])
+            n_grams.append(tuple(n_gram))
+        return tuple(n_grams)
 
 class GreedyTextGenerator:
     """
@@ -324,6 +364,8 @@ class GreedyTextGenerator:
             language_model (NGramLanguageModel): A language model to use for text generation
             text_processor (TextProcessor): A TextProcessor instance to handle text processing
         """
+        self._model = language_model
+        self._text_processor = text_processor
 
     def run(self, seq_len: int, prompt: str) -> Optional[str]:
         """
@@ -339,6 +381,24 @@ class GreedyTextGenerator:
         In case of corrupt input arguments or methods used return None,
         None is returned
         """
+        if not isinstance(seq_len, int) or not isinstance(prompt, str) or len(prompt) == 0:
+            return None
+        encoded_text = self._text_processor.encode(prompt)
+        n_gram_size = self._model.get_n_gram_size()
+        if not encoded_text or not n_gram_size:
+            return None
+        while seq_len > 0:
+            candidates = self._model.generate_next_token(encoded[n_gram_size + 1:])
+            if not candidates:
+                break
+            best_candidate = [letter for letter, freq in candidates.items() if freq == max(candidates.values())]
+            max_freq_letters = sorted(best_candidate)
+            encoded += (max_freq_letters[0])
+            seq_len -= 1
+        decoded_prompt = self._text_processor.decode(encoded)
+        if decoded_prompt is None:
+            return None
+        return decoded_prompt
 
 
 class BeamSearcher:
