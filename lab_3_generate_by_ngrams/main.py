@@ -23,9 +23,8 @@ class TextProcessor:
         Args:
             end_of_word_token (str): A token denoting word boundary
         """
-        self.end_of_word_token = end_of_word_token
-        self._storage = _storage
-        self._end_of_word_token = _end_of_word_token
+        self._end_of_word_token = end_of_word_token
+        self._storage = {}
 
     def _tokenize(self, text: str) -> Optional[tuple[str, ...]]:
         """
