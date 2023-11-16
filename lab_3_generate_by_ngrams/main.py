@@ -16,7 +16,7 @@ class TextProcessor:
         _storage (dict): Dictionary in the form of <token: identifier>
     """
 
-    def __init__(self, end_of_word_token: str, _storage: dict, _end_of_word_token: str) -> None:
+    def __init__(self, end_of_word_token: str) -> None:
         """
         Initialize an instance of LetterStorage.
 
@@ -48,12 +48,16 @@ class TextProcessor:
             return None
         clear_text = ''
         for symbol in text.lower():
-            if not symbol.isalpha:
+            if not symbol.isalpha() or symbol.isdigit():
                 symbol = self.end_of_word_token
             clear_text += symbol
-        if self.end_of_word_token * 2 in clear_text:
-            clear_text.replace(self.end_of_word_token * 2, self.end_of_word_token)
-        if clear_text == self.end_of_word_token:
+        i = 0
+        while i < len(clear_text) - 1:
+            if clear_text[i] == clear_text[i + 1] and clear_text[i] == self.end_of_word_token:
+                clear_text = clear_text[:i] + clear_text[i + 1:]
+                i -= 1
+            i += 1
+        if clear_text == self.end_of_word_token or not clear_text:
             return None
         tokens = tuple(clear_text)
         return tokens
@@ -119,7 +123,7 @@ class TextProcessor:
         In case of corrupt input arguments, None is returned.
         In case any of methods used return None, None is returned.
         """
-        if not isinstance(text, str) or text == '':
+        if not isinstance(text, str) or not text:
             return None
         tokens = self._tokenize(text)
         if tokens is None:
@@ -141,7 +145,7 @@ class TextProcessor:
         In case of corrupt input arguments or invalid argument length,
         an element is not added to storage
         """
-        if not isinstance(element, str) or len(element) != 1:
+        if not isinstance(element, str):
             return None
         if len(self._storage) == 0:
             self._storage[self.end_of_word_token] = 0
@@ -186,7 +190,7 @@ class TextProcessor:
         In case of corrupt input arguments, None is returned.
         In case any of methods used return None, None is returned.
         """
-        if not isinstance(corpus, tuple) or corpus == ():
+        if not isinstance(corpus, tuple) or not corpus:
             return None
         decoded_corpus = []
         for element_id in corpus:
@@ -212,18 +216,17 @@ class TextProcessor:
 
         In case of corrupt input arguments, None is returned
         """
-        if not isinstance(decoded_corpus, tuple) or decoded_corpus == ():
+        if not isinstance(decoded_corpus, tuple) or not decoded_corpus:
             return None
         str_text = ''
         for element in decoded_corpus:
             if element.isalpha():
-                if str_text == '':
-                    str_text += element.upper()
                 str_text += element
             else:
                 str_text += ' '
+        str_text = str_text.capitalize()
         str_text = str_text[:-1]
-        str_text += '..'
+        str_text += '.'
         return str_text
 
 
