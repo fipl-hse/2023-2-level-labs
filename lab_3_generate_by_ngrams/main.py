@@ -57,10 +57,8 @@ class TextProcessor:
                     pass
                 elif tokenized_text[-1] != self._end_of_word_token:
                     tokenized_text.append(self._end_of_word_token)
-                else:
-                    pass
 
-        if len(tokenized_text) == 0:
+        if not tokenized_text:
             return None
 
         return tuple(tokenized_text)
@@ -104,9 +102,12 @@ class TextProcessor:
 
         In case of corrupt input arguments or arguments not included in storage, None is returned
         """
+        if not isinstance(element_id, int):
+            return None
+
         inv_storage = {identifier: element for element, identifier in self._storage.items()}
 
-        if not isinstance(element_id, int) or element_id not in inv_storage:
+        if element_id not in inv_storage:
             return None
 
         return inv_storage[element_id]
@@ -127,7 +128,7 @@ class TextProcessor:
         In case of corrupt input arguments, None is returned.
         In case any of methods used return None, None is returned.
         """
-        if not isinstance(text, str) or len(text) == 0:
+        if not isinstance(text, str) or not len(text):
             return None
 
         tokenized_text = self._tokenize(text)
@@ -155,9 +156,6 @@ class TextProcessor:
         In case of corrupt input arguments or invalid argument length,
         an element is not added to storage
         """
-        if self._end_of_word_token not in self._storage:
-            self._storage[self._end_of_word_token] = 0
-
         if isinstance(element, str) and len(element) == 1 and element not in self._storage:
             self._storage[element] = len(self._storage)
 
@@ -177,7 +175,7 @@ class TextProcessor:
         In case of corrupt input arguments, None is returned.
         In case any of methods used return None, None is returned.
         """
-        if not isinstance(encoded_corpus, tuple) or len(encoded_corpus) == 0:
+        if not isinstance(encoded_corpus, tuple) or not encoded_corpus:
             return None
 
         decoded_corpus = self._decode(encoded_corpus)
@@ -211,7 +209,7 @@ class TextProcessor:
         In case of corrupt input arguments, None is returned.
         In case any of methods used return None, None is returned.
         """
-        if not isinstance(corpus, tuple) or len(corpus) == 0:
+        if not isinstance(corpus, tuple) or not corpus:
             return None
 
         decoded_corpus = []
@@ -219,7 +217,7 @@ class TextProcessor:
             if self.get_token(identifier) is not None:
                 decoded_corpus.append(self.get_token(identifier))
 
-        if decoded_corpus is None or len(decoded_corpus) == 0:
+        if decoded_corpus is None or not decoded_corpus:
             return None
 
         return tuple(decoded_corpus)
@@ -239,7 +237,7 @@ class TextProcessor:
 
         In case of corrupt input arguments, None is returned
         """
-        if not isinstance(decoded_corpus, tuple) or len(decoded_corpus) == 0:
+        if not isinstance(decoded_corpus, tuple) or not decoded_corpus:
             return None
 
         postprocessed_text = ''
@@ -253,6 +251,8 @@ class TextProcessor:
                     postprocessed_text += ' '
             else:
                 postprocessed_text += token
+        if postprocessed_text[-1] != '.':
+            postprocessed_text += '.'
 
         return postprocessed_text
 
@@ -308,7 +308,7 @@ class NGramLanguageModel:
         In case of corrupt input arguments or methods used return None,
         1 is returned
         """
-        if not isinstance(self._encoded_corpus, tuple) or len(self._encoded_corpus) == 0:
+        if not isinstance(self._encoded_corpus, tuple) or not self._encoded_corpus:
             return 1
 
         n_grams = self._extract_n_grams(self._encoded_corpus)
@@ -323,7 +323,7 @@ class NGramLanguageModel:
                     rel_freq += 1
             self._n_gram_frequencies[n_gram] = abs_freq / rel_freq
 
-        if len(self._n_gram_frequencies) == 0:
+        if not self._n_gram_frequencies:
             return 1
 
         return 0
@@ -340,7 +340,7 @@ class NGramLanguageModel:
 
         In case of corrupt input arguments, None is returned
         """
-        if not isinstance(sequence, tuple) or len(sequence) == 0 or len(sequence) < self._n_gram_size - 1:
+        if not isinstance(sequence, tuple) or not sequence or len(sequence) < self._n_gram_size - 1:
             return None
 
         possible_tokens = {}
@@ -366,16 +366,15 @@ class NGramLanguageModel:
 
         In case of corrupt input arguments, None is returned
         """
-        if not isinstance(encoded_corpus, tuple) or len(encoded_corpus) == 0:
+        if not isinstance(encoded_corpus, tuple) or not encoded_corpus:
             return None
 
         n_grams_list = []
         for index, number in enumerate(encoded_corpus):
             if index == len(encoded_corpus) - (self._n_gram_size - 1):
                 break
-            n_gram = [number]
-            for i in range(1, self._n_gram_size):
-                n_gram.append(encoded_corpus[index + i])
+            n_gram = []
+            n_gram.extend(encoded_corpus[index:index + self._n_gram_size])
             n_grams_list.append(tuple(n_gram))
 
         return tuple(n_grams_list)
@@ -415,31 +414,27 @@ class GreedyTextGenerator:
         In case of corrupt input arguments or methods used return None,
         None is returned
         """
-        if not isinstance(seq_len, int) or not isinstance(prompt, str) or len(prompt) == 0:
+        if not isinstance(seq_len, int) or not isinstance(prompt, str) or not prompt:
             return None
 
         encoded_text_tuple = self._text_processor.encode(prompt)
         if encoded_text_tuple is None:
             return None
-        # context_len = self._model.get_n_gram_size() - 1
         encoded_text_list = list(encoded_text_tuple)
 
         for i in range(seq_len):
             possible_tokens = self._model.generate_next_token(encoded_text_tuple)
             if possible_tokens is None:
                 return prompt + '.'
-            if len(possible_tokens) == 0:
+            if not possible_tokens:
                 break
-            # max_value = sorted(list(possible_tokens.values()), reverse=True)[0]
-            # max_freq_tokens = [(key, value) for key, value in possible_tokens.items() if value == max_value]
             possible_tokens_list = list(possible_tokens.items())
-            possible_tokens_list.sort(key=lambda x: x[0], reverse=True)
             possible_tokens_list.sort(key=lambda x: x[1], reverse=True)
 
             encoded_text_list.append(possible_tokens_list[0][0])
             encoded_text_tuple = tuple(encoded_text_list)
 
-        decoded_text = self._text_processor.decode(encoded_text_tuple) + '.'
+        decoded_text = self._text_processor.decode(encoded_text_tuple)
 
         return decoded_text
 
@@ -461,6 +456,8 @@ class BeamSearcher:
             beam_width (int): Number of candidates to consider at each step
             language_model (NGramLanguageModel): A language model to use for next token prediction
         """
+        self._beam_width = beam_width
+        self._model = language_model
 
     def get_next_token(self, sequence: tuple[int, ...]) -> Optional[list[tuple[int, float]]]:
         """
@@ -481,12 +478,31 @@ class BeamSearcher:
 
         In case of corrupt input arguments or methods used return None.
         """
+        if not isinstance(sequence, tuple) or not sequence:
+            return None
+
+        possible_tokens = self._model.generate_next_token(sequence)
+        if possible_tokens is None:
+            return None
+        if not possible_tokens:
+            return []
+
+        possible_tokens_list = list(possible_tokens.items())
+        possible_tokens_list.sort(key=lambda x: x[0], reverse=True)
+        possible_tokens_list.sort(key=lambda x: x[1], reverse=True)
+
+        best_tokens = []
+        for _ in range(self._beam_width):
+            best_tokens.append(possible_tokens_list[0])
+            possible_tokens_list.pop(0)
+
+        return best_tokens
 
     def continue_sequence(
-            self,
-            sequence: tuple[int, ...],
-            next_tokens: list[tuple[int, float]],
-            sequence_candidates: dict[tuple[int, ...], float],
+        self,
+        sequence: tuple[int, ...],
+        next_tokens: list[tuple[int, float]],
+        sequence_candidates: dict[tuple[int, ...], float],
     ) -> Optional[dict[tuple[int, ...], float]]:
         """
         Generate new sequences from the base sequence with next tokens provided.
@@ -504,8 +520,9 @@ class BeamSearcher:
         In case of corrupt input arguments or unexpected behaviour of methods used return None.
         """
 
+
     def prune_sequence_candidates(
-            self, sequence_candidates: dict[tuple[int, ...], float]
+        self, sequence_candidates: dict[tuple[int, ...], float]
     ) -> Optional[dict[tuple[int, ...], float]]:
         """
         Remove those sequence candidates that do not make top-N most probable sequences.
@@ -532,10 +549,10 @@ class BeamSearchTextGenerator:
     """
 
     def __init__(
-            self,
-            language_model: NGramLanguageModel,
-            text_processor: TextProcessor,
-            beam_width: int,
+        self,
+        language_model: NGramLanguageModel,
+        text_processor: TextProcessor,
+        beam_width: int,
     ):
         """
         Initializes an instance of BeamSearchTextGenerator.
@@ -562,7 +579,7 @@ class BeamSearchTextGenerator:
         """
 
     def _get_next_token(
-            self, sequence_to_continue: tuple[int, ...]
+        self, sequence_to_continue: tuple[int, ...]
     ) -> Optional[list[tuple[int, float]]]:
         """
         Retrieve next tokens for sequence continuation.
@@ -632,9 +649,9 @@ class BackOffGenerator:
     """
 
     def __init__(
-            self,
-            language_models: tuple[NGramLanguageModel, ...],
-            text_processor: TextProcessor,
+        self,
+        language_models: tuple[NGramLanguageModel, ...],
+        text_processor: TextProcessor,
     ):
         """
         Initializes an instance of BackOffGenerator.
