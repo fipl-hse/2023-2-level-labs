@@ -12,20 +12,27 @@ def tokenize(text: str) -> list[str] | None:
         if char.isalpha():
             characters.append(char)
     return characters
+    def calculate_frequencies(tokens: list[str] | None) -> dict[str, float] | None:
+        frequency = {}
+        for i in tokens:
+            frequency[i] = tokens.count(i) / len(tokens)
+        return frequency
+
+    def create_language_profile(language: str, text: str) -> dict[str, str | dict[str, float]] | None:
+
+        tokenized = tokenize(text)
+        frequencies = calculate_frequencies(tokenized)
+        profile = dict({"name": language, "freq": frequencies})
+        return profile
 
 
 
-def calculate_frequencies(tokens: list[str] | None) -> dict[str, float] | None:
+
     """
-    Calculates frequencies of given tokens
-    :param tokens: a list of tokens
-    :return: a dictionary with frequencies
-
-    """
 
 
-def create_language_profile(language: str, text: str) -> dict[str, str | dict[str, float]] | None:
-    """
+ def create_language_profile(language: str, text: str) -> dict[str, str | dict[str, float]] | None:
+ 
     Creates a language profile
     :param language: a language
     :param text: a text
