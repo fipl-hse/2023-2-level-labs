@@ -18,6 +18,7 @@ assets
 assignees
 ast
 autoformatting
+back-off
 backoff
 backoffgenerator
 base
@@ -237,6 +238,7 @@ preprocess
 preprocessed
 preprocessing
 print
+private
 pro
 processing
 processor
@@ -246,6 +248,7 @@ profiles
 programming
 projectconfig
 prompt
+protected
 prune
 pull
 push
