@@ -139,6 +139,25 @@ class TextProcessor:
         In case of corrupt input arguments or invalid argument length,
         an element is not added to storage
         """
+        if not isinstance(text, str):
+            return None
+
+        tokenized_text = self._tokenize(text)
+        encoded_text = []
+
+        if not tokenized_text:
+            return None
+
+        for token in tokenized_text:
+            self._put(token)
+            token_id = self.get_id(token)
+
+            if token_id is None:
+                return None
+
+            encoded_text.append(token_id)
+
+        return tuple(encoded_text)
 
     def decode(self, encoded_corpus: tuple[int, ...]) -> Optional[str]:
         """
