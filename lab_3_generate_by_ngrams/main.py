@@ -378,8 +378,10 @@ class GreedyTextGenerator:
         In case of corrupt input arguments or methods used return None,
         None is returned
         """
-
-
+        if not isinstance(seq_len, int) or not isinstance(prompt, str) or not prompt:
+            return None
+        encoded = self._text_processor.encode(prompt)
+        n_gram_size = self._language_model.get_n_gram_size()
 
 
 class BeamSearcher:
