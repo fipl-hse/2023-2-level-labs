@@ -393,20 +393,22 @@ class GreedyTextGenerator:
             return None
         encoded_prompt = self._text_processor.encode(prompt)
         len_of_context = self._model.get_n_gram_size()
+        context = encoded_prompt[- len_of_context:]
         if not (encoded_prompt and len_of_context):
             return None
+        encoded_sequence = ()
         for i in range(seq_len):
-            next_tokens = self._model.generate_next_token(encoded_prompt)
+            next_tokens = self._model.generate_next_token(context)
             if not next_tokens:
                 break
             max_freq = max(next_tokens.values())
             next_token = next_tokens[max_freq]
-            encoded_sequence = encoded_prompt + next_token
-            encoded_prompt = encoded_prompt + next_token
+            encoded_sequence += next_token
+            context = context[1:] + next_token
             if not encoded_sequence:
                 return None
-            decoded = self._text_processor.decode(encoded_sequence)
-            return decoded
+        return self._text_processor.decode(encoded_sequence)
+
 
 class BeamSearcher:
     """
@@ -510,12 +512,16 @@ class BeamSearcher:
 
         In case of corrupt input arguments return None.
         """
-        if not(isinstance(sequence_candidates, dict)
-               and sequence_candidates):
+        if not (isinstance(sequence_candidates, dict) and sequence_candidates):
             return None
-        sorted_sequence_candidates = dict(sorted(sequence_candidates.items(), key=lambda x: x[1]))
-        while len(sorted_sequence_candidates) > self._beam_width:
-            sorted_sequence_candidates.popitem()
+        keys = list(sequence_candidates.keys())
+        values = list(sequence_candidates.values())
+        values.sort()
+        sorted_sequence_candidates = {}
+        for value in values[:self._beam_width]:
+            index = values.index(value)
+            key = keys[index]
+            sorted_sequence_candidates[key] = value
         return sorted_sequence_candidates
 
 class BeamSearchTextGenerator:
