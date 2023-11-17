@@ -13,7 +13,6 @@ def main() -> None:
         text = text_file.read()
     result = train(collect_frequencies(text, None, '</s>'), 100)
     print(result)
-    result = None
     assert result, "Encoding is not working"
 
 
