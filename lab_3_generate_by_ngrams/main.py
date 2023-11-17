@@ -290,7 +290,6 @@ class NGramLanguageModel:
         if not isinstance(frequencies, dict) or len(frequencies) == 0:
             return None
         self._n_gram_frequencies = frequencies
-        return None
 
     def build(self) -> int:
         """
@@ -337,8 +336,8 @@ class NGramLanguageModel:
             return None
 
         tokens = {}
-        for ngram, freq in self._n_gram_frequencies.items():
-            if sequence[-self._n_gram_size + 1:] == ngram[:self._n_gram_size - 1]:
+        for n_gram, freq in self._n_gram_frequencies.items():
+            if sequence[-self._n_gram_size + 1:] == n_gram[:self._n_gram_size - 1]:
                 tokens[self._n_gram_size - 1] = freq
         return tokens
 
