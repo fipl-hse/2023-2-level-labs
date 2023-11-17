@@ -12,7 +12,19 @@ def main() -> None:
     with open("./assets/Harry_Potter.txt", "r", encoding="utf-8") as text_file:
         text = text_file.read()
     result = None
+    processor = TextProcessor('_')
+    encoded = processor.encode(text)
+
+    if not encoded:
+        return None
+
+    result = processor.decode(encoded)
+
+    model_for_build = NGramLanguageModel(encoded[:10], 2)
+    print(model_for_build.build())
+
     assert result
+
 
 
 if __name__ == "__main__":

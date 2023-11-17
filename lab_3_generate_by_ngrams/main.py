@@ -4,6 +4,7 @@ Lab 3.
 Beam-search and natural language generation evaluation
 """
 # pylint:disable=too-few-public-methods
+
 from typing import Optional
 
 
@@ -32,6 +33,7 @@ class TextProcessor:
         1. It is followed by punctuation
         2. It is followed by space symbol
 
+
         Args:
             text (str): Original text
 
@@ -41,6 +43,24 @@ class TextProcessor:
         In case of corrupt input arguments, None is returned.
         In case any of methods used return None, None is returned.
         """
+        if not isinstance(text, str):
+            return None
+        tokenized_text = []
+        lower_split_text = list(text.lower().split())
+
+        for i in lower_split_text:
+            word = list(''.join(token for token in i if token.isalpha()))
+            if word:
+                tokenized_text.extend(word)
+                tokenized_text.append(self._end_of_word_token)
+
+        if not tokenized_text:
+            return None
+
+        if text[-1].isalnum():
+            del tokenized_text[-1]
+
+        return tuple(tokenized_text)
 
     def get_id(self, element: str) -> Optional[int]:
         """
@@ -55,6 +75,11 @@ class TextProcessor:
         In case of corrupt input arguments or arguments not included in storage,
         None is returned
         """
+        if not isinstance(element, str) or element not in self._storage:
+            return None
+
+        return self._storage[element]
+
 
     def get_end_of_word_token(self) -> str:
         """
