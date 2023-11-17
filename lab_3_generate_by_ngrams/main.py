@@ -149,7 +149,7 @@ class TextProcessor:
             return None
         if element not in self._storage:
             self._storage[element] = len(self._storage)
-        return
+        return None
 
     def decode(self, encoded_corpus: tuple[int, ...]) -> Optional[str]:
         """
@@ -190,7 +190,7 @@ class TextProcessor:
             for letter in n_gram:
                 if letter.isalpha():
                     self._put(letter)
-        return
+        return None
 
     def _decode(self, corpus: tuple[int, ...]) -> Optional[tuple[str, ...]]:
         """
@@ -282,7 +282,7 @@ class NGramLanguageModel:
         if not isinstance(frequencies, dict) or not frequencies:
             return None
         self._n_gram_frequencies = frequencies
-        return
+        return None
 
     def build(self) -> int:
         """
