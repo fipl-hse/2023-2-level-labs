@@ -151,14 +151,15 @@ def train(
         token_pairs = count_tokens_pairs(word_frequencies)
         if not token_pairs:
             return None
-        max_result = max(token_pairs.values())
-        max_results = {k: v for k, v in token_pairs.items() if v == max_result}
+        max_results = count_tokens_pairs(word_frequencies)
+        #max_result = max(token_pairs.values())
+        #max_results = {k: v for k, v in token_pairs.items() if v == max_result}
 
         if len(max_results) == 1:
             word_frequencies = merge_tokens(word_frequencies, list(max_results.keys())[0])
         elif len(max_results) > 1:
-            key_sorted = sorted(max_results.keys(), key=lambda x: (-len(''.join(x)), x))
-            word_frequencies = merge_tokens(word_frequencies, key_sorted[0])
+            key_sorted = sorted(max_results.items(), key=lambda x: (-x[1], -len(''.join(x[0])), str(x[0])))
+            word_frequencies = merge_tokens(word_frequencies, key_sorted[0][0])
 
         if not word_frequencies:
             return None

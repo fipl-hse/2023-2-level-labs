@@ -14,7 +14,7 @@ def main() -> None:
     with open(assets_path / 'text.txt', 'r', encoding='utf-8') as text_file:
         text = text_file.read()
 
-    with open(assets_path / 'secrets/secret_5.txt', 'r', encoding='utf-8') as secret_file:
+    with open(assets_path / 'secrets/secret_3.txt', 'r', encoding='utf-8') as secret_file:
         secret = secret_file.read()
 
     word_frequencies = collect_frequencies(text, None, "</s>")
