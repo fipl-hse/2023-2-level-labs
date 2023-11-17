@@ -178,22 +178,17 @@ def decode(
     :param end_of_word_token: an end-of-word token
     :return: decoded sequence
     """
-    if not isinstance(encoded_text, list) or not isinstance(vocabulary, dict) or not (
-            isinstance(end_of_word_token, (str, type(None)))):
+    if not isinstance(encoded_text, list) and isinstance(vocabulary, dict) and (
+            isinstance(end_of_word_token, str) or end_of_word_token is None):
         return None
 
     decoded_text = ''
+    all_keys = list(vocabulary.keys())
     for token_id in encoded_text:
-        if token_id in vocabulary.keys():
-            token = vocabulary[token_id]
-            if token == end_of_word_token:
-                break
-            decoded_text += token + ' '
-        else:
-            decoded_text += '<unk>'
-
-        decoded_text = decoded_text.strip()
-
+        token = all_keys[token_id]
+        decoded_text += token
+    if end_of_word_token is not None:
+        decoded_text = decoded_text.replace(end_of_word_token, ' ')
     return decoded_text
 
 
