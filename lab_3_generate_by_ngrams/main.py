@@ -124,10 +124,9 @@ class TextProcessor:
         tokenized_text = self._tokenize(text)
         if not tokenized_text:
             return None
-        for symbol in tokenized_text:
-            self._put(symbol)
         encoded_corpus = []
         for symbol in tokenized_text:
+            self._put(symbol)
             ind = self.get_id(symbol)
             if not isinstance(ind, int):
                 return None
@@ -229,18 +228,11 @@ class TextProcessor:
         """
         if not isinstance(decoded_corpus, tuple) or not decoded_corpus:
             return None
-        decoded_str = ''
-        decoded_str += decoded_corpus[0].upper()
-        for symbol in decoded_corpus[1:-1]:
-            if symbol == self._end_of_word_token:
-                decoded_str += ' '
-            else:
-                decoded_str += symbol
-        if decoded_corpus[-1] == self._end_of_word_token:
-            decoded_str += '.'
-        else:
-            decoded_str += decoded_corpus[-1] + '.'
-        return decoded_str
+        decoded_list = list(decoded_corpus)
+        if decoded_list[-1] == self._end_of_word_token:
+            decoded_list = decoded_list[:-1]
+        decoded_str = ''.join(decoded_list).replace(self._end_of_word_token, ' ') + '.'
+        return decoded_str.capitalize()
 
 class NGramLanguageModel:
     """
@@ -544,9 +536,10 @@ class BeamSearchTextGenerator:
             text_processor (TextProcessor): A TextProcessor instance to handle text processing
             beam_width (int): Beam width parameter for generation
         """
+        self._language_model = language_model
         self._text_processor = text_processor
         self._beam_width = beam_width
-        self.beam_searcher = BeamSearcher(self._beam_width, language_model)
+        self.beam_searcher = BeamSearcher(self._beam_width, self._language_model)
 
     def run(self, prompt: str, seq_len: int) -> Optional[str]:
         """
@@ -570,20 +563,20 @@ class BeamSearchTextGenerator:
             return None
         sequence_candidates = {prompt_encoded: 0.0}
         for prediction in range(seq_len):
-            copy = sequence_candidates.copy()
+            candidates_copy = sequence_candidates.copy()
             for sequence in sequence_candidates:
                 tokens = self._get_next_token(sequence)
                 if not tokens:
                     return None
                 n_sequence_candidates = self.beam_searcher.continue_sequence(sequence,
                                                                              tokens,
-                                                                             copy)
+                                                                             candidates_copy)
                 if not n_sequence_candidates:
-                    for_decode = sorted([seq for seq, prob in copy.items() if
-                                         prob == min(copy.values())])[0]
+                    for_decode = sorted([seq for seq, prob in candidates_copy.items() if
+                                         prob == min(candidates_copy.values())])[0]
                     prompt_decoded = self._text_processor.decode(tuple(for_decode))
                     return prompt_decoded
-            best_choice = self.beam_searcher.prune_sequence_candidates(copy)
+            best_choice = self.beam_searcher.prune_sequence_candidates(candidates_copy)
             if not best_choice:
                 return None
             sequence_candidates = best_choice
