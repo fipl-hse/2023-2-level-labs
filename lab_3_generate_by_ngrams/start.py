@@ -23,6 +23,10 @@ def main() -> None:
     model_for_build = NGramLanguageModel(encoded[:10], 2)
     print(model_for_build.build())
 
+    model = NGramLanguageModel(encoded, 7)
+    greedy_text_generator = GreedyTextGenerator(model, processor)
+    print(greedy_text_generator.run(51, 'Vernon'))
+
     assert result
 
 
