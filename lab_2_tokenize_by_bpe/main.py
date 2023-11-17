@@ -101,10 +101,10 @@ def merge_tokens(
     for key, value in word_frequencies.items():
         if pairs_new in ''.join(key):
             new_list = list(key)
-            for index in range(len(key)-1):
-                if (key[index], key[index+1]) == pair:
+            for index in range(len(key) - 1):
+                if (key[index], key[index + 1]) == pair:
                     new_list[index] = pairs_new
-                    del new_list[index+1]
+                    del new_list[index + 1]
             new_word_frequencies[tuple(new_list)] = value
         else:
             new_word_frequencies[key] = value
@@ -129,14 +129,16 @@ def train(
         num_merges = min(num_merges, len(new_vocab))
         pairs_frequency = max(new_vocab.values())
         list_of_pairs = [key for key, value in new_vocab.items() if value == pairs_frequency]
-        longest_token = max(len(''.join(pair))for pair in list_of_pairs)
+        longest_token = max(len(''.join(pair)) for pair in list_of_pairs)
         list_of_longest = [pair for pair in list_of_pairs if len(''.join(pair)) == longest_token]
         the_best_token = sorted(list_of_longest)[0]
         word_frequencies = merge_tokens(word_frequencies, the_best_token)
         if not word_frequencies:
             return None
         num_merges -= 1
-        return word_frequencies
+    return word_frequencies
+
+
 def get_vocabulary(
         word_frequencies: dict[tuple[str, ...], int], unknown_token: str
 ) -> dict[str, int] | None:
@@ -156,14 +158,15 @@ def get_vocabulary(
 
     tokens.sort(key=lambda x: (-len(x), x))
 
-    if len(tokens)>1:
+    if len(tokens) > 1:
         tokens.append('<START>')
         tokens.append('<END>')
 
     vocabulary = {token: i for i, token in enumerate(tokens)}
 
-
     return vocabulary
+
+
 def decode(
         encoded_text: list[int] | None, vocabulary: dict[str, int] | None,
         end_of_word_token: str | None
@@ -175,13 +178,13 @@ def decode(
     :param end_of_word_token: an end-of-word token
     :return: decoded sequence
     """
-    if not isinstance(encoded_text, list) or not isinstance(vocabulary, dict) or not(
-    isinstance(end_of_word_token, (str, type(None)))):
+    if not isinstance(encoded_text, list) or not isinstance(vocabulary, dict) or not (
+            isinstance(end_of_word_token, (str, type(None)))):
         return None
 
     decoded_text = ''
     for token_id in encoded_text:
-        if token_id in vocabulary:
+        if token_id in vocabulary.keys():
             token = vocabulary[token_id]
             if token == end_of_word_token:
                 break
@@ -191,7 +194,9 @@ def decode(
 
         decoded_text = decoded_text.strip()
 
-        return decoded_text
+    return decoded_text
+
+
 def tokenize_word(
         word: tuple[str, ...], vocabulary: dict[str, int], end_of_word: str | None,
         unknown_token: str
