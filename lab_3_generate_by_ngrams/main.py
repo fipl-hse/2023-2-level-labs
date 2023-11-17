@@ -217,7 +217,6 @@ class TextProcessor:
             return None
         return tuple(decoded_corpus)
 
-
     def _postprocess_decoded_text(self, decoded_corpus: tuple[str, ...]) -> Optional[str]:
         """
         Convert decoded sentence into the string sequence.
