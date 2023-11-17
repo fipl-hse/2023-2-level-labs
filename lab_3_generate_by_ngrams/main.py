@@ -185,13 +185,11 @@ class TextProcessor:
         Args:
             content (dict): ngrams from external JSON
         """
-        if not isinstance(content, dict) or not content:
-            return None
-        for key in content['freq']:
-            for element in key:
-                if element.isalpha():
-                    self._put(element.lower())
-        return None
+        if isinstance(content, dict) and content:
+            for key in content['freq']:
+                for element in key:
+                    if element.isalpha():
+                        self._put(element.lower())
 
     def _decode(self, corpus: tuple[int, ...]) -> Optional[tuple[str, ...]]:
         """
@@ -235,11 +233,12 @@ class TextProcessor:
         """
         if not (isinstance(decoded_corpus, tuple) and decoded_corpus):
             return None
-        decoded_text = decoded_corpus[0].upper() + ''.join(decoded_corpus)[1:-1]
-        decoded_text = decoded_text.replace(self._end_of_word_token, ' ')
         if decoded_corpus[-1] != self._end_of_word_token:
-            decoded_text += decoded_corpus[-1]
-        return decoded_text + '.'
+            return f"{decoded_corpus[0].upper()}{''.join(decoded_corpus)[1:]}."\
+                .replace(self._end_of_word_token, ' ')
+        else:
+            return f"{decoded_corpus[0].upper()}{''.join(decoded_corpus)[1:-1]}."\
+                .replace(self._end_of_word_token, ' ')
 
 
 class NGramLanguageModel:
@@ -280,10 +279,8 @@ class NGramLanguageModel:
         Args:
             frequencies (dict): Computed in advance frequencies for n-grams
         """
-        if not (isinstance(frequencies, dict) and frequencies):
-            return None
-        self._n_gram_frequencies = frequencies
-        return None
+        if isinstance(frequencies, dict) and frequencies:
+            self._n_gram_frequencies = frequencies
 
     def build(self) -> int:
         """
