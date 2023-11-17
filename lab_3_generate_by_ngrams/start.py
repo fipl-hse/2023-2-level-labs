@@ -21,7 +21,7 @@ def main() -> None:
     model = NGramLanguageModel(encoded[:100], n_gram_size=3)
     result = model.build()
     print(result)
-
+    assert result
 
 if __name__ == "__main__":
     main()

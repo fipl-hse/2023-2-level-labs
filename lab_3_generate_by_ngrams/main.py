@@ -3,7 +3,6 @@ Lab 3.
 
 Beam-search and natural language generation evaluation
 """
-# pylint:disable=too-few-public-methods
 from typing import Optional
 
 
@@ -397,11 +396,14 @@ class GreedyTextGenerator:
         In case of corrupt input arguments or methods used return None,
         None is returned
         """
-        if not (isinstance(seq_len, int) and isinstance(prompt, str)) and not prompt:
+        if not isinstance(seq_len, int) and isinstance(prompt, str):
             return None
 
         encoded_prompt = self._text_processor.encode(prompt)
         n_gram_size = self._model.get_n_gram_size()
+
+        if not encoded_prompt or not n_gram_size:
+            return None
 
         generated_sequence = list(encoded_prompt)
 
@@ -418,6 +420,7 @@ class GreedyTextGenerator:
         generated_text = self._text_processor.decode(tuple(generated_sequence))
 
         return generated_text
+
 
 class BeamSearcher:
     """
