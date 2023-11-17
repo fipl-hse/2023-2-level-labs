@@ -88,6 +88,8 @@ class TextProcessor:
         Returns:
             str: EoW token
         """
+        return self._end_of_word_token
+
 
     def get_token(self, element_id: int) -> Optional[str]:
         """
@@ -101,6 +103,14 @@ class TextProcessor:
 
         In case of corrupt input arguments or arguments not included in storage, None is returned
         """
+        if not isinstance(element_id, int) or element_id not in self._storage.values():
+            return None
+
+        for key, value in self._storage.items():
+            if value == element_id:
+                return key
+        return None
+
 
     def encode(self, text: str) -> Optional[tuple[int, ...]]:
         """
