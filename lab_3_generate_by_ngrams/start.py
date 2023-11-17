@@ -1,7 +1,8 @@
 """
 Generation by NGrams starter
 """
-from main import TextProcessor
+from main import TextProcessor, NGramLanguageModel
+
 
 def main() -> None:
     """
@@ -13,11 +14,13 @@ def main() -> None:
         text = text_file.read()
     processor = TextProcessor(end_of_word_token='_')
     encoded = processor.encode(text)
-    if not encoded:
-        return None
-    result = processor.decode(encoded)
+    decoded = str(processor.decode(encoded))
+    result = decoded
+    print(result[:100])
+
+    model = NGramLanguageModel(encoded[:100], n_gram_size=3)
+    result = model.build()
     print(result)
-    assert result
 
 
 if __name__ == "__main__":
