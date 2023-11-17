@@ -181,6 +181,7 @@ def decode(
             (isinstance(end_of_word_token, str) or end_of_word_token is None)
     ):
         return None
+
     decoded_text = ''
     all_keys = list(vocabulary.keys())
     for token_id in encoded_text:
