@@ -150,16 +150,18 @@ def get_vocabulary(
     """
     if not isinstance(word_frequencies, dict) or not isinstance(unknown_token, str):
         return None
-    tokens = []
-    for word in word_frequencies.keys():
-        tokens.extend(word)
-    tokens = list(set(tokens))
-    tokens.sort(key=lambda x: (-len(x), x))
-    if len(tokens) > 1:
-        tokens.append('<START>')
-        tokens.append('<END>')
-    vocabulary = {token: i for i, token in enumerate(tokens)}
-    return vocabulary
+    tokens_dict = {}
+    tokens = set()
+    for word_tuple in word_frequencies.keys():
+        for word in word_tuple:
+            tokens.add(word)
+            for token in word:
+                tokens.add(token)
+    tokens.add(unknown_token)
+    sorted_tokens = sorted(list(tokens), key=lambda uni_token: (-len(uni_token), uni_token))
+    for ident, token in enumerate(sorted_tokens):
+        tokens_dict[token] = ident
+    return tokens_dict
 
 
 def decode(
