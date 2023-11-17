@@ -173,21 +173,22 @@ print('*' * 15 + ' TASKS ' + '*' * 15)
 
 # Task 1
 # easy level
-# class ...:
-#
-#     def __init__(...):
-#         ...
+class Deadline:
+
+     def __init__(self):
+         print("Oh, no! It is another deadline!"
 
 # fill the gaps so that the next line prints: "Oh, no! It is another deadline!"
-# deadline = Deadline()
+deadline = Deadline()
 
 
 #  Task 2
 # easy level
-# class ...:
-#
-#     def ...:
-#         ...
+class Student:
+     def __init__(self, name: str, int):
+         self.name = name
+         self.age = age
+         print('Hello! My name is')
 
 # fill the gaps so that the next lines print the corresponding messages
 # student1 = Student('Marina', 1)  # Hello! My name is Marina, I'm in year 1
@@ -196,25 +197,23 @@ print('*' * 15 + ' TASKS ' + '*' * 15)
 
 # Task 3
 # easy level
-# class Insect:
-#
-#     def __init__(...):
-#         ...
-#
-#     def introduce(self):
-#         print(f'Hi! My name is {self.name} and I have {self.legs} legs')
+class Insect:
+     def __init__(self, name, legs):
+         self.name = name
+         self.legs = legs
+     def introduce(self):
+         print(f'Hi! My name is {self.name} and I have {self.legs} legs')
 
-# bee = Insect('Bee', 6)
-# bee.introduce()  # Hi! My name is Bee and I have 6 legs
-#
-# spider = Insect('Spider', 8)
-# spider.introduce()  # Hi! My name is Spider and I have 8 legs
+ bee = Insect('Bee', 6)
+ bee.introduce()  # Hi! My name is Bee and I have 6 legs
+ spider = Insect('Spider', 8)
+ spider.introduce()  # Hi! My name is Spider and I have 8 legs
 
 
 # Task 4
 # medium level
-# class Student:
-#     """
+ class Student:
+    """
 #     If I have less than three deadlines, my mood is Good!
 #     If I have from 3 to 5 deadlines, my mood is So-so...
 #     If I have more than 5 deadlines, my mood is Bad!!!
@@ -231,22 +230,21 @@ print('*' * 15 + ' TASKS ' + '*' * 15)
 
 # Task 5
 # medium level
-# class Square:
-#
-#     def __init__(self, side_length: float) -> None:
-#         ...
-#
-#     def get_area(self) -> float:
-#         ...
-#
-#     def get_perimeter(self) -> float:
-#         ...
+ class Square:
+     def __init__(self, side_length: float) -> None:
+         self.side_length = side_length
 
-# square1 = Square(side_length=2)
-# print(square1.get_area(), square1.get_perimeter())  # 4 8
+     def get_area(self) -> float:
+         return self.side_length**2
+
+     def get_perimeter(self) -> float:
+         return self.side_length*4
+
+ square1 = Square(side_length=2)
+ print(square1.get_area(), square1.get_perimeter())  # 4 8
 #
-# square2 = Square(side_length=5.12)
-# print(square2.get_area(), square2.get_perimeter())  # 26.2144 20.48
+ square2 = Square(side_length=5.12)
+ print(square2.get_area(), square2.get_perimeter())  # 26.2144 20.48
 
 
 # Task 6
