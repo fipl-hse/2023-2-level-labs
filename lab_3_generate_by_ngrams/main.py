@@ -144,6 +144,7 @@ class TextProcessor:
 
         return tuple(encoded_corpus)
 
+
     def _put(self, element: str) -> None:
         """
         Put an element into the storage, assign a unique id to it.
@@ -213,7 +214,7 @@ class TextProcessor:
         In case of corrupt input arguments, None is returned.
         In case any of methods used return None, None is returned.
         """
-        if not isinstance(corpus, tuple) or corpus is False:
+        if not isinstance(corpus, tuple) or len(corpus) == 0:
             return None
 
         decoded_corpus = []
@@ -260,6 +261,7 @@ class TextProcessor:
         text_string = text_string.replace(self._end_of_word_token, ' ')
 
         return text_string.capitalize()
+
 
 class NGramLanguageModel:
     """
@@ -312,12 +314,12 @@ class NGramLanguageModel:
         In case of corrupt input arguments or methods used return None,
         1 is returned
         """
-        if not (isinstance(self._encoded_corpus, tuple) and self._encoded_corpus):
+        if not isinstance(self._encoded_corpus, tuple) or len(self._encoded_corpus) == 0:
             return 1
 
         ngrams = self._extract_n_grams(self._encoded_corpus)
 
-        if not ngrams:
+        if ngrams is None:
             return 1
 
         for ngram in set(ngrams):
@@ -344,10 +346,12 @@ class NGramLanguageModel:
             return None
 
         tokens = {}
-        context = sequence[-self._n_gram_size + 1:]
+        context = sequence[- self._n_gram_size + 1:]
         for ngram, frequency in self._n_gram_frequencies.items():
             if ngram[:self._n_gram_size - 1] == context:
-                tokens[ngram[self._n_gram_size - 1]] = frequency
+                letter = ngram[self._n_gram_size - 1]
+                if letter not in tokens:
+                    tokens[letter] = frequency
 
         return tokens
 
@@ -365,11 +369,16 @@ class NGramLanguageModel:
 
         In case of corrupt input arguments, None is returned
         """
-        if not isinstance(self._encoded_corpus, tuple) or self._encoded_corpus is None:
+        if not isinstance(encoded_corpus, tuple) or len(encoded_corpus) == 0:
             return None
 
-        return [tuple(self._encoded_corpus[i:i + self._n_gram_size])
-                for i in range(len(self._encoded_corpus) - self._n_gram_size + 1)]
+        encoded_corpus_list = list(encoded_corpus)
+        ngrams = []
+        for i in range(len(encoded_corpus_list) - self._n_gram_size + 1):
+            ngram = tuple(encoded_corpus_list[i: i + self._n_gram_size])
+            ngrams.append(ngram)
+
+        return tuple(ngrams)
 
 
 class GreedyTextGenerator:
@@ -418,7 +427,7 @@ class GreedyTextGenerator:
 
         text = prompt
         for i in range(seq_len):
-            tokens = self._model.generate_next_token(encoded[-n_gram_size + 1:])
+            tokens = self._model.generate_next_token(encoded)
 
             if not tokens:
                 None
