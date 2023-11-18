@@ -50,8 +50,7 @@ class TextProcessor:
         splited_text = text.split()
         final_text = []
         for word in splited_text:
-            clear_word = "".join(char.lower() for char in word if char.isalpha())
-            clear_word = list(clear_word)
+            clear_word = [char.lower() for char in word if char.isalpha()]
             if clear_word:
                 final_text += clear_word
                 final_text.append(self._end_of_word_token)
@@ -103,10 +102,10 @@ class TextProcessor:
         if not isinstance(element_id, int) or element_id not in self._storage.values():
             return None
 
-        inv_storage = {value: key for key, value in self._storage.items()}
-
-        return inv_storage[element_id]
-
+        for key, id_num in self._storage.items():
+            if id_num == element_id:
+                return key
+            
     def encode(self, text: str) -> Optional[tuple[int, ...]]:
         """
         Encode text.
@@ -152,17 +151,10 @@ class TextProcessor:
         """
         if not isinstance(element, str) or len(element) != 1:
             return None
-        if element in self._storage:
-            return self._storage[element]
-        key = len(self._storage)
-        while key <= len(self._storage):
-            if key not in self._storage.values():
-                self._storage[element] = key
-                break
-            key += 1
+        if element not in self._storage:
+            self._storage.update({element: len(self._storage)})
+        return None
 
-        else:
-            return None
 
     def decode(self, encoded_corpus: tuple[int, ...]) -> Optional[str]:
         """
@@ -579,9 +571,11 @@ class BeamSearchTextGenerator:
             text_processor (TextProcessor): A TextProcessor instance to handle text processing
             beam_width (int): Beam width parameter for generation
         """
+
         self._text_processor = text_processor
         self._beam_width = beam_width
-        self.beam_searchers = BeamSearcher(self._beam_width, language_model)
+        self.beam_searcher = BeamSearcher(self._beam_width, language_model)
+        self._language_model = language_model
 
     def run(self, prompt: str, seq_len: int) -> Optional[str]:
         """
@@ -598,7 +592,7 @@ class BeamSearchTextGenerator:
         None is returned
         """
 
-        if not(isinstance(prompt, str) and isinstance(seq_len, int) and seq_len >= 0 and prompt):
+        if not (isinstance(prompt, str) and isinstance(seq_len, int) and seq_len and prompt):
             return None
 
         encoded_sequence = self._text_processor.encode(prompt)
@@ -608,8 +602,24 @@ class BeamSearchTextGenerator:
 
         sequence_candidates = {encoded_sequence: 0.0}
 
+        for i in range(seq_len):
+            new_seq = dict(sequence_candidates)
+            for sequence in sequence_candidates:
+                probable_letters = self._get_next_token(sequence)
+                if not probable_letters:
+                    return None
+                probable_seq = self.beam_searcher.continue_sequence(sequence, probable_letters, new_seq)
+                if not probable_seq:
+                    return self._text_processor.decode(sorted(sequence_candidates,
+                                                              key=lambda x: x[1])[0])
+                top_seq = self.beam_searcher.prune_sequence_candidates(new_seq)
+                if top_seq is None:
+                    return None
+                sequence_candidates = top_seq
+        sorted_top_seq = sorted(sequence_candidates, key=lambda x: x[1])
+        decoded_seq = self._text_processor.decode(sorted_top_seq[0])
 
-
+        return decoded_seq
 
     def _get_next_token(
             self, sequence_to_continue: tuple[int, ...]
@@ -630,7 +640,7 @@ class BeamSearchTextGenerator:
         if not (isinstance(sequence_to_continue, tuple) and sequence_to_continue):
             return None
 
-        next_token = self.beam_searchers.get_next_token(sequence_to_continue)
+        next_token = self.beam_searcher.get_next_token(sequence_to_continue)
 
         if next_token is None:
             return None
