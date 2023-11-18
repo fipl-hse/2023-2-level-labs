@@ -510,7 +510,8 @@ class BeamSearcher:
             return []
 
         token_pairs = list(tokens.items())
-        token_pairs = sorted(token_pairs, key=lambda x: x[1], reverse=True)
+        if isinstance(token_pairs, list):
+            token_pairs = sorted(token_pairs, key=lambda x: x[1], reverse=True)
         if len(token_pairs) <= self._beam_width:
             return token_pairs
 
