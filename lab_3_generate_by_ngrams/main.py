@@ -46,7 +46,7 @@ class TextProcessor:
         if not isinstance(text, str) or not text or not any(char.isalpha() for char in text):
             return None
 
-        last_symbol = text[-1]
+        self.text = text
         splited_text = text.split()
         list_of_tokens = []
         for word in splited_text:
@@ -55,11 +55,10 @@ class TextProcessor:
                 list_of_tokens += current_word
                 list_of_tokens.append(self._end_of_word_token)
 
-        if last_symbol.isalnum():
+        if text[-1].isalnum():
             del list_of_tokens[-1]
 
         return tuple(list_of_tokens)
-
 
     def get_id(self, element: str) -> Optional[int]:
         """
@@ -430,7 +429,7 @@ class GreedyTextGenerator:
             tokens = self._model.generate_next_token(encoded)
 
             if not tokens:
-                None
+                break
 
             max_frequency = max(tokens.values())
             candidates_max = [candidate for candidate, frequency in tokens.items() if frequency == max_frequency]
