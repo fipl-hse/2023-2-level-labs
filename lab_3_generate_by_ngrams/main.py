@@ -276,6 +276,9 @@ class NGramLanguageModel:
             encoded_corpus (tuple): Encoded text
             n_gram_size (int): A size of n-grams to use for language modelling
         """
+        self._encoded_corpus = encoded_corpus
+        self._n_gram_size = n_gram_size
+        self._n_gram_frequencies = {}
 
     def get_n_gram_size(self) -> int:
         """
@@ -284,6 +287,7 @@ class NGramLanguageModel:
         Returns:
             int: Size of stored n_grams
         """
+        return self._n_gram_size
 
     def set_n_grams(self, frequencies: dict) -> None:
         """
@@ -305,6 +309,21 @@ class NGramLanguageModel:
         In case of corrupt input arguments or methods used return None,
         1 is returned
         """
+        if not isinstance(self._encoded_corpus, tuple) or len(self._encoded_corpus) == 0:
+            return 1
+
+        n_grams = self._extract_n_grams(self._encoded_corpus)
+        if not isinstance(n_grams, tuple) or n_grams is None:
+            return 1
+
+        for ngram in set(n_grams):
+            if not isinstance(ngram, tuple):
+                return 1
+            p_w_1_2 = n_grams.count(ngram)
+            p_w_1 = len([context for context in n_grams if context[:-1] == ngram[:-1]])
+            self._n_gram_frequencies[ngram] = p_w_1_2/p_w_1
+
+        return 0
 
     def generate_next_token(self, sequence: tuple[int, ...]) -> Optional[dict]:
         """
@@ -318,6 +337,17 @@ class NGramLanguageModel:
 
         In case of corrupt input arguments, None is returned
         """
+        if not isinstance(sequence, tuple) or len(sequence) == 0 or len(sequence) < self._n_gram_size - 1:
+            return None
+
+        possible_tokens = {}
+
+        context = sequence[-(self._n_gram_size - 1)::]
+        for ngram in self._n_gram_frequencies:
+            if ngram[:self._n_gram_size - 1] == context:
+                possible_tokens[ngram[-1]] = self._n_gram_frequencies[ngram]
+
+        return possible_tokens
 
     def _extract_n_grams(
         self, encoded_corpus: tuple[int, ...]
@@ -333,6 +363,15 @@ class NGramLanguageModel:
 
         In case of corrupt input arguments, None is returned
         """
+        if not isinstance(encoded_corpus, tuple) or len(encoded_corpus) == 0:
+            return None
+
+        n_grams = []
+        for i in range(len(encoded_corpus) - self._n_gram_size + 1):
+            ngram = tuple(encoded_corpus[i: i + self._n_gram_size])
+            n_grams.append(ngram)
+
+        return tuple(n_grams)
 
 
 class GreedyTextGenerator:
@@ -352,6 +391,8 @@ class GreedyTextGenerator:
             language_model (NGramLanguageModel): A language model to use for text generation
             text_processor (TextProcessor): A TextProcessor instance to handle text processing
         """
+        self._model = language_model
+        self._text_processor = text_processor
 
     def run(self, seq_len: int, prompt: str) -> Optional[str]:
         """
@@ -367,6 +408,36 @@ class GreedyTextGenerator:
         In case of corrupt input arguments or methods used return None,
         None is returned
         """
+        if not isinstance(seq_len, int) or not isinstance(prompt, str) or len(prompt) == 0:
+            return None
+
+        encoded_prompt = self._text_processor.encode(prompt)
+        if encoded_prompt is None:
+            return None
+        ngram_size = self._model.get_n_gram_size()
+
+        text = prompt
+
+        for i in range(seq_len):
+            tokens = self._model.generate_next_token(encoded_prompt[-ngram_size+1:])
+            if tokens is None:
+                break
+            max_freq = max(tokens.values())
+            max_candidates = []
+            for candidate, freq in tokens.items():
+                if freq == max_freq:
+                    max_candidates.append(candidate)
+            encoded_prompt = encoded_prompt + (sorted(max_candidates)[0])
+            best_candidate =self._text_processor.get_token(encoded_prompt[-1])
+            if best_candidate is None:
+                return None
+            text += best_candidate
+
+        decoded_prompt = self._text_processor.decode(encoded_prompt)
+        if decoded_prompt is None:
+            return None
+
+        return decoded_prompt
 
 
 class BeamSearcher:

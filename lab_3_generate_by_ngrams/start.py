@@ -16,7 +16,10 @@ def main() -> None:
         text_processor = main_py.TextProcessor('_')
         encoded_text = text_processor.encode(text)
         decoded_text = text_processor.decode(encoded_text)
-    result = decoded_text
+        language_model = main_py.NGramLanguageModel(encoded_text, 7)
+        greedy_generator = main_py.GreedyTextGenerator(language_model, text_processor)
+        generated_text = greedy_generator.run(51, 'Vernon')
+    result = generated_text
     assert result
 
 
