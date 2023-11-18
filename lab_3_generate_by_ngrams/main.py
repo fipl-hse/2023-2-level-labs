@@ -3,9 +3,9 @@ Lab 3.
 
 Beam-search and natural language generation evaluation
 """
+import math
 # pylint:disable=too-few-public-methods
 from typing import Optional
-import math
 
 
 class TextProcessor:
@@ -527,7 +527,6 @@ class BeamSearcher:
         for token in next_tokens:
             seq = sequence + (token[0],)
             sequence_candidates[seq] = sequence_candidates[sequence] - math.log(token[1])
-            #sequence_candidates.update({sequence + (token[0],): sequence_candidates[sequence] - math.log(token[1])})
         del sequence_candidates[sequence]
 
         return sequence_candidates
