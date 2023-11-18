@@ -24,7 +24,7 @@ class TextProcessor:
             end_of_word_token (str): A token denoting word boundary
         """
         self._end_of_word_token = end_of_word_token
-        self._storage = {"_": 0}
+        self._storage = {end_of_word_token: 0}
 
     def _tokenize(self, text: str) -> Optional[tuple[str, ...]]:
         """
@@ -50,7 +50,8 @@ class TextProcessor:
         splited_text = text.split()
         list_of_tokens = []
         for word in splited_text:
-            current_word = list(''.join(char.lower() for char in word if char.isalpha()))
+            current_word = ''.join(char.lower() for char in word if char.isalpha())
+            current_word = list(current_word)
             if current_word:
                 list_of_tokens += current_word
                 list_of_tokens.append(self._end_of_word_token)
@@ -433,7 +434,7 @@ class GreedyTextGenerator:
 
             max_frequency = max(tokens.values())
             candidates_max = [candidate for candidate, frequency in tokens.items() if frequency == max_frequency]
-            encoded = encoded + (sorted(candidates_max)[0])
+            encoded = encoded + (sorted(candidates_max)[0],)
             best_candidate = self._text_processor.get_token(encoded[-1])
 
             if not best_candidate:
