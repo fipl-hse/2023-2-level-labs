@@ -16,13 +16,15 @@ class TextProcessor:
         _storage (dict): Dictionary in the form of <token: identifier>
     """
 
-    def __init__(self, end_of_word_token: str) -> None:
+    def __init__(self, end_of_word_token: str, storage: dict) -> None:
         """
         Initialize an instance of LetterStorage.
 
         Args:
             end_of_word_token (str): A token denoting word boundary
         """
+        self._end_of_word_token = end_of_word_token
+        self._storage = {end_of_word_token: 0}
 
     def _tokenize(self, text: str) -> Optional[tuple[str, ...]]:
         """
@@ -41,6 +43,22 @@ class TextProcessor:
         In case of corrupt input arguments, None is returned.
         In case any of methods used return None, None is returned.
         """
+        if not isinstance(text, str) or not text:
+            return None
+
+        tokenized_text = []
+
+        for symbol in text.lower():
+            if symbol.isalpha():
+                tokenized_text.append(symbol)
+            elif symbol in ' !?.' \
+                    and tokenized_text[-1] != self._end_of_word_token:
+                tokenized_text.append(self._end_of_word_token)
+
+        if not tokenized_text:
+            return None
+
+        return tuple(tokenized_text)
 
     def get_id(self, element: str) -> Optional[int]:
         """
@@ -55,6 +73,11 @@ class TextProcessor:
         In case of corrupt input arguments or arguments not included in storage,
         None is returned
         """
+        if not (element in self._storage
+                and isinstance(element, str)):
+            return None
+
+        return self._storage[element]
 
     def get_end_of_word_token(self) -> str:
         """
@@ -63,6 +86,7 @@ class TextProcessor:
         Returns:
             str: EoW token
         """
+        return self._end_of_word_token
 
     def get_token(self, element_id: int) -> Optional[str]:
         """
@@ -76,6 +100,15 @@ class TextProcessor:
 
         In case of corrupt input arguments or arguments not included in storage, None is returned
         """
+        if not (isinstance(element_id, int)
+                and element_id in self._storage.values()):
+            return None
+
+        for key, value in self._storage.items():
+            if value == element_id:
+                return key
+
+        return None
 
     def encode(self, text: str) -> Optional[tuple[int, ...]]:
         """
@@ -93,6 +126,23 @@ class TextProcessor:
         In case of corrupt input arguments, None is returned.
         In case any of methods used return None, None is returned.
         """
+        if not (isinstance(text, str)
+                and len(text) > 0):
+            return None
+
+        tokenized_text = self._tokenize(text)
+        encoded_corpus = []
+
+        for symbol in tokenized_text:
+            self._put(symbol)
+            encoded_corpus.append(self.get_id(symbol))
+
+        if None in tokenized_text \
+                or None in encoded_corpus \
+                or None in self._storage:
+            return None
+
+        return tuple(encoded_corpus)
 
     def _put(self, element: str) -> None:
         """
@@ -104,6 +154,12 @@ class TextProcessor:
         In case of corrupt input arguments or invalid argument length,
         an element is not added to storage
         """
+        if not (isinstance(element, str)
+                and len(element) == 1):
+            return None
+
+        if element not in self._storage:
+            self._storage[element] = len(self._storage)
 
     def decode(self, encoded_corpus: tuple[int, ...]) -> Optional[str]:
         """
@@ -121,6 +177,19 @@ class TextProcessor:
         In case of corrupt input arguments, None is returned.
         In case any of methods used return None, None is returned.
         """
+        if not isinstance(encoded_corpus, tuple) \
+                or not encoded_corpus:
+            return None
+
+        decoded_corpus = self._decode(encoded_corpus)
+        if not decoded_corpus:
+            return None
+
+        decoded_text = self._postprocess_decoded_text(decoded_corpus)
+        if not decoded_text:
+            return None
+
+        return decoded_text
 
     def fill_from_ngrams(self, content: dict) -> None:
         """
@@ -143,6 +212,19 @@ class TextProcessor:
         In case of corrupt input arguments, None is returned.
         In case any of methods used return None, None is returned.
         """
+        if not isinstance(corpus, tuple) \
+                or not corpus:
+            return None
+
+        decoded_corpus = []
+
+        for token_id in corpus:
+            token = self.get_token(token_id)
+            if not token:
+                return None
+            decoded_corpus.append(token)
+
+        return tuple(decoded_corpus)
 
     def _postprocess_decoded_text(self, decoded_corpus: tuple[str, ...]) -> Optional[str]:
         """
@@ -159,6 +241,25 @@ class TextProcessor:
 
         In case of corrupt input arguments, None is returned
         """
+        if not isinstance(decoded_corpus, tuple) \
+                or not decoded_corpus:
+            return None
+
+        decoding_list = []
+
+        for token in list(decoded_corpus):
+            if token == self._end_of_word_token:
+                decoding_list += ' '
+            else:
+                decoding_list += token
+
+        if decoding_list[-1] == ' ':
+            decoding_list[-1] = '.'
+
+        result = ''.join(decoding_list).capitalize()
+
+        return result
+
 
 
 class NGramLanguageModel:

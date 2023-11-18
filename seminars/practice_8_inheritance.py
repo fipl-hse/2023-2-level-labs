@@ -11,8 +11,14 @@ Intoduction to class inheritance
     # Methods:
         # move
 
+
 class Vehicle:
-    ...
+    def __init__(self, max_speed: int, colour: str) -> None:
+        self._max_speed = max_speed
+        self._colour = colour
+
+    def move(self):
+        pass
 
 
 # Car
@@ -25,11 +31,26 @@ class Vehicle:
         # stay
 
 
-class Car:
-    ...
+class Car(Vehicle):
+    def __init__(self, max_speed: int, colour: str, fuel: float):
+        super().__init__(max_speed, colour)
+        self._fuel = fuel
+
+    def move(self) -> None:
+        while self._fuel:
+            self._fuel -= 1
+            print('Мошино запрвлено сполна.')
+        print('Мошино не заправлено.')
+
+    def stay(self) -> None:
+        if self._fuel:
+            return
+        print('popa.')
 
 
-LADA = ...
+LADA = Car(100, 'eggplant', 95)
+LADA.move()
+LADA.stay()
 
 
 # Bicycle
@@ -41,15 +62,27 @@ LADA = ...
         # move
         # freestyle
 
+
 class Bicycle(Vehicle):
-    ...
+    def __init__(self, number_of_wheels: int, max_speed: int, colour: str) -> None:
+        super().__init__(max_speed, colour)
+        self._number_of_wheels = number_of_wheels
+
+    def move(self):
+        print(f'I go with a speed of {self._number_of_wheels * 2} because I have {self._number_of_wheels} wheels.')
+
+    def freestyle(self):
+        pass
 
 
-# stels = Bicycle('yellow', 30, 2)
-# print(stels.colour)
-# stels.move()
-# stels.freestyle()
+stels = Bicycle(2, 30, 'yellow')
+print(stels._colour)
+stels.move()
+stels.freestyle()
 
+lst = [stels, LADA]
+for i in lst:
+    i.move()
 
 # Aircraft
     # Attributes:
