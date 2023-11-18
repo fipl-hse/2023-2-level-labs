@@ -52,7 +52,7 @@ class TextProcessor:
         for word in text.split():
             word = ''.join(letter for letter in word if letter.isalpha())
             if list(word):
-                tokens += word
+                tokens.extend(word) #+= word
                 tokens.append(self._end_of_word_token)
 
         if not tokens:
@@ -200,14 +200,6 @@ class TextProcessor:
         Args:
             content (dict): ngrams from external JSON
         """
-        if not isinstance(content, dict) or not content:
-            return None
-
-        for element in content['freq']:
-            for token in element:
-                if token.isalpha():
-                    self._put(token)
-        return None
 
     def _decode(self, corpus: tuple[int, ...]) -> Optional[tuple[str, ...]]:
         """
@@ -329,10 +321,10 @@ class NGramLanguageModel:
         if not isinstance(n_grams, tuple) or not n_grams:
             return 1
 
-        for n_gram in n_grams:
-            same_n_grams = n_grams.count(n_gram)
-            same_context_count = len([context for context in n_grams if context[:-1] == n_gram[:-1]])
-            self._n_gram_frequencies[n_gram] = same_n_grams/same_context_count
+        for n_gram in set(n_grams):
+            n_grams_count = n_grams.count(n_gram)
+            context_count = len([context for context in n_grams if context[:-1] == n_gram[:-1]])
+            self._n_gram_frequencies[n_gram] = n_grams_count/context_count
         return 0
 
     def generate_next_token(self, sequence: tuple[int, ...]) -> Optional[dict]:
@@ -347,6 +339,15 @@ class NGramLanguageModel:
 
         In case of corrupt input arguments, None is returned
         """
+        if not (isinstance(sequence, tuple) and sequence and len(sequence) >= self._n_gram_size - 1):
+            return None
+
+        next_tokens = {}
+        context = sequence[- self._n_gram_size + 1:]
+        for n_gram, freq in self._n_gram_frequencies.items():
+            if n_gram[:self._n_gram_size - 1] == context:
+                next_tokens[n_gram[-1]] = freq
+        return next_tokens
 
     def _extract_n_grams(
         self, encoded_corpus: tuple[int, ...]
@@ -388,6 +389,8 @@ class GreedyTextGenerator:
             language_model (NGramLanguageModel): A language model to use for text generation
             text_processor (TextProcessor): A TextProcessor instance to handle text processing
         """
+        self._language_model = language_model
+        self._text_processor = text_processor
 
     def run(self, seq_len: int, prompt: str) -> Optional[str]:
         """
@@ -403,6 +406,7 @@ class GreedyTextGenerator:
         In case of corrupt input arguments or methods used return None,
         None is returned
         """
+
 
 
 class BeamSearcher:

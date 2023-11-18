@@ -17,6 +17,11 @@ def main() -> None:
     result = processor.decode(encoded_text)
     print(encoded_text)
     print(result)
+
+    lang_model = NGramLanguageModel(encoded_text, 2)
+    build = lang_model.build()
+    print(build)
+
     assert result
 
 
