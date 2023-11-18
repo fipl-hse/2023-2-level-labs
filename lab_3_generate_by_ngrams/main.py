@@ -23,7 +23,7 @@ class TextProcessor:
         Args:
             end_of_word_token (str): A token denoting word boundary
         """
-        self._end_of_word_token =  end_of_word_token
+        self._end_of_word_token = end_of_word_token
         self._storage = {self._end_of_word_token: 0}
 
     def _tokenize(self, text: str) -> Optional[tuple[str, ...]]:
@@ -52,7 +52,7 @@ class TextProcessor:
                 tokenized_text.append(element)
             elif element.isspace() and tokenized_text[-1] != self._end_of_word_token:
                 tokenized_text.append(self._end_of_word_token)
-        if not tokenized_text[-1].isalnum():
+        if not text[-1].isalnum():
             tokenized_text.append(self._end_of_word_token)
 
         if len(tokenized_text) == 0:
@@ -99,7 +99,7 @@ class TextProcessor:
 
         In case of corrupt input arguments or arguments not included in storage, None is returned
         """
-        if not isinstance(element_id, str) or element_id not in self._storage.values():
+        if not isinstance(element_id, int) or element_id not in self._storage.values():
             return None
 
         for token, ident in self._storage.items():
@@ -131,8 +131,6 @@ class TextProcessor:
 
         for token in tokenized_text:
             self._put(token)
-            if self._put(token) is None:
-                return None
 
         encoded_corpus = []
         for token in tokenized_text:
@@ -244,14 +242,17 @@ class TextProcessor:
             return None
 
         resulting_text = ""
-        for token in decoded_corpus:
-            if decoded_corpus[0]:
+        for index, token in enumerate(decoded_corpus):
+            if index == 0:
                 resulting_text += token.upper()
             elif token == self._end_of_word_token:
-                resulting_text += " "
+                if index == len(decoded_corpus) - 1:
+                    resulting_text += "."
+                else:
+                    resulting_text += " "
             else:
                 resulting_text += token
-        resulting_text.replace(resulting_text[-1], ".")
+        # resulting_text.replace(resulting_text[-1], ".")
 
         return resulting_text
 
