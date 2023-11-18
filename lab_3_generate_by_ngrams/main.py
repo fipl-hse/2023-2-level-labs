@@ -249,18 +249,17 @@ class TextProcessor:
         if not isinstance(decoded_corpus, tuple) or len(decoded_corpus) == 0:
             return None
 
-        text_list = []
+        decoded_corpus = list(decoded_corpus)
+        if decoded_corpus[-1] == self._end_of_word_token:
+            decoded_corpus[-1] = '.'
+        else:
+            decoded_corpus.append('.')
 
-        for i in decoded_corpus:
-            text_list += i
-
-        if text_list[-1] == self._end_of_word_token:
-            text_list[-1] = '.'
-
-        text_string = ''.join(text_list)
-        text_string = text_string.replace(self._end_of_word_token, ' ')
-
-        return text_string.capitalize()
+        for token in range(len(decoded_corpus)):
+            if decoded_corpus[token] == self._end_of_word_token:
+                decoded_corpus[token] = ' '
+        capitalized_corpus = ''.join(decoded_corpus).capitalize()
+        return capitalized_corpus
 
 
 class NGramLanguageModel:
