@@ -52,7 +52,7 @@ class TextProcessor:
         for word in text.split():
             word = ''.join(letter for letter in word if letter.isalpha())
             if list(word):
-                tokens.extend(word) #+= word
+                tokens += word
                 tokens.append(self._end_of_word_token)
 
         if not tokens:
@@ -252,7 +252,7 @@ class TextProcessor:
         text_new = []
 
         for i in decoded_corpus:
-            text_new += i
+            text_new.append(i)
 
         if text_new[-1] == self._end_of_word_token:
             text_new[-1] = '.'
