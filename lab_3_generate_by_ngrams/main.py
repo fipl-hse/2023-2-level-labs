@@ -393,21 +393,17 @@ class GreedyTextGenerator:
             return None
         encoded_prompt = self._text_processor.encode(prompt)
         len_of_context = self._model.get_n_gram_size()
-        context = encoded_prompt[- len_of_context:]
         if not (encoded_prompt and len_of_context):
             return None
-        encoded_sequence = ()
         for i in range(seq_len):
-            next_tokens = self._model.generate_next_token(context)
+            next_tokens = self._model.generate_next_token(encoded_prompt)
             if not next_tokens:
                 break
             max_freq = max(next_tokens.values())
-            next_token = next_tokens[max_freq]
-            encoded_sequence += next_token
-            context = context[1:] + next_token
-            if not encoded_sequence:
-                return None
-        return self._text_processor.decode(encoded_sequence)
+            max_freq_tokens = [token for token, freq in next_tokens.items() if freq == max_freq]
+            sorted_tokens = sorted(max_freq_tokens)
+            encoded_prompt += (sorted_tokens[0],)
+        return self._text_processor.decode(encoded_prompt)
 
 
 class BeamSearcher:
