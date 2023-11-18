@@ -569,7 +569,8 @@ class BeamSearcher:
         if not (isinstance(sequence_candidates, dict) and sequence_candidates):
             return None
 
-        return dict(sorted(list(sequence_candidates.items()), key=lambda x: x[1])[:self._beam_width])
+        return dict(sorted(list(sequence_candidates.items()),
+                           key=lambda x: x[1])[:self._beam_width])
 
 
 class BeamSearchTextGenerator:
