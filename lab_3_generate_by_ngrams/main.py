@@ -672,10 +672,10 @@ class NGramLanguageModelReader:
 
         correct_size_ngrams = {}
         for n_gram, freq in n_grams:
-            if len(n_gram) == n_gram_size:
-                same_context = sum(context_freq for context, context_freq in n_grams.items()
-                                    if context[-n_gram_size:-1] == n_gram[-n_gram_size:-1])
-                correct_size_ngrams[n_gram] = freq / same_context
+            if isinstance(n_gram, tuple) and len(n_gram) == n_gram_size:
+                same_context = [context_freq for context, context_freq in n_grams.items()
+                                    if context[-n_gram_size:-1] == n_gram[-n_gram_size:-1]]
+                correct_size_ngrams[n_gram] = freq / sum(same_context)
 
         model = NGramLanguageModel(None, n_gram_size)
         model.set_n_grams(correct_size_ngrams)
