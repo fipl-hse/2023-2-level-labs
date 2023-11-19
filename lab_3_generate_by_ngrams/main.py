@@ -299,13 +299,20 @@ class NGramLanguageModel:
         if not (isinstance(n_grams, tuple) and n_grams):
             return 1
 
-        for n_gram in set(n_grams):
+        contexts = {}
+        for n_gram in n_grams:
             if not isinstance(n_gram, tuple):
                 return 1
-            same_context = len([context for context in n_grams
-                                if context[:-1] == n_gram[:-1]])
-            same_n_gram = n_grams.count(n_gram)
-            self._n_gram_frequencies[n_gram] = same_n_gram/same_context
+            if n_gram[:-1] not in contexts:
+                contexts[n_gram[:-1]] = {}
+            if n_gram not in contexts[n_gram[:-1]]:
+                contexts[n_gram[:-1]][n_gram] = 0.0
+            contexts[n_gram[:-1]][n_gram] += 1.
+
+        for same_context_ngrams in contexts.values():
+            same_context_count = sum(same_context_ngrams.values())
+            for n_gram, freq in same_context_ngrams.items():
+                self._n_gram_frequencies[n_gram] = freq/same_context_count
         return 0
 
     def generate_next_token(self, sequence: tuple[int, ...]) -> Optional[dict]:
