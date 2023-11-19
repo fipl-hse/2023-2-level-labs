@@ -279,7 +279,7 @@ class NGramLanguageModel:
         if not isinstance(self._encoded_corpus, tuple) or len(self._encoded_corpus) == 0:
             return 1
         n_grams = self._extract_n_grams(self._encoded_corpus)
-        if not isinstance(n_grams, tuple):
+        if not isinstance(n_grams, tuple) or not n_grams:
             return 1
         for n_gram in n_grams:
             seq = n_grams.count(n_gram)
@@ -287,8 +287,8 @@ class NGramLanguageModel:
             for context_n_gram in n_grams:
                 if context_n_gram[:-1] == n_gram[:-1]:
                     context += 1
-            self._n_gram_frequencies[n_gram]: seq / context
-            return 0
+            self._n_gram_frequencies[n_gram] = seq/context
+        return 0
 
     def generate_next_token(self, sequence: tuple[int, ...]) -> Optional[dict]:
         """
@@ -305,10 +305,11 @@ class NGramLanguageModel:
         if not isinstance(sequence, tuple) or len(sequence) == 0 or len(sequence) < self._n_gram_size - 1:
             return None
         next_poss_token = {}
-        context = sequence[-(self._n_gram_size - 1)::]
-        for n_gram, freq in self._n_gram_frequencies:
+        context = sequence[-self._n_gram_size + 1:]
+        print(self._n_gram_frequencies)
+        for n_gram, freq in self._n_gram_frequencies.items():
             if n_gram[:self._n_gram_size - 1] == context:
-                next_poss_token[n_gram[-1]]: freq
+                next_poss_token[n_gram[-1]] = freq
         return next_poss_token
 
     def _extract_n_grams(
@@ -328,10 +329,8 @@ class NGramLanguageModel:
         if not isinstance(encoded_corpus, tuple) or len(encoded_corpus) == 0:
             return None
         n_grams = []
-        for index in encoded_corpus:
-            if index == len(encoded_corpus) - (self._n_gram_size - 1):
-                break
-            n_grams.append(tuple(encoded_corpus[index:(index + self._n_gram_size)]))
+        for index in range(len(encoded_corpus) - 1):
+            n_grams.append(tuple(encoded_corpus[index:index + self._n_gram_size]))
         return tuple(n_grams)
 
 
@@ -373,10 +372,10 @@ class GreedyTextGenerator:
             return None
         encoded = self._text_processor.encode(prompt)
         n_gram_size = self._model.get_n_gram_size()
-        if not (encoded and n_gram_size):
+        if not (encoded or n_gram_size):
             return None
         for i in range(seq_len):
-            next_tokens = self._model.generate_next_token(encoded[-(n_gram_size + 1):])
+            next_tokens = self._model.generate_next_token(encoded[-n_gram_size + 1:])
             if not next_tokens:
                 break
             best_next = [token for token, freq in next_tokens.items() if freq == max(next_tokens.values())]
