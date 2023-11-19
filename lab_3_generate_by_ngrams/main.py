@@ -54,7 +54,7 @@ class TextProcessor:
                 tokens.append(self._end_of_word_token)
             elif token.isalpha():
                 tokens.append(token)
-        if not text[-1].isalnum():
+        if not text[-1].isalnum() and tokens[-1] != self._end_of_word_token:
             tokens.append(self._end_of_word_token)
 
         if tokens.count(self._end_of_word_token) == len(tokens):
@@ -236,8 +236,7 @@ class TextProcessor:
         if decoded_corpus[-1] != self._end_of_word_token:
             return f"{decoded_corpus[0].upper()}{''.join(decoded_corpus)[1:]}."\
                 .replace(self._end_of_word_token, ' ')
-        else:
-            return f"{decoded_corpus[0].upper()}{''.join(decoded_corpus)[1:-1]}."\
+        return f"{decoded_corpus[0].upper()}{''.join(decoded_corpus)[1:-1]}."\
                 .replace(self._end_of_word_token, ' ')
 
 
@@ -325,9 +324,9 @@ class NGramLanguageModel:
                 and len(sequence) >= self._n_gram_size - 1):
             return None
         context = sequence[-self._n_gram_size + 1:]
-        return {n_gram[self._n_gram_size - 1]: freq
+        return {n_gram[-1]: freq
                 for n_gram, freq in self._n_gram_frequencies.items()
-                if n_gram[:self._n_gram_size - 1] == context}
+                if n_gram[:-1] == context}
 
     def _extract_n_grams(
         self, encoded_corpus: tuple[int, ...]
@@ -652,33 +651,34 @@ class NGramLanguageModelReader:
 
         In case of corrupt input arguments or unexpected behaviour of methods used, return 1.
         """
-        if not (isinstance(n_gram_size, int) and n_gram_size >= 2):
+        if not (isinstance(n_gram_size, int) and 5 >= n_gram_size >= 2):
             return None
 
-        useful_n_grams = {}
+        n_grams = {}
         for key in self._content['freq']:
             encoded = []
             for token in key:
                 if token.isspace():
                     encoded.append(0)
-                elif token.isalpha:
+                elif token.isalpha():
                     ident = self._text_processor.get_id(token.lower())
                     if not ident:
                         continue
                     encoded.append(ident)
-            if not encoded or len(encoded) != n_gram_size:
-                continue
-            if tuple(encoded) not in useful_n_grams:
-                useful_n_grams[tuple(encoded)] = 0.0
-            useful_n_grams[tuple(encoded)] += 1.0
 
-        for n_gram in useful_n_grams:
-            same_context = len([context for context in useful_n_grams
-                                if context[:-1] == n_gram[:-1]])
-            useful_n_grams[n_gram] /= same_context
+            if tuple(encoded) not in n_grams:
+                n_grams[tuple(encoded)] = 0.0
+            n_grams[tuple(encoded)] += self._content['freq'][key]
+
+        correct_size_ngrams = {}
+        for n_gram in n_grams:
+            if len(n_gram) == n_gram_size:
+                same_context = [freq for context, freq in n_grams.items()
+                                    if context[-n_gram_size:-1] == n_gram[-n_gram_size:-1]]
+                correct_size_ngrams[n_gram] = n_grams[n_gram] / sum(same_context)
 
         model = NGramLanguageModel(None, n_gram_size)
-        model.set_n_grams(useful_n_grams)
+        model.set_n_grams(correct_size_ngrams)
         return model
 
     def get_text_processor(self) -> TextProcessor:  # type: ignore[empty-body]
