@@ -421,6 +421,8 @@ class GreedyTextGenerator:
         for i in range(seq_len):
             tokens = self._model.generate_next_token(encoded_prompt[-ngram_size+1:])
             if tokens is None:
+                return prompt + "."
+            if len(tokens) == 0:
                 break
             max_freq = max(tokens.values())
             max_candidates = []
@@ -428,12 +430,12 @@ class GreedyTextGenerator:
                 if freq == max_freq:
                     max_candidates.append(candidate)
             encoded_prompt = encoded_prompt + (sorted(max_candidates)[0])
-            best_candidate =self._text_processor.get_token(encoded_prompt[-1])
+            best_candidate = self._text_processor.get_token(encoded_prompt[-1])
             if best_candidate is None:
                 return None
             text += best_candidate
 
-        decoded_prompt = self._text_processor.decode(encoded_prompt)
+        decoded_prompt = self._text_processor.decode(encoded_prompt) + "."
         if decoded_prompt is None:
             return None
 
