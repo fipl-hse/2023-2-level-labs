@@ -73,7 +73,7 @@ class TextProcessor:
             return None
         if element not in self._storage:
             return None
-        return self._storage.get(element)
+        return self._storage[element]
 
     def get_end_of_word_token(self) -> str:
         """
@@ -132,6 +132,8 @@ class TextProcessor:
         for i in tokenized_text:
             self._put(i)
             element_id = self.get_id(i)
+            if not isinstance(element_id, int):
+                return None
             encoded_corpus.append(element_id)
         return tuple(encoded_corpus)
 
@@ -297,11 +299,11 @@ class NGramLanguageModel:
         In case of corrupt input arguments or methods used return None,
         1 is returned
         """
-        if not isinstance(self._encoded_corpus, tuple) and self._encoded_corpus:
+        if not (isinstance(self._encoded_corpus, tuple) and self._encoded_corpus):
             return 1
 
         n_grams = self._extract_n_grams(self._encoded_corpus)
-        if not isinstance(n_grams, tuple):
+        if not isinstance(n_grams, tuple) or len(n_grams) == 0:
             return 1
 
         for n_gram in n_grams:
@@ -323,10 +325,12 @@ class NGramLanguageModel:
 
         In case of corrupt input arguments, None is returned
         """
-        if not isinstance(sequence, tuple) or len(sequence) != self._n_gram_size - 1:
+        if not isinstance(sequence, tuple) or len(sequence) == 0:
             return None
 
         context = sequence[-(self._n_gram_size - 1):]
+        if len(context) > len(sequence):
+            return None
         potential_n_grams = [n_gram for n_gram in self._n_gram_frequencies.keys() if n_gram[:len(context)] == context]
         next_tokens = {}
         for n_gram in potential_n_grams:
@@ -405,19 +409,19 @@ class GreedyTextGenerator:
         if not encoded_prompt or not n_gram_size:
             return None
 
-        generated_sequence = list(encoded_prompt)
-
-        while len(generated_sequence) < seq_len:
-            context = tuple(generated_sequence[-(n_gram_size - 1):])
+        for i in range(seq_len):
+            context = encoded_prompt[-(n_gram_size - 1):]
             next_tokens = self._model.generate_next_token(context)
 
-            if next_tokens is None:
+            if not next_tokens:
                 break
 
-            next_token = max(next_tokens, key=next_tokens.get)
-            generated_sequence.append(next_token)
+            next_token = [key for key in next_tokens if next_tokens[key] == max(next_tokens.values())]
+            if not next_token:
+                return None
+            encoded_prompt += (next_token[0],)
 
-        generated_text = self._text_processor.decode(tuple(generated_sequence))
+        generated_text = self._text_processor.decode(encoded_prompt)
 
         return generated_text
 

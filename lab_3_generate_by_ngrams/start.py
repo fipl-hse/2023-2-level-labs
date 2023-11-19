@@ -1,7 +1,7 @@
 """
 Generation by NGrams starter
 """
-from main import TextProcessor, NGramLanguageModel
+from main import NGramLanguageModel, TextProcessor
 
 
 def main() -> None:
