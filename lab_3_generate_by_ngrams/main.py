@@ -671,7 +671,7 @@ class NGramLanguageModelReader:
             n_grams[tuple(encoded)] += self._content['freq'][key]
 
         correct_size_ngrams = {}
-        for n_gram, freq in n_grams:
+        for n_gram, freq in n_grams.items():
             if isinstance(n_gram, tuple) and len(n_gram) == n_gram_size:
                 same_context = [context_freq for context, context_freq in n_grams.items()
                                     if context[-n_gram_size:-1] == n_gram[-n_gram_size:-1]]
