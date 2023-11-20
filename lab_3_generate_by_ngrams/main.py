@@ -50,14 +50,14 @@ class TextProcessor:
 
         tokens = []
         for token in text.lower():
-            if token.isspace() and tokens[-1] != self._end_of_word_token:
+            if token.isspace() and tokens and tokens[-1] != self._end_of_word_token:
                 tokens.append(self._end_of_word_token)
             elif token.isalpha():
                 tokens.append(token)
         if not text[-1].isalnum() and tokens[-1] != self._end_of_word_token:
             tokens.append(self._end_of_word_token)
 
-        if tokens.count(self._end_of_word_token) == len(tokens):
+        if not tokens:
             return None
         return tuple(tokens)
 
@@ -128,6 +128,7 @@ class TextProcessor:
         tokens = self._tokenize(text)
         if not tokens:
             return None
+
         for token in tokens:
             self._put(token)
             identificator = self.get_id(token)
@@ -146,11 +147,8 @@ class TextProcessor:
         In case of corrupt input arguments or invalid argument length,
         an element is not added to storage
         """
-        if not isinstance(element, str) or len(element) != 1:
-            return None
-        if element not in self._storage:
+        if isinstance(element, str) and len(element) == 1 and element not in self._storage:
             self._storage[element] = len(self._storage)
-        return None
 
     def decode(self, encoded_corpus: tuple[int, ...]) -> Optional[str]:
         """
@@ -234,9 +232,9 @@ class TextProcessor:
         if not (isinstance(decoded_corpus, tuple) and decoded_corpus):
             return None
         if decoded_corpus[-1] != self._end_of_word_token:
-            return f"{decoded_corpus[0].upper()}{''.join(decoded_corpus)[1:]}."\
+            return f"{''.join(decoded_corpus).capitalize()}."\
                 .replace(self._end_of_word_token, ' ')
-        return f"{decoded_corpus[0].upper()}{''.join(decoded_corpus)[1:-1]}."\
+        return f"{''.join(decoded_corpus)[:-1].capitalize()}."\
                 .replace(self._end_of_word_token, ' ')
 
 
@@ -303,11 +301,14 @@ class NGramLanguageModel:
         for n_gram in n_grams:
             if not isinstance(n_gram, tuple):
                 return 1
-            if n_gram[:-1] not in contexts:
-                contexts[n_gram[:-1]] = {}
-            if n_gram not in contexts[n_gram[:-1]]:
-                contexts[n_gram[:-1]][n_gram] = 0.0
-            contexts[n_gram[:-1]][n_gram] += 1.
+
+            context = n_gram[:-1]
+            if context not in contexts:
+                contexts[context] = {}
+
+            if n_gram not in contexts[context]:
+                contexts[context][n_gram] = 0.
+            contexts[context][n_gram] += 1.
 
         for same_context_ngrams in contexts.values():
             same_context_count = sum(same_context_ngrams.values())
@@ -396,7 +397,6 @@ class GreedyTextGenerator:
         if not (encoded and n_gram_size):
             return None
 
-        phrase = prompt
         for iteration in range(seq_len):
             tokens = self._model.generate_next_token(encoded[-n_gram_size + 1:])
             if not tokens:
@@ -404,11 +404,7 @@ class GreedyTextGenerator:
             max_freq = max(tokens.values())
             candidates_max = [candidate for candidate, freq in tokens.items()
                               if freq == max_freq]
-            encoded = encoded + (sorted(candidates_max)[0],)
-            best_candidate = self._text_processor.get_token(encoded[-1])
-            if not best_candidate:
-                return None
-            phrase += best_candidate
+            encoded += (sorted(candidates_max)[0],)
 
         text = self._text_processor.decode(encoded)
         if not text:
@@ -576,10 +572,10 @@ class BeamSearchTextGenerator:
                 possible_tokens = self._get_next_token(sequence)
                 if not possible_tokens:
                     return None
-                possible_sequences = self.beam_searcher.continue_sequence(sequence,
-                                                                          possible_tokens,
-                                                                          new_sequences)
-                if not possible_sequences:
+
+                if not self.beam_searcher.continue_sequence(sequence,
+                                                            possible_tokens,
+                                                            new_sequences):  # updates it
                     return self._text_processor.decode(sorted(tuple(seq_candidates),
                                                               key=lambda pair: pair[1])[0])
 
