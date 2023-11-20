@@ -50,7 +50,7 @@ class TextProcessor:
         for token in text.lower():
             if token.isspace() and tokens[-1] != self._end_of_word_token:
                 tokens.append(self._end_of_word_token)
-            elif token.isalpha():
+            if token.isalpha():
                 tokens.append(token)
         if not text[-1].isalnum() and tokens[-1] != self._end_of_word_token:
             tokens.append(self._end_of_word_token)
@@ -221,11 +221,14 @@ class TextProcessor:
         """
         if not isinstance(decoded_corpus, tuple) or len(decoded_corpus) == 0:
             return None
-        decoded_text = ''.join(decoded_corpus)
-        decoded_text = decoded_text.replace(self._end_of_word_token, ' ')
-        decoded_text = decoded_text.capitalize()
-        decoded_text = decoded_text[:-1] + '.'
-        return decoded_text
+        list_tokens = []
+        for i in decoded_corpus:
+            list_tokens += i
+        if list_tokens[-1] == self._end_of_word_token:
+            del list_tokens[-1]
+        new_line = ''.join(list_tokens)
+        new_line = new_line.replace(self._end_of_word_token, ' ')
+        return new_line.capitalize() + '.'
 
 
 class NGramLanguageModel:
@@ -279,24 +282,24 @@ class NGramLanguageModel:
         In case of corrupt input arguments or methods used return None,
         1 is returned
         """
-        if not isinstance(self._encoded_corpus, tuple) or len(self._encoded_corpus) == 0:
+        if not (isinstance(self._encoded_corpus, tuple) and self._encoded_corpus):
             return 1
         n_grams = self._extract_n_grams(self._encoded_corpus)
-        if not isinstance(n_grams, tuple) or not n_grams:
+        if not (isinstance(n_grams, tuple) and n_grams):
             return 1
-        seq_n_gram = {}
-        context ={}
+        contexts = {}
         for n_gram in n_grams:
-            if n_gram not in seq_n_gram:
-                seq_n_gram[n_gram] = 1
-            if n_gram in seq_n_gram:
-                seq_n_gram[n_gram] += 1
-            if n_gram[:-1] not in context:
-                context[n_gram[:-1]] = 0
-            if n_gram[:-1] in context:
-                context[n_gram[:-1]] += 1
-        for n_gram in seq_n_gram:
-            self._n_gram_frequencies[n_gram] = seq_n_gram[n_gram]/context[n_gram[:-1]]
+            if not isinstance(n_gram, tuple):
+                return 1
+            if n_gram[:-1] not in contexts:
+                contexts[n_gram[:-1]] = {}
+            if n_gram not in contexts[n_gram[:-1]]:
+                contexts[n_gram[:-1]][n_gram] = 0.0
+            contexts[n_gram[:-1]][n_gram] += 1.
+        for same_context_ngrams in contexts.values():
+            same_context_count = sum(same_context_ngrams.values())
+            for n_gram, freq in same_context_ngrams.items():
+                self._n_gram_frequencies[n_gram] = freq / same_context_count
         return 0
 
     def generate_next_token(self, sequence: tuple[int, ...]) -> Optional[dict]:
@@ -315,7 +318,6 @@ class NGramLanguageModel:
             return None
         next_poss_token = {}
         context = sequence[-self._n_gram_size + 1:]
-        print(self._n_gram_frequencies)
         for n_gram, freq in self._n_gram_frequencies.items():
             if n_gram[:self._n_gram_size - 1] == context:
                 next_poss_token[n_gram[-1]] = freq
@@ -335,12 +337,10 @@ class NGramLanguageModel:
 
         In case of corrupt input arguments, None is returned
         """
-        if not isinstance(encoded_corpus, tuple) or len(encoded_corpus) == 0:
+        if not isinstance(encoded_corpus, tuple) or not encoded_corpus:
             return None
-        n_grams = []
-        for index in range(len(encoded_corpus) - self._n_gram_size - 2):
-            n_grams.append(tuple(encoded_corpus[index:index + self._n_gram_size]))
-        return tuple(n_grams)
+        return tuple(encoded_corpus[index:index + self._n_gram_size]
+                     for index in range(len(encoded_corpus) - 1))
 
 
 class GreedyTextGenerator:
@@ -377,22 +377,28 @@ class GreedyTextGenerator:
         In case of corrupt input arguments or methods used return None,
         None is returned
         """
-        if not isinstance(seq_len, int) or not isinstance(prompt, str) or len(prompt) == 0:
+        if not (isinstance(seq_len, int) and isinstance(prompt, str) and prompt):
             return None
-        encoded = self._text_processor.encode(prompt)
         n_gram_size = self._model.get_n_gram_size()
-        if not (encoded or n_gram_size):
+        encoded = self._text_processor.encode(prompt)
+        if not (encoded and n_gram_size):
             return None
-        for i in range(seq_len):
-            next_tokens = self._model.generate_next_token(encoded[-n_gram_size + 1:])
-            if not next_tokens:
+        for iteration in range(seq_len):
+            tokens = self._model.generate_next_token(encoded[-n_gram_size + 1:])
+            if not tokens:
                 break
-            best_next = [token for token, freq in next_tokens.items() if freq == max(next_tokens.values())]
-            encoded += (best_next[0],)
-            decoded_text = self._text_processor.decode(encoded)
-            if not decoded_text:
+            max_freq = max(tokens.values())
+            biggest_token = [candidate for candidate, freq in tokens.items()
+                              if freq == max_freq]
+            encoded = encoded + (sorted(biggest_token)[0],)
+            next_token = self._text_processor.get_token(encoded[-1])
+            if not next_token:
                 return None
-            return decoded_text
+            prompt += next_token
+        text = self._text_processor.decode(encoded)
+        if not text:
+            return None
+        return text
 
 
 class BeamSearcher:
