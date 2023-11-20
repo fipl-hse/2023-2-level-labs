@@ -457,7 +457,7 @@ class BeamSearcher:
         for token, freq in tokens.items():
             token_pair = (token, freq)
             list_of_token_pairs.append(token_pair)
-        best = sorted(list_of_token_pairs,key=lambda x: x[1], reverse=True)[:self._beam_width]
+        best = sorted(list_of_token_pairs, key=lambda x: x[1], reverse=True)[:self._beam_width]
         return best
 
 
