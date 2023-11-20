@@ -3,10 +3,10 @@ Lab 3.
 
 Beam-search and natural language generation evaluation
 """
-import math
 # pylint:disable=too-few-public-methods
-from typing import Optional
 import json
+import math
+from typing import Optional
 
 
 class TextProcessor:
@@ -812,14 +812,15 @@ class BackOffGenerator:
         while iteration <= seq_len:
             next_token_candidates = None
             for n_gram_size in sorted(self._language_models.keys(), reverse=True):
-                next_token_candidates = self._get_next_token(tuple(generated_sequence[-(n_gram_size - 1):]))
+                next_token_candidates = self._get_next_token(
+                    tuple(generated_sequence[-(n_gram_size - 1):]))
                 if next_token_candidates is not None and len(next_token_candidates) > 0:
                     break
 
             if next_token_candidates is None or len(next_token_candidates) == 0:
                 break
 
-            max_probability_token = max(next_token_candidates, key=next_token_candidates.get)
+            max_probability_token = max(next_token_candidates, key=lambda x: next_token_candidates.get(x))
             generated_sequence.append(max_probability_token)
 
             iteration += 1
@@ -841,7 +842,8 @@ class BackOffGenerator:
 
         In case of corrupt input arguments return None.
         """
-        if not (isinstance(sequence_to_continue, tuple) and sequence_to_continue and self._language_models):
+        if not (isinstance(sequence_to_continue, tuple) and sequence_to_continue
+                and self._language_models):
             return None
 
         n_gram_sizes = sorted(self._language_models.keys(), reverse=True)
@@ -852,8 +854,8 @@ class BackOffGenerator:
             token_candidates = n_gram_model.generate_next_token(sequence_to_continue)
 
             if token_candidates is not None and len(token_candidates) > 0:
-                token_probabilities = {token: freq / sum(token_candidates.values()) for token, freq in
-                                       token_candidates.items()}
+                token_probabilities = {token: freq / sum(token_candidates.values())
+                                       for token, freq in token_candidates.items()}
                 return token_probabilities
 
         return None
