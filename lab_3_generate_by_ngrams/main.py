@@ -50,10 +50,12 @@ class TextProcessor:
         for token in text.lower():
             if token.isalpha():
                 tokens.append(token)
-            elif tokens[-1] != self._end_of_word_token and token == ' ':
-                tokens.append(self._end_of_word_token)
+            elif token == ' ' and len(tokens) > 0 and tokens[-1] != self._end_of_word_token:
+                 tokens.append(self._end_of_word_token)
+        if tokens == []:
+                return None
 
-        if not tokens[-1].isalnum():
+        if text[-1] != "/?;:'-=+.,£#@$%^><*&()":
             tokens.append(self._end_of_word_token)
 
         return tuple(tokens)
@@ -85,6 +87,7 @@ class TextProcessor:
         Returns:
             str: EoW token
         """
+        return self._end_of_word_token
 
     def get_token(self, element_id: int) -> Optional[str]:
         """
@@ -98,6 +101,13 @@ class TextProcessor:
 
         In case of corrupt input arguments or arguments not included in storage, None is returned
         """
+        if not isinstance(element_id, int) or element_id not in self._storage.values():
+            return None
+
+        for key, value in self._storage.items():
+            if value == element_id:
+                return key
+
 
     def encode(self, text: str) -> Optional[tuple[int, ...]]:
         """
@@ -115,6 +125,22 @@ class TextProcessor:
         In case of corrupt input arguments, None is returned.
         In case any of methods used return None, None is returned.
         """
+        if not isinstance(text, str) or str == ' ':
+            return None
+
+        tokens = self._tokenize(text)
+        if not tokens:
+            return None
+
+        encoded_text = []
+        for i in tokens:
+            self._put(i)
+            if self.get_id(i) is None:
+                return None
+            encoded_text.append(self.get_id(i))
+
+        return tuple(encoded_text)
+
 
     def _put(self, element: str) -> None:
         """
@@ -147,6 +173,18 @@ class TextProcessor:
         In case of corrupt input arguments, None is returned.
         In case any of methods used return None, None is returned.
         """
+        if not isinstance(encoded_corpus, tuple) or not encoded_corpus:
+            return None
+
+        decoded_corpus = self._decode(encoded_corpus)
+        if not decoded_corpus:
+            return None
+        postprocessed_corpus = self._postprocess_decoded_text(decoded_corpus)
+        if not postprocessed_corpus:
+            return None
+
+        return postprocessed_corpus
+
 
     def fill_from_ngrams(self, content: dict) -> None:
         """
@@ -169,6 +207,17 @@ class TextProcessor:
         In case of corrupt input arguments, None is returned.
         In case any of methods used return None, None is returned.
         """
+        if not isinstance(corpus, tuple) or not corpus:
+            return None
+
+        decoded_corpus = []
+        for i in corpus:
+            token = self.get_token(i)
+            if token is None:
+                return None
+            decoded_corpus.append(token)
+
+        return tuple(decoded_corpus)
 
     def _postprocess_decoded_text(self, decoded_corpus: tuple[str, ...]) -> Optional[str]:
         """
@@ -185,7 +234,21 @@ class TextProcessor:
 
         In case of corrupt input arguments, None is returned
         """
+        if not isinstance(decoded_corpus, tuple) or not decoded_corpus:
+            return None
 
+        postprocess_decoded_text = ''
+        for index, token in enumerate(decoded_corpus):
+            if index == len(decoded_corpus) - 1:
+                postprocess_decoded_text += '.'
+            elif token == self._end_of_word_token:
+                postprocess_decoded_text += ' '
+            elif token == self._end_of_word_token:
+                postprocess_decoded_text += '.'
+            else:
+                postprocess_decoded_text += token
+
+        return postprocess_decoded_text.capitalize()
 
 class NGramLanguageModel:
     """
@@ -205,7 +268,9 @@ class NGramLanguageModel:
             encoded_corpus (tuple): Encoded text
             n_gram_size (int): A size of n-grams to use for language modelling
         """
-
+        self._encoded_corpus = encoded_corpus
+        self._n_gram_size = range(2, 5)
+        self._n_gram_frequencies = {}
     def get_n_gram_size(self) -> int:
         """
         Retrieve value stored in self._n_gram_size attribute.
@@ -262,6 +327,12 @@ class NGramLanguageModel:
 
         In case of corrupt input arguments, None is returned
         """
+        if not isinstance(encoded_corpus, tuple) or not encoded_corpus:
+            return None
+
+        n_grams = []
+        # for i in encoded_corpus:
+
 
 
 class GreedyTextGenerator:
