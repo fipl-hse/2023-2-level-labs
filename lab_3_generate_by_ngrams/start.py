@@ -3,6 +3,7 @@ Generation by NGrams starter
 """
 import lab_3_generate_by_ngrams.main as main_py
 
+
 def main() -> None:
     """
     Launches an implementation.
