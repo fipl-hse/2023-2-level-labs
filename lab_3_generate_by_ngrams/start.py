@@ -9,8 +9,9 @@ def main() -> None:
 
     In any case returns, None is returned
     """
-    with open("./assets/Harry_Potter.txt", "r", encoding="utf-8") as text_file:
-        text = text_file.read()
+   # with open("./assets/Harry_Potter.txt", "r", encoding="utf-8") as text_file:
+  #      text = text_file.read()
+
     text_processor = main_py.TextProcessor(end_of_word_token='_')
     encoded_corpus = text_processor.encode(text)
     decoded_text = text_processor.decode(encoded_corpus)

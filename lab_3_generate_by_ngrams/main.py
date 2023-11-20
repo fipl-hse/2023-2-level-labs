@@ -43,18 +43,21 @@ class TextProcessor:
         In case of corrupt input arguments, None is returned.
         In case any of methods used return None, None is returned.
         """
-        if not isinstance(text, str):
+        if not isinstance(text, str) or not text:
             return None
-        tokenized_text = []
+
+        tokens = []
         for token in text.lower():
-            if token.isalpha():
-                tokenized_text.append(token)
-            if not token.isalnum():
-                if tokenized_text[-1] != self._end_of_word_token:
-                    tokenized_text.append(self._end_of_word_token)
-        if len(tokenized_text) == 0:
+            if token.isspace() and tokens[-1] != self._end_of_word_token:
+                tokens.append(self._end_of_word_token)
+            elif token.isalpha():
+                tokens.append(token)
+        if not text[-1].isalnum() and tokens[-1] != self._end_of_word_token:
+            tokens.append(self._end_of_word_token)
+
+        if tokens.count(self._end_of_word_token) == len(tokens):
             return None
-        return tuple(tokenized_text)
+        return tuple(tokens)
 
     def get_id(self, element: str) -> Optional[int]:
         """
