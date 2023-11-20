@@ -544,7 +544,7 @@ class BeamSearcher:
             return None
 
         sorted_dict = sorted(sequence_candidates.items(), key=lambda x: (x[1], x[0]))
-        return {sequence: probability for sequence, probability in sorted_dict[:self._beam_width]}
+        return {x[0]: x[1] for x in sorted_dict[:self._beam_width]}
 
 
 class BeamSearchTextGenerator:
