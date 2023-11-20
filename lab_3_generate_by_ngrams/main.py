@@ -162,6 +162,7 @@ class TextProcessor:
 
         if element not in self._storage:
             self._storage[element] = len(self._storage)
+        return None
 
     def decode(self, encoded_corpus: tuple[int, ...]) -> Optional[str]:
         """
@@ -344,7 +345,9 @@ class NGramLanguageModel:
             return None
 
         tokens = {}
-        sort_data = dict(sorted(self._n_gram_frequencies.items(), key=lambda x: (x[1], -x[0][0], -x[0][1])))
+        sort_data = dict(sorted(self._n_gram_frequencies.items(), key=lambda x: (
+            x[1], -x[0][0], -x[0][1])))
+
         for key in sort_data:
             if key[:self._n_gram_size-1] == context:
                 tokens.update({key[-1]: sort_data[key]})
@@ -425,7 +428,8 @@ class GreedyTextGenerator:
             if not next_candidate:
                 break
 
-            best_candidates = [key for key in next_candidate if next_candidate[key] == max(next_candidate.values())]
+            best_candidates = [key for key in next_candidate if next_candidate[key] == max(
+                next_candidate.values())]
             encoded += (best_candidates[0],)
 
         decoded = self._text_processor.decode(encoded)
@@ -515,7 +519,8 @@ class BeamSearcher:
             return None
 
         for i in next_tokens:
-            sequence_candidates.update({sequence+(i[0],): sequence_candidates[sequence] - math.log(i[1])})
+            sequence_candidates.update({sequence+(i[0],): sequence_candidates[sequence] - math.log(
+                i[1])})
 
         del sequence_candidates[sequence]
 
@@ -610,7 +615,8 @@ class BeamSearchTextGenerator:
                     candidate, new_tokens, updated_candidates)
 
                 if not possible_continuations:
-                    return self._text_processor.decode(sorted(tuple(candidates), key=lambda x: x[1])[0])
+                    return self._text_processor.decode(sorted(tuple(
+                        candidates), key=lambda x: x[1])[0])
 
             filtered_candidates = self.beam_searcher.prune_sequence_candidates(updated_candidates)
 
