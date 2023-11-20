@@ -446,7 +446,7 @@ class BeamSearcher:
 
         In case of corrupt input arguments or methods used return None.
         """
-        if not(isinstance(sequence, tuple) and sequence):
+        if not (isinstance(sequence, tuple) and sequence):
             return None
         tokens = self._model.generate_next_token(sequence)
         if tokens is None:
@@ -459,7 +459,6 @@ class BeamSearcher:
             list_of_token_pairs.append(token_pair)
         best = sorted(list_of_token_pairs, key=lambda x: x[1], reverse=True)[:self._beam_width]
         return best
-
 
     def continue_sequence(
         self,
@@ -576,7 +575,7 @@ class BeamSearchTextGenerator:
         for i in range(seq_len):
             for sequence in dict(candidates):
                 next_tokens = self._get_next_token(sequence)
-                if next_tokens is None:
+                if not next_tokens:
                     return None
                 continued_sequence = self.beam_searcher.continue_sequence(sequence,
                                                                           next_tokens, candidates)
@@ -584,16 +583,18 @@ class BeamSearchTextGenerator:
                     min_freq = min(candidates.values())
                     min_freq_tokens = [token for token, freq in candidates.items()
                                        if freq == min_freq]
-                    sorted_tokens = sorted(min_freq_tokens)[0]
-                    return self._text_processor.decode(sorted_tokens)
+                    sorted_tokens = sorted(min_freq_tokens)
+                    token = sorted_tokens[0]
+                    return self._text_processor.decode(token)
             best_sequence = self.beam_searcher.prune_sequence_candidates(candidates)
             if best_sequence is None:
                 return None
             candidates = best_sequence
         min_freq = min(candidates.values())
         min_freq_tokens = [token for token, freq in candidates.items() if freq == min_freq]
-        sorted_tokens = sorted(min_freq_tokens)[0]
-        return self._text_processor.decode(sorted_tokens)
+        sorted_tokens = sorted(min_freq_tokens)
+        token = sorted_tokens[0]
+        return self._text_processor.decode(token)
 
     def _get_next_token(
         self, sequence_to_continue: tuple[int, ...]
