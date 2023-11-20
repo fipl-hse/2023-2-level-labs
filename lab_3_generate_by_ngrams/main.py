@@ -564,6 +564,33 @@ class BeamSearchTextGenerator:
         In case of corrupt input arguments or methods used return None,
         None is returned
         """
+        if not (isinstance(prompt, str) and prompt
+                and isinstance(seq_len, int) and seq_len):
+            return None
+        encoded_prompt = self._text_processor.encode(prompt)
+        if not encoded_prompt:
+            return None
+        candidates = {encoded_prompt: 0.0}
+        for i in range(seq_len):
+            for sequence in dict(candidates):
+                next_tokens = self._get_next_token(sequence)
+                if next_tokens is None:
+                    return None
+                continued_sequence = self.beam_searcher.continue_sequence(sequence, next_tokens, candidates)
+                if not continued_sequence:
+                    min_freq = min(candidates.values())
+                    min_freq_tokens = [token for token, freq in candidates.items() if freq == min_freq]
+                    sorted_tokens = sorted(min_freq_tokens)[0]
+                    return self._text_processor.decode(sorted_tokens)
+            best_sequence = self.beam_searcher.prune_sequence_candidates(candidates)
+            if best_sequence is None:
+                return None
+            candidates = best_sequence
+        min_freq = min(candidates.values())
+        min_freq_tokens = [token for token, freq in candidates.items() if freq == min_freq]
+        sorted_tokens = sorted(min_freq_tokens)[0]
+        return self._text_processor.decode(sorted_tokens)
+
 
     def _get_next_token(
         self, sequence_to_continue: tuple[int, ...]
@@ -580,7 +607,13 @@ class BeamSearchTextGenerator:
 
         In case of corrupt input arguments return None.
         """
-
+        if not(isinstance(sequence_to_continue, tuple)
+               and sequence_to_continue):
+            return None
+        next_token = self.beam_searcher.get_next_token(sequence_to_continue)
+        if next_token is None:
+            return None
+        return next_token
 
 class NGramLanguageModelReader:
     """
