@@ -3,6 +3,7 @@ Lab 3.
 
 Beam-search and natural language generation evaluation
 """
+import json
 import math
 # pylint:disable=too-few-public-methods
 from typing import Optional
@@ -46,7 +47,7 @@ class TextProcessor:
         """
         if not isinstance(text, str) or not text or not any(char.isalpha() for char in text):
             return None
-        self.text = text
+
         splited_text = text.split()
         final_text = []
         for word in splited_text:
@@ -105,7 +106,9 @@ class TextProcessor:
         for key, id_num in self._storage.items():
             if id_num == element_id:
                 return key
-            
+        return None
+
+
     def encode(self, text: str) -> Optional[tuple[int, ...]]:
         """
         Encode text.
@@ -129,9 +132,9 @@ class TextProcessor:
         tokenized = self._tokenize(text)
         if not tokenized:
             return None
-        for i in range(len(tokenized)):
-            encoded_text[tokenized[i]] = self._put(tokenized[i])
-            encoded_corpus_num = self.get_id(tokenized[i])
+        for i, token in enumerate(tokenized):
+            encoded_text[token] = self._put(token)
+            encoded_corpus_num = self.get_id(token)
             if encoded_corpus_num is None:
                 return None
             encoded_corpus.append(encoded_corpus_num)
@@ -209,8 +212,8 @@ class TextProcessor:
             return None
 
         decoded_corpus = []
-        for element in range(len(corpus)):
-            decoded_element = self.get_token(corpus[element])
+        for i, element in enumerate(corpus):
+            decoded_element = self.get_token(element)
             if decoded_element is None:
                 return None
             decoded_corpus.append(decoded_element)
@@ -242,9 +245,9 @@ class TextProcessor:
         else:
             decoded_corpus.append(".")
 
-        for token in range(len(decoded_corpus)):
-            if decoded_corpus[token] == self._end_of_word_token:
-                decoded_corpus[token] = " "
+        for i, token in enumerate(decoded_corpus):
+            if token == self._end_of_word_token:
+                decoded_corpus[i] = " "
         return "".join(decoded_corpus).capitalize()
 
 
@@ -309,7 +312,8 @@ class NGramLanguageModel:
 
         for n_gram in set(n_grams):
             absolute_frequency = n_grams.count(n_gram)
-            beginning_frequency = len([n_gram_begin for n_gram_begin in n_grams if n_gram_begin[:-1] == n_gram[:-1]])
+            beginning_frequency = len([n_gram_begin for n_gram_begin in n_grams
+                                       if n_gram_begin[:-1] == n_gram[:-1]])
             self._n_gram_frequencies[n_gram] = absolute_frequency / beginning_frequency
 
         return 0
@@ -419,7 +423,8 @@ class GreedyTextGenerator:
             if not possible_letters:
                 break
             max_freq = max(possible_letters.values())
-            max_freq_letters = [letter for letter, freq in possible_letters.items() if freq == max_freq]
+            max_freq_letters = [letter for letter, freq in possible_letters.items()
+                                if freq == max_freq]
             max_freq_letters = sorted(max_freq_letters)
             encoded_prompt += (max_freq_letters[0],)
 
@@ -483,7 +488,7 @@ class BeamSearcher:
         if not next_tokens:
             return []
 
-        next_tokens = sorted([(token, freq) for token, freq in next_tokens.items()],
+        next_tokens = sorted(list(next_tokens.items()),
                              key=lambda x: (-x[1], -x[0]))[:self._beam_width]
 
         return next_tokens
@@ -543,7 +548,7 @@ class BeamSearcher:
 
         sorted_sequences = sorted(sequence_candidates.items(), key=lambda x: (x[1], x[0]))
 
-        return {sequence: freq for sequence, freq in sorted_sequences[:self._beam_width]}
+        return dict(sorted_sequences[:self._beam_width])
 
 
 class BeamSearchTextGenerator:
@@ -608,7 +613,8 @@ class BeamSearchTextGenerator:
                 probable_letters = self._get_next_token(sequence)
                 if not probable_letters:
                     return None
-                probable_seq = self.beam_searcher.continue_sequence(sequence, probable_letters, new_seq)
+                probable_seq = self.beam_searcher.continue_sequence(sequence,
+                                                                    probable_letters, new_seq)
                 if not probable_seq:
                     return self._text_processor.decode(sorted(sequence_candidates,
                                                               key=lambda x: x[1])[0])
