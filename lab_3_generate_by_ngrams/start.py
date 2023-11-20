@@ -1,7 +1,8 @@
 """
 Generation by NGrams starter
 """
-from lab_3_generate_by_ngrams.main import GreedyTextGenerator, NGramLanguageModel, TextProcessor
+from lab_3_generate_by_ngrams.main import (BeamSearcher, GreedyTextGenerator,
+                                           NGramLanguageModel, TextProcessor)
 
 
 def main() -> None:
@@ -14,9 +15,9 @@ def main() -> None:
         text = text_file.read()
     split_text = TextProcessor('_')
     encoded_text = split_text.encode(text)
-    if not encoded_text:
-        return None
-    n_grams = NGramLanguageModel(encoded_text, 7)
+    if encoded_text:
+        n_grams = NGramLanguageModel(encoded_text, 7)
+        print(n_grams.build)
     greedy_text = GreedyTextGenerator(n_grams, split_text)
     result = greedy_text.run(51, 'Vernon')
     print(result)
