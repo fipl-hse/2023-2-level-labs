@@ -23,7 +23,6 @@ def main() -> None:
     print(greedy_text.run(51, 'Vernon'))
     greedy = BeamSearchTextGenerator(lang_model, split_text, 7)
     print(greedy.run('Vernon', 56))
-
     assert result
 
 if __name__ == "__main__":
