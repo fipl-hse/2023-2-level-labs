@@ -457,8 +457,8 @@ class BeamSearcher:
         for token, freq in tokens.items():
             token_pair = (token, freq)
             list_of_token_pairs.append(token_pair)
-        sorted_list_of_token_pairs = sorted(list_of_token_pairs, key=lambda x: x[1], reverse=True)
-        return sorted_list_of_token_pairs[:self._beam_width]
+        best = sorted(list_of_token_pairs,key=lambda x: x[1], reverse=True)[:self._beam_width]
+        return best
 
 
     def continue_sequence(
