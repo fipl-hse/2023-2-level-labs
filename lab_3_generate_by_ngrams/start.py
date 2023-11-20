@@ -1,7 +1,8 @@
 """
 Generation by NGrams starter
 """
-from lab_3_generate_by_ngrams.main import GreedyTextGenerator, NGramLanguageModel, TextProcessor
+from lab_3_generate_by_ngrams.main import (BeamSearchTextGenerator, GreedyTextGenerator,
+                                           NGramLanguageModel, TextProcessor)
 
 
 def main() -> None:
@@ -13,14 +14,16 @@ def main() -> None:
     with open("./assets/Harry_Potter.txt", "r", encoding="utf-8") as text_file:
         text = text_file.read()
     story = TextProcessor("_")
-    decoded_story = story.decode(story.encode(text))
     encoded = story.encode(text)
+    decoded_story = story.decode(encoded)
     result = decoded_story
     lang_model = NGramLanguageModel(encoded[:50], 3)
     model = lang_model.build()
     model2 = NGramLanguageModel(encoded, 7)
     greedy = GreedyTextGenerator(model2, story)
     print(greedy.run(51, "Vernon"))
+    beam_search = BeamSearchTextGenerator(model2, story, 7)
+    print(beam_search.run('Vernon', 56))
     assert result
 
 
