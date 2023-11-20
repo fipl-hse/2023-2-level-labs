@@ -223,13 +223,13 @@ class TextProcessor:
         if not isinstance(decoded_corpus, tuple) or not decoded_corpus:
             return None
         result = ''
-        for i, j in enumerate(decoded_corpus):
-            if j == self._end_of_word_token and i == len(decoded_corpus)-1:
+        for index, symbol in enumerate(decoded_corpus):
+            if symbol == self._end_of_word_token and index == len(decoded_corpus)-1:
                 result += '.'
-            elif j == self._end_of_word_token:
+            elif symbol == self._end_of_word_token:
                 result += ' '
             else:
-                result += j
+                result += symbol
         return result.capitalize()
 
 
