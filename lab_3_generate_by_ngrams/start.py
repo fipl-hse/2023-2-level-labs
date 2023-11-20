@@ -1,7 +1,8 @@
 """
 Generation by NGrams starter
 """
-from lab_3_generate_by_ngrams.main import GreedyTextGenerator, NGramLanguageModel, TextProcessor
+from lab_3_generate_by_ngrams.main import BeamSearchTextGenerator, GreedyTextGenerator, \
+    NGramLanguageModel, TextProcessor
 
 
 def main() -> None:
@@ -21,12 +22,20 @@ def main() -> None:
 
     result = processor.decode(encoded)
 
+    if not result:
+        return None
+
+    print(result[:100])
+
     model_for_build = NGramLanguageModel(encoded[:10], 2)
     print(model_for_build.build())
 
     model = NGramLanguageModel(encoded, 7)
     greedy_text_generator = GreedyTextGenerator(model, processor)
     print(greedy_text_generator.run(51, 'Vernon'))
+
+    beam_search_generator = BeamSearchTextGenerator(model, processor, 7)
+    print(beam_search_generator.run('Vernon', 56))
 
     assert result
 
