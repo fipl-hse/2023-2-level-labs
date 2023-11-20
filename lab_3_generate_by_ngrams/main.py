@@ -486,10 +486,8 @@ class BeamSearcher:
         if not next_tokens:
             return []
 
-        next_tokens = sorted(list(next_tokens.items()),
+        return sorted(list(next_tokens.items()),
                              key=lambda x: (-x[1], -x[0]))[:self._beam_width]
-
-        return next_tokens
 
     def continue_sequence(
             self,
