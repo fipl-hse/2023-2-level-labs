@@ -3,7 +3,7 @@ Lab 3.
 
 Beam-search and natural language generation evaluation
 """
-import json
+#import json
 import math
 # pylint:disable=too-few-public-methods
 from typing import Optional
@@ -127,19 +127,17 @@ class TextProcessor:
         """
         if not isinstance(text, str) or len(text) == 0:
             return None
-        encoded_text = {}
+
         encoded_corpus = []
         tokenized = self._tokenize(text)
         if not tokenized:
             return None
-        for i, token in enumerate(tokenized):
-            encoded_text[token] = self._put(token)
+        for token in tokenized:
+            self._put(token)
             encoded_corpus_num = self.get_id(token)
-            if encoded_corpus_num is None:
+            if not isinstance(encoded_corpus_num, int):
                 return None
             encoded_corpus.append(encoded_corpus_num)
-        if not encoded_text:
-            return None
         return tuple(encoded_corpus)
 
     def _put(self, element: str) -> None:
@@ -239,16 +237,16 @@ class TextProcessor:
         """
         if not isinstance(decoded_corpus, tuple) or len(decoded_corpus) == 0:
             return None
-        decoded_corpus = list(decoded_corpus)
-        if decoded_corpus[-1] == self._end_of_word_token:
-            decoded_corpus[-1] = "."
+        decoded_corpus_list = list(decoded_corpus)
+        if decoded_corpus_list[-1] == self._end_of_word_token:
+            decoded_corpus_list[-1] = "."
         else:
-            decoded_corpus.append(".")
+            decoded_corpus_list.append(".")
 
-        for i, token in enumerate(decoded_corpus):
+        for i, token in enumerate(decoded_corpus_list):
             if token == self._end_of_word_token:
-                decoded_corpus[i] = " "
-        return "".join(decoded_corpus).capitalize()
+                decoded_corpus_list[i] = " "
+        return "".join(decoded_corpus_list).capitalize()
 
 
 class NGramLanguageModel:
