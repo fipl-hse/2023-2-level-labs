@@ -591,7 +591,6 @@ class BeamSearchTextGenerator:
         sorted_tokens = sorted(min_freq_tokens)[0]
         return self._text_processor.decode(sorted_tokens)
 
-
     def _get_next_token(
         self, sequence_to_continue: tuple[int, ...]
     ) -> Optional[list[tuple[int, float]]]:
