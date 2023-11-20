@@ -50,10 +50,10 @@ class TextProcessor:
         split_text = text.split()
         list_of_text = []
         for word in split_text:
-            word = [letter for letter in word if letter.isalpha()]
-            if not word:
+            word_list = [letter for letter in word if letter.isalpha()]
+            if not word_list:
                 continue
-            list_of_text += word
+            list_of_text += word_list
             list_of_text.append(self._end_of_word_token)
         if list_of_text.count(self._end_of_word_token) == len(list_of_text):
             return None
@@ -100,12 +100,13 @@ class TextProcessor:
 
         In case of corrupt input arguments or arguments not included in storage, None is returned
         """
-        if not isinstance(element_id, int) or \
-                element_id not in self._storage.values():
+        if not (isinstance(element_id, int)
+                and element_id in self._storage.values()):
             return None
         for letter, index in self._storage.items():
             if index == element_id:
                 return letter
+        return None
 
     def encode(self, text: str) -> Optional[tuple[int, ...]]:
         """
@@ -459,6 +460,7 @@ class BeamSearcher:
         sorted_list_of_token_pairs = sorted(list_of_token_pairs, key=lambda x: x[1], reverse=True)
         return sorted_list_of_token_pairs[:self._beam_width]
 
+
     def continue_sequence(
         self,
         sequence: tuple[int, ...],
@@ -576,10 +578,12 @@ class BeamSearchTextGenerator:
                 next_tokens = self._get_next_token(sequence)
                 if next_tokens is None:
                     return None
-                continued_sequence = self.beam_searcher.continue_sequence(sequence, next_tokens, candidates)
+                continued_sequence = self.beam_searcher.continue_sequence(sequence,
+                                                                          next_tokens, candidates)
                 if not continued_sequence:
                     min_freq = min(candidates.values())
-                    min_freq_tokens = [token for token, freq in candidates.items() if freq == min_freq]
+                    min_freq_tokens = [token for token, freq in candidates.items()
+                                       if freq == min_freq]
                     sorted_tokens = sorted(min_freq_tokens)[0]
                     return self._text_processor.decode(sorted_tokens)
             best_sequence = self.beam_searcher.prune_sequence_candidates(candidates)
