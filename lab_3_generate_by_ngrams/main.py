@@ -579,21 +579,16 @@ class BeamSearchTextGenerator:
                     self.beam_searcher.continue_sequence(sequence, next_tokens, new_candidates)
                 )
                 if not continued_sequence:
-                    min_freq = min(candidates.values())
-                    min_freq_tokens = [token for token, freq in candidates.items()
-                                       if freq == min_freq]
-                    sorted_tokens = sorted(min_freq_tokens)
-                    token = sorted_tokens[0]
-                    return self._text_processor.decode(token)
+                    break
             best_sequence = self.beam_searcher.prune_sequence_candidates(new_candidates)
             if best_sequence is None:
                 return None
             candidates = best_sequence
-        min_freq = min(candidates.values())
-        min_freq_tokens = [token for token, freq in candidates.items() if freq == min_freq]
-        sorted_tokens = sorted(min_freq_tokens)
-        token = sorted_tokens[0]
-        return self._text_processor.decode(token)
+        min_probability = min(candidates.values())
+        min_prob_tokens = [candidate for candidate, probability in candidates.items() if probability == min_probability]
+        sorted_probable = sorted(min_prob_tokens)
+        best = sorted_probable[0]
+        return self._text_processor.decode(best)
 
     def _get_next_token(
         self, sequence_to_continue: tuple[int, ...]
