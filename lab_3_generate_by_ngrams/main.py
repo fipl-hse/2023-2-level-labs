@@ -52,7 +52,6 @@ class TextProcessor:
         list_of_tokens = []
         for word in splited_text:
             current_word = ''.join(char.lower() for char in word if char.isalpha())
-            current_word = list(current_word)
             if current_word:
                 list_of_tokens += current_word
                 list_of_tokens.append(self._end_of_word_token)
@@ -61,6 +60,7 @@ class TextProcessor:
             del list_of_tokens[-1]
 
         return tuple(list_of_tokens)
+
 
     def get_id(self, element: str) -> Optional[int]:
         """
@@ -134,9 +134,9 @@ class TextProcessor:
         if not tokenized_text:
             return None
 
-        for i in range(len(tokenized_text)):
-            encoded_text[tokenized_text[i]] = self._put(tokenized_text[i])
-            encoded_numbers = self.get_id(tokenized_text[i])
+        for token in tokenized_text:
+            self._put(token)
+            encoded_numbers = self.get_id(token)
 
             if encoded_numbers is None:
                 return None
@@ -144,7 +144,6 @@ class TextProcessor:
             encoded_corpus.append(encoded_numbers)
 
         return tuple(encoded_corpus)
-
 
     def _put(self, element: str) -> None:
         """
@@ -251,18 +250,17 @@ class TextProcessor:
         if not isinstance(decoded_corpus, tuple) or len(decoded_corpus) == 0:
             return None
 
-        decoded_corpus = list(decoded_corpus)
-        if decoded_corpus[-1] == self._end_of_word_token:
-            decoded_corpus[-1] = '.'
+        decoded_corpus_list = list(decoded_corpus)
+        if decoded_corpus_list[-1] == self._end_of_word_token:
+            decoded_corpus_list[-1] = '.'
         else:
-            decoded_corpus.append('.')
+            decoded_corpus_list.append('.')
 
-        for token in range(len(decoded_corpus)):
-            if decoded_corpus[token] == self._end_of_word_token:
-                decoded_corpus[token] = ' '
-        capitalized_corpus = ''.join(decoded_corpus).capitalize()
+        for token in range(len(decoded_corpus_list)):
+            if decoded_corpus_list[token] == self._end_of_word_token:
+                decoded_corpus_list[token] = ' '
+        capitalized_corpus = ''.join(decoded_corpus_list).capitalize()
         return capitalized_corpus
-
 
 class NGramLanguageModel:
     """
@@ -489,7 +487,7 @@ class BeamSearcher:
 
         In case of corrupt input arguments or methods used return None.
         """
-        if not isinstance(sequence, tuple) or not sequence:
+        if not isinstance(sequence, tuple) or len(sequence) == 0:
             return None
 
         next_tokens = self._model.generate_next_token(sequence)
@@ -499,10 +497,7 @@ class BeamSearcher:
         if not next_tokens:
             return []
 
-        next_tokens = sorted([(token, frequency) for token, frequency in next_tokens.items()],
-                             key=lambda x: (-x[1], -x[0]))[:self._beam_width]
-
-        return next_tokens
+        return sorted(list(next_tokens.items()), key=lambda x: (-x[1], -x[0]))[:self._beam_width]
 
     def continue_sequence(
         self,
