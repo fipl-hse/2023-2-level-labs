@@ -136,8 +136,7 @@ class TextProcessor:
         for token in tokenized_text:
             if self.get_id(token) is None:
                 return None
-            else:
-                encoded_corpus.append(self.get_id(token))
+            encoded_corpus.append(self.get_id(token))
 
         return tuple(encoded_corpus)
 
@@ -151,11 +150,10 @@ class TextProcessor:
         In case of corrupt input arguments or invalid argument length,
         an element is not added to storage
         """
-        if not isinstance(element, str) or len(element) != 1:
+        if not isinstance(element, str) or len(element) != 1 or element in self._storage:
             return None
 
-        if element not in self._storage:
-            self._storage[element] = len(self._storage)
+        self._storage[element] = len(self._storage)
 
         return None
 
@@ -217,9 +215,10 @@ class TextProcessor:
         for ident in corpus:
             if not isinstance(ident, int):
                 return None
-            if self.get_token(ident) is None:
+            new_token = self.get_token(ident)
+            if new_token is None:
                 return None
-            decoded_corpus.append(self.get_token(ident))
+            decoded_corpus.append(new_token)
 
         return tuple(decoded_corpus)
 
@@ -247,12 +246,11 @@ class TextProcessor:
                 resulting_text += token.upper()
             elif token == self._end_of_word_token:
                 if index == len(decoded_corpus) - 1:
-                    resulting_text += "."
+                    resulting_text = f"{resulting_text}."
                 else:
-                    resulting_text += " "
+                    resulting_text = f"{resulting_text} "
             else:
                 resulting_text += token
-        # resulting_text.replace(resulting_text[-1], ".")
 
         return resulting_text
 
@@ -320,7 +318,7 @@ class NGramLanguageModel:
             if not isinstance(ngram, tuple):
                 return 1
             p_w_1_2 = n_grams.count(ngram)
-            p_w_1 = len([context for context in n_grams if context[:-1] == ngram[:-1]])
+            p_w_1 = [context[:-1] for context in n_grams].count(ngram[:-1])
             self._n_gram_frequencies[ngram] = p_w_1_2/p_w_1
 
         return 0
@@ -421,7 +419,7 @@ class GreedyTextGenerator:
         for i in range(seq_len):
             tokens = self._model.generate_next_token(encoded_prompt[-ngram_size+1:])
             if tokens is None:
-                return prompt + "."
+                return f"{prompt}."
             if len(tokens) == 0:
                 break
             max_freq = max(tokens.values())
@@ -429,13 +427,13 @@ class GreedyTextGenerator:
             for candidate, freq in tokens.items():
                 if freq == max_freq:
                     max_candidates.append(candidate)
-            encoded_prompt = encoded_prompt + (sorted(max_candidates)[0])
+            encoded_prompt = encoded_prompt + (sorted(max_candidates)[0],)
             best_candidate = self._text_processor.get_token(encoded_prompt[-1])
             if best_candidate is None:
                 return None
             text += best_candidate
 
-        decoded_prompt = self._text_processor.decode(encoded_prompt) + "."
+        decoded_prompt = f"{self._text_processor.decode(encoded_prompt)}."
         if decoded_prompt is None:
             return None
 
