@@ -507,11 +507,8 @@ class BeamSearcher:
         if not tokens:
             return []
 
-        token_pairs = sorted(list(tokens.items()), key=lambda x: x[1], reverse=True)
-        if len(token_pairs) <= self._beam_width:
-            return token_pairs
-
-        return token_pairs[:self._beam_width]
+        return sorted([(token, float(freq)) for token, freq in tokens.items()],
+                      key=lambda pair: pair[1], reverse=True)[:self._beam_width]
 
     def continue_sequence(
             self,
@@ -818,7 +815,8 @@ class BackOffGenerator:
                 break
 
             max_prob = max(next_token_candidates.values())
-            max_probability_token = [token for token, prob in next_token_candidates.items() if prob == max_prob]
+            max_probability_token = [token for token, prob in next_token_candidates.items()
+                                     if prob == max_prob]
             generated_sequence.append(max_probability_token[0])
 
             iteration += 1
