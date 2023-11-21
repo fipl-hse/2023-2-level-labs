@@ -17,14 +17,14 @@ def main() -> None:
     processor = TextProcessor('_')
     encoded_text = processor.encode(text)
     print(processor.decode(encoded_text))
-    if encoded_text:
-        lang_model = NGramLanguageModel(encoded_text, 2)
-        print(lang_model.build())
 
-        language_model = NGramLanguageModel(encoded_text, 7)
-        greedy_gen = GreedyTextGenerator(language_model, processor)
-        generated_text = greedy_gen.run(51, 'Vernon')
-        print(generated_text)
+    lang_model = NGramLanguageModel(encoded_text, 2)
+    print(lang_model.build())
+
+    language_model = NGramLanguageModel(encoded_text, 7)
+    greedy_gen = GreedyTextGenerator(language_model, processor)
+    generated_text = greedy_gen.run(51, 'Vernon')
+    print(generated_text)
     assert result
 
 
