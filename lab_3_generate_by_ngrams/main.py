@@ -512,7 +512,8 @@ class BeamSearcher:
         if not (isinstance(sequence_candidates, dict)
                 and sequence_candidates):
             return None
-        sorted_sequence_candidates = dict(sorted(list(sequence_candidates.items()), key=lambda x: x[1]))
+        sorted_sequence_candidates = dict(sorted(list(sequence_candidates.items()),
+                                                 key=lambda x: x[1]))
         while len(sorted_sequence_candidates) > self._beam_width:
             sorted_sequence_candidates.popitem()
         return sorted_sequence_candidates
@@ -574,8 +575,9 @@ class BeamSearchTextGenerator:
                 next_tokens = self._get_next_token(sequence)
                 if not next_tokens:
                     return None
-                continued_sequence = self.beam_searcher.continue_sequence(sequence,
-                                                                          next_tokens, new_candidates)
+                continued_sequence = (
+                    self.beam_searcher.continue_sequence(sequence, next_tokens, new_candidates)
+                )
                 if not continued_sequence:
                     min_freq = min(candidates.values())
                     min_freq_tokens = [token for token, freq in candidates.items()
