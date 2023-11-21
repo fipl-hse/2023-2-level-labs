@@ -221,7 +221,6 @@ class TextProcessor:
             token = self.get_token(ids)
             if token is None:
                 return None
-
             decoded_corpus.append(token)
 
             if not decoded_corpus:
@@ -249,14 +248,17 @@ class TextProcessor:
 
         text_new = []
         for i in decoded_corpus:
-            text_new.append(i)
+            text_new += i
 
         if text_new[-1] == self._end_of_word_token:
-            text_new[-1] = '.'
+            del text_new[-1]
 
-        return ''.join(text_new).capitalize().replace(self._end_of_word_token, ' ')
+        return ''.join(text_new).capitalize().replace(self._end_of_word_token, ' ') + '.'
 
-        #return text_string.capitalize()
+        #text_string = ''.join(list(decoded_corpus))
+        #text = text_string.replace(self._end_of_word_token, ' ')
+        #return text.capitalize().strip() + '.'
+
 
 
 class NGramLanguageModel:
@@ -310,7 +312,7 @@ class NGramLanguageModel:
         In case of corrupt input arguments or methods used return None,
         1 is returned
         """
-        if not isinstance(self._encoded_corpus, tuple) and not self._encoded_corpus:
+        if not isinstance(self._encoded_corpus, tuple) or not self._encoded_corpus:
             return 1
 
         n_grams = self._extract_n_grams(self._encoded_corpus)
@@ -318,11 +320,13 @@ class NGramLanguageModel:
             return 1
 
         for n_gram in set(n_grams):
-            n_grams_count = n_grams.count(n_gram)
+            #n_grams_count = n_grams.count(n_gram)
             #context_count = len([context for context in n_grams if context[:-1] == n_gram[:-1]])
-            context_count = list(filter(lambda context: context[:-1] == n_gram[:-1], n_grams))
-            self._n_gram_frequencies[n_gram] = n_grams_count/len(context_count)
+            context_count = filter(lambda context: context[:-1] == n_gram[:-1], n_grams)
+            self._n_gram_frequencies[n_gram] = n_grams.count(n_gram)/len(list(context_count))
+
         return 0
+
 
     def generate_next_token(self, sequence: tuple[int, ...]) -> Optional[dict]:
         """
@@ -421,11 +425,7 @@ class GreedyTextGenerator:
             best_candidates = [token for token, freq in next_tokens.items() if freq == max(next_tokens.values())]
             encoded += (sorted(best_candidates)[0],)
 
-        decoded = self._text_processor.decode(encoded)
-        if not decoded:
-            return None
-
-        return decoded
+        return self._text_processor.decode(encoded)
 
 
 class BeamSearcher:
