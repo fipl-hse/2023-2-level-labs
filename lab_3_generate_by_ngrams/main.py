@@ -16,7 +16,7 @@ class TextProcessor:
         _storage (dict): Dictionary in the form of <token: identifier>
     """
 
-    def __init__(self, end_of_word_token: str, storage: dict) -> None:
+    def __init__(self, end_of_word_token: str) -> None:
         """
         Initialize an instance of LetterStorage.
 
@@ -51,7 +51,7 @@ class TextProcessor:
         for symbol in text.lower():
             if symbol.isalpha():
                 tokenized_text.append(symbol)
-            elif symbol in ' !?.' \
+            elif symbol in '''!"#$%&'()*+, ./\:;<=>?@[]^_`{|}~''' \
                     and tokenized_text[-1] != self._end_of_word_token:
                 tokenized_text.append(self._end_of_word_token)
 
@@ -73,8 +73,8 @@ class TextProcessor:
         In case of corrupt input arguments or arguments not included in storage,
         None is returned
         """
-        if not (element in self._storage
-                and isinstance(element, str)):
+        if not isinstance(element, str) \
+                or element not in self._storage:
             return None
 
         return self._storage[element]
@@ -126,11 +126,13 @@ class TextProcessor:
         In case of corrupt input arguments, None is returned.
         In case any of methods used return None, None is returned.
         """
-        if not (isinstance(text, str)
-                and len(text) > 0):
+        if not isinstance(text, str) or not text:
             return None
 
         tokenized_text = self._tokenize(text)
+        if not tokenized_text:
+            return None
+
         encoded_corpus = []
 
         for symbol in tokenized_text:
@@ -248,17 +250,14 @@ class TextProcessor:
         decoding_list = []
 
         for token in list(decoded_corpus):
-            if token == self._end_of_word_token:
-                decoding_list += ' '
-            else:
-                decoding_list += token
+            decoding_list.append(token)
 
-        if decoding_list[-1] == ' ':
-            decoding_list[-1] = '.'
+        if decoding_list[-1] == self._end_of_word_token:
+            decoding_list.pop()
 
-        result = ''.join(decoding_list).capitalize()
+        result = ''.join(decoding_list).capitalize().replace(self._end_of_word_token, ' ')
 
-        return result
+        return result + '.'
 
 
 
