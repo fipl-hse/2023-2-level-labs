@@ -208,7 +208,8 @@ class TextProcessor:
         if not isinstance(content, dict) or len(content) == 0:
             return None
 
-        for token in (char for n_gram in content['freq'] for char in n_gram.lower() if char.isalpha()):
+        for token in (char for n_gram in content['freq']
+                      for char in n_gram.lower() if char.isalpha()):
             self._put(token)
 
         return None
@@ -334,7 +335,8 @@ class NGramLanguageModel:
             absolute_freq = n_grams.count(n_gram)
             context = n_gram[:-1]
             if context not in context_freq_dict:
-                context_freq_dict[context] = [n_gram_1[:-1] == context for n_gram_1 in n_grams].count(True)
+                context_freq_dict[context] = [n_gram_1[:-1] == context
+                                              for n_gram_1 in n_grams].count(True)
             context_freq = context_freq_dict[context]
 
             self._n_gram_frequencies[n_gram] = absolute_freq / context_freq

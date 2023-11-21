@@ -16,7 +16,7 @@ def main() -> None:
     processor = TextProcessor(end_of_word_token='_')
     encoded = processor.encode(text)
     if not(isinstance(encoded, tuple) and encoded):
-        return None
+        return
 
     decoded = str(processor.decode(encoded))
     result = decoded
