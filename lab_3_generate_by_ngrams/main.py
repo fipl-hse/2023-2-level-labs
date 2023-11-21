@@ -585,7 +585,8 @@ class BeamSearchTextGenerator:
                 return None
             candidates = best_sequence
         min_probability = min(candidates.values())
-        min_prob_tokens = [candidate for candidate, probability in candidates.items() if probability == min_probability]
+        min_prob_tokens = [candidate for candidate, probability in candidates.items()
+                           if probability == min_probability]
         sorted_probable = sorted(min_prob_tokens)
         best = sorted_probable[0]
         return self._text_processor.decode(best)
