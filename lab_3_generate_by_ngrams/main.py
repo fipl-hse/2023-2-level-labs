@@ -102,9 +102,11 @@ class TextProcessor:
         if not isinstance(element_id, int) or element_id not in self._storage.values():
             return None
 
-        for token, ident in self._storage.items():
-            if element_id == ident:
-                return token
+        items = list(filter(lambda x: x[1] == element_id, self._storage.items()))
+        return items[0][0]
+        # for token, ident in self._storage.items():
+            # if element_id == ident:
+                # return token
 
     def encode(self, text: str) -> Optional[tuple[int, ...]]:
         """
@@ -457,6 +459,8 @@ class BeamSearcher:
             beam_width (int): Number of candidates to consider at each step
             language_model (NGramLanguageModel): A language model to use for next token prediction
         """
+        self._beam_width = beam_width
+        self._model = language_model
 
     def get_next_token(self, sequence: tuple[int, ...]) -> Optional[list[tuple[int, float]]]:
         """
@@ -477,6 +481,16 @@ class BeamSearcher:
 
         In case of corrupt input arguments or methods used return None.
         """
+        if not isinstance(sequence, tuple) or len(sequence) == 0:
+            return None
+
+        generated_dict = self._model.generate_next_token(sequence)
+        if generated_dict is None:
+            return None
+        if not generated_dict:
+            return []
+
+
 
     def continue_sequence(
         self,
