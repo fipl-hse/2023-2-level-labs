@@ -258,8 +258,8 @@ class TextProcessor:
             return None
         result = ''.join(decoded_corpus).capitalize().replace(self._end_of_word_token, ' ')
         if result[-1] == ' ':
-            result = result[:-1]+'.'
-        return result
+            result = result[:-1]
+        return result + '.'
 
 
 class NGramLanguageModel:
@@ -302,7 +302,6 @@ class NGramLanguageModel:
         Args:
             frequencies (dict): Computed in advance frequencies for n-grams
         """
-
 
 
     def build(self) -> int:
@@ -403,6 +402,9 @@ class GreedyTextGenerator:
             language_model (NGramLanguageModel): A language model to use for text generation
             text_processor (TextProcessor): A TextProcessor instance to handle text processing
         """
+        self._model = language_model
+        self._text_processor = text_processor
+
 
     def run(self, seq_len: int, prompt: str) -> Optional[str]:
         """
@@ -418,6 +420,26 @@ class GreedyTextGenerator:
         In case of corrupt input arguments or methods used return None,
         None is returned
         """
+        if not(
+            isinstance(seq_len, int) and
+            isinstance(prompt, str) and prompt
+        ):
+            return None
+
+        encoded_prompt = self._text_processor.encode(prompt)
+        n_gram_size = self._model.get_n_gram_size()
+        if not encoded_prompt or not n_gram_size:
+            return None
+        for i in range(seq_len):
+            tokens = self._model.generate_next_token(encoded_prompt)
+            if not tokens:
+                break
+            max_freq = max(tokens.values())
+            frequent_tokens = [token for token in tokens if tokens[token] == max_freq]
+            token = sorted(frequent_tokens)[0]
+            encoded_prompt += (token,)
+        decoded = self._text_processor.decode(encoded_prompt)
+        return decoded
 
 
 class BeamSearcher:
