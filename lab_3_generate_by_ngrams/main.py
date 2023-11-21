@@ -509,16 +509,12 @@ class BeamSearcher:
 
         In case of corrupt input arguments return None.
         """
-        if not (isinstance(sequence_candidates, dict) and sequence_candidates):
+        if not (isinstance(sequence_candidates, dict)
+                and sequence_candidates):
             return None
-        keys = list(sequence_candidates.keys())
-        values = list(sequence_candidates.values())
-        values.sort()
-        sorted_sequence_candidates = {}
-        for value in values[:self._beam_width]:
-            index = values.index(value)
-            key = keys[index]
-            sorted_sequence_candidates[key] = value
+        sorted_sequence_candidates = dict(sorted(list(sequence_candidates.items()), key=lambda x: x[1]))
+        while len(sorted_sequence_candidates) > self._beam_width:
+            sorted_sequence_candidates.popitem()
         return sorted_sequence_candidates
 
 class BeamSearchTextGenerator:
@@ -573,12 +569,13 @@ class BeamSearchTextGenerator:
             return None
         candidates = {encoded_prompt: 0.0}
         for i in range(seq_len):
-            for sequence in dict(candidates):
+            new_candidates = dict(candidates)
+            for sequence in candidates:
                 next_tokens = self._get_next_token(sequence)
                 if not next_tokens:
                     return None
                 continued_sequence = self.beam_searcher.continue_sequence(sequence,
-                                                                          next_tokens, candidates)
+                                                                          next_tokens, new_candidates)
                 if not continued_sequence:
                     min_freq = min(candidates.values())
                     min_freq_tokens = [token for token, freq in candidates.items()
@@ -586,7 +583,7 @@ class BeamSearchTextGenerator:
                     sorted_tokens = sorted(min_freq_tokens)
                     token = sorted_tokens[0]
                     return self._text_processor.decode(token)
-            best_sequence = self.beam_searcher.prune_sequence_candidates(candidates)
+            best_sequence = self.beam_searcher.prune_sequence_candidates(new_candidates)
             if best_sequence is None:
                 return None
             candidates = best_sequence
@@ -637,6 +634,7 @@ class NGramLanguageModelReader:
             json_path (str): Local path to assets file
             eow_token (str): Special token for text processor
         """
+
 
     def load(self, n_gram_size: int) -> Optional[NGramLanguageModel]:
         """
