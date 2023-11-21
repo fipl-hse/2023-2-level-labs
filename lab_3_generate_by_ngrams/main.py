@@ -104,9 +104,6 @@ class TextProcessor:
 
         items = list(filter(lambda x: x[1] == element_id, self._storage.items()))
         return items[0][0]
-        # for token, ident in self._storage.items():
-            # if element_id == ident:
-                # return token
 
     def encode(self, text: str) -> Optional[tuple[int, ...]]:
         """
