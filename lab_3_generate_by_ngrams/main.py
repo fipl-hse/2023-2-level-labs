@@ -4,6 +4,7 @@ Lab 3.
 Beam-search and natural language generation evaluation
 """
 # pylint:disable=too-few-public-methods
+import math
 from typing import Optional
 
 
@@ -101,8 +102,8 @@ class TextProcessor:
         if not isinstance(element_id, int) or element_id not in self._storage.values():
             return None
 
-        for key in self._storage:
-            if self._storage[key] == element_id:
+        for key, value in self._storage.items():
+            if value == element_id:
                 return key
 
     def encode(self, text: str) -> Optional[tuple[int, ...]]:
@@ -151,6 +152,7 @@ class TextProcessor:
             return None
         if element not in self._storage:
             self._storage[element] = len(self._storage)
+        return None
 
     def decode(self, encoded_corpus: tuple[int, ...]) -> Optional[str]:
         """
@@ -331,14 +333,15 @@ class NGramLanguageModel:
 
         In case of corrupt input arguments, None is returned
         """
-        if (not isinstance(sequence, tuple) or len(sequence) == 0
-                or len(sequence) >= self._n_gram_size - 1):
+        if (not isinstance(sequence, tuple) or not sequence
+                or len(sequence) < self._n_gram_size - 1):
             return None
 
+        context = sequence[-self._n_gram_size + 1:]
         tokens = {}
         for n_gram, freq in self._n_gram_frequencies.items():
-            if sequence[-self._n_gram_size + 1:] == n_gram[:self._n_gram_size - 1]:
-                tokens[self._n_gram_size - 1] = freq
+            if n_gram[:len(context)] == context:
+                tokens[n_gram[len(context)]] = freq
         return tokens
 
     def _extract_n_grams(
@@ -440,6 +443,8 @@ class BeamSearcher:
             beam_width (int): Number of candidates to consider at each step
             language_model (NGramLanguageModel): A language model to use for next token prediction
         """
+        self._beam_width = beam_width
+        self._model = language_model
 
     def get_next_token(self, sequence: tuple[int, ...]) -> Optional[list[tuple[int, float]]]:
         """
@@ -460,6 +465,17 @@ class BeamSearcher:
 
         In case of corrupt input arguments or methods used return None.
         """
+        if not isinstance(sequence, tuple) or len(sequence) == 0:
+            return None
+
+        tokens_dict = self._model.generate_next_token(sequence)
+        if tokens_dict is None:
+            return None
+        if not tokens_dict:
+            return []
+
+        return sorted([(token, float(probability)) for token, probability in tokens_dict.items()],
+                        key=lambda x: x[1], reverse=True)[:self._beam_width]
 
     def continue_sequence(
         self,
@@ -482,6 +498,28 @@ class BeamSearcher:
 
         In case of corrupt input arguments or unexpected behaviour of methods used return None.
         """
+        if (not isinstance(sequence, tuple) or not isinstance(next_tokens, list) or
+                not isinstance(sequence_candidates, dict) or not sequence):
+            return None
+        if (not next_tokens or not sequence_candidates or
+                sequence not in sequence_candidates or
+                len(next_tokens) > self._beam_width):
+            return None
+
+        new_sequence_candidates = {}
+        for key, value in sequence_candidates.items():
+            if key != sequence:
+                probability = value
+                for token, token_probability in next_tokens:
+                    new_sequence = key + (token,)
+                    new_probability = probability + (-1) * math.log(token_probability)
+                    new_sequence_candidates[new_sequence] = new_probability
+
+        if len(new_sequence_candidates) > self._beam_width:
+            new_sequence_candidates = dict(
+                sorted(new_sequence_candidates.items(), key=lambda x: x[1], reverse=True)[:self._beam_width])
+
+        return new_sequence_candidates
 
     def prune_sequence_candidates(
         self, sequence_candidates: dict[tuple[int, ...], float]
@@ -497,6 +535,11 @@ class BeamSearcher:
 
         In case of corrupt input arguments return None.
         """
+        if not isinstance(sequence_candidates, dict) or len(sequence_candidates) == 0:
+            return None
+
+        sorted_candidates = dict(sorted(sequence_candidates.items(), key=lambda x: (x[1], x[0]), reverse=True))
+        return dict(list(sorted_candidates.items())[:self._beam_width])
 
 
 class BeamSearchTextGenerator:
