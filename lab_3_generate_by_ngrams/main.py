@@ -5,6 +5,7 @@ Beam-search and natural language generation evaluation
 """
 # pylint:disable=too-few-public-methods
 from typing import Optional
+import math
 
 
 class TextProcessor:
@@ -519,7 +520,29 @@ class BeamSearcher:
 
         In case of corrupt input arguments or unexpected behaviour of methods used return None.
         """
+        if not isinstance(sequence, tuple) or not isinstance(next_tokens, list) \
+                or not isinstance(sequence_candidates, dict):
+            return None
+        if not sequence or not next_tokens or not sequence_candidates:
+            return None
+        if sequence not in sequence_candidates:
+            return None
 
+        copy_seq_candidates = sequence_candidates.copy()
+        list_sequence = list(sequence)
+
+        for token in next_tokens:
+            list_sequence.append(token[0])
+            possible_seq = tuple(list_sequence)
+            freq = sequence_candidates[sequence] - math.log(token[-1])
+            copy_seq_candidates[possible_seq] = freq
+
+        copy_seq_candidates.pop(sequence)
+
+        if len(copy_seq_candidates) > self._beam_width:
+            return None
+
+        return copy_seq_candidates
 
     def prune_sequence_candidates(
         self, sequence_candidates: dict[tuple[int, ...], float]
@@ -535,6 +558,8 @@ class BeamSearcher:
 
         In case of corrupt input arguments return None.
         """
+        if not isinstance(sequence_candidates, dict) or not sequence_candidates:
+            return None
 
 
 class BeamSearchTextGenerator:
