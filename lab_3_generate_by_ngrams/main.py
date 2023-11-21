@@ -304,6 +304,7 @@ class NGramLanguageModel:
         """
 
 
+
     def build(self) -> int:
         """
         Fill attribute `_n_gram_frequencies` from encoded corpus.
@@ -346,16 +347,12 @@ class NGramLanguageModel:
 
         In case of corrupt input arguments, None is returned
         """
-        if (not isinstance(sequence, tuple) or len(sequence) == 0
-                or len(sequence) < self._n_gram_size - 1):
-            return None
         if (
             not(isinstance(sequence, tuple) and sequence)
             or len(sequence) < self._n_gram_size - 1
         ):
             return None
         context = sequence[-(self._n_gram_size-1):]
-        print(context, self._n_gram_size, sequence)
         next_token_freq = {}
         for n_gram, frequency in self._n_gram_frequencies.items():
             if n_gram[:-1] == context:
