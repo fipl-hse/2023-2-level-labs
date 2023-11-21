@@ -50,13 +50,14 @@ class TextProcessor:
         tokens = []
 
         for word in text.split():
-            word = list(''.join(letter for letter in word if letter.isalpha()))
+            word = ''.join(filter(str.isalpha, word))
+            #word = list(''.join(letter for letter in word if letter.isalpha()))
             if word:
                 tokens += word
                 tokens.append(self._end_of_word_token)
 
-        if not tokens:
-            return None
+            if not tokens:
+                return None
 
         if tokens.count(self._end_of_word_token) == len(tokens):
             return None
@@ -318,8 +319,9 @@ class NGramLanguageModel:
 
         for n_gram in set(n_grams):
             n_grams_count = n_grams.count(n_gram)
-            context_count = len([context for context in n_grams if context[:-1] == n_gram[:-1]])
-            self._n_gram_frequencies[n_gram] = n_grams_count/context_count
+            #context_count = len([context for context in n_grams if context[:-1] == n_gram[:-1]])
+            context_count = list(filter(lambda context: context[:-1] == n_gram[:-1], n_grams))
+            self._n_gram_frequencies[n_gram] = n_grams_count/len(context_count)
         return 0
 
     def generate_next_token(self, sequence: tuple[int, ...]) -> Optional[dict]:
