@@ -52,9 +52,8 @@ class TextProcessor:
         tokens = []
         for word in text_words:
             len_prev = len(tokens)
-            for alpha in word:
-                if alpha.isalpha():
-                    tokens.append(alpha)
+            word_tokens = [alpha for alpha in word if alpha.isalpha()]
+            tokens.extend(word_tokens)
             if len(tokens) > len_prev:
                 tokens.append(self._end_of_word_token)
 
@@ -62,7 +61,7 @@ class TextProcessor:
             return None
 
         if text[-1].isdigit() or text[-1].isalpha():
-            tokens = tokens[:-1]
+            tokens.pop(-1)
 
         return tuple(tokens)
 
@@ -163,8 +162,10 @@ class TextProcessor:
         if not isinstance(element, str) or len(element) != 1:
             return None
 
-        if element not in self._storage:
-            self._storage[element] = len(self._storage)
+        if element in self._storage:
+            return None
+
+        self._storage[element] = len(self._storage)
 
         return None
 
@@ -207,10 +208,8 @@ class TextProcessor:
         if not isinstance(content, dict) or len(content) == 0:
             return None
 
-        for n_gram in content['freq']:
-            for token in n_gram.lower():
-                if token.isalpha():
-                    self._put(token)
+        for token in (char for n_gram in content['freq'] for char in n_gram.lower() if char.isalpha()):
+            self._put(token)
 
         return None
 
@@ -257,15 +256,12 @@ class TextProcessor:
         if not isinstance(decoded_corpus, tuple) or len(decoded_corpus) == 0:
             return None
 
-        decoded_text = ''.join(decoded_corpus)
-        decoded_text = decoded_text.replace('_', ' ')
-        decoded_text = decoded_text.capitalize()
+        decoded_text = ''.join(decoded_corpus).replace('_', ' ').capitalize()
+
         if decoded_text[-1] == ' ':
-            decoded_text = decoded_text[:-1]
+            return f"{decoded_text[:-1]}."
 
-        decoded_text += '.'
-
-        return decoded_text
+        return f"{decoded_text}."
 
 
 class NGramLanguageModel:
@@ -338,8 +334,7 @@ class NGramLanguageModel:
             absolute_freq = n_grams.count(n_gram)
             context = n_gram[:-1]
             if context not in context_freq_dict:
-                context_freq_dict[context] = sum(1 for n_gram_1 in n_grams
-                                                 if n_gram_1[:-1] == context)
+                context_freq_dict[context] = [n_gram_1[:-1] == context for n_gram_1 in n_grams].count(True)
             context_freq = context_freq_dict[context]
 
             self._n_gram_frequencies[n_gram] = absolute_freq / context_freq
@@ -376,7 +371,7 @@ class NGramLanguageModel:
         return token_frequencies
 
     def _extract_n_grams(
-            self, encoded_corpus: tuple[int, ...]
+        self, encoded_corpus: tuple[int, ...]
     ) -> Optional[tuple[tuple[int, ...], ...]]:
         """
         Split encoded sequence into n-grams.

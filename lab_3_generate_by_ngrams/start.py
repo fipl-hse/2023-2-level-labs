@@ -15,18 +15,20 @@ def main() -> None:
         text = text_file.read()
     processor = TextProcessor(end_of_word_token='_')
     encoded = processor.encode(text)
-    if isinstance(encoded, tuple) and encoded:
-        decoded = str(processor.decode(encoded))
-        result = decoded
+    if not(isinstance(encoded, tuple) and encoded):
+        return None
 
-        n_gram_model = NGramLanguageModel(encoded[:100], n_gram_size=3)
-        model_7 = NGramLanguageModel(encoded, 7)
-        greedy_text_generator = GreedyTextGenerator(model_7, processor)
-        print(greedy_text_generator.run(51, 'Vernon'))
+    decoded = str(processor.decode(encoded))
+    result = decoded
 
-        beam_search_generator = BeamSearchTextGenerator(model_7, processor, 7)
-        print(beam_search_generator.run('Vernon', 56))
-        assert result
+    n_gram_model = NGramLanguageModel(encoded[:100], n_gram_size=3)
+    model_7 = NGramLanguageModel(encoded, 7)
+    greedy_text_generator = GreedyTextGenerator(model_7, processor)
+    print(greedy_text_generator.run(51, 'Vernon'))
+
+    beam_search_generator = BeamSearchTextGenerator(model_7, processor, 7)
+    print(beam_search_generator.run('Vernon', 56))
+    assert result
 
 
 if __name__ == "__main__":
