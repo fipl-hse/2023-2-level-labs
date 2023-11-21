@@ -817,8 +817,9 @@ class BackOffGenerator:
             if next_token_candidates is None or len(next_token_candidates) == 0:
                 break
 
-            max_probability_token = max(next_token_candidates, key=next_token_candidates.get)
-            generated_sequence.append(max_probability_token)
+            max_prob = max(next_token_candidates.values())
+            max_probability_token = [token for token, prob in next_token_candidates.items() if prob == max_prob]
+            generated_sequence.append(max_probability_token[0])
 
             iteration += 1
 
