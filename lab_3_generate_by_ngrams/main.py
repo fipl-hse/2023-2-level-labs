@@ -43,7 +43,7 @@ class TextProcessor:
         In case of corrupt input arguments, None is returned.
         In case any of methods used return None, None is returned.
         """
-        if not isinstance(text, str) or len(text) == 0:
+        if not isinstance(text, str) or not text:
             return None
         tokens = []
         alpha_cnt = 0
@@ -99,10 +99,8 @@ class TextProcessor:
         """
         if not isinstance(element_id, int) or element_id not in self._storage.values():
             return None
-        for key, value in self._storage.items():
-            if value == element_id:
-                return key
-        return None
+        result = tuple(filter(lambda item: item[1] == element_id, self._storage.items()))
+        return result[0][0]
 
     def encode(self, text: str) -> Optional[tuple[int, ...]]:
         """
@@ -294,8 +292,9 @@ class NGramLanguageModel:
             if not isinstance(n_gram, tuple):
                 return 1
             cnt_p2 = 0
+            context = n_gram[:-1]
             for another_n_gram in n_grams:
-                if n_gram[:-1] == another_n_gram[:-1]:
+                if context == another_n_gram[:-1]:
                     cnt_p2 += 1
             cnt_p1 = n_grams.count(n_gram)
             self._n_gram_frequencies.update({n_gram: cnt_p1 / cnt_p2})
@@ -382,6 +381,11 @@ class GreedyTextGenerator:
             return None
         encoded = self._text_processor.encode(prompt)
         n_gram_size = self._language_model.get_n_gram_size()
+        if not encoded:
+            return None
+
+        for i in range(seq_len):
+            self._language_model.generate_next_token(encoded)
 
 
 class BeamSearcher:
