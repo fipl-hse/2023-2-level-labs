@@ -43,6 +43,19 @@ class TextProcessor:
         In case of corrupt input arguments, None is returned.
         In case any of methods used return None, None is returned.
         """
+        if not isinstance(text, str) or not text:
+            return None
+        prep_text = []
+        for token in text.lower():
+            if token.isalpha():
+                prep_text.append(token)
+            elif token.isspace() and prep_text[-1] != self._end_of_word_token:
+                prep_text.append(self._end_of_word_token)
+        if not text[-1].isalnum():
+            prep_text.append(self._end_of_word_token)
+        if not prep_text:
+            return None
+        return tuple(prep_text)
 
 
     def get_id(self, element: str) -> Optional[int]:
