@@ -316,11 +316,17 @@ class NGramLanguageModel:
         if n_grams is None:
             return 1
 
+        beginning_freq_dict = {}
+
         for n_gram in set(n_grams):
             absolute_frequency = n_grams.count(n_gram)
-            beginning_frequency = len([n_gram_begin for n_gram_begin in n_grams
-                                       if n_gram_begin[:-1] == n_gram[:-1]])
-            self._n_gram_frequencies[n_gram] = absolute_frequency / beginning_frequency
+            beginning = n_gram[:-1]
+            if beginning not in beginning_freq_dict:
+                beginning_freq_dict[beginning] = [n_gram_begin[:-1] == beginning
+                                              for n_gram_begin in n_grams].count(True)
+            beginning_freq = beginning_freq_dict[beginning]
+
+            self._n_gram_frequencies[n_gram] = absolute_frequency / beginning_freq
 
         return 0
 
