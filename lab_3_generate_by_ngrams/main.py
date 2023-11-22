@@ -105,6 +105,7 @@ class TextProcessor:
         for key, value in self._storage.items():
             if value == element_id:
                 return key
+        return None
 
     def encode(self, text: str) -> Optional[tuple[int, ...]]:
         """
@@ -194,6 +195,7 @@ class TextProcessor:
             for element in key:
                 if element.isalpha():
                     self._put(element)
+        return None
 
     def _decode(self, corpus: tuple[int, ...]) -> Optional[tuple[str, ...]]:
         """
@@ -272,7 +274,6 @@ class NGramLanguageModel:
         self._n_gram_frequencies = {}
         self._encoded_corpus = encoded_corpus
 
-
     def get_n_gram_size(self) -> int:
         """
         Retrieve value stored in self._n_gram_size attribute.
@@ -292,6 +293,7 @@ class NGramLanguageModel:
         if not isinstance(frequencies, dict) or len(frequencies) == 0:
             return None
         self._n_gram_frequencies = frequencies
+        return None
 
     def build(self) -> int:
         """
@@ -415,12 +417,12 @@ class GreedyTextGenerator:
             candidates = self._model.generate_next_token(encoded)
             if not candidates:
                 break
-            best_candidate = [letter for letter, freq in candidates.items() if freq == max(candidates.values())]
+            best_candidate = ([letter for letter, freq in candidates.items()
+                               if freq == max(candidates.values())])
             max_freq_letters = sorted(best_candidate)
             encoded += (max_freq_letters[0],)
             seq_len -= 1
         return self._text_processor.decode(encoded)
-
 
 
 class BeamSearcher:
@@ -513,9 +515,8 @@ class BeamSearcher:
                     new_sequence_candidates[new_sequence] = new_probability
 
         if len(new_sequence_candidates) > self._beam_width:
-            new_sequence_candidates = dict(
-                sorted(new_sequence_candidates.items(), key=lambda x: x[1], reverse=True)[:self._beam_width])
-
+            new_sequence_candidates = dict(sorted(new_sequence_candidates.items(),
+                                                  key=lambda x: x[1], reverse=True)[:self._beam_width])
         return new_sequence_candidates
 
     def prune_sequence_candidates(
@@ -535,7 +536,8 @@ class BeamSearcher:
         if not isinstance(sequence_candidates, dict) or len(sequence_candidates) == 0:
             return None
 
-        sorted_candidates = dict(sorted(sequence_candidates.items(), key=lambda x: (x[1], x[0]), reverse=True))
+        sorted_candidates = dict(sorted(sequence_candidates.items(),
+                                        key=lambda x: (x[1], x[0]), reverse=True))
         return dict(list(sorted_candidates.items())[:self._beam_width])
 
 
