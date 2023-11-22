@@ -102,10 +102,8 @@ class TextProcessor:
         if not isinstance(element_id, int) or element_id not in self._storage.values():
             return None
 
-        for key, value in self._storage.items():
-            if value == element_id:
-                return key
-        return None
+        token = list(filter(lambda x: x[1] == element_id, self._storage.items()))
+        return token[0][0]
 
     def encode(self, text: str) -> Optional[tuple[int, ...]]:
         """
@@ -177,10 +175,11 @@ class TextProcessor:
         decoded_tokens = self._decode(encoded_corpus)
         if not decoded_tokens:
             return None
-        decoded_text = self._postprocess_decoded_text(decoded_tokens)
-        if not decoded_text:
+
+        if not self._postprocess_decoded_text(decoded_tokens):
             return None
-        return decoded_text
+
+        return self._postprocess_decoded_text(decoded_tokens)
 
     def fill_from_ngrams(self, content: dict) -> None:
         """
@@ -515,8 +514,8 @@ class BeamSearcher:
                     new_sequence_candidates[new_sequence] = new_probability
 
         if len(new_sequence_candidates) > self._beam_width:
-            new_sequence_candidates = dict(sorted(new_sequence_candidates.items(),
-                                                  key=lambda x: x[1], reverse=True)[:self._beam_width])
+            new_sequence_candidates = dict(sorted(
+                new_sequence_candidates.items(), key=lambda x: x[1], reverse=True)[:self._beam_width])
         return new_sequence_candidates
 
     def prune_sequence_candidates(
