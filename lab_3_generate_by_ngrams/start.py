@@ -19,8 +19,10 @@ def main() -> None:
     print(language_model.build())
     greedy_generator = main_py.GreedyTextGenerator(language_model, text_processor)
     generated_text = greedy_generator.run(51, 'Vernon')
-    result = decoded_text
     print(generated_text)
+    beam_search_generator = main_py.BeamSearchTextGenerator(language_model, text_processor, 7)
+    print(beam_search_generator.run('Vernon', 56))
+    result = decoded_text
     assert result
 
 
