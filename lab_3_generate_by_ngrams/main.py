@@ -279,6 +279,9 @@ class NGramLanguageModel:
             encoded_corpus (tuple): Encoded text
             n_gram_size (int): A size of n-grams to use for language modelling
         """
+        self._encoded_corpus = encoded_corpus
+        self._n_gram_size = n_gram_size
+        self._n_gram_frequencies = {}
 
     def get_n_gram_size(self) -> int:
         """
@@ -308,6 +311,22 @@ class NGramLanguageModel:
         In case of corrupt input arguments or methods used return None,
         1 is returned
         """
+        if not isinstance(self._encoded_corpus, tuple) \
+                or not self._encoded_corpus:
+            return 1
+
+        n_grams = self._extract_n_grams(self._encoded_corpus)
+        if not n_grams:
+            return 1
+
+        unique_n_grams = set(n_grams)
+
+        for n_gram in unique_n_grams:
+            its_frequency = n_grams.count(n_gram)
+            common_beginning = n_grams.count(n_gram[:-1])
+            self._n_gram_frequencies[n_gram] = its_frequency / common_beginning
+
+        return 0
 
     def generate_next_token(self, sequence: tuple[int, ...]) -> Optional[dict]:
         """
@@ -336,6 +355,16 @@ class NGramLanguageModel:
 
         In case of corrupt input arguments, None is returned
         """
+        if not encoded_corpus \
+                or not isinstance(encoded_corpus, tuple):
+            return None
+
+        extracted_n_grams = []
+
+        for digit_index in range(len(encoded_corpus) - 1):
+            extracted_n_grams.append(tuple(encoded_corpus[digit_index:digit_index + self._n_gram_size]))
+
+        return tuple(extracted_n_grams)
 
 
 class GreedyTextGenerator:
