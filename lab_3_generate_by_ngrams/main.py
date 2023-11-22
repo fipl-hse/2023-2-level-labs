@@ -512,8 +512,9 @@ class BeamSearcher:
         if not (isinstance(sequence_candidates, dict)
                 and sequence_candidates):
             return None
-        sorted_sequence_candidates = dict(sorted(list(sequence_candidates.items()),
-                                                 key=lambda x: x[1]))
+        list_of_candidates = list(sequence_candidates.items())
+        sorted_candidates = sorted(list_of_candidates, key=lambda x: x[1])
+        sorted_sequence_candidates = dict(sorted_candidates)
         while len(sorted_sequence_candidates) > self._beam_width:
             sorted_sequence_candidates.popitem()
         return sorted_sequence_candidates
