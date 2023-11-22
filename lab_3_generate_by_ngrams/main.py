@@ -53,7 +53,7 @@ class TextProcessor:
         for word in splited_text:
             clear_word = [char.lower() for char in word if char.isalpha()]
             if clear_word:
-                final_text += clear_word
+                final_text.extend(clear_word)
                 final_text.append(self._end_of_word_token)
 
         if text[-1].isalnum():
@@ -103,11 +103,8 @@ class TextProcessor:
         if not isinstance(element_id, int) or element_id not in self._storage.values():
             return None
 
-        for key, id_num in self._storage.items():
-            if id_num == element_id:
-                return key
-        return None
-
+        tokens = list(filter(lambda x: x[1] == element_id, self._storage.items()))
+        return tokens[0][0]
 
     def encode(self, text: str) -> Optional[tuple[int, ...]]:
         """
@@ -150,12 +147,12 @@ class TextProcessor:
         In case of corrupt input arguments or invalid argument length,
         an element is not added to storage
         """
-        if not isinstance(element, str) or len(element) != 1:
+        if not isinstance(element, str) or len(element) != 1 \
+                or element in self._storage:
             return None
-        if element not in self._storage:
-            self._storage.update({element: len(self._storage)})
-        return None
 
+        self._storage.update({element: len(self._storage)})
+        return None
 
     def decode(self, encoded_corpus: tuple[int, ...]) -> Optional[str]:
         """
@@ -200,7 +197,6 @@ class TextProcessor:
             for element in key:
                 if element.isalpha():
                     self._put(element.lower())
-
 
     def _decode(self, corpus: tuple[int, ...]) -> Optional[tuple[str, ...]]:
         """
@@ -296,10 +292,8 @@ class NGramLanguageModel:
         Args:
             frequencies (dict): Computed in advance frequencies for n-grams
         """
-        if not(isinstance(frequencies, dict) and frequencies):
-            return None
-
-        self._n_gram_frequencies = frequencies
+        if isinstance(frequencies, dict) and frequencies:
+            self._n_gram_frequencies = frequencies
 
     def build(self) -> int:
         """
@@ -798,7 +792,8 @@ class BackOffGenerator:
             if not candidates:
                 break
 
-            best_candidate = [token for token, freq in candidates.items() if freq == max(candidates.values())]
+            best_candidate = [token for token, freq in candidates.items()
+                              if freq == max(candidates.values())]
             encoded_prompt += (best_candidate[0],)
         decoded_sequence = self._text_processor.decode(encoded_prompt)
 
@@ -842,5 +837,3 @@ class BackOffGenerator:
                 return probabilities
 
         return None
-
-
