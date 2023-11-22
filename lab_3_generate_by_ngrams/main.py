@@ -5,6 +5,7 @@ Beam-search and natural language generation evaluation
 """
 # pylint:disable=too-few-public-methods
 from typing import Optional
+
 import math
 
 
@@ -515,8 +516,10 @@ class BeamSearcher:
         In case of corrupt input arguments or unexpected behaviour of methods used return None.
         """
         if (not isinstance(sequence, tuple) or len(sequence) == 0 or
-            not isinstance(next_tokens, list) or len(next_tokens) == 0 or
-            not isinstance(sequence_candidates, dict) or not sequence_candidates):
+                not isinstance(next_tokens, list)):
+            return None
+        if (len(next_tokens) == 0 or not isinstance(sequence_candidates, dict) or
+                not sequence_candidates):
             return None
         if (len(next_tokens) >= self._beam_width or
                 sequence not in sequence_candidates):
