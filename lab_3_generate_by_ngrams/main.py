@@ -96,6 +96,10 @@ class TextProcessor:
 
         In case of corrupt input arguments or arguments not included in storage, None is returned
         """
+        if not isinstance(element_id, int) or element_id not in self._storage.values():
+            return None
+        elements = list(filter(lambda i: self._storage[i] == element_id, self._storage.keys()))
+        return ''.join(elements)
 
     def encode(self, text: str) -> Optional[tuple[int, ...]]:
         """
@@ -113,6 +117,19 @@ class TextProcessor:
         In case of corrupt input arguments, None is returned.
         In case any of methods used return None, None is returned.
         """
+        if not isinstance(text, str) or not text:
+            return None
+        tokenized_text = self._tokenize(text)
+        encoded_text = []
+        if tokenized_text is None:
+            return None
+        for token in tokenized_text:
+            self._put(token)
+            id_ = self.get_id(token)
+            if not isinstance(id_, int):
+                return None
+            encoded_text.append(id_)
+        return tuple(encoded_text)
 
     def _put(self, element: str) -> None:
         """
@@ -124,6 +141,9 @@ class TextProcessor:
         In case of corrupt input arguments or invalid argument length,
         an element is not added to storage
         """
+        if not isinstance(element, str) or len(element) != 1 or element in self._storage:
+            return None
+        self._storage[element] = len(self._storage)
 
     def decode(self, encoded_corpus: tuple[int, ...]) -> Optional[str]:
         """
