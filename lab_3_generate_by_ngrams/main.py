@@ -4,6 +4,7 @@ Lab 3.
 Beam-search and natural language generation evaluation
 """
 # pylint:disable=too-few-public-methods
+import math
 from typing import Optional
 
 
@@ -99,9 +100,8 @@ class TextProcessor:
         """
         if not isinstance(element_id, int) or element_id not in self._storage.values():
             return None
-        for key, value in self._storage.items():
-            if value == element_id:
-                return key
+        tokens = list(filter(lambda x: x[1] == element_id, self._storage.items()))
+        return tokens[0][0]
 
     def encode(self, text: str) -> Optional[tuple[int, ...]]:
         """
@@ -124,10 +124,9 @@ class TextProcessor:
         tokenized_text = self._tokenize(text)
         if not tokenized_text:
             return None
-        for token in tokenized_text:
-            self._put(token)
         encoded_text = []
         for token in tokenized_text:
+            self._put(token)
             if not isinstance(self.get_id(token), int):
                 return None
             encoded_text.append(self.get_id(token))
@@ -143,9 +142,11 @@ class TextProcessor:
         In case of corrupt input arguments or invalid argument length,
         an element is not added to storage
         """
-        if not isinstance(element, str) or len(element) != 1:
+        if not (isinstance(element, str) and len(element) == 1 and element not in self._storage):
             return None
-        if element not in self._storage:
+        if element in self._storage:
+            pass
+        else:
             self._storage[element] = len(self._storage)
 
     def decode(self, encoded_corpus: tuple[int, ...]) -> Optional[str]:
@@ -226,9 +227,7 @@ class TextProcessor:
             list_tokens += i
         if list_tokens[-1] == self._end_of_word_token:
             del list_tokens[-1]
-        new_line = ''.join(list_tokens)
-        new_line = new_line.replace(self._end_of_word_token, ' ')
-        return new_line.capitalize() + '.'
+        return f"{''.join(list_tokens).capitalize()}.".replace(self._end_of_word_token, ' ')
 
 
 class NGramLanguageModel:
@@ -291,11 +290,12 @@ class NGramLanguageModel:
         for n_gram in n_grams:
             if not isinstance(n_gram, tuple):
                 return 1
-            if n_gram[:-1] not in contexts:
-                contexts[n_gram[:-1]] = {}
-            if n_gram not in contexts[n_gram[:-1]]:
-                contexts[n_gram[:-1]][n_gram] = 0.0
-            contexts[n_gram[:-1]][n_gram] += 1.
+            small_gram = n_gram[:-1]
+            if small_gram not in contexts:
+                contexts[small_gram] = {}
+            if n_gram not in contexts[small_gram]:
+                contexts[small_gram][n_gram] = 0
+            contexts[small_gram][n_gram] += 1
         for same_context_ngrams in contexts.values():
             same_context_count = sum(same_context_ngrams.values())
             for n_gram, freq in same_context_ngrams.items():
@@ -418,6 +418,8 @@ class BeamSearcher:
             beam_width (int): Number of candidates to consider at each step
             language_model (NGramLanguageModel): A language model to use for next token prediction
         """
+        self._beam_width = beam_width
+        self._model = language_model
 
     def get_next_token(self, sequence: tuple[int, ...]) -> Optional[list[tuple[int, float]]]:
         """
@@ -438,6 +440,17 @@ class BeamSearcher:
 
         In case of corrupt input arguments or methods used return None.
         """
+        if not isinstance(sequence, tuple) or not sequence:
+            return None
+        next_token = self._model.generate_next_token(sequence)
+        if next_token is None:
+            return None
+        if not next_token:
+            return []
+        token_list = sorted([(token, float(freq)) for token, freq in next_token.items()],
+                        key=lambda x: x[1], reverse=True)
+
+        return token_list[:self._beam_width]
 
     def continue_sequence(
         self,
@@ -460,6 +473,15 @@ class BeamSearcher:
 
         In case of corrupt input arguments or unexpected behaviour of methods used return None.
         """
+        if (not isinstance(sequence, list) or not isinstance(next_tokens, list)
+                or not isinstance(sequence_candidates, dict) or not sequence
+                or not sequence_candidates or not next_tokens
+                or not len(next_tokens) <= self._beam_width or sequence not in sequence_candidates):
+            return None
+        dict_candidates = sequence_candidates.copy()
+        for token, freq in next_tokens:
+            dict_candidates[sequence + (token,)] = freq - math.log(freq)
+        return dict_candidates
 
     def prune_sequence_candidates(
         self, sequence_candidates: dict[tuple[int, ...], float]
