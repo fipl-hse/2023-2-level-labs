@@ -161,6 +161,15 @@ class TextProcessor:
         In case of corrupt input arguments, None is returned.
         In case any of methods used return None, None is returned.
         """
+        if not isinstance(encoded_corpus, tuple) or not encoded_corpus:
+            return None
+        decoded_text = self._decode(encoded_corpus)
+        if decoded_text is None:
+            return None
+        postproc_text = self._postprocess_decoded_text(decoded_text)
+        if postproc_text is None:
+            return None
+        return postproc_text
 
     def fill_from_ngrams(self, content: dict) -> None:
         """
@@ -169,6 +178,8 @@ class TextProcessor:
         Args:
             content (dict): ngrams from external JSON
         """
+        # if not isinstance(content, dict):
+        #     return None
 
     def _decode(self, corpus: tuple[int, ...]) -> Optional[tuple[str, ...]]:
         """
@@ -183,6 +194,17 @@ class TextProcessor:
         In case of corrupt input arguments, None is returned.
         In case any of methods used return None, None is returned.
         """
+        if not isinstance(corpus, tuple) or not corpus:
+            return None
+        decoded_corp = []
+        for id_ in corpus:
+            if not isinstance(id_, int):
+                return None
+            token = self.get_token(id_)
+            if token is None:
+                return None
+            decoded_corp.append(token)
+        return tuple(decoded_corp)
 
     def _postprocess_decoded_text(self, decoded_corpus: tuple[str, ...]) -> Optional[str]:
         """
@@ -199,6 +221,14 @@ class TextProcessor:
 
         In case of corrupt input arguments, None is returned
         """
+        if not isinstance(decoded_corpus, tuple) or not decoded_corpus:
+            return None
+        decoded_list = list(decoded_corpus)
+        if decoded_list[-1] == self._end_of_word_token:
+            del decoded_list[-1]
+        decoded = ''.join(decoded_list).capitalize()
+        decoded = decoded.replace(self._end_of_word_token, ' ').rstrip()
+        return decoded
 
 
 class NGramLanguageModel:
