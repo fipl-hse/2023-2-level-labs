@@ -6,6 +6,7 @@ Beam-search and natural language generation evaluation
 # pylint:disable=too-few-public-methods
 from typing import Optional
 import math
+import operator
 
 
 class TextProcessor:
@@ -54,7 +55,7 @@ class TextProcessor:
             elif element.isdigit():
                 pass
             else:
-                if index == 0:
+                if not index:
                     pass
                 elif tokenized_text[-1] != self._end_of_word_token:
                     tokenized_text.append(self._end_of_word_token)
@@ -243,7 +244,7 @@ class TextProcessor:
 
         postprocessed_text = ''
         for index, token in enumerate(decoded_corpus):
-            if index == 0:
+            if not index:
                 postprocessed_text += token.upper()
             elif token == self._end_of_word_token:
                 if index == len(decoded_corpus) - 1:
@@ -430,7 +431,7 @@ class GreedyTextGenerator:
             if not possible_tokens:
                 break
             possible_tokens_list = list(possible_tokens.items())
-            possible_tokens_list.sort(key=lambda x: x[1], reverse=True)
+            possible_tokens_list.sort(key=operator.itemgetter(1,0), reverse=True)
 
             encoded_text_list.append(possible_tokens_list[0][0])
             encoded_text_tuple = tuple(encoded_text_list)
@@ -489,13 +490,8 @@ class BeamSearcher:
             return []
 
         possible_tokens_list = list(possible_tokens.items())
-        possible_tokens_list.sort(key=lambda x: x[0], reverse=True)
-        possible_tokens_list.sort(key=lambda x: x[1], reverse=True)
-
-        best_tokens = []
-        for _ in range(self._beam_width):
-            best_tokens.append(possible_tokens_list[0])
-            possible_tokens_list.pop(0)
+        sorted_tokens_list = sorted(possible_tokens_list, key=operator.itemgetter(1,0), reverse=True)
+        best_tokens = sorted_tokens_list[:self._beam_width]
 
         return best_tokens
 
@@ -561,6 +557,13 @@ class BeamSearcher:
         if not isinstance(sequence_candidates, dict) or not sequence_candidates:
             return None
 
+        sorted_sequences = sorted(tuple(sequence_candidates.items()), key=operator.itemgetter(0,1), reverse=True)
+        result = {}
+        for sequence in sorted_sequences[:self._beam_width]:
+            result[sequence[0]] = sequence[1]
+
+        return result
+
 
 class BeamSearchTextGenerator:
     """
@@ -587,6 +590,10 @@ class BeamSearchTextGenerator:
             text_processor (TextProcessor): A TextProcessor instance to handle text processing
             beam_width (int): Beam width parameter for generation
         """
+        self._text_processor = text_processor
+        self._beam_width = beam_width
+        self._language_model = language_model
+        self.beam_searcher = BeamSearcher(self._beam_width, self._language_model)
 
     def run(self, prompt: str, seq_len: int) -> Optional[str]:
         """
@@ -602,6 +609,34 @@ class BeamSearchTextGenerator:
         In case of corrupt input arguments or methods used return None,
         None is returned
         """
+        if not isinstance(seq_len, int) or seq_len <= 0 or not isinstance(prompt, str) or not prompt:
+            return None
+
+        encoded_prompt = self._text_processor.encode(prompt)
+        if encoded_prompt is None:
+            return None
+        seq_candidates = {encoded_prompt: 0.0}
+
+        for _ in range(seq_len):
+            for sequence in seq_candidates:
+                next_tokens = self._get_next_token(sequence)
+                if not next_tokens:
+                    return None
+
+                seq_candidates = self.beam_searcher.continue_sequence(encoded_prompt, next_tokens, seq_candidates)
+                if not seq_candidates:
+                    return None
+
+            best_sequences = self.beam_searcher.prune_sequence_candidates(seq_candidates)
+            if not best_sequences:
+                return None
+
+            seq_candidates = best_sequences
+
+        sorted_candidates = sorted(seq_candidates, key=operator.itemgetter(0, 1), reverse=True)
+        decoded_sequence = self._text_processor.decode(sorted_candidates[0])
+
+        return decoded_sequence
 
     def _get_next_token(
         self, sequence_to_continue: tuple[int, ...]
@@ -618,6 +653,14 @@ class BeamSearchTextGenerator:
 
         In case of corrupt input arguments return None.
         """
+        if not isinstance(sequence_to_continue, tuple) or not sequence_to_continue:
+            return None
+
+        next_token = self.beam_searcher.get_next_token(sequence_to_continue)
+        if next_token is None:
+            return None
+
+        return next_token
 
 
 class NGramLanguageModelReader:
