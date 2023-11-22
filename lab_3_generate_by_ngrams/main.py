@@ -346,9 +346,9 @@ class NGramLanguageModel:
         sort_data = dict(sorted(self._n_gram_frequencies.items(), key=lambda x: (
             x[1], list(x[0]))))
 
-        for key in sort_data.keys():
+        for key, value in sort_data.items():
             if key[:self._n_gram_size-1] == context:
-                tokens.update({key[-1]: sort_data[key]})
+                tokens.update({key[-1]: value})
 
         return tokens
 
@@ -426,7 +426,8 @@ class GreedyTextGenerator:
             if not next_candidate:
                 break
 
-            best_dict = dict(filter(lambda x: x[1] == max(next_candidate.values()), next_candidate.items()))
+            max_value = max(next_candidate.values())
+            best_dict = dict(filter(lambda x: x[1] == max_value, next_candidate.items()))
             best_candidates = list(best_dict.keys())
 
             encoded += (best_candidates[0],)
