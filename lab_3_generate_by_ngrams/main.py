@@ -586,8 +586,6 @@ class BeamSearchTextGenerator:
         self._beam_width = beam_width
         self._beam_searchers = BeamSearcher(self._beam_width, self._language_model)
 
-        return None
-
     def run(self, prompt: str, seq_len: int) -> Optional[str]:
         """
         Generate sequence based on NGram language model and prompt provided.
