@@ -52,7 +52,7 @@ class TextProcessor:
         for word in text.split():
             word = list(filter(str.isalpha, word))
             if word:
-                tokens += word
+                tokens.extend(word)
                 tokens.append(self._end_of_word_token)
 
         if not tokens:
@@ -248,7 +248,7 @@ class TextProcessor:
         text_new = []
 
         for i in decoded_corpus:
-            text_new += i
+            text_new.append(i)
 
         if text_new[-1] == self._end_of_word_token:
             del text_new[-1]
