@@ -46,24 +46,24 @@ class TextProcessor:
         if not isinstance(text, str):
             return None
 
-        text = text.lower()
         tokens = []
 
-        for word in text.split():
-            word = ''.join(filter(str.isalpha, word))
-            #word = list(''.join(letter for letter in word if letter.isalpha()))
-            if word:
-                tokens += word
+            #word = filter(str.isalpha, word)
+            #if word.isspace() and tokens[-1] != self._end_of_word_token:
+                #tokens.append(self._end_of_word_token)
+
+        for word in text.lower():
+            #word = ''.join(filter(str.isalpha, word))
+            if word.isalpha():
+                tokens.append(word)
+            elif word.isspace() and tokens[-1] != self._end_of_word_token:
                 tokens.append(self._end_of_word_token)
 
-            if not tokens:
-                return None
+        if not text[-1].isalnum():
+            tokens.append(self._end_of_word_token)
 
-        if tokens.count(self._end_of_word_token) == len(tokens):
+        if not tokens:
             return None
-
-        if not text[-1].isalnum:
-            del tokens[-1]
 
         return tuple(tokens)
 
@@ -112,6 +112,7 @@ class TextProcessor:
         for key, value in self._storage.items():
             if value == element_id:
                 return key
+
         return None
 
     def encode(self, text: str) -> Optional[tuple[int, ...]]:
@@ -130,13 +131,13 @@ class TextProcessor:
         In case of corrupt input arguments, None is returned.
         In case any of methods used return None, None is returned.
         """
-        if not isinstance(text, str) or not text:
+        if not (isinstance(text, str) and text):
             return None
 
         encoded_corpus = []
         tokenized_text = self._tokenize(text)
 
-        if not tokenized_text:
+        if tokenized_text is None:
             return None
 
         for token in tokenized_text:
@@ -181,7 +182,7 @@ class TextProcessor:
         In case of corrupt input arguments, None is returned.
         In case any of methods used return None, None is returned.
         """
-        if not isinstance(encoded_corpus, tuple):
+        if not (isinstance(encoded_corpus, tuple) and encoded_corpus):
             return None
 
         decoded_tokens = self._decode(encoded_corpus)
@@ -212,7 +213,7 @@ class TextProcessor:
         In case of corrupt input arguments, None is returned.
         In case any of methods used return None, None is returned.
         """
-        if not isinstance(corpus, tuple) or not corpus:
+        if not (isinstance(corpus, tuple) and corpus):
             return None
 
         decoded_corpus = []
@@ -222,9 +223,6 @@ class TextProcessor:
             if token is None:
                 return None
             decoded_corpus.append(token)
-
-            if not decoded_corpus:
-                return None
 
         return tuple(decoded_corpus)
 
@@ -254,12 +252,6 @@ class TextProcessor:
             del text_new[-1]
 
         return ''.join(text_new).capitalize().replace(self._end_of_word_token, ' ') + '.'
-
-        #text_string = ''.join(list(decoded_corpus))
-        #text = text_string.replace(self._end_of_word_token, ' ')
-        #return text.capitalize().strip() + '.'
-
-
 
 class NGramLanguageModel:
     """
@@ -320,13 +312,11 @@ class NGramLanguageModel:
             return 1
 
         for n_gram in set(n_grams):
-            #n_grams_count = n_grams.count(n_gram)
             #context_count = len([context for context in n_grams if context[:-1] == n_gram[:-1]])
-            context_count = filter(lambda context: context[:-1] == n_gram[:-1], n_grams)
-            self._n_gram_frequencies[n_gram] = n_grams.count(n_gram)/len(list(context_count))
+            context_count = list(filter(lambda context: context[:-1] == n_gram[:-1], n_grams))
+            self._n_gram_frequencies[n_gram] = n_grams.count(n_gram)/len(context_count)
 
         return 0
-
 
     def generate_next_token(self, sequence: tuple[int, ...]) -> Optional[dict]:
         """
@@ -346,8 +336,9 @@ class NGramLanguageModel:
         next_tokens = {}
         context = sequence[- self._n_gram_size + 1:]
         for n_gram, freq in self._n_gram_frequencies.items():
-            if n_gram[:self._n_gram_size - 1] == context:
+            if n_gram[:-1] == context:
                 next_tokens[n_gram[-1]] = freq
+
         return next_tokens
 
     def _extract_n_grams(
