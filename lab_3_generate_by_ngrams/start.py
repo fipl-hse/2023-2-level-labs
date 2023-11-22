@@ -21,7 +21,7 @@ def main() -> None:
 
     extracted_n_grams = NGramLanguageModel(encoded_corpus=encoded[:100], n_gram_size=3)
     built_model = extracted_n_grams.build()
-    print(built_model)
+
     assert result
 
 

@@ -260,7 +260,6 @@ class TextProcessor:
         return result + '.'
 
 
-
 class NGramLanguageModel:
     """
     Store language model by n_grams, predict the next token.
@@ -290,6 +289,7 @@ class NGramLanguageModel:
         Returns:
             int: Size of stored n_grams
         """
+        return self._n_gram_size
 
     def set_n_grams(self, frequencies: dict) -> None:
         """
@@ -316,15 +316,19 @@ class NGramLanguageModel:
             return 1
 
         n_grams = self._extract_n_grams(self._encoded_corpus)
-        if not n_grams:
+        if not isinstance(n_grams, tuple) \
+                or not n_grams:
             return 1
 
         unique_n_grams = set(n_grams)
+        number_of_n_grams_with_common_beginning = 0
 
         for n_gram in unique_n_grams:
             its_frequency = n_grams.count(n_gram)
-            common_beginning = n_grams.count(n_gram[:-1])
-            self._n_gram_frequencies[n_gram] = its_frequency / common_beginning
+            for n_gram_to_compare in n_grams:
+                if n_gram_to_compare[:-1] == n_gram[:-1]:
+                    number_of_n_grams_with_common_beginning += 1
+            self._n_gram_frequencies[n_gram] = its_frequency / number_of_n_grams_with_common_beginning
 
         return 0
 
@@ -340,6 +344,20 @@ class NGramLanguageModel:
 
         In case of corrupt input arguments, None is returned
         """
+        if not isinstance(sequence, tuple) \
+                or not sequence \
+                or len(sequence) < self._n_gram_size - 1:
+            return None
+
+        context = sequence[-(self._n_gram_size-1):]
+        possibility_of_being_next_token = {}
+
+        for n_gram, freq in self._n_gram_frequencies.items():
+            if n_gram[:-1] == context:
+                possibility_of_being_next_token[n_gram[-1]] = freq
+
+        return possibility_of_being_next_token
+
 
     def _extract_n_grams(
         self, encoded_corpus: tuple[int, ...]
