@@ -50,7 +50,7 @@ class TextProcessor:
 
         tokens = []
         for token in text.lower():
-            if token.isspace() and tokens and tokens[-1] != self._end_of_word_token:
+            if token.isspace() and tokens[-1] != self._end_of_word_token:
                 tokens.append(self._end_of_word_token)
             elif token.isalpha():
                 tokens.append(token)
@@ -101,10 +101,7 @@ class TextProcessor:
         """
         if not isinstance(element_id, int) or element_id not in self._storage.values():
             return None
-        for key, identificator in self._storage.items():
-            if identificator == element_id:
-                return key
-        return None
+        return next(filter(lambda token: self._storage[token] == element_id, self._storage))
 
     def encode(self, text: str) -> Optional[tuple[int, ...]]:
         """
@@ -183,11 +180,14 @@ class TextProcessor:
         Args:
             content (dict): ngrams from external JSON
         """
-        if isinstance(content, dict) and content:
-            for key in content['freq']:
-                for element in key:
-                    if element.isalpha():
-                        self._put(element.lower())
+        if not (isinstance(content, dict) and content):
+            return None
+
+        for key in content['freq']:
+            alpha_elements = filter(str.isalpha, key)
+            for element in alpha_elements:
+                self._put(element.lower())
+        return None
 
     def _decode(self, corpus: tuple[int, ...]) -> Optional[tuple[str, ...]]:
         """
@@ -231,10 +231,11 @@ class TextProcessor:
         """
         if not (isinstance(decoded_corpus, tuple) and decoded_corpus):
             return None
-        if decoded_corpus[-1] != self._end_of_word_token:
-            return f"{''.join(decoded_corpus).capitalize()}."\
-                .replace(self._end_of_word_token, ' ')
-        return f"{''.join(decoded_corpus)[:-1].capitalize()}."\
+
+        if decoded_corpus[-1] == self._end_of_word_token:
+            decoded_corpus = decoded_corpus[:-1]
+
+        return f"{''.join(decoded_corpus).capitalize()}."\
                 .replace(self._end_of_word_token, ' ')
 
 
@@ -332,9 +333,9 @@ class NGramLanguageModel:
                 and len(sequence) >= self._n_gram_size - 1):
             return None
         context = sequence[-self._n_gram_size + 1:]
-        return {n_gram[-1]: freq
-                for n_gram, freq in self._n_gram_frequencies.items()
-                if n_gram[:-1] == context}
+        suitable_contexts = dict(filter(lambda ngram_and_freq: ngram_and_freq[0][:-1] == context,
+                                        self._n_gram_frequencies.items()))
+        return {n_gram[-1]: freq for n_gram, freq in suitable_contexts.items()}
 
     def _extract_n_grams(
         self, encoded_corpus: tuple[int, ...]
@@ -402,8 +403,7 @@ class GreedyTextGenerator:
             if not tokens:
                 break
             max_freq = max(tokens.values())
-            candidates_max = [candidate for candidate, freq in tokens.items()
-                              if freq == max_freq]
+            candidates_max = list(filter(lambda candidate: tokens[candidate] == max_freq, tokens))
             encoded += (sorted(candidates_max)[0],)
 
         text = self._text_processor.decode(encoded)
@@ -458,8 +458,9 @@ class BeamSearcher:
             return None
         if not tokens:
             return []
-        return sorted([(token, float(freq)) for token, freq in tokens.items()],
-                      key=lambda pair: pair[1], reverse=True)[:self._beam_width]
+        return sorted(list(tokens.items()),
+                      key=lambda pair: float(pair[1]),
+                      reverse=True)[:self._beam_width]
 
     def continue_sequence(
         self,
@@ -669,7 +670,7 @@ class NGramLanguageModelReader:
                         continue
                     encoded.append(ident)
 
-            if tuple(encoded) not in n_grams:
+            if not n_grams.get(tuple(encoded)):
                 n_grams[tuple(encoded)] = 0.0
             n_grams[tuple(encoded)] += self._content['freq'][key]
 
