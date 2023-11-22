@@ -490,8 +490,13 @@ class BeamSearcher:
         if not generated_dict:
             return []
 
-        return sorted(list((token, freq) for token, freq in generated_dict.items()),
-                      key=lambda pair: pair[1], reverse=True)[:self._beam_width]
+        list_of_token_pairs = []
+        for token, freq in generated_dict.items():
+            token_pair = (token, float(freq))
+            list_of_token_pairs.append(token_pair)
+        best = sorted(list_of_token_pairs, key=lambda x: x[1], reverse=True)[:self._beam_width]
+
+        return best
 
 
     def continue_sequence(
