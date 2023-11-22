@@ -403,8 +403,8 @@ class GreedyTextGenerator:
             if not tokens:
                 break
             max_freq = max(tokens.values())
-            candidates_max = list(filter(lambda candidate: tokens[candidate] == max_freq, tokens))
-            encoded += (sorted(candidates_max)[0],)
+            candidates_max = filter(lambda token_freq: token_freq[1] == max_freq, tokens.items())
+            encoded += (sorted(candidates_max)[0][0],)
 
         text = self._text_processor.decode(encoded)
         if not text:
