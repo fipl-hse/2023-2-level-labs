@@ -197,6 +197,7 @@ class TextProcessor:
             for element in key:
                 if element.isalpha():
                     self._put(element.lower())
+        return None
 
     def _decode(self, corpus: tuple[int, ...]) -> Optional[tuple[str, ...]]:
         """
