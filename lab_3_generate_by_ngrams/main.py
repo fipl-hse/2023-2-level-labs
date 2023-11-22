@@ -3,7 +3,7 @@ Lab 3.
 
 Beam-search and natural language generation evaluation
 """
-#import json
+import json
 import math
 # pylint:disable=too-few-public-methods
 from typing import Optional
@@ -193,6 +193,15 @@ class TextProcessor:
             content (dict): ngrams from external JSON
         """
 
+        if not(isinstance(content, dict) and content):
+            return None
+
+        for key in content['freq']:
+            for element in key:
+                if element.isalpha():
+                    self._put(element.lower())
+
+
     def _decode(self, corpus: tuple[int, ...]) -> Optional[tuple[str, ...]]:
         """
         Decode sentence by replacing ids with corresponding letters.
@@ -287,6 +296,10 @@ class NGramLanguageModel:
         Args:
             frequencies (dict): Computed in advance frequencies for n-grams
         """
+        if not(isinstance(frequencies, dict) and frequencies):
+            return None
+
+        self._n_gram_frequencies = frequencies
 
     def build(self) -> int:
         """
@@ -668,6 +681,14 @@ class NGramLanguageModelReader:
             json_path (str): Local path to assets file
             eow_token (str): Special token for text processor
         """
+        self._json_path = json_path
+        self._eow_token = eow_token
+        self._text_processor = TextProcessor(self._eow_token)
+
+        with open(self._json_path, "r", encoding="utf-8") as text_file:
+            text = json.load(text_file)
+            self._content = text
+            self._text_processor.fill_from_ngrams(self._content)
 
     def load(self, n_gram_size: int) -> Optional[NGramLanguageModel]:
         """
@@ -684,6 +705,37 @@ class NGramLanguageModelReader:
 
         In case of corrupt input arguments or unexpected behaviour of methods used, return 1.
         """
+        if not(isinstance(n_gram_size, int) and n_gram_size and 2<= n_gram_size <= 5):
+            return None
+
+        ngrams = {}
+        for ngram in self._content['freq']:
+            encoded = []
+            for token in ngram:
+                if token.isspace():
+                    encoded.append(0)
+                elif token.isalpha():
+                    token_id = self._text_processor.get_id(token.lower())
+                    if not token_id:
+                        continue
+                    encoded.append(token_id)
+
+            if tuple(encoded) not in ngrams:
+                ngrams[tuple(encoded)] = 0.0
+
+            ngrams[tuple(encoded)] += self._content['freq'][ngram]
+
+        clean_ngrams = {}
+        for ngram, freq in ngrams.items():
+            if isinstance(ngram, tuple) and len(ngram) == n_gram_size:
+                same_context = [context_freq for context, context_freq in ngrams.items()
+                                if context[-n_gram_size:-1] == ngram[-n_gram_size:-1]]
+                clean_ngrams[ngram] = freq / sum(same_context)
+
+        ngram_model = NGramLanguageModel(None, n_gram_size)
+        ngram_model.set_n_grams(clean_ngrams)
+
+        return ngram_model
 
     def get_text_processor(self) -> TextProcessor:  # type: ignore[empty-body]
         """
@@ -692,6 +744,7 @@ class NGramLanguageModelReader:
         Returns:
             TextProcessor: processor created for the current JSON file.
         """
+        return self._text_processor
 
 
 class BackOffGenerator:
@@ -715,6 +768,8 @@ class BackOffGenerator:
             language_models (tuple[NGramLanguageModel]): Language models to use for text generation
             text_processor (TextProcessor): A TextProcessor instance to handle text processing
         """
+        self._language_models = {model.get_n_gram_size(): model for model in language_models}
+        self._text_processor = text_processor
 
     def run(self, seq_len: int, prompt: str) -> Optional[str]:
         """
@@ -730,6 +785,27 @@ class BackOffGenerator:
         In case of corrupt input arguments or methods used return None,
         None is returned
         """
+        if not (isinstance(seq_len, int) and isinstance(prompt, str) and prompt
+        ):
+            return None
+
+        encoded_prompt = self._text_processor.encode(prompt)
+        if encoded_prompt is None:
+            return None
+
+        for i in range(seq_len):
+            candidates = self._get_next_token(encoded_prompt)
+            if not candidates:
+                break
+
+            best_candidate = [token for token, freq in candidates.items() if freq == max(candidates.values())]
+            encoded_prompt += (best_candidate[0],)
+        decoded_sequence = self._text_processor.decode(encoded_prompt)
+
+        if not decoded_sequence:
+            return None
+
+        return decoded_sequence
 
     def _get_next_token(self, sequence_to_continue: tuple[int, ...]) -> Optional[dict[int, float]]:
         """
@@ -744,3 +820,27 @@ class BackOffGenerator:
 
         In case of corrupt input arguments return None.
         """
+
+        if not (isinstance(sequence_to_continue, tuple) and sequence_to_continue
+                and self._language_models
+        ):
+            return None
+
+        ngram_sizes = sorted(self._language_models.keys(), reverse=True)
+
+        for ngram_size in ngram_sizes:
+            ngram_model = self._language_models[ngram_size]
+
+            candidates = ngram_model.generate_next_token(sequence_to_continue)
+
+            if candidates is None:
+                return None
+
+            if len(candidates) > 0:
+                probabilities = {token: freq / sum(candidates.values())
+                                 for token, freq in candidates.items()}
+                return probabilities
+
+        return None
+
+
