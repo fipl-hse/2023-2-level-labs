@@ -19,12 +19,12 @@ def main() -> None:
     decoded_text = text_processor.decode(encoded_text)
 
     language_model = main_py.NGramLanguageModel(encoded_text, 7)
-    #print(language_model.build())
+    print(language_model.build())
 
     greedy_generator = main_py.GreedyTextGenerator(language_model, text_processor)
     generated_text = greedy_generator.run(51, 'Vernon')
     result = generated_text
-    #print(generated_text)
+    print(generated_text)
 
     assert result
 

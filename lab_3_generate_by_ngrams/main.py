@@ -46,26 +46,27 @@ class TextProcessor:
         if not isinstance(text, str):
             return None
 
+        text = text.lower()
         tokens = []
 
-            #word = filter(str.isalpha, word)
-            #if word.isspace() and tokens[-1] != self._end_of_word_token:
-                #tokens.append(self._end_of_word_token)
-
-        for word in text.lower():
-            #word = ''.join(filter(str.isalpha, word))
-            if word.isalpha():
-                tokens.append(word)
-            elif word.isspace() and tokens[-1] != self._end_of_word_token:
+        for word in text.split():
+            word = list(filter(str.isalpha, word))
+            if word:
+                tokens += word
                 tokens.append(self._end_of_word_token)
-
-        if not text[-1].isalnum():
-            tokens.append(self._end_of_word_token)
 
         if not tokens:
             return None
 
+        if text[-1].isalnum():
+            del tokens[-1]
+
         return tuple(tokens)
+
+    # if word.isalpha():
+    # tokens.append(word)
+    # elif word.isspace() and tokens[-1] != self._end_of_word_token:
+    # tokens.append(self._end_of_word_token)
 
     def get_id(self, element: str) -> Optional[int]:
         """
@@ -245,6 +246,7 @@ class TextProcessor:
             return None
 
         text_new = []
+
         for i in decoded_corpus:
             text_new += i
 
