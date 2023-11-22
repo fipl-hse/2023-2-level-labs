@@ -398,12 +398,14 @@ class GreedyTextGenerator:
         if not (encoded and n_gram_size):
             return None
 
+        max_freq = []
         for iteration in range(seq_len):
             tokens = self._model.generate_next_token(encoded[-n_gram_size + 1:])
             if not tokens:
                 break
-            max_freq = max(tokens.values())
-            candidates_max = filter(lambda token_freq: token_freq[1] == max_freq, tokens.items())
+            max_freq.append(max(tokens.values()))
+            candidates_max = filter(lambda token_freq: token_freq[1] == max_freq[-1],
+                                    tokens.items())
             encoded += (sorted(candidates_max)[0][0],)
 
         text = self._text_processor.decode(encoded)
