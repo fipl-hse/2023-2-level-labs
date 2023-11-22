@@ -5,6 +5,7 @@ Beam-search and natural language generation evaluation
 """
 # pylint:disable=too-few-public-methods
 from typing import Optional
+import string
 
 
 class TextProcessor:
@@ -49,9 +50,10 @@ class TextProcessor:
         for symbol in text.lower():
             if symbol.isalpha():
                 preprocessed.append(symbol)
-            if (symbol in '!"#$%&\'()*+, ./:;<=>?@[]^_`{|}~\\'
-                    and preprocessed[-1] != self._end_of_word_token):
+            elif symbol.isspace() and preprocessed[-1] != self._end_of_word_token:
                 preprocessed.append(self._end_of_word_token)
+        if text[-1] in string.punctuation and preprocessed[-1] != self._end_of_word_token:
+            preprocessed.append(self._end_of_word_token)
         if not preprocessed:
             return None
         return tuple(preprocessed)
@@ -96,8 +98,8 @@ class TextProcessor:
         """
         if not isinstance(element_id, int) or element_id not in self._storage.values():
             return None
-        position = list(self._storage.values()).index(element_id)
-        return list(self._storage.keys())[position]
+        token = tuple(filter(lambda x: x[1] == element_id, self._storage.items()))
+        return token[0][0]
 
     def encode(self, text: str) -> Optional[tuple[int, ...]]:
         """
@@ -138,10 +140,9 @@ class TextProcessor:
         In case of corrupt input arguments or invalid argument length,
         an element is not added to storage
         """
-        if not isinstance(element, str) or len(element) != 1:
+        if not isinstance(element, str) or len(element) != 1 or element in self._storage:
             return None
-        if element not in self._storage:
-            self._storage[element] = len(self._storage)
+        self._storage[element] = len(self._storage)
 
     def decode(self, encoded_corpus: tuple[int, ...]) -> Optional[str]:
         """
@@ -279,10 +280,10 @@ class NGramLanguageModel:
             for i, n_gram in enumerate(sorted_n_grams):
                 if i <= search_start:
                     continue
-                if n_gram[:self._n_gram_size - 1] == start:
-                    same_start.append(n_gram)
-                    search_start = i
-                    continue
+                if n_gram[:self._n_gram_size - 1] > start:
+                    break
+                same_start.append(n_gram)
+                search_start = i
             context = 1 / len(same_start)
             for variant in same_start:
                 if variant not in self._n_gram_frequencies:
@@ -350,6 +351,8 @@ class GreedyTextGenerator:
             language_model (NGramLanguageModel): A language model to use for text generation
             text_processor (TextProcessor): A TextProcessor instance to handle text processing
         """
+        self._model = language_model
+        self._text_processor = text_processor
 
     def run(self, seq_len: int, prompt: str) -> Optional[str]:
         """
@@ -365,6 +368,25 @@ class GreedyTextGenerator:
         In case of corrupt input arguments or methods used return None,
         None is returned
         """
+        if not isinstance(seq_len, int) or not isinstance(prompt, str) or not prompt:
+            return None
+        prompt_encoded = self._text_processor.encode(prompt)
+        if not prompt_encoded:
+            return None
+        context = prompt_encoded[-self._model.get_n_gram_size() + 1:]
+        generated = []
+        for i in range(seq_len):
+            candidates = self._model.generate_next_token(context)
+            if not candidates:
+                break
+            best_pair = tuple(filter(lambda x: x[1] == max(candidates.values()), candidates.items()))[0]
+            if not best_pair:
+                break
+            best_token = best_pair[0]
+            generated.append(best_token)
+            context = context[1:] + (best_token,)
+        sequence = self._text_processor.decode(prompt_encoded + tuple(generated))
+        return sequence
 
 
 class BeamSearcher:
