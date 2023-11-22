@@ -5,6 +5,7 @@ Beam-search and natural language generation evaluation
 """
 # pylint:disable=too-few-public-methods
 from typing import Optional
+import string
 
 
 class TextProcessor:
@@ -24,7 +25,7 @@ class TextProcessor:
             end_of_word_token (str): A token denoting word boundary
         """
         self._end_of_word_token = end_of_word_token
-        self._storage = {self._end_of_word_token: 0}
+        self._storage = {end_of_word_token: 0}
 
     def _tokenize(self, text: str) -> Optional[tuple[str, ...]]:
         """
@@ -43,21 +44,33 @@ class TextProcessor:
         In case of corrupt input arguments, None is returned.
         In case any of methods used return None, None is returned.
         """
-        if not isinstance(text, str) or not text:
+        if not isinstance(text, (str | None)):
             return None
         tokens = []
-        alphas = 0
         for token in text.lower():
             if token.isalpha():
                 tokens.append(token)
-                alphas += 1
-            elif token == ' ' and tokens[-1] != self._end_of_word_token:
+            elif token.isspace() and tokens[-1] != self._end_of_word_token:
                 tokens.append(self._end_of_word_token)
-            elif not text[-1].isalnum():
-                tokens.append(self._end_of_word_token)
-        if alphas == 0:
+        if (text[-1] in string.punctuation
+                and tokens[-1] != self._end_of_word_token):
+            tokens.append(self._end_of_word_token)
+        if not list(filter(str.isalpha, text.lower())):
             return None
         return tuple(tokens)
+        # if not isinstance(text, (str | None)):
+        #     return None
+        # tokens = []
+        # for token in text.lower():
+        #     if token.isalpha():
+        #         tokens.append(token)
+        #     elif token.isspace() and tokens[-1] != self._end_of_word_token:
+        #         tokens.append(self._end_of_word_token)
+        #     elif text[-1] in string.punctuation and tokens[-1] != self._end_of_word_token:
+        #         tokens.append(self._end_of_word_token)
+        # if not filter(str.isalpha, text.lower()):
+        #     return None
+        # return tuple(tokens)
 
     def get_id(self, element: str) -> Optional[int]:
         """
@@ -99,9 +112,8 @@ class TextProcessor:
         """
         if element_id not in self._storage.values() or not isinstance(element_id, int):
             return None
-        for key, value in self._storage.items():
-            if value == element_id:
-                return key
+        token = tuple(filter(lambda x: x[1] == element_id, self._storage.items()))
+        return token[0][0]
 
     def encode(self, text: str) -> Optional[tuple[int, ...]]:
         """
@@ -127,7 +139,10 @@ class TextProcessor:
             return None
         for element in tokenized_text:
             self._put(element)
-            encoded_corpus.append(self.get_id(element))
+            ident = self.get_id(element)
+            if not id:
+                return None
+            encoded_corpus.append(ident)
         if not encoded_corpus:
             return None
         return tuple(encoded_corpus)
@@ -201,7 +216,10 @@ class TextProcessor:
         for element_id in corpus:
             if not isinstance(element_id, int):
                 return None
-            decoded_corpus.append(self.get_token(element_id))
+            token = self.get_token(element_id)
+            if not token:
+                return None
+            decoded_corpus.append(token)
         return tuple(decoded_corpus)
 
     def _postprocess_decoded_text(self, decoded_corpus: tuple[str, ...]) -> Optional[str]:
@@ -221,16 +239,10 @@ class TextProcessor:
         """
         if not isinstance(decoded_corpus, tuple) or not decoded_corpus:
             return None
-        post_text = ''
-        for token, i in enumerate(decoded_corpus):
-            if token == self._end_of_word_token:
-                post_text += ' '
-            elif token == self._end_of_word_token and i == len(decoded_corpus) - 1:
-                post_text += '.'
-            else:
-                post_text += token
-        return post_text.capitalize()
-        # post_text = '.'
+        decoded_list = list(decoded_corpus)
+        if decoded_list[-1] == self._end_of_word_token:
+            del decoded_list[-1]
+        return f"{''.join(decoded_list).capitalize()}.".replace(self._end_of_word_token, ' ')
 
 
 class NGramLanguageModel:
@@ -284,7 +296,6 @@ class NGramLanguageModel:
         1 is returned
         """
 
-
     def generate_next_token(self, sequence: tuple[int, ...]) -> Optional[dict]:
         """
         Retrieve tokens that can continue the given sequence along with their probabilities.
@@ -299,7 +310,7 @@ class NGramLanguageModel:
         """
 
     def _extract_n_grams(
-        self, encoded_corpus: tuple[int, ...]
+            self, encoded_corpus: tuple[int, ...]
     ) -> Optional[tuple[tuple[int, ...], ...]]:
         """
         Split encoded sequence into n-grams.
@@ -318,8 +329,6 @@ class NGramLanguageModel:
         for i in range(len(encoded_corpus) - 1):
             n_grams.append(tuple(encoded_corpus[i: i + self._n_gram_size]))
         return tuple(n_grams)
-
-
 
 
 class GreedyTextGenerator:
@@ -395,10 +404,10 @@ class BeamSearcher:
         """
 
     def continue_sequence(
-        self,
-        sequence: tuple[int, ...],
-        next_tokens: list[tuple[int, float]],
-        sequence_candidates: dict[tuple[int, ...], float],
+            self,
+            sequence: tuple[int, ...],
+            next_tokens: list[tuple[int, float]],
+            sequence_candidates: dict[tuple[int, ...], float],
     ) -> Optional[dict[tuple[int, ...], float]]:
         """
         Generate new sequences from the base sequence with next tokens provided.
@@ -417,7 +426,7 @@ class BeamSearcher:
         """
 
     def prune_sequence_candidates(
-        self, sequence_candidates: dict[tuple[int, ...], float]
+            self, sequence_candidates: dict[tuple[int, ...], float]
     ) -> Optional[dict[tuple[int, ...], float]]:
         """
         Remove those sequence candidates that do not make top-N most probable sequences.
@@ -444,10 +453,10 @@ class BeamSearchTextGenerator:
     """
 
     def __init__(
-        self,
-        language_model: NGramLanguageModel,
-        text_processor: TextProcessor,
-        beam_width: int,
+            self,
+            language_model: NGramLanguageModel,
+            text_processor: TextProcessor,
+            beam_width: int,
     ):
         """
         Initializes an instance of BeamSearchTextGenerator.
@@ -474,7 +483,7 @@ class BeamSearchTextGenerator:
         """
 
     def _get_next_token(
-        self, sequence_to_continue: tuple[int, ...]
+            self, sequence_to_continue: tuple[int, ...]
     ) -> Optional[list[tuple[int, float]]]:
         """
         Retrieve next tokens for sequence continuation.
@@ -544,9 +553,9 @@ class BackOffGenerator:
     """
 
     def __init__(
-        self,
-        language_models: tuple[NGramLanguageModel, ...],
-        text_processor: TextProcessor,
+            self,
+            language_models: tuple[NGramLanguageModel, ...],
+            text_processor: TextProcessor,
     ):
         """
         Initializes an instance of BackOffGenerator.
