@@ -159,6 +159,7 @@ class TextProcessor:
             return None
 
         self._storage[element] = len(self._storage)
+        return None
 
     def decode(self, encoded_corpus: tuple[int, ...]) -> Optional[str]:
         """
@@ -316,7 +317,8 @@ class NGramLanguageModel:
 
         for i in set(corpus):
             if str(corpus).count(str(i[:-1])[:-1]):
-                self._n_gram_frequencies.update({i: corpus.count(i)/str(corpus).count(str(i[:-1])[:-1])})
+                self._n_gram_frequencies.update({i: corpus.count(i)/str(corpus).count(
+                    str(i[:-1])[:-1])})
 
         return 0
 
@@ -424,10 +426,8 @@ class GreedyTextGenerator:
             if not next_candidate:
                 break
 
-            u = max(next_candidate.values())
-
-            best = dict(filter(lambda x: x[1] == u, next_candidate.items()))
-            best_candidates = list(best.keys())
+            best_dict = dict(filter(lambda x: x[1] == max(next_candidate.values()), next_candidate.items()))
+            best_candidates = list(best_dict.keys())
 
             encoded += (best_candidates[0],)
 
