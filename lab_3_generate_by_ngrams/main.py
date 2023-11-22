@@ -319,7 +319,7 @@ class NGramLanguageModel:
                 return 1
             p_w_1_2 = n_grams.count(ngram)
             p_w_1 = [context[:-1] for context in n_grams].count(ngram[:-1])
-            self._n_gram_frequencies[ngram] = p_w_1_2/p_w_1
+            self._n_gram_frequencies[ngram] = p_w_1_2 / p_w_1
 
         return 0
 
@@ -335,15 +335,16 @@ class NGramLanguageModel:
 
         In case of corrupt input arguments, None is returned
         """
-        if not isinstance(sequence, tuple) or len(sequence) == 0 or len(sequence) < self._n_gram_size - 1:
+        if (not isinstance(sequence, tuple) or len(sequence) == 0
+                or len(sequence) < self._n_gram_size - 1):
             return None
 
         possible_tokens = {}
 
         context = sequence[-(self._n_gram_size - 1)::]
-        for ngram in self._n_gram_frequencies:
+        for ngram, freq in self._n_gram_frequencies.items():
             if ngram[:self._n_gram_size - 1] == context:
-                possible_tokens[ngram[-1]] = self._n_gram_frequencies[ngram]
+                possible_tokens[ngram[-1]] = freq
 
         return possible_tokens
 
@@ -417,7 +418,7 @@ class GreedyTextGenerator:
         text = prompt
 
         for i in range(seq_len):
-            tokens = self._model.generate_next_token(encoded_prompt[-ngram_size+1:])
+            tokens = self._model.generate_next_token(encoded_prompt[-ngram_size + 1:])
             if tokens is None:
                 return f"{prompt}."
             if len(tokens) == 0:
@@ -488,7 +489,7 @@ class BeamSearcher:
         if not generated_dict:
             return []
 
-        return sorted([(token, freq) for token, freq in generated_dict.items()],
+        return sorted(list((token, freq) for token, freq in generated_dict.items()),
                       key=lambda pair: pair[1], reverse=True)[:self._beam_width]
 
 
@@ -513,11 +514,12 @@ class BeamSearcher:
 
         In case of corrupt input arguments or unexpected behaviour of methods used return None.
         """
-        if (not isinstance(sequence,tuple) or len(sequence) == 0 or
+        if (not isinstance(sequence, tuple) or len(sequence) == 0 or
             not isinstance(next_tokens, list) or len(next_tokens) == 0 or
-            not isinstance(sequence_candidates, dict) or not sequence_candidates or
-            len(next_tokens) >= self._beam_width or
-            sequence not in sequence_candidates):
+            not isinstance(sequence_candidates, dict) or not sequence_candidates):
+            return None
+        if (len(next_tokens) >= self._beam_width or
+                sequence not in sequence_candidates):
             return None
 
         result_dict_cand = sequence_candidates.copy()
@@ -544,7 +546,8 @@ class BeamSearcher:
         if not isinstance(sequence_candidates, dict) or not sequence_candidates:
             return None
 
-        sorted_sequences = sorted(sequence_candidates.items(), key=lambda item: item[1], reverse=True)
+        sorted_sequences = sorted(sequence_candidates.items(),
+                                  key=lambda item: item[1], reverse=True)
 
         return dict(sorted_sequences[:self._beam_width])
 
@@ -621,7 +624,8 @@ class BeamSearchTextGenerator:
                     return None
                 candidates = best_sequence
 
-            decoded_result = self._text_processor.decode(sorted(tuple(candidates), key=lambda item: item[1])[0])
+            decoded_result = self._text_processor.decode(sorted(tuple(candidates),
+                                                                key=lambda item: item[1])[0])
 
             return decoded_result
 
