@@ -134,9 +134,10 @@ class TextProcessor:
 
         encoded_corpus = []
         for token in tokenized_text:
-            if self.get_id(token) is None:
+            ident = self.get_id(token)
+            if ident is None:
                 return None
-            encoded_corpus.append(self.get_id(token))
+            encoded_corpus.append(ident)
 
         return tuple(encoded_corpus)
 
