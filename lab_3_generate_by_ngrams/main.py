@@ -5,6 +5,7 @@ Beam-search and natural language generation evaluation
 """
 # pylint:disable=too-few-public-methods
 from typing import Optional
+import math
 
 
 class TextProcessor:
@@ -487,6 +488,8 @@ class BeamSearcher:
         if not generated_dict:
             return []
 
+        return sorted([(token, freq) for token, freq in generated_dict.items()],
+                      key=lambda pair: pair[1], reverse=True)[:self._beam_width]
 
 
     def continue_sequence(
@@ -510,6 +513,19 @@ class BeamSearcher:
 
         In case of corrupt input arguments or unexpected behaviour of methods used return None.
         """
+        if (not isinstance(sequence,tuple) or len(sequence) == 0 or
+            not isinstance(next_tokens, list) or len(next_tokens) == 0 or
+            not isinstance(sequence_candidates, dict) or not sequence_candidates or
+            len(next_tokens) >= self._beam_width or
+            sequence not in sequence_candidates):
+            return None
+
+        result_dict_cand = sequence_candidates.copy()
+        for token, freq in next_tokens:
+            result_dict_cand[sequence + (token,)] = freq - math.log(freq)
+
+        return result_dict_cand
+
 
     def prune_sequence_candidates(
         self, sequence_candidates: dict[tuple[int, ...], float]
@@ -525,6 +541,13 @@ class BeamSearcher:
 
         In case of corrupt input arguments return None.
         """
+        if not isinstance(sequence_candidates, dict) or not sequence_candidates:
+            return None
+
+        sorted_sequences = sorted(sequence_candidates.items(), key=lambda item: item[1], reverse=True)
+
+        return dict(sorted_sequences[:self._beam_width])
+
 
 
 class BeamSearchTextGenerator:
@@ -552,6 +575,10 @@ class BeamSearchTextGenerator:
             text_processor (TextProcessor): A TextProcessor instance to handle text processing
             beam_width (int): Beam width parameter for generation
         """
+        self._language_model = language_model
+        self._text_processor = text_processor
+        self._beam_width = beam_width
+        self._beam_searchers = BeamSearcher(self._beam_width, self._language_model)
 
     def run(self, prompt: str, seq_len: int) -> Optional[str]:
         """
@@ -567,6 +594,39 @@ class BeamSearchTextGenerator:
         In case of corrupt input arguments or methods used return None,
         None is returned
         """
+        if (not isinstance(prompt, str) or len(prompt) == 0 or
+            not isinstance(seq_len, int) or seq_len < 0):
+            return None
+
+        encoded_prompt = self._text_processor.encode(prompt)
+        if encoded_prompt is None:
+            return None
+        candidates = {encoded_prompt: 0.0}
+
+        for i in range(seq_len):
+            new_candidates = candidates.copy()
+            for sequence in candidates:
+                next_tokens = self._get_next_token(sequence)
+                if next_tokens is None:
+                    return None
+
+                continued_sentence = (
+                    self._beam_searchers.continue_sequence(sequence, next_tokens, new_candidates)
+                )
+                if continued_sentence is None:
+                    break
+
+                best_sequence = self._beam_searchers.prune_sequence_candidates(new_candidates)
+                if best_sequence is None:
+                    return None
+                candidates = best_sequence
+
+            decoded_result = self._text_processor.decode(sorted(tuple(candidates), key=lambda item: item[1])[0])
+
+            return decoded_result
+
+
+
 
     def _get_next_token(
         self, sequence_to_continue: tuple[int, ...]
@@ -583,6 +643,14 @@ class BeamSearchTextGenerator:
 
         In case of corrupt input arguments return None.
         """
+        if not isinstance(sequence_to_continue, tuple) or len(sequence_to_continue) == 0:
+            return None
+
+        next_token = self._beam_searchers.get_next_token(sequence_to_continue)
+        if next_token is None:
+            return None
+
+        return next_token
 
 
 class NGramLanguageModelReader:
