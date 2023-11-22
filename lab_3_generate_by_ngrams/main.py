@@ -222,13 +222,12 @@ class TextProcessor:
             return None
         result_text = ""
         for i, token in enumerate(decoded_corpus):
-            if token == self._end_of_word_token and i == len(decoded_corpus) - 1:
-                result_text += "."
-            elif token == self._end_of_word_token:
+            if token == self._end_of_word_token and i != len(decoded_corpus) - 1:
                 result_text += " "
             else:
                 result_text += token
-        result_text = result_text.capitalize()
+        result_text = result_text.replace("_", "")
+        result_text = f"{result_text.capitalize()}."
         return result_text
 
 
@@ -360,7 +359,7 @@ class GreedyTextGenerator:
             language_model (NGramLanguageModel): A language model to use for text generation
             text_processor (TextProcessor): A TextProcessor instance to handle text processing
         """
-        self._language_model = language_model
+        self._model = language_model
         self._text_processor = text_processor
 
     def run(self, seq_len: int, prompt: str) -> Optional[str]:
@@ -380,12 +379,20 @@ class GreedyTextGenerator:
         if not isinstance(seq_len, int) or not isinstance(prompt, str) or not prompt:
             return None
         encoded = self._text_processor.encode(prompt)
-        n_gram_size = self._language_model.get_n_gram_size()
-        if not encoded:
+        n_gram_size = self._model.get_n_gram_size()
+        if not encoded or not n_gram_size:
             return None
 
         for i in range(seq_len):
-            self._language_model.generate_next_token(encoded)
+            next_symbol = self._model.generate_next_token(encoded[-n_gram_size+1:])
+            if not next_symbol:
+                break
+            max_freq = max(next_symbol.values())
+            dict_of_candidates = dict(filter(lambda item: item[1] == max_freq, next_symbol.items()))
+            candidates = list(dict_of_candidates.keys())
+            encoded += (candidates[0],)
+        decoded = self._text_processor.decode(encoded)
+        return decoded
 
 
 class BeamSearcher:
