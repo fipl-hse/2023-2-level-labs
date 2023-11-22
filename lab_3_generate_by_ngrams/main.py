@@ -520,15 +520,16 @@ class BeamSearcher:
         if (len(next_tokens) == 0 or not isinstance(sequence_candidates, dict) or
                 not sequence_candidates):
             return None
-        if (len(next_tokens) >= self._beam_width or
+        if (len(next_tokens) > self._beam_width or
                 sequence not in sequence_candidates):
             return None
 
-        result_dict_cand = sequence_candidates.copy()
-        for token, freq in next_tokens:
-            result_dict_cand[sequence + (token,)] = freq - math.log(freq)
+        for (token, freq) in next_tokens:
+            sequence_candidates[sequence + (token,)] = \
+                sequence_candidates[sequence] - math.log(freq)
+        sequence_candidates.pop(sequence)
 
-        return result_dict_cand
+        return sequence_candidates
 
 
     def prune_sequence_candidates(
@@ -585,6 +586,8 @@ class BeamSearchTextGenerator:
         self._beam_width = beam_width
         self._beam_searchers = BeamSearcher(self._beam_width, self._language_model)
 
+        return None
+
     def run(self, prompt: str, seq_len: int) -> Optional[str]:
         """
         Generate sequence based on NGram language model and prompt provided.
@@ -600,7 +603,7 @@ class BeamSearchTextGenerator:
         None is returned
         """
         if (not isinstance(prompt, str) or len(prompt) == 0 or
-            not isinstance(seq_len, int) or seq_len < 0):
+                not isinstance(seq_len, int) or seq_len < 0):
             return None
 
         encoded_prompt = self._text_processor.encode(prompt)
@@ -609,7 +612,7 @@ class BeamSearchTextGenerator:
         candidates = {encoded_prompt: 0.0}
 
         for i in range(seq_len):
-            new_candidates = candidates.copy()
+            new_candidates = dict(candidates)
             for sequence in candidates:
                 next_tokens = self._get_next_token(sequence)
                 if next_tokens is None:
