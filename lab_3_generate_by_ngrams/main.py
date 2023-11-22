@@ -388,9 +388,10 @@ class GreedyTextGenerator:
             if not tokens:
                 break
             max_freq = max(tokens.values())
-            biggest_token = [candidate for candidate, freq in tokens.items()
-                              if freq == max_freq]
-            encoded = encoded + (sorted(biggest_token)[0],)
+           # biggest_token = [candidate for candidate, freq in tokens.items()
+                             # if freq == max_freq]
+            biggest_token = list(filter(lambda x: x[1] == max_freq, tokens.items()))
+            encoded = encoded + (sorted(biggest_token)[0][0],)
             next_token = self._text_processor.get_token(encoded[-1])
             if not next_token:
                 return None
