@@ -175,7 +175,7 @@ def get_vocabulary(
 
 
 def decode(
-        encoded_text: list[int] | None, vocabulary: dict[str, int] | None, end_of_word_token: str | None
+    encoded_text: list[int] | None, vocabulary: dict[str, int] | None, end_of_word_token: str | None
 ) -> str | None:
     """
     Translates encoded sequence into decoded one
@@ -201,7 +201,7 @@ def decode(
 
 
 def tokenize_word(
-        word: tuple[str, ...], vocabulary: dict[str, int], end_of_word: str | None, unknown_token: str
+    word: tuple[str, ...], vocabulary: dict[str, int], end_of_word: str | None, unknown_token: str
 ) -> list[int] | None:
     """
     Splits word into tokens
