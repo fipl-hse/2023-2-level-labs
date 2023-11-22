@@ -381,7 +381,7 @@ class GreedyTextGenerator:
             tokens = self._model.generate_next_token(encoded[-n_gram_size + 1:])
             if not tokens:
                 break
-            max_freq = max(tokens.values())
+            max_freq.append(max(tokens.values()))
             biggest_token = list(filter(lambda x: x[1] == max_freq, tokens.items()))
             encoded = encoded + (sorted(biggest_token)[0][0],)
             next_token = self._text_processor.get_token(encoded[-1])
