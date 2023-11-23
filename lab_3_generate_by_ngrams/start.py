@@ -17,13 +17,16 @@ def main() -> None:
     encoded_text = text_processor.encode(text)
     if isinstance(encoded_text, tuple) and encoded_text is not None:
         decoded_text = text_processor.decode(encoded_text)
+        print(decoded_text)
 
         language_model = main_py.NGramLanguageModel(encoded_text, 7)
         greedy_generator = main_py.GreedyTextGenerator(language_model, text_processor)
         generated_text = greedy_generator.run(51, 'Vernon')
+        print(generated_text)
 
         beam_search_generator = main_py.BeamSearchTextGenerator(language_model, text_processor, 7)
         resulted_text = beam_search_generator.run('Vernon', 56)
+        print(resulted_text)
 
         result = resulted_text
         assert result
