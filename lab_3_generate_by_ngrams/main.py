@@ -110,9 +110,10 @@ class TextProcessor:
         if not isinstance(element_id, int):
             return None
 
-        for token, ident in self._storage.items():
-            if ident == element_id:
-                return token
+        filtered_items = filter(lambda item: item[1] == element_id, self._storage.items())
+        token = next(filtered_items, None)
+        if token:
+            return token[0]
 
         return None
 
