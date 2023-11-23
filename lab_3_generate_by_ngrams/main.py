@@ -420,13 +420,15 @@ class GreedyTextGenerator:
         if not encoded or not ngram_size:
             return None
 
+        max_value = []
         for i in range(seq_len):
             next_candidate = self._model.generate_next_token(encoded[-ngram_size+1:])
 
             if not next_candidate:
                 break
 
-            best_dict = dict(filter(lambda x: x[1] == max(next_candidate.values()), next_candidate.items()))
+            max_value.append(max(next_candidate.values()))
+            best_dict = dict(filter(lambda x: x[1] == max_value, next_candidate.items()))
             best_candidates = list(best_dict.keys())
 
             encoded += (best_candidates[0],)
