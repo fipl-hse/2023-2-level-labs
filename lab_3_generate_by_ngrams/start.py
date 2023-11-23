@@ -2,7 +2,7 @@
 Generation by NGrams starter
 """
 
-from lab_3_generate_by_ngrams.main import TextProcessor, NGramLanguageModel
+from lab_3_generate_by_ngrams.main import TextProcessor, NGramLanguageModel, GreedyTextGenerator
 
 
 def main() -> None:
@@ -21,6 +21,9 @@ def main() -> None:
 
     extracted_n_grams = NGramLanguageModel(encoded_corpus=encoded[:100], n_gram_size=3)
     built_model = extracted_n_grams.build()
+
+    greedy = GreedyTextGenerator(extracted_n_grams, processor)
+    print('Greedy generation: ', greedy.run(51, 'Vernon'))
 
     assert result
 

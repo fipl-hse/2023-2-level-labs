@@ -52,7 +52,7 @@ class TextProcessor:
         for symbol in text.lower():
             if symbol.isalpha():
                 tokenized_text.append(symbol)
-            elif symbol in string.punctuation \
+            elif (symbol in string.punctuation or symbol == ' ')\
                     and tokenized_text[-1] != self._end_of_word_token:
                 tokenized_text.append(self._end_of_word_token)
 
@@ -200,6 +200,16 @@ class TextProcessor:
         Args:
             content (dict): ngrams from external JSON
         """
+        if not isinstance(content, dict) \
+                or not content:
+            return None
+
+        for key in content['freq']:
+            for el in key:
+                if el.isalpha():
+                    self._put(el.lower())
+
+        return None
 
     def _decode(self, corpus: tuple[int, ...]) -> Optional[tuple[str, ...]]:
         """
@@ -402,6 +412,8 @@ class GreedyTextGenerator:
             language_model (NGramLanguageModel): A language model to use for text generation
             text_processor (TextProcessor): A TextProcessor instance to handle text processing
         """
+        self._model = language_model
+        self._text_processor = text_processor
 
     def run(self, seq_len: int, prompt: str) -> Optional[str]:
         """
@@ -417,6 +429,30 @@ class GreedyTextGenerator:
         In case of corrupt input arguments or methods used return None,
         None is returned
         """
+        if (not isinstance(prompt, str)
+                or not isinstance(seq_len, int)
+                or not prompt):
+            return None
+
+        encoded = self._text_processor.encode(prompt)
+        n_gram_size = self._model.get_n_gram_size()
+
+        if not encoded or not n_gram_size:
+            return None
+
+        for i in range(seq_len):
+            tokens = self._model.generate_next_token(encoded)
+            if not tokens:
+                break
+            max_freq = max(tokens.values())
+            frequent_tokens = [token for token in tokens if tokens[token] == max_freq]
+            token = sorted(frequent_tokens)[0]
+            encoded += (token,)
+
+        decoded = self._text_processor.decode(encoded)
+
+        return decoded
+
 
 
 class BeamSearcher:
