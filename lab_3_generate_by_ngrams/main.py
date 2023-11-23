@@ -428,7 +428,7 @@ class GreedyTextGenerator:
                 break
 
             max_value.append(max(next_candidate.values()))
-            best_dict = dict(filter(lambda x: x[1] == max_value, next_candidate.items()))
+            best_dict = dict(filter(lambda x: x[1] == max_value[-1], next_candidate.items()))
             best_candidates = list(best_dict.keys())
 
             encoded += (best_candidates[0],)
