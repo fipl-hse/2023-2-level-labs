@@ -258,20 +258,11 @@ class TextProcessor:
             else:
                 result += ' '
 
-        result = result.replace(result[0], result[0].upper(), 1)
+        result = result.capitalize()
         result = result.rstrip(' ')
         result += '.'
 
         return result
-
-text = 'GPT-4 — большая мультимодальная языковая модель,' ' созданная OpenAI, четвёртая в серии GPT.'
-
-text_processor = TextProcessor('_')
-encoded = text_processor.encode(text)
-protected_decoded = text_processor._decode(encoded)
-res = text_processor._postprocess_decoded_text(protected_decoded)
-print(res)
-print (res[0])
 
 class NGramLanguageModel:
     """
