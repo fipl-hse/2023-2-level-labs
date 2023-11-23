@@ -43,20 +43,18 @@ class TextProcessor:
         In case of corrupt input arguments, None is returned.
         In case any of methods used return None, None is returned.
         """
-        if not isinstance(text, str):
+        if not isinstance(text, str) or not text:
             return None
         if not list(filter(str.isalpha, text.lower())):
             return None
         listed_text = list(text.lower())
         tokenized_text = []
-        for i in listed_text[:-1]:
+        for i in listed_text:
             if i.isalpha():
                 tokenized_text.append(i)
-            elif i in string.punctuation or i.isdigit() or i == ' ':
-                if listed_text[listed_text.index(i) + 1].isalpha() and tokenized_text[-1] != self._end_of_word_token:
+            elif i in string.punctuation or i == ' ':
+                if tokenized_text[-1] != self._end_of_word_token:
                     tokenized_text.append(self._end_of_word_token)
-        if listed_text[-1] in string.punctuation:
-            tokenized_text.append(self._end_of_word_token)
         return tuple(tokenized_text)
     def get_id(self, element: str) -> Optional[int]:
         """
@@ -71,7 +69,9 @@ class TextProcessor:
         In case of corrupt input arguments or arguments not included in storage,
         None is returned
         """
-
+        if not isinstance(element, str) or element not in self._storage.keys():
+            return None
+        return self._storage[element]
     def get_end_of_word_token(self) -> str:
         """
         Retrieve value stored in self._end_of_word_token attribute.
@@ -79,6 +79,7 @@ class TextProcessor:
         Returns:
             str: EoW token
         """
+        return self._end_of_word_token
 
     def get_token(self, element_id: int) -> Optional[str]:
         """
@@ -120,9 +121,10 @@ class TextProcessor:
         In case of corrupt input arguments or invalid argument length,
         an element is not added to storage
         """
-
-        if self._storage.get(i) == None:
-            self._storage[i] = len(self._storage) + 1
+        if not isinstance(element, str) or len(element) > 1:
+            return None
+        if self._storage.get(element) is None:
+            self._storage[element] = len(self._storage)
     def decode(self, encoded_corpus: tuple[int, ...]) -> Optional[str]:
         """
         Decode and postprocess encoded corpus by converting integer identifiers to string.
@@ -177,6 +179,22 @@ class TextProcessor:
 
         In case of corrupt input arguments, None is returned
         """
+        if not isinstance(decoded_corpus, tuple) or len(decoded_corpus) < 1:
+            return None
+        string_text = ''
+        string_text = ''.join([string_text, decoded_corpus[0].upper()])
+        print(string_text)
+        for i in decoded_corpus[1:-1]:
+            if i.isalpha():
+                string_text = ''.join([string_text, i])
+            else:
+                string_text = ''.join([string_text, ' '])
+        print(string_text)
+        if decoded_corpus[-1] == self._end_of_word_token:
+            string_text = ''.join([string_text, '.'])
+        else:
+            string_text = ''.join([string_text, decoded_corpus[-1], '.'])
+        return string_text
 
 
 class NGramLanguageModel:
