@@ -144,8 +144,9 @@ class TextProcessor:
         In case of corrupt input arguments or invalid argument length,
         an element is not added to storage
         """
-        if isinstance(element, str) and len(element) == 1 and element not in self._storage:
-            self._storage[element] = len(self._storage)
+        if not isinstance(element, str) or len(element) != 1 or element in self._storage:
+            return None
+        return self._storage.update({element: len(self._storage)})
 
     def decode(self, encoded_corpus: tuple[int, ...]) -> Optional[str]:
         """
@@ -169,8 +170,6 @@ class TextProcessor:
         if not decoded_symbols:
             return None
         decoded_text = self._postprocess_decoded_text(decoded_symbols)
-        if not decoded_text:
-            return None
         return decoded_text
 
     def fill_from_ngrams(self, content: dict) -> None:
@@ -409,8 +408,6 @@ class GreedyTextGenerator:
             encoded += (sorted(candidates_max)[0][0],)
 
         text = self._text_processor.decode(encoded)
-        if not text:
-            return None
         return text
 
 

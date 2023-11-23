@@ -18,7 +18,6 @@ def main() -> None:
     if isinstance(encoded, tuple) and encoded:
         decoded = str(processor.decode(encoded))
         print('Text:', text[:100], '\nDecoded:', decoded[:100], sep='\n', end='\n\n')
-        result = decoded
 
         ng_model = NGramLanguageModel(encoded, n_gram_size=3)
         print('Started building n-grams!')
