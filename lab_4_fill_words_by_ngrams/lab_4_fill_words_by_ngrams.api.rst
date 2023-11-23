@@ -1,11 +1,11 @@
-lab\_1\_classify\_by\_unigrams package
-======================================
+lab\_4\_fill\_words\_by\_ngrams package
+=======================================
 
 Submodules
 ----------
 
 
-.. automodule:: lab_1_classify_by_unigrams.main
+.. automodule:: lab_4_fill_words_by_ngrams.main
    :members:
    :undoc-members:
    :show-inheritance:
@@ -15,7 +15,7 @@ Submodules
 Module contents
 ---------------
 
-.. automodule:: lab_1_classify_by_unigrams
+.. automodule:: lab_4_fill_words_by_ngrams
    :members:
    :undoc-members:
    :show-inheritance:
