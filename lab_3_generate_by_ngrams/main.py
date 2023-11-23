@@ -341,7 +341,7 @@ class NGramLanguageModel:
 
         sort_dict = dict(sorted(self._n_gram_frequencies.items(), key=lambda x: (-x[1], x[0])))
         for n_gram in sort_dict:
-            if n_gram[:self._n_gram_size-1] == context:
+            if n_gram[:-1] == context:
                 freq_of_prediction[n_gram[-1]] = sort_dict[n_gram]
 
         return freq_of_prediction
@@ -684,12 +684,10 @@ class NGramLanguageModelReader:
         """
         if not isinstance(n_gram_size, int) or not n_gram_size or n_gram_size < 2:
             return None
-            
 
-        ngrams = {}
-        encoded_seq = []
-
-        for ngram in self._content["freq"]:
+        n_grams = {}
+        for ngram in self._content['freq']:
+            encoded_seq = []
             for token in ngram:
                 if token.isalpha():
                     id = self._text_processor.get_id(token.lower())
@@ -697,23 +695,21 @@ class NGramLanguageModelReader:
                 elif token.isspace():
                     encoded_seq.append(0)
 
-            if not ngrams.get(tuple(encoded_seq)):
-                ngrams[tuple(encoded_seq)] = 0.0
-            ngrams[tuple(encoded_seq)] += self._content['freq'][ngram]
+            if not n_grams.get(tuple(encoded_seq)):
+                n_grams[tuple(encoded_seq)] = 0.0
+            n_grams[tuple(encoded_seq)] += self._content['freq'][ngram]
 
-        sized_ngrams = {}    
-        for ngram, freq in ngrams.items():
-            if len(ngram) == n_gram_size and isinstance(ngram, tuple):
-                same_beginning = [ngrams[same_beginning] for same_beginning in ngrams
-                                    if same_beginning[-n_gram_size: -1]] == ngram[-n_gram_size: -1]
-                sized_ngrams[ngram] = freq / sum(same_beginning)
+        sized_ngrams = {}
+        for n_gram, freq in n_grams.items():
+            if isinstance(n_gram, tuple) and len(n_gram) == n_gram_size:
+                same_beginning = [n_grams[beginning] for beginning in n_grams
+                                    if beginning[-n_gram_size:-1] == n_gram[-n_gram_size:-1]]
+                sized_ngrams[n_gram] = freq / sum(same_beginning)
 
-        new_model = NGramLanguageModel(None, n_gram_size)
-        new_model.set_n_grams(sized_ngrams)
-        return new_model
-      
+        model = NGramLanguageModel(None, n_gram_size)
+        model.set_n_grams(sized_ngrams)
+        return model
 
-        # filter(lambda ngrams[x]: context[-n_gram_size: -1]] == ngram[-ngram_size: -1], ngrams)
     def get_text_processor(self) -> TextProcessor:  # type: ignore[empty-body]
         """
         Get method for the processor created for the current JSON file.
