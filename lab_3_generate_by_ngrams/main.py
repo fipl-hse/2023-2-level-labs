@@ -4,7 +4,7 @@ Lab 3.
 Beam-search and natural language generation evaluation
 """
 # pylint:disable=too-few-public-methods
-from typing import Optional, List, Any
+from typing import Optional
 import string
 
 
@@ -330,12 +330,12 @@ class NGramLanguageModel:
                 and sequence and len(sequence) >= self._n_gram_size - 1):
             return None
 
-        context = sequence[- (self._n_gram_size-1):]
+        context = sequence[- (self._n_gram_size - 1):]
 
         tokens_freq = {}
         for n_gram, freq in self._n_gram_frequencies.items():
-            if n_gram[:self._n_gram_size-1] == context:
-                token = n_gram[self._n_gram_size-1]
+            if n_gram[:self._n_gram_size - 1] == context:
+                token = n_gram[self._n_gram_size - 1]
                 tokens_freq[token] = freq
 
         return tokens_freq
@@ -361,6 +361,7 @@ class NGramLanguageModel:
         for i in range(len(encoded_corpus) - self._n_gram_size + 1):
             n_grams.append(tuple(encoded_corpus[i: i + self._n_gram_size]))
         return tuple(n_grams)
+
 
 class GreedyTextGenerator:
     """
@@ -408,7 +409,7 @@ class GreedyTextGenerator:
             return None
 
         for i in range(seq_len):
-            tokens = self._model.generate_next_token(encoded_prompt[-n_gram_size+1:])
+            tokens = self._model.generate_next_token(encoded_prompt[-n_gram_size + 1:])
             if not tokens:
                 break
             max_freq = max(tokens.values())
@@ -417,6 +418,7 @@ class GreedyTextGenerator:
             encoded_prompt += (best_candidates[0],)
         decoded_prompt = self._text_processor.decode(encoded_prompt)
         return decoded_prompt
+
 
 class BeamSearcher:
     """
