@@ -105,11 +105,9 @@ class TextProcessor:
         if not isinstance(element_id, int) or element_id not in self._storage.values():
             return None
 
-        #for key, value in self._storage.items():
-            #if value == element_id:
-                #return key
-
-        return ''.join(list(filter(lambda x: self._storage[x] == element_id, self._storage.keys())))
+        for key, value in self._storage.items():
+            if value == element_id:
+                return key
 
     def encode(self, text: str) -> Optional[tuple[int, ...]]:
         """
