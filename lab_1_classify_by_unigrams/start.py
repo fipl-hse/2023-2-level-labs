@@ -18,6 +18,6 @@ def main() -> None:
 
 
 import main
-f = open('C:/Users/alena\OneDrive\Рабочий стол/2023/2023-2-level-labs\lab_1_classify_by_unigrams/assets/texts/en.txt', 'r')
+f = open('en.txt', 'r')
 f_text = f.read()
 print(main.tokenize(f_text))
