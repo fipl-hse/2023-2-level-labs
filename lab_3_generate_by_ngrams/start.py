@@ -23,7 +23,12 @@ def main() -> None:
     print(generated_text)
     beam_search_generator = main_py.BeamSearchTextGenerator(language_model, text_processor, 7)
     print(beam_search_generator.run('Vernon', 56))
+    new_language_model = main_py.NGramLanguageModelReader('assets/en.json', '_')
+    new_model = new_language_model.load(3)
+    back_off_generator = main_py.BackOffGenerator(new_model, text_processor)
+    print(back_off_generator.run(56, 'Vernon'))
     result = decoded_text
+
     assert result
 
 
