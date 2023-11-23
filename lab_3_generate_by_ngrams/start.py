@@ -16,8 +16,8 @@ def main() -> None:
     processor = TextProcessor('_')
     encoded = processor.encode(text)
     if encoded:
-        the_result = processor.decode(encoded)
-        print(the_result)
+        result = processor.decode(encoded)
+        print(result)
         the_model = NGramLanguageModel(encoded[:10], 2)
         print(the_model.build())
         model = NGramLanguageModel(encoded, 7)
