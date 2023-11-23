@@ -390,7 +390,7 @@ class GreedyTextGenerator:
                 and isinstance(prompt, str) and prompt):
             return None
         encoded_prompt = self._text_processor.encode(prompt)
-    len_of_context = self._model.get_n_gram_size()
+        len_of_context = self._model.get_n_gram_size()
         if not (encoded_prompt and len_of_context):
             return None
         for i in range(seq_len):
