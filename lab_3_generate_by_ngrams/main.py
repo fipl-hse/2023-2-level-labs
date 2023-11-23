@@ -219,7 +219,7 @@ class TextProcessor:
         decoded_text = decoded_corpus.capitalize()
         for element in decoded_corpus[1:-1]:
             if element = self._end_of_word_token:
-                decoded_text = f'{decoded_text} "
+                decoded_text = f'{decoded_text} '
             else:
                 decoded_text += element
         if decoded_corpus[-1] != self._end_of_word_token:
