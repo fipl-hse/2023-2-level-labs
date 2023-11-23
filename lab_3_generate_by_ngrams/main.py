@@ -46,13 +46,13 @@ class TextProcessor:
 
         if not isinstance(text, str) or not text or not any(char.isalpha() for char in text):
             return None
-        self.text = text
+
         splited_text = text.split()
         list_of_tokens = []
         for word in splited_text:
-            current_word = ''.join(char.lower() for char in word if char.isalpha())
-            if current_word:
-                list_of_tokens += current_word
+            clear_word = [char.lower() for char in word if char.isalpha()]
+            if clear_word:
+                list_of_tokens.extend(clear_word)
                 list_of_tokens.append(self._end_of_word_token)
 
         if text[-1].isalnum():
@@ -105,9 +105,9 @@ class TextProcessor:
         if not isinstance(element_id, int) or element_id not in self._storage.values():
             return None
 
-        for i in self._storage.values():
-            if element_id == self._storage.values():
-                return str(self._storage.keys())
+        inverted_storage = {v: k for k, v in self._storage.items()}
+
+        return inverted_storage[element_id]
 
     def encode(self, text: str) -> Optional[tuple[int, ...]]:
         """
@@ -146,8 +146,6 @@ class TextProcessor:
 
         return tuple(encoded_corpus)
 
-        return tuple(encoded_corpus)
-
     def _put(self, element: str) -> None:
         """
         Put an element into the storage, assign a unique id to it.
@@ -163,6 +161,8 @@ class TextProcessor:
 
         if element not in self._storage:
             self._storage[element] = len(self._storage)
+
+        return None
 
     def decode(self, encoded_corpus: tuple[int, ...]) -> Optional[str]:
         """
