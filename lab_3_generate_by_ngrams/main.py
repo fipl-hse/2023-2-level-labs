@@ -97,10 +97,8 @@ class TextProcessor:
         """
         if not isinstance(element_id, int) or element_id not in self._storage.values():
             return None
-        for keys, values in self._storage.items():
-            if element_id == values:
-                return keys
-        return None
+        keys = tuple(filter(lambda a: a[1] == element_id, self._storage.items()))
+        return keys[0][0]
 
     def encode(self, text: str) -> Optional[tuple[int, ...]]:
         """
