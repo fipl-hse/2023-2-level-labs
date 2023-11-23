@@ -339,34 +339,17 @@ class NGramLanguageModel:
 
         In case of corrupt input arguments, None is returned
         """
-        # if (not isinstance(sequence, tuple) or len(sequence) == 0
-        #         or len(sequence) < self._n_gram_size - 1):
-        #     return None
-        #
-        # frequencies = {i[-1]: self._n_gram_frequencies[i]
-        #                for i in self._n_gram_frequencies
-        #                if i[:self._n_gram_size - 1]
-        #                == sequence[-(self._n_gram_size-1):]}
-        #
-        # return frequencies
-        if not isinstance(sequence, tuple) or len(sequence) == 0:
+        if (not isinstance(sequence, tuple) or len(sequence) == 0
+                or len(sequence) < self._n_gram_size - 1):
             return None
 
-        context = sequence[-(self._n_gram_size - 1):]
-        if len(context) > len(sequence):
-            return None
-        potential_n_grams = [n_gram for n_gram in self._n_gram_frequencies.keys() if n_gram[:len(context)] == context]
-        next_tokens = {}
-        for n_gram in potential_n_grams:
-            next_token = n_gram[-1]
-            if next_token in next_tokens:
-                next_tokens[next_token] += self._n_gram_frequencies[n_gram]
-            else:
-                next_tokens[next_token] = self._n_gram_frequencies[n_gram]
+        frequencies = {i[-1]: self._n_gram_frequencies[i]
+                       for i in self._n_gram_frequencies.keys()
+                       if i[:self._n_gram_size - 1]
+                       == sequence[-(self._n_gram_size-1):]}
 
-        sorted_next_tokens = {k: v for k, v in sorted(next_tokens.items(), key=lambda item: (-item[1], item[0]))}
+        return frequencies
 
-        return sorted_next_tokens
 
     def _extract_n_grams(
             self, encoded_corpus: tuple[int, ...]
@@ -386,8 +369,8 @@ class NGramLanguageModel:
             return None
 
         extracted_n_grams = []
-        for i, v in enumerate(encoded_corpus[:-(self._n_gram_size-1)]):
-            n_gram = tuple([encoded_corpus[i+num] for num in range(0, self._n_gram_size)])
+        for i, value in enumerate(encoded_corpus[:-(self._n_gram_size-1)]):
+            n_gram = tuple(encoded_corpus[i+num] for num in range(0, self._n_gram_size))
             extracted_n_grams.append(n_gram)
 
         return tuple(extracted_n_grams)
@@ -430,16 +413,16 @@ class GreedyTextGenerator:
         if not (isinstance(seq_len, int) and isinstance(prompt, str)) or len(prompt) == 0:
             return None
 
-        encoded = self._text_processor.encode(prompt)
-        if encoded is None:
+        encoded_tuple = self._text_processor.encode(prompt)
+        if encoded_tuple is None:
             return None
-        encoded = [*encoded]
+        encoded = [*encoded_tuple]
 
         for i in range(seq_len):
             tokens = self._model.generate_next_token(tuple(encoded))
             if tokens is None or len(tokens) == 0:
                 break
-            token = max(tokens, key=tokens.get)
+            token = max(tokens, key=tokens.__getitem__)
             encoded.append(token)
 
         return self._text_processor.decode(tuple(encoded))
