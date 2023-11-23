@@ -15,8 +15,6 @@ class TextProcessor:
         _end_of_word_token (str): A token denoting word boundary
         _storage (dict): Dictionary in the form of <token: identifier>
     """
-    _end_of_word_token: str
-    _storage: dict
 
     def __init__(self, end_of_word_token: str) -> None:
         """
