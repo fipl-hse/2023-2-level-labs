@@ -43,19 +43,17 @@ class TextProcessor:
         In case of corrupt input arguments, None is returned.
         In case any of methods used return None, None is returned.
         """
-        if not isinstance(text, str) or len(text) == 0:
+        if not isinstance(text, str) or not text:
             return None
         tokenized_text = []
-        counter = 0
         for word in text.lower():
             if word.isalpha():
                 tokenized_text.append(word)
-                counter += 1
             elif word is ' ' and tokenized_text[-1] != self._end_of_word_token:
                 tokenized_text.append(self._end_of_word_token)
         if not text[-1].isalnum():
             tokenized_text.append(self._end_of_word_token)
-        if counter == 0:
+        if not tokenized_text:
             return None
         return tuple(tokenized_text)
 
