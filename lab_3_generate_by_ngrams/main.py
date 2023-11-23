@@ -44,7 +44,7 @@ class TextProcessor:
         In case of corrupt input arguments, None is returned.
         In case any of methods used return None, None is returned.
         """
-        if not isinstance(text, str) or not text:
+        if not isinstance(text, str):
             return None
         tokens = []
         for token in text.lower():
@@ -274,6 +274,7 @@ class NGramLanguageModel:
         if not isinstance(frequencies, dict) or not frequencies:
             return None
         self._n_gram_frequencies = frequencies
+        return None
 
     def build(self) -> int:
         """
@@ -293,7 +294,8 @@ class NGramLanguageModel:
         if not isinstance(n_grams, tuple) or not n_grams:
             return 1
         for n_gram in set(n_grams):
-            start_occurrence = len([another_ng for another_ng in n_grams if another_ng[:-1] == n_gram[:-1]])
+            start_occurrence = len([another_ng for another_ng in n_grams
+                                    if another_ng[:-1] == n_gram[:-1]])
             abs_freq = n_grams.count(n_gram)
             self._n_gram_frequencies[n_gram] = abs_freq / start_occurrence
         return 0
@@ -318,7 +320,7 @@ class NGramLanguageModel:
         for n_gram, freq in self._n_gram_frequencies.items():
             if n_gram[:-1] == context:
                 result[n_gram[-1]] = freq
-        sorted_result = {k: v for k, v in sorted(result.items(), key=lambda item: (-item[1], item[0]))}
+        sorted_result = dict(sorted(result.items(), key=lambda item: (-item[1], item[0])))
         return sorted_result
 
     def _extract_n_grams(
@@ -469,12 +471,12 @@ class BeamSearcher:
 
         In case of corrupt input arguments or unexpected behaviour of methods used return None.
         """
-        if not isinstance(sequence, tuple) or not sequence \
-                or not isinstance(next_tokens, list) or not next_tokens \
-                or not isinstance(sequence_candidates, dict) \
-                or not sequence_candidates \
-                or not len(next_tokens) <= self._beam_width \
-                or sequence not in sequence_candidates:
+        if not (isinstance(sequence, tuple) and sequence
+                and isinstance(next_tokens, list) and next_tokens
+                and isinstance(sequence_candidates, dict)
+                and sequence_candidates
+                and len(next_tokens) <= self._beam_width
+                and sequence in sequence_candidates):
             return None
         new_sequence_candidates = dict(sequence_candidates)
         for token in next_tokens:
