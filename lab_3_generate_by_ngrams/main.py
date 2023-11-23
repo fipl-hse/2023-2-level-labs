@@ -50,7 +50,7 @@ class TextProcessor:
         tokens = []
         list_text = text.lower().split()
         for element in list_text:
-            word = [token for token in element if token.isalpha()]
+            word = list(filter(str.isalpha, element))
             if word:
                 tokens.extend(word)
                 tokens.append(self._end_of_word_token)
@@ -147,9 +147,7 @@ class TextProcessor:
         In case of corrupt input arguments or invalid argument length,
         an element is not added to storage
         """
-        if not isinstance(element, str) or len(element) != 1:
-            return None
-        if element not in self._storage:
+        if isinstance(element, str) and len(element) == 1 and element not in self._storage:
             self._storage[element] = len(self._storage)
         return None
 
@@ -190,10 +188,10 @@ class TextProcessor:
         """
         if not isinstance(content, dict) or not content:
             return None
-        for key in content['freq']:
-            for element in key:
-                if element.isalpha():
-                    self._put(element)
+        for n_gram in content['freq']:
+            for token in n_gram:
+                if token.isalpha():
+                    self._put(token)
         return None
 
     def _decode(self, corpus: tuple[int, ...]) -> Optional[tuple[str, ...]]:
@@ -243,12 +241,12 @@ class TextProcessor:
         decoded_text = decoded_corpus[0].upper()
         for token in decoded_corpus[1:-1]:
             if token == self._end_of_word_token:
-                decoded_text += ' '
+                decoded_text = f'{decoded_text} '
             else:
                 decoded_text += token
         if decoded_corpus[-1] != self._end_of_word_token:
             decoded_text += decoded_corpus[-1]
-        return decoded_text + '.'
+        return f'{decoded_text}.'
 
 
 class NGramLanguageModel:
@@ -365,7 +363,8 @@ class NGramLanguageModel:
         n_grams = []
         list_encoded_corpus = list(encoded_corpus)
         for index in range(len(encoded_corpus) + 1 - self._n_gram_size):
-            n_grams.append(tuple(list_encoded_corpus[index: index + self._n_gram_size]))
+            n_gram = tuple(list_encoded_corpus[index: index + self._n_gram_size])
+            n_grams.append(n_gram)
         return tuple(n_grams)
 
 
@@ -415,8 +414,8 @@ class GreedyTextGenerator:
             candidates = self._model.generate_next_token(encoded)
             if not candidates:
                 break
-            best_candidate = ([letter for letter, freq in candidates.items()
-                               if freq == max(candidates.values())])
+            max_freq = max(candidates.values())
+            best_candidate = list(filter(lambda x: candidates[x] == max_freq, candidates))
             max_freq_letters = sorted(best_candidate)
             encoded += (max_freq_letters[0],)
             seq_len -= 1
