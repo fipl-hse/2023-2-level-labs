@@ -34,6 +34,17 @@ def format_stub_file(res_stub_path: Path) -> None:
         raise ValueError(res_process.stderr.decode('utf-8'))
 
 
+def sort_stub_imports(res_stub_path: Path) -> None:
+    """
+    Autoformatting resulting stub
+    """
+    res_process = _run_console_tool('isort',
+                                    str(res_stub_path),
+                                    debug=False)
+    if res_process.returncode != 0:
+        raise ValueError(res_process.stderr.decode('utf-8'))
+
+
 def main() -> None:
     """
     Entrypoint for stub generation

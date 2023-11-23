@@ -11,6 +11,10 @@
         {
             "name": "lab_3_generate_by_ngrams",
             "coverage": 10
+        },
+        {
+            "name": "lab_4_fill_words_by_ngrams",
+            "coverage": 10
         }
     ],
     "addons": [],
