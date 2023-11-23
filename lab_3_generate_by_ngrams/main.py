@@ -223,9 +223,12 @@ class TextProcessor:
         """
         if not isinstance(decoded_corpus, tuple) or not decoded_corpus:
             return None
-        decoded_list = []
-        for token in decoded_corpus:
-            decoded_list += token
+        decoded_list = list(decoded_corpus)
+        if decoded_list[-1] == self._end_of_word_token :
+            del decoded_list[-1]
+        decoded = ''.join(decoded_list)
+        decoded = decoded.replace(self._end_of_word_token, ' ')
+        return f'{decoded.capitalize()}.'
 
 
 class NGramLanguageModel:
