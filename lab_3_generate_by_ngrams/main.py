@@ -199,6 +199,13 @@ class TextProcessor:
         Args:
             content (dict): ngrams from external JSON
         """
+        if not(isinstance(content, dict) and content):
+            return None
+
+        n_grams = ''.join([''.join((filter(lambda x: x.isalpha, key))) for key in content['freq']])
+        n_grams = n_grams.replace(' ', '')
+        for n_gram in n_grams:
+            self._put(n_gram)
 
     def _decode(self, corpus: tuple[int, ...]) -> Optional[tuple[str, ...]]:
         """
