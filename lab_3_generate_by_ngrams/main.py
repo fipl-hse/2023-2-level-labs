@@ -309,7 +309,7 @@ class NGramLanguageModel:
 
         In case of corrupt input arguments, None is returned
         """
-        if not isinstance(sequence, tuple) or not sequence or self.n_gram_size > len(sequence):
+        if not isinstance(sequence, tuple) or not sequence or self._n_gram_size > len(sequence):
             return None
         context_freq = {}
         context = sequence[len(sequence) - (self._n_gram_size - 1):]
@@ -391,10 +391,9 @@ class GreedyTextGenerator:
             max_freq = max(candidates.values())
             best_candidate = [letter for letter, freq in candidates.items() if freq == max_freq]
             max_freq_letters = sorted(best_candidate)
-            encoded_text += (max_freq_letters[0])
+            encoded_text += (max_freq_letters[0],)
             seq_len -= 1
-        decoded_prompt = self._text_processor.decode(encoded_text)
-        return decoded_prompt
+        return self._text_processor.decode(encoded_text)
 
 
 class BeamSearcher:
