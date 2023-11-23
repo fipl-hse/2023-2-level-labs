@@ -178,8 +178,6 @@ class TextProcessor:
         Args:
             content (dict): ngrams from external JSON
         """
-        # if not isinstance(content, dict):
-        #     return None
 
     def _decode(self, corpus: tuple[int, ...]) -> Optional[tuple[str, ...]]:
         """
