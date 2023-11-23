@@ -23,6 +23,8 @@ class TextProcessor:
         Args:
             end_of_word_token (str): A token denoting word boundary
         """
+        self._end_of_word_token = end_of_word_token
+        self._storage = {'_': 0}
 
     def _tokenize(self, text: str) -> Optional[tuple[str, ...]]:
         """
@@ -41,6 +43,26 @@ class TextProcessor:
         In case of corrupt input arguments, None is returned.
         In case any of methods used return None, None is returned.
         """
+        if not isinstance(text, str):
+            return None
+
+        text = text.lower()
+        text_split = text.split()
+        text_list = []
+
+        for word in text_split:
+            word_list = [letter for letter in word if letter.isalpha()]
+            if not word_list:
+                continue
+            text_list += word_list
+            text_list.append(self._end_of_word_token)
+
+        if text_list.count(self._end_of_word_token) == len(text_list):
+            return None
+
+        if text[-1].isalnum():
+            del text_list[-1]
+        return tuple(text_list)
 
     def get_id(self, element: str) -> Optional[int]:
         """
@@ -55,6 +77,10 @@ class TextProcessor:
         In case of corrupt input arguments or arguments not included in storage,
         None is returned
         """
+        if not isinstance(element, str) or element not in self._storage:
+            return None
+
+        return self._storage[element]
 
     def get_end_of_word_token(self) -> str:
         """
@@ -63,7 +89,7 @@ class TextProcessor:
         Returns:
             str: EoW token
         """
-
+        return self._end_of_word_token
     def get_token(self, element_id: int) -> Optional[str]:
         """
         Retrieve an element by unique identifier.
@@ -76,6 +102,10 @@ class TextProcessor:
 
         In case of corrupt input arguments or arguments not included in storage, None is returned
         """
+        if not isinstance(element, str) or element not in self._storage:
+            return None
+
+        return self._storage[element]
 
     def encode(self, text: str) -> Optional[tuple[int, ...]]:
         """
@@ -93,6 +123,21 @@ class TextProcessor:
         In case of corrupt input arguments, None is returned.
         In case any of methods used return None, None is returned.
         """
+        if not (isinstance(text, str) and text):
+            return None
+
+        encoded_corpus = []
+        tokens = self._tokenize(text)
+
+        if tokens is None:
+            return None
+        for token in tokens:
+            self._put(token)
+            token_id = self.get_id(token)
+            if token_id is None:
+                return None
+            encoded_corpus.append(token_id)
+        return tuple(encoded_corpus)
 
     def _put(self, element: str) -> None:
         """
