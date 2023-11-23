@@ -35,7 +35,7 @@ def main() -> None:
             beam_search_generator = BeamSearchTextGenerator(model, processor, 7)
             print(beam_search_generator.run('Vernon', 56))
 
-        assert result
+            assert result
 
 
 
