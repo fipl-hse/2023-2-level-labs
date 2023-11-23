@@ -51,10 +51,9 @@ class TextProcessor:
         text_words = text.lower().split()
         tokens = []
         for word in text_words:
-            len_prev = len(tokens)
             word_tokens = [alpha for alpha in word if alpha.isalpha()]
             tokens.extend(word_tokens)
-            if len(tokens) > len_prev:
+            if word_tokens:
                 tokens.append(self._end_of_word_token)
 
         if not tokens:
