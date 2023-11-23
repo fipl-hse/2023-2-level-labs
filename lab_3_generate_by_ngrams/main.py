@@ -125,9 +125,10 @@ class TextProcessor:
         encoded = []
         for symbol in unigrams:
             self._put(symbol)
-            encoded.append(self.get_id(symbol))
-        if None in self._storage or None in encoded:
-            return None
+            codenumber = self.get_id(symbol)
+            if not symbol or not isinstance(codenumber, int):
+                return None
+            encoded.append(codenumber)
         return tuple(encoded)
 
     def _put(self, element: str) -> None:
@@ -192,9 +193,10 @@ class TextProcessor:
             return None
         decoded = []
         for token_id in corpus:
-            decoded.append(self.get_token(token_id))
-        if None in decoded:
-            return None
+            token = self.get_token(token_id)
+            if not token:
+                return None
+            decoded.append(token)
         return tuple(decoded)
 
     def _postprocess_decoded_text(self, decoded_corpus: tuple[str, ...]) -> Optional[str]:
