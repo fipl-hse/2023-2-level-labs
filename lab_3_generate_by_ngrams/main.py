@@ -123,7 +123,7 @@ class TextProcessor:
         In case of corrupt input arguments, None is returned.
         In case any of methods used return None, None is returned.
         """
-        if not isinstance(text, str) or len(text) == 0:
+        if not isinstance(text, str) or not text:
             return None
 
         encoded_text = {}
@@ -201,7 +201,7 @@ class TextProcessor:
             content (dict): ngrams from external JSON
         """
         #!!!
-        if not isinstance(content, dict) or len(content) == 0:
+        if not isinstance(content, dict) or not content:
             return None
 
         for token in content['freq']:
@@ -224,12 +224,12 @@ class TextProcessor:
         In case of corrupt input arguments, None is returned.
         In case any of methods used return None, None is returned.
         """
-        if not isinstance(corpus, tuple) or len(corpus) == 0:
+        if not isinstance(corpus, tuple) or not corpus:
             return None
 
         decoded_corpus = []
-        for element in range(len(corpus)):
-            decoded_element = self.get_token(corpus[element])
+        for element in corpus:
+            decoded_element = self.get_token(element)
 
             if decoded_element is None:
                 return None
@@ -253,20 +253,15 @@ class TextProcessor:
 
         In case of corrupt input arguments, None is returned
         """
-        if not isinstance(decoded_corpus, tuple) or len(decoded_corpus) == 0:
+        if not isinstance(decoded_corpus, tuple) or not decoded_corpus:
             return None
 
-        decoded_corpus_list = list(decoded_corpus)
-        if decoded_corpus_list[-1] == self._end_of_word_token:
-            decoded_corpus_list[-1] = '.'
-        else:
-            decoded_corpus_list.append('.')
+        capitalized_corpus = ''.join(decoded_corpus).capitalize().replace(self._end_of_word_token, ' ')
+        if capitalized_corpus[-1] == ' ':
+            capitalized_corpus = capitalized_corpus[:-1]
+        result = capitalized_corpus + '.'
 
-        for token in range(len(decoded_corpus_list)):
-            if decoded_corpus_list[token] == self._end_of_word_token:
-                decoded_corpus_list[token] = ' '
-        capitalized_corpus = ''.join(decoded_corpus_list).capitalize()
-        return capitalized_corpus
+        return result
 
 class NGramLanguageModel:
     """
@@ -306,7 +301,7 @@ class NGramLanguageModel:
         Args:
             frequencies (dict): Computed in advance frequencies for n-grams
         """
-        if not isinstance(frequencies, dict) or len(frequencies) == 0:
+        if not isinstance(frequencies, dict) or not frequencies:
             return None
 
         self._n_gram_frequencies = frequencies
@@ -325,7 +320,7 @@ class NGramLanguageModel:
         In case of corrupt input arguments or methods used return None,
         1 is returned
         """
-        if not isinstance(self._encoded_corpus, tuple) or len(self._encoded_corpus) == 0:
+        if not isinstance(self._encoded_corpus, tuple) or not self._encoded_corpus:
             return 1
 
         ngrams = self._extract_n_grams(self._encoded_corpus)
@@ -567,7 +562,7 @@ class BeamSearcher:
 
         In case of corrupt input arguments return None.
         """
-        if not isinstance(sequence_candidates, dict) or len(sequence_candidates) == 0:
+        if not isinstance(sequence_candidates, dict) or not sequence_candidates:
             return None
 
         sorted_sequences = sorted(sequence_candidates.items(), key=lambda x: (x[1], x[0]))
