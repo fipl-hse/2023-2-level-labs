@@ -92,6 +92,7 @@ class TextProcessor:
             str: EoW token
         """
 
+
     def get_token(self, element_id: int) -> Optional[str]:
         """
         Retrieve an element by unique identifier.
@@ -104,6 +105,12 @@ class TextProcessor:
 
         In case of corrupt input arguments or arguments not included in storage, None is returned
         """
+        if not isinstance(element_id, int):
+            return None
+
+        reverted_storage = {v: k for k, v in self._storage.items()}
+        if element_id in reverted_storage:
+            return reverted_storage[element_id]
 
     def encode(self, text: str) -> Optional[tuple[int, ...]]:
         """
