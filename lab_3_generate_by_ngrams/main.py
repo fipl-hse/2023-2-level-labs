@@ -127,9 +127,9 @@ class TextProcessor:
         for token in tokenized_text:
             self._put(token)
             token_id = self.get_id(token)
-            encoded_text.append(token_id)
             if not isinstance(token_id, int):
                 return None
+            encoded_text.append(token_id)
         return tuple(encoded_text)
 
     def _put(self, element: str) -> None:
