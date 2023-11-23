@@ -27,7 +27,7 @@ def main() -> None:
     print(beam_search_generator.run('Vernon', 56))
     new_language_model = main_py.NGramLanguageModelReader('assets/en.json', '_')
     new_model = (new_language_model.load(3),)
-    if isinstance(new_model, tuple):
+    if new_language_model in new_model:
         back_off_generator = main_py.BackOffGenerator(new_model, text_processor)
         print(back_off_generator.run(56, 'Vernon'))
 
