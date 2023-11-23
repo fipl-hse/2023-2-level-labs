@@ -149,10 +149,6 @@ class TextProcessor:
 
         return tuple(result)
 
-
-
-
-
     def _put(self, element: str) -> None:
         """
         Put an element into the storage, assign a unique id to it.
@@ -187,6 +183,7 @@ class TextProcessor:
         In case any of methods used return None, None is returned.
         """
 
+
     def fill_from_ngrams(self, content: dict) -> None:
         """
         Fill internal storage with letters from external JSON.
@@ -208,6 +205,18 @@ class TextProcessor:
         In case of corrupt input arguments, None is returned.
         In case any of methods used return None, None is returned.
         """
+        if not isinstance(corpus, tuple) or len(corpus) == 0:
+            return None
+
+        result = []
+
+        for el in corpus:
+            get_token_el = self.get_token(el)
+            if not get_token_el:
+                return None
+            result.append(get_token_el)
+
+        return tuple(result)
 
     def _postprocess_decoded_text(self, decoded_corpus: tuple[str, ...]) -> Optional[str]:
         """
@@ -224,11 +233,31 @@ class TextProcessor:
 
         In case of corrupt input arguments, None is returned
         """
+        if not isinstance(decoded_corpus, tuple) or len(decoded_corpus) == 0:
+            return None
+
+        result = ''
+
+        for el in decoded_corpus:
+            if el != self._end_of_word_token:
+                result += el
+            else:
+                result += ' '
+
+        result = result.replace(result[0], result[0].upper(), 1)
+        result = result.rstrip(' ')
+        result += '.'
+
+        return result
 
 text = 'GPT-4 — большая мультимодальная языковая модель,' ' созданная OpenAI, четвёртая в серии GPT.'
 
 text_processor = TextProcessor('_')
-print(text_processor.encode(text))
+encoded = text_processor.encode(text)
+protected_decoded = text_processor._decode(encoded)
+res = text_processor._postprocess_decoded_text(protected_decoded)
+print(res)
+print (res[0])
 
 class NGramLanguageModel:
     """
