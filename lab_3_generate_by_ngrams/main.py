@@ -23,7 +23,7 @@ class TextProcessor:
         Args:
             end_of_word_token (str): A token denoting word boundary
         """
-1
+11
     def _tokenize(self, text: str) -> Optional[tuple[str, ...]]:
         """
         Tokenize text into unigrams, separating words with special token.
