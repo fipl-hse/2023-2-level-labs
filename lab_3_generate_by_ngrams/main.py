@@ -192,7 +192,7 @@ class TextProcessor:
             for token in element:
                 if token.isalpha():
                     self._put(token)
-                if token == ' ' or token == self._end_of_word_token:
+                if token in (' ', self._end_of_word_token):
                     self._put(self._end_of_word_token)
         return None
 
