@@ -58,7 +58,6 @@ class TextProcessor:
 
         if text[-1] in string.punctuation:
             tokens.append(self._end_of_word_token)
-
         return tuple(tokens)
 
     def get_id(self, element: str) -> Optional[int]:

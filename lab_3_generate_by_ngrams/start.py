@@ -1,7 +1,8 @@
 """
 Generation by NGrams starter
 """
- from lab_3_generate_by_ngrams.main import TextProcessor, NGramLanguageModel, GreedyTextGenerator
+from lab_3_generate_by_ngrams.main import TextProcessor, NGramLanguageModel, GreedyTextGenerator
+
 
 def main() -> None:
     """
