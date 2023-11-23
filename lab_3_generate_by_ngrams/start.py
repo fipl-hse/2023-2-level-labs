@@ -18,16 +18,16 @@ def main() -> None:
     encoded_text = text_processor.encode(text)
     if not (isinstance(encoded_text, tuple) and encoded_text):
         return
-    result = str(text_processor.decode(encoded_text))
+    result = text_processor.decode(encoded_text)
     print(result)
 
-    language_model = NGramLanguageModel(encoded_text, 7)
-    language_model.build()
-    print(language_model)
+    language_model = NGramLanguageModel(encoded_text[:100], 3)
+    result = language_model.build()
+    print(result)
 
     greedy_generator = GreedyTextGenerator(language_model, text_processor)
-    resulting_text = greedy_generator.run(51, "Vernon")
-    print(resulting_text)
+    result = greedy_generator.run(51, "Vernon")
+    print(result)
 
     assert result
 
