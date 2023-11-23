@@ -191,11 +191,12 @@ class TextProcessor:
             return None
         decoded_corpus = []
         for element_id in corpus:
-            if element_id is None:
+            if not isinstance(element_id, int):
                 return None
-            decoded_corpus.append(self.get_token(element_id))
-        if None in decoded_corpus:
-            return None
+            token = self.get_token(element_id)
+            if not token:
+                return None
+            decoded_corpus.append(token)
         return tuple(decoded_corpus)
 
     def _postprocess_decoded_text(self, decoded_corpus: tuple[str, ...]) -> Optional[str]:
@@ -215,16 +216,15 @@ class TextProcessor:
         """
         if not isinstance(decoded_corpus, tuple) or not decoded_corpus:
             return None
-        str_text = ''
-        for element in decoded_corpus:
-            if element != self._end_of_word_token:
-                str_text += element
+        decoded_text = decoded_corpus.capitalize()
+        for element in decoded_corpus[1:-1]:
+            if element = self._end_of_word_token:
+                decoded_text = f'{decoded_text} "
             else:
-                str_text += ' '
-        str_text = str_text.capitalize()
-        str_text = str_text[:-1]
-        str_text += '.'
-        return str_text
+                decoded_text += element
+        if decoded_corpus[-1] != self._end_of_word_token:
+            decoded_text += decoded_corpus[-1]
+        return f'{decoded_text}.'
 
 
 class NGramLanguageModel:
