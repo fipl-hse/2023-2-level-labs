@@ -149,7 +149,6 @@ class TextProcessor:
         """
         if isinstance(element, str) and len(element) == 1 and element not in self._storage:
             self._storage[element] = len(self._storage)
-        return None
 
     def decode(self, encoded_corpus: tuple[int, ...]) -> Optional[str]:
         """
@@ -415,7 +414,8 @@ class GreedyTextGenerator:
             if not candidates:
                 break
             max_freq = max(candidates.values())
-            best_candidate = list(filter(lambda x: candidates[x] == max_freq, candidates))
+            best_candidate = ([letter for letter, freq in candidates.items()
+                               if freq == max_freq])
             max_freq_letters = sorted(best_candidate)
             encoded += (max_freq_letters[0],)
             seq_len -= 1
