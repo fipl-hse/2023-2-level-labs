@@ -754,10 +754,9 @@ class BackOffGenerator:
         n_gram_sizes = sorted(self._language_models.keys(), reverse=True)
         for size in n_gram_sizes:
             n_gram_model = self._language_models[size]
-        candidate_letters = n_gram_model.generate_next_token(sequence_to_continue)
-        if candidate_letters is not None and len(candidate_letters) > 0:
-            prob_candidates = {}
-            for token, freq in candidate_letters.items():
-                prob_candidates[token] = freq / sum(candidate_letters.values())
-            return prob_candidates
+            candidate_letters = n_gram_model.generate_next_token(sequence_to_continue)
+            if candidate_letters is not None and len(candidate_letters) > 0:
+                prob_candidates = {token: freq / sum(candidate_letters.values())
+                                   for token, freq in candidate_letters.items()}
+                return prob_candidates
         return None
