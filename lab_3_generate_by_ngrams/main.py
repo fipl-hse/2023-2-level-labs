@@ -128,6 +128,30 @@ class TextProcessor:
         In case of corrupt input arguments, None is returned.
         In case any of methods used return None, None is returned.
         """
+        if not (text or isinstance(text, str)):
+            return None
+
+        tokenized_text = self._tokenize(text)
+
+        if not tokenized_text:
+            return None
+
+        for el in tokenized_text:
+            self._put(el)
+
+        result = []
+
+        for el in tokenized_text:
+            get_id_el = self.get_id(el)
+            if not get_id_el and get_id_el != 0:
+                return None
+            result.append(get_id_el)
+
+        return tuple(result)
+
+
+
+
 
     def _put(self, element: str) -> None:
         """
@@ -201,6 +225,10 @@ class TextProcessor:
         In case of corrupt input arguments, None is returned
         """
 
+text = 'GPT-4 — большая мультимодальная языковая модель,' ' созданная OpenAI, четвёртая в серии GPT.'
+
+text_processor = TextProcessor('_')
+print(text_processor.encode(text))
 
 class NGramLanguageModel:
     """
