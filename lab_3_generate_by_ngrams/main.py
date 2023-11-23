@@ -122,7 +122,7 @@ class TextProcessor:
         In case of corrupt input arguments, None is returned.
         In case any of methods used return None, None is returned.
         """
-        if not isinstance(text, str) or len(text) == 0:
+        if not (isinstance(text, str) and text):
             return None
 
         encoded_corpus = []
@@ -212,7 +212,7 @@ class TextProcessor:
         In case of corrupt input arguments, None is returned.
         In case any of methods used return None, None is returned.
         """
-        if not isinstance(corpus, tuple) or len(corpus) == 0:
+        if not (isinstance(corpus, tuple) and corpus):
             return None
 
         decoded_corpus = []
@@ -241,7 +241,7 @@ class TextProcessor:
 
         In case of corrupt input arguments, None is returned
         """
-        if not isinstance(decoded_corpus, tuple) or len(decoded_corpus) == 0:
+        if not (isinstance(decoded_corpus, tuple) and decoded_corpus):
             return None
         decoded_corpus_list = list(decoded_corpus)
         if decoded_corpus_list[-1] == self._end_of_word_token:
@@ -308,7 +308,7 @@ class NGramLanguageModel:
         In case of corrupt input arguments or methods used return None,
         1 is returned
         """
-        if not isinstance(self._encoded_corpus, tuple) or len(self._encoded_corpus) == 0:
+        if not (isinstance(self._encoded_corpus, tuple) and self._encoded_corpus):
             return 1
 
         n_grams = self._extract_n_grams(self._encoded_corpus)
@@ -316,17 +316,11 @@ class NGramLanguageModel:
         if n_grams is None:
             return 1
 
-        beginning_freq_dict = {}
-
         for n_gram in set(n_grams):
             absolute_frequency = n_grams.count(n_gram)
-            beginning = n_gram[:-1]
-            if beginning not in beginning_freq_dict:
-                beginning_freq_dict[beginning] = [n_gram_begin[:-1] == beginning
-                                              for n_gram_begin in n_grams].count(True)
-            beginning_freq = beginning_freq_dict[beginning]
+            beginning_frequency = [context[:-1] for context in n_grams].count(n_gram[:-1])
 
-            self._n_gram_frequencies[n_gram] = absolute_frequency / beginning_freq
+            self._n_gram_frequencies[n_gram] = absolute_frequency / beginning_frequency
 
         return 0
 
@@ -343,7 +337,7 @@ class NGramLanguageModel:
         In case of corrupt input arguments, None is returned
         """
 
-        if (not isinstance(sequence, tuple) or len(sequence) == 0 or
+        if (not (isinstance(sequence, tuple) and sequence) or
                 len(sequence) < self._n_gram_size - 1):
             return None
 
@@ -372,7 +366,7 @@ class NGramLanguageModel:
 
         In case of corrupt input arguments, None is returned
         """
-        if not isinstance(encoded_corpus, tuple) or len(encoded_corpus) == 0:
+        if not (isinstance(encoded_corpus, tuple) and encoded_corpus):
             return None
 
         encoded_corpus_list = list(encoded_corpus)
@@ -418,7 +412,7 @@ class GreedyTextGenerator:
         In case of corrupt input arguments or methods used return None,
         None is returned
         """
-        if not (isinstance(seq_len, int) and isinstance(prompt, str)) or len(prompt) == 0:
+        if not (isinstance(seq_len, int) and isinstance(prompt, str) and prompt):
             return None
 
         encoded_prompt = self._text_processor.encode(prompt)
@@ -489,7 +483,7 @@ class BeamSearcher:
         In case of corrupt input arguments or methods used return None.
         """
 
-        if not isinstance(sequence, tuple) or len(sequence) == 0:
+        if not (isinstance(sequence, tuple) and sequence):
             return None
 
         next_tokens = self._model.generate_next_token(sequence)
@@ -534,7 +528,7 @@ class BeamSearcher:
         for token in next_tokens:
             seq = sequence + (token[0],)
             sequence_candidates[seq] = sequence_candidates[sequence] - math.log(token[1])
-        del sequence_candidates[sequence]
+        sequence_candidates.pop(sequence)
 
         return sequence_candidates
 
@@ -706,7 +700,7 @@ class NGramLanguageModelReader:
 
         In case of corrupt input arguments or unexpected behaviour of methods used, return 1.
         """
-        if not(isinstance(n_gram_size, int) and n_gram_size and 2<= n_gram_size <= 5):
+        if not(isinstance(n_gram_size, int) and n_gram_size and 2 <= n_gram_size <= 5):
             return None
 
         ngrams = {}
