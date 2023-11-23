@@ -372,6 +372,7 @@ class GreedyTextGenerator:
         self._model = language_model
         self._text_processor = text_processor
 
+
     def run(self, seq_len: int, prompt: str) -> Optional[str]:
         """
         Generate sequence based on NGram language model and prompt provided.
