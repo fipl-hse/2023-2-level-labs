@@ -93,6 +93,12 @@ class TextProcessor:
 
         In case of corrupt input arguments or arguments not included in storage, None is returned
         """
+        if (not isinstance(element_id, int) or
+                element_id not in self._storage.values()):
+            return None
+        for key, value in self._storage.items():
+            if value == element_id:
+                return key
 
     def encode(self, text: str) -> Optional[tuple[int, ...]]:
         """
