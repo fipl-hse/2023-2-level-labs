@@ -5,6 +5,7 @@ Beam-search and natural language generation evaluation
 """
 # pylint:disable=too-few-public-methods
 from typing import Optional
+import string
 
 
 class TextProcessor:
@@ -51,7 +52,7 @@ class TextProcessor:
         for symbol in text.lower():
             if symbol.isalpha():
                 tokenized_text.append(symbol)
-            elif symbol in '''!"#$%&'()*+, ./\:;<=>?@[]^_`{|}~''' \
+            elif symbol in string.punctuation \
                     and tokenized_text[-1] != self._end_of_word_token:
                 tokenized_text.append(self._end_of_word_token)
 
@@ -137,12 +138,9 @@ class TextProcessor:
 
         for symbol in tokenized_text:
             self._put(symbol)
+            if self.get_id(symbol) is None:
+                return None
             encoded_corpus.append(self.get_id(symbol))
-
-        if None in tokenized_text \
-                or None in encoded_corpus \
-                or None in self._storage:
-            return None
 
         return tuple(encoded_corpus)
 
@@ -162,6 +160,8 @@ class TextProcessor:
 
         if element not in self._storage:
             self._storage[element] = len(self._storage)
+
+        return None
 
     def decode(self, encoded_corpus: tuple[int, ...]) -> Optional[str]:
         """
@@ -257,7 +257,7 @@ class TextProcessor:
 
         result = ''.join(decoding_list).capitalize().replace(self._end_of_word_token, ' ')
 
-        return result + '.'
+        return f'{result}.'
 
 
 class NGramLanguageModel:
@@ -647,4 +647,3 @@ class BackOffGenerator:
 
         In case of corrupt input arguments return None.
         """
-
