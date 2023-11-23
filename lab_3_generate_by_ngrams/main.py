@@ -44,7 +44,7 @@ class TextProcessor:
         In case of corrupt input arguments, None is returned.
         In case any of methods used return None, None is returned.
         """
-        if not isinstance(text, str):
+        if not (isinstance(text, str) and text):
             return None
         tokens = []
         for token in text.lower():
@@ -147,6 +147,7 @@ class TextProcessor:
             return None
         if element not in self._storage:
             self._storage[element] = len(self._storage)
+        return None
 
     def decode(self, encoded_corpus: tuple[int, ...]) -> Optional[str]:
         """
@@ -187,6 +188,7 @@ class TextProcessor:
             for symbol in key:
                 if symbol.isalpha():
                     self._put(symbol)
+        return None
 
     def _decode(self, corpus: tuple[int, ...]) -> Optional[tuple[str, ...]]:
         """
