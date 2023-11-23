@@ -7,6 +7,7 @@ markers = [
     "lab_1_classify_by_unigrams: tests for lab 1",
     "lab_2_tokenize_by_bpe: tests for lab 2",
     "lab_3_generate_by_ngrams: tests for lab 3",
+    "lab_4_fill_words_by_ngrams: tests for lab 4"
 ]
 norecursedirs = [
     "venv*"
