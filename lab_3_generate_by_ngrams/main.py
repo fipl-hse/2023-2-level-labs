@@ -385,17 +385,15 @@ class GreedyTextGenerator:
         if not encoded_text or not n_gram_size:
             return None
         while seq_len > 0:
-            candidates = self._model.generate_next_token(encoded)
+            candidates = self._model.generate_next_token(encoded_text)
             if not candidates:
                 break
             max_freq = max(candidates.values())
             best_candidate = [letter for letter, freq in candidates.items() if freq == max_freq]
             max_freq_letters = sorted(best_candidate)
-            encoded += (max_freq_letters[0])
+            encoded_text += (max_freq_letters[0])
             seq_len -= 1
         decoded_prompt = self._text_processor.decode(encoded_text)
-        if decoded_prompt is None:
-            return None
         return decoded_prompt
 
 
