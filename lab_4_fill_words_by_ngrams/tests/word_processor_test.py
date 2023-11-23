@@ -129,6 +129,7 @@ class WordProcessorTest(unittest.TestCase):
     def test_word_processor_postprocess_decoded_text(self):
         """
         Checks WordProcessor _postprocess_decoded_text method ideal scenario
+        for text
         """
         word_processor = WordProcessor('<eos>')
         encoded = word_processor.encode('She is HAPPY! He is HAPPY!')
@@ -144,6 +145,7 @@ class WordProcessorTest(unittest.TestCase):
     def test_word_processor_postprocess_decoded_sentence(self):
         """
         Checks WordProcessor _postprocess_decoded_text method ideal scenario
+        for sentence
         """
         word_processor = WordProcessor('<eos>')
         encoded = word_processor.encode('She is HAPPY')
