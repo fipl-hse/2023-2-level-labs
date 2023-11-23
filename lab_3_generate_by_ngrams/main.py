@@ -48,20 +48,18 @@ class TextProcessor:
         if not isinstance(text, str) or not text or not any(char.isalpha() for char in text):
             return None
 
-        self.text = text
         splited_text = text.split()
         list_of_tokens = []
         for word in splited_text:
-            current_word = ''.join(char.lower() for char in word if char.isalpha())
-            if current_word:
-                list_of_tokens += current_word
+            clear_word = [char.lower() for char in word if char.isalpha()]
+            if clear_word:
+                list_of_tokens.extend(clear_word)
                 list_of_tokens.append(self._end_of_word_token)
 
         if text[-1].isalnum():
             del list_of_tokens[-1]
 
         return tuple(list_of_tokens)
-
 
     def get_id(self, element: str) -> Optional[int]:
         """
@@ -342,7 +340,8 @@ class NGramLanguageModel:
                 return 1
 
             self._n_gram_frequencies[ngram] = \
-                ngrams.count(ngram) / len([occurence for occurence in ngrams if occurence[:-1] == ngram[:-1]])
+                ngrams.count(ngram) / len([occurence
+                                           for occurence in ngrams if occurence[:-1] == ngram[:-1]])
 
         return 0
 
@@ -358,7 +357,8 @@ class NGramLanguageModel:
 
         In case of corrupt input arguments, None is returned
         """
-        if not (isinstance(sequence, tuple) and sequence and len(sequence) >= self._n_gram_size - 1):
+        if not (isinstance(sequence, tuple)
+                and sequence and len(sequence) >= self._n_gram_size - 1):
             return None
 
         tokens = {}
