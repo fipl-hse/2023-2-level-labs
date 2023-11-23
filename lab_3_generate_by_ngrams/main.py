@@ -314,7 +314,7 @@ class NGramLanguageModel:
         context_freq = {}
         context = sequence[-self._n_gram_size + 1:]
         for n_gram, freq in self._n_gram_frequencies.items():
-            if n_gram[:len(context)] == context
+            if n_gram[:len(context)] == context:
                 tokens[n_gram[len(context)]] = freq
         return context_freq
 
