@@ -5,7 +5,7 @@ Beam-search and natural language generation evaluation
 """
 # pylint:disable=too-few-public-methods
 from typing import Optional
-
+import string
 
 class TextProcessor:
     """
@@ -23,6 +23,8 @@ class TextProcessor:
         Args:
             end_of_word_token (str): A token denoting word boundary
         """
+        self._end_of_word_token = end_of_word_token
+        self._storage = {self._end_of_word_token: 0}
 
     def _tokenize(self, text: str) -> Optional[tuple[str, ...]]:
         """
@@ -41,7 +43,21 @@ class TextProcessor:
         In case of corrupt input arguments, None is returned.
         In case any of methods used return None, None is returned.
         """
-
+        if not isinstance(text, str):
+            return None
+        if not list(filter(str.isalpha, text.lower())):
+            return None
+        listed_text = list(text.lower())
+        tokenized_text = []
+        for i in listed_text[:-1]:
+            if i.isalpha():
+                tokenized_text.append(i)
+            elif i in string.punctuation or i.isdigit() or i == ' ':
+                if listed_text[listed_text.index(i) + 1].isalpha() and tokenized_text[-1] != self._end_of_word_token:
+                    tokenized_text.append(self._end_of_word_token)
+        if listed_text[-1] in string.punctuation:
+            tokenized_text.append(self._end_of_word_token)
+        return tuple(tokenized_text)
     def get_id(self, element: str) -> Optional[int]:
         """
         Retrieve a unique identifier of an element.
@@ -105,6 +121,8 @@ class TextProcessor:
         an element is not added to storage
         """
 
+        if self._storage.get(i) == None:
+            self._storage[i] = len(self._storage) + 1
     def decode(self, encoded_corpus: tuple[int, ...]) -> Optional[str]:
         """
         Decode and postprocess encoded corpus by converting integer identifiers to string.
