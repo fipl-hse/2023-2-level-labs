@@ -77,6 +77,11 @@ class TextProcessor:
         In case of corrupt input arguments or arguments not included in storage,
         None is returned
         """
+        if not isinstance(element, str):
+            return None
+
+        if element in self._storage:
+            return self._storage[element]
 
 
     def get_end_of_word_token(self) -> str:
@@ -127,12 +132,11 @@ class TextProcessor:
         In case of corrupt input arguments or invalid argument length,
         an element is not added to storage
         """
-        if not (isinstance(element, str) and len(element) == 1) or element in self._storage:
+        if not isinstance(element, str) or len(element) != 1:
             return None
 
-        self._storage[element] = len(self._storage)
-
-        return None
+        if element not in self._storage:
+            self._storage[element] = len(self._storage)
 
 
     def decode(self, encoded_corpus: tuple[int, ...]) -> Optional[str]:
