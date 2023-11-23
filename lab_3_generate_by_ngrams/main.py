@@ -63,11 +63,6 @@ class TextProcessor:
 
         return tuple(tokens)
 
-    # if word.isalpha():
-    # tokens.append(word)
-    # elif word.isspace() and tokens[-1] != self._end_of_word_token:
-    # tokens.append(self._end_of_word_token)
-
     def get_id(self, element: str) -> Optional[int]:
         """
         Retrieve a unique identifier of an element.
@@ -110,11 +105,11 @@ class TextProcessor:
         if not isinstance(element_id, int) or element_id not in self._storage.values():
             return None
 
-        for key, value in self._storage.items():
-            if value == element_id:
-                return key
+        #for key, value in self._storage.items():
+            #if value == element_id:
+                #return key
 
-        return None
+        return ''.join(list(filter(lambda x: self._storage[x] == element_id, self._storage.keys())))
 
     def encode(self, text: str) -> Optional[tuple[int, ...]]:
         """
@@ -162,10 +157,8 @@ class TextProcessor:
         In case of corrupt input arguments or invalid argument length,
         an element is not added to storage
         """
-        if isinstance(element, str) and len(element) == 1:
-            if element not in self._storage:
-                self._storage[element] = len(self._storage)
-        return None
+        if isinstance(element, str) and len(element) == 1 and element not in self._storage:
+            self._storage[element] = len(self._storage)
 
     def decode(self, encoded_corpus: tuple[int, ...]) -> Optional[str]:
         """
@@ -190,8 +183,7 @@ class TextProcessor:
         if not decoded_tokens:
             return None
 
-        decoded_text = self._postprocess_decoded_text(decoded_tokens)
-        return decoded_text
+        return self._postprocess_decoded_text(decoded_tokens)
 
     def fill_from_ngrams(self, content: dict) -> None:
         """
@@ -247,13 +239,13 @@ class TextProcessor:
 
         text_new = []
 
-        for i in decoded_corpus:
-            text_new.append(i)
+        text_new.extend(decoded_corpus)
 
         if text_new[-1] == self._end_of_word_token:
             del text_new[-1]
 
-        return ''.join(text_new).capitalize().replace(self._end_of_word_token, ' ') + '.'
+        return f"{''.join(text_new).capitalize()}.".replace(self._end_of_word_token, ' ')
+
 
 class NGramLanguageModel:
     """
@@ -314,7 +306,6 @@ class NGramLanguageModel:
             return 1
 
         for n_gram in set(n_grams):
-            #context_count = len([context for context in n_grams if context[:-1] == n_gram[:-1]])
             context_count = list(filter(lambda context: context[:-1] == n_gram[:-1], n_grams))
             self._n_gram_frequencies[n_gram] = n_grams.count(n_gram)/len(context_count)
 
