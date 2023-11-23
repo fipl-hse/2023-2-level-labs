@@ -17,17 +17,18 @@ def main() -> None:
     text_processor = TextProcessor('_')
     encoded_text = text_processor.encode(text)
 
-    result = text_processor.decode(encoded_text)
-    print(result)
+    if encoded_text:
+        result = text_processor.decode(encoded_text)
+        print(result)
 
-    language_model = NGramLanguageModel(encoded_text[:10], 2)
-    print(language_model.build())
+        language_model = NGramLanguageModel(encoded_text[:10], 2)
+        print(language_model.build())
 
-    model = NGramLanguageModel(encoded_text, 7)
-    greedy_generator = GreedyTextGenerator(model, text_processor)
-    print(greedy_generator.run(51, 'Vernon'))
+        model = NGramLanguageModel(encoded_text, 7)
+        greedy_generator = GreedyTextGenerator(model, text_processor)
+        print(greedy_generator.run(51, 'Vernon'))
 
-    assert result
+        assert result
 
 
 if __name__ == "__main__":
