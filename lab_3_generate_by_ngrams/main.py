@@ -56,7 +56,7 @@ class TextProcessor:
             tokens.append(self._end_of_word_token)
         if tokens.count(self._end_of_word_token) == len(tokens):
             return None
-        print(tuple(tokens))
+        return tuple(tokens)
 
     def get_id(self, element: str) -> Optional[int]:
         """
@@ -123,12 +123,12 @@ class TextProcessor:
             return None
         encoded_text = []
         tokenized = self._tokenize(text)
-        if not tokenized:
+        if tokenized is None:
             return None
         for token in tokenized:
             self._put(token)
             identifier = self.get_id(token)
-            if not isinstance(identifier, int):
+            if not isinstance(identifier, int) or not identifier:
                 return None
             encoded_text.append(identifier)
         return tuple(encoded_text)
