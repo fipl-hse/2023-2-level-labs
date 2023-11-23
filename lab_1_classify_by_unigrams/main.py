@@ -11,7 +11,17 @@ def tokenize(text: str) -> list[str] | None:
     :param text: a text
     :return: a list of lower-cased tokens without punctuation
     """
-
+    text = text.lower()
+    text = text.replace(' ', '')
+    text = text.replace('\n', 'replace')
+    nopunc_str = '''!()-[]{};:/?@]#$%^'"\,.&*_~'''
+    for punc in text:
+        if punc in nopunc_str:
+            text = text.replace(punc, "")
+        if punc.isdigit():
+            text = text.replace(punc, "")
+    token = list(text)
+    return token
 
 def calculate_frequencies(tokens: list[str] | None) -> dict[str, float] | None:
     """
