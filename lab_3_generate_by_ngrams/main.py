@@ -309,15 +309,13 @@ class NGramLanguageModel:
 
         In case of corrupt input arguments, None is returned
         """
-        if not isinstance(sequence, tuple) or not sequence or self._n_gram_size > len(sequence):
+        if not isinstance(sequence, tuple) or not sequence or self._n_gram_size => len(sequence):
             return None
         context_freq = {}
-        context = sequence[len(sequence) - (self._n_gram_size - 1):]
-        for n_gram in self._n_gram_frequencies:
-            if n_gram[:self._n_gram_size - 1] == context:
-                if n_gram not in context_freq:
-                    context_freq[n_gram] = 0
-                context_freq[n_gram] += 1
+        context = sequence[-self._n_gram_size + 1:]
+        for n_gram, freq in self._n_gram_frequencies.items():
+            if n_gram[:len(context)] == context
+                tokens[n_gram[len(context)]] = freq
         return context_freq
 
     def _extract_n_grams(
