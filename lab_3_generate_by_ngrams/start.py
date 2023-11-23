@@ -15,7 +15,7 @@ def main() -> None:
     # result = None
     text_processor = TextProcessor('_')
     encoded_text = text_processor.encode(text)
-    decoded_text = text_processor.decode(encoded_text)
+    # decoded_text = text_processor.decode(encoded_text)
     language_model = NGramLanguageModel(encoded_text, 7)
     # freqs = n_grams.build()
     greedy_gen = GreedyTextGenerator(language_model, text_processor)
