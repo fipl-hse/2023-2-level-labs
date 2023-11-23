@@ -1,7 +1,7 @@
 """
 Generation by NGrams starter
 """
-from main import TextProcessor
+from lab_3_generate_by_ngrams.main import TextProcessor
 
 def main() -> None:
     """
@@ -13,7 +13,9 @@ def main() -> None:
         text = text_file.read()
     result = TextProcessor('_')
     encoded_corpus = result.encode(text)
-    print(result.decode(encoded_corpus))
+    if isinstance(encoded_corpus, tuple):
+        res = result.decode(encoded_corpus)
+    print(res)
     assert result
 
 

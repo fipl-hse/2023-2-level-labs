@@ -81,7 +81,9 @@ class TextProcessor:
             return None
 
         if element in self._storage:
-            return self._storage[element]
+            return int(self._storage[element])
+        else:
+            return None
 
 
     def get_end_of_word_token(self) -> str:
@@ -91,7 +93,7 @@ class TextProcessor:
         Returns:
             str: EoW token
         """
-        return self._end_of_word_token
+        return str(self._end_of_word_token)
 
 
     def get_token(self, element_id: int) -> Optional[str]:
@@ -111,7 +113,9 @@ class TextProcessor:
 
         reverted_storage = {v: k for k, v in self._storage.items()}
         if element_id in reverted_storage:
-            return reverted_storage[element_id]
+            return str(reverted_storage[element_id])
+        else:
+            return None
 
     def encode(self, text: str) -> Optional[tuple[int, ...]]:
         """
@@ -282,6 +286,7 @@ class NGramLanguageModel:
             encoded_corpus (tuple): Encoded text
             n_gram_size (int): A size of n-grams to use for language modelling
         """
+        pass
 
     def get_n_gram_size(self) -> int:
         """
@@ -290,6 +295,7 @@ class NGramLanguageModel:
         Returns:
             int: Size of stored n_grams
         """
+        pass
 
     def set_n_grams(self, frequencies: dict) -> None:
         """
@@ -298,6 +304,7 @@ class NGramLanguageModel:
         Args:
             frequencies (dict): Computed in advance frequencies for n-grams
         """
+        pass
 
     def build(self) -> int:
         """
@@ -311,6 +318,7 @@ class NGramLanguageModel:
         In case of corrupt input arguments or methods used return None,
         1 is returned
         """
+        pass
 
     def generate_next_token(self, sequence: tuple[int, ...]) -> Optional[dict]:
         """
