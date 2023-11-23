@@ -716,21 +716,21 @@ class BackOffGenerator:
         In case of corrupt input arguments or methods used return None,
         None is returned
         """
-        if not isinstance(seq_len, int) or not isinstance(prompt, str) or not prompt:
+        if not (isinstance(seq_len, int) and isinstance(prompt, str) and prompt):
             return None
-        encoded = self._text_processor.encode(prompt)
-        if not encoded:
+
+        encoded_sequence = self._text_processor.encode(prompt)
+        if not encoded_sequence:
             return None
-        biggest_prob = []
         for iteration in range(seq_len):
-            next_candidates = self._get_next_token(encoded)
-            if not next_candidates:
+            candidates = self._get_next_token(encoded_sequence)
+            if not candidates:
                 break
-            biggest_prob.append(next_candidates.values())
-            biggest_prob.sort()
-            best_candidate = list(filter(lambda x: x[1] == biggest_prob[-1], next_candidates.items()))
-            encoded += (best_candidate[0],)
-        decoded = self._text_processor.decode(encoded)
+            max_probability = max(candidates.values())
+            best_candidate = [token for token, freq in candidates.items()
+                              if freq == max_probability]
+            encoded_sequence += (best_candidate[0],)
+        decoded = self._text_processor.decode(encoded_sequence)
         if not decoded:
             return None
         return decoded
