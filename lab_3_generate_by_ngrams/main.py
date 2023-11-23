@@ -306,10 +306,9 @@ class NGramLanguageModel:
             return 1
 
         for ngram in set(n_grams):
-            if not isinstance(ngram, tuple):
-                return 1
             p_w_1_2 = n_grams.count(ngram)
-            p_w_1 = [context[:-1] for context in n_grams].count(ngram[:-1])
+            p_w_1 = len([context for context in n_grams
+                        if context[:-1] == ngram[:-1]])
             self._n_gram_frequencies[ngram] = p_w_1_2 / p_w_1
 
         return 0
@@ -471,7 +470,7 @@ class BeamSearcher:
 
         In case of corrupt input arguments or methods used return None.
         """
-        if not isinstance(sequence, tuple) or len(sequence) == 0:
+        if not (isinstance(sequence, tuple) and sequence):
             return None
 
         generated_dict = self._model.generate_next_token(sequence)
@@ -509,14 +508,12 @@ class BeamSearcher:
 
         In case of corrupt input arguments or unexpected behaviour of methods used return None.
         """
-        if (not isinstance(sequence, tuple) or len(sequence) == 0 or
-                not isinstance(next_tokens, list)):
-            return None
-        if (len(next_tokens) == 0 or not isinstance(sequence_candidates, dict) or
-                not sequence_candidates):
-            return None
-        if (len(next_tokens) > self._beam_width or
-                sequence not in sequence_candidates):
+        if not (isinstance(sequence, tuple) and sequence
+                and isinstance(next_tokens, list) and next_tokens
+                and isinstance(sequence_candidates, dict)
+                and sequence_candidates
+                and len(next_tokens) <= self._beam_width
+                and sequence in sequence_candidates):
             return None
 
         for (token, freq) in next_tokens:
