@@ -282,11 +282,8 @@ class NGramLanguageModel:
         if not n_grams:
             return 1
         for n_gram in n_grams:
-            if n_gram in self._n_gram_frequencies:
-                continue
             count_n_grams = n_grams.count(n_gram)
-            cut_n_grams = n_gram[:self._n_gram_size - 1]
-            start_n_grams = len([i for i in n_grams if i[:self._n_gram_size - 1] == cut_n_grams])
+            start_n_grams = [i[:-1] for i in n_grams].count(n_gram[:-1])
             self._n_gram_frequencies[n_gram] = count_n_grams / start_n_grams
         return 0
 
@@ -377,7 +374,7 @@ class GreedyTextGenerator:
             if not tokens:
                 break
             max_frequencies = max(tokens.values())
-            freq_tokens = list(filter(lambda x: tokens[x] == max_frequencies, tokens))
+            freq_tokens = [token for token in tokens if tokens[token] == max_frequencies]
             token = sorted(freq_tokens)[0]
             encoded_prompt += (token,)
         decoded_prompt = self._text_processor.decode(encoded_prompt)
