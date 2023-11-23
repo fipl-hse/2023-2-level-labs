@@ -626,7 +626,8 @@ class BeamSearchTextGenerator:
                     self._beam_searchers.continue_sequence(sequence, next_tokens, new_candidates)
                 )
                 if continued_sentence is None:
-                    break
+                    return self._text_processor.decode(sorted(tuple(candidates),
+                                                              key=lambda pair: pair[1])[0])
 
                 best_sequence = self._beam_searchers.prune_sequence_candidates(new_candidates)
                 if best_sequence is None:
