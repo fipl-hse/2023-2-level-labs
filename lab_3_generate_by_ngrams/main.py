@@ -4,6 +4,7 @@ Lab 3.
 Beam-search and natural language generation evaluation
 """
 # pylint:disable=too-few-public-methods
+import json
 import math
 from typing import Optional
 
@@ -102,10 +103,9 @@ class TextProcessor:
         """
         if not isinstance(element_id, int) or not element_id in self._storage.values():
             return None
-        for key, identificator in self._storage.items():
-            if identificator == element_id:
-                return key
-        return None
+
+        keys = list(filter(lambda x: self._storage[x] == element_id, self._storage))
+        return ''.join(keys)
 
     def encode(self, text: str) -> Optional[tuple[int, ...]]:
         """
@@ -190,6 +190,14 @@ class TextProcessor:
         Args:
             content (dict): ngrams from external JSON
         """
+        if not isinstance(content, dict) or len(content) == 0:
+            return None
+
+        for n_gram in content["freq"]:
+            for token in n_gram:
+                if token.isalpha():
+                    self._put(token.lower())
+
     def _decode(self, corpus: tuple[int, ...]) -> Optional[tuple[str, ...]]:
         """
         Decode sentence by replacing ids with corresponding letters.
@@ -281,6 +289,10 @@ class NGramLanguageModel:
         Args:
             frequencies (dict): Computed in advance frequencies for n-grams
         """
+        if not isinstance(frequencies, dict) or len(frequencies) == 0:
+            return None
+        self._n_gram_frequencies = frequencies
+
     def build(self) -> int:
         """
         Fill attribute `_n_gram_frequencies` from encoded corpus.
@@ -333,6 +345,7 @@ class NGramLanguageModel:
                 freq_of_prediction[n_gram[-1]] = sort_dict[n_gram]
 
         return freq_of_prediction
+
     def _extract_n_grams(
         self, encoded_corpus: tuple[int, ...]
     ) -> Optional[tuple[tuple[int, ...], ...]]:
@@ -644,6 +657,15 @@ class NGramLanguageModelReader:
             json_path (str): Local path to assets file
             eow_token (str): Special token for text processor
         """
+        self._json_path = json_path
+        self._eow_token = eow_token
+        self._text_processor = TextProcessor(self._eow_token)
+
+        with open(self._json_path, 'r', encoding='utf-8') as text_file:
+            text = json.load(text_file)
+
+        self._content = text
+        self._text_processor.fill_from_ngrams(self._content)
 
     def load(self, n_gram_size: int) -> Optional[NGramLanguageModel]:
         """
@@ -660,7 +682,38 @@ class NGramLanguageModelReader:
 
         In case of corrupt input arguments or unexpected behaviour of methods used, return 1.
         """
+        if not isinstance(n_gram_size, int) or not n_gram_size or n_gram_size < 2:
+            return None
+            
 
+        ngrams = {}
+        encoded_seq = []
+
+        for ngram in self._content["freq"]:
+            for token in ngram:
+                if token.isalpha():
+                    id = self._text_processor.get_id(token.lower())
+                    encoded_seq.append(id)
+                elif token.isspace():
+                    encoded_seq.append(0)
+
+            if not ngrams.get(tuple(encoded_seq)):
+                ngrams[tuple(encoded_seq)] = 0.0
+            ngrams[tuple(encoded_seq)] += self._content['freq'][ngram]
+
+        sized_ngrams = {}    
+        for ngram, freq in ngrams.items():
+            if len(ngram) == n_gram_size and isinstance(ngram, tuple):
+                same_beginning = [ngrams[same_beginning] for same_beginning in ngrams
+                                    if same_beginning[-n_gram_size: -1]] == ngram[-n_gram_size: -1]
+                sized_ngrams[ngram] = freq / sum(same_beginning)
+
+        new_model = NGramLanguageModel(None, n_gram_size)
+        new_model.set_n_grams(sized_ngrams)
+        return new_model
+      
+
+        # filter(lambda ngrams[x]: context[-n_gram_size: -1]] == ngram[-ngram_size: -1], ngrams)
     def get_text_processor(self) -> TextProcessor:  # type: ignore[empty-body]
         """
         Get method for the processor created for the current JSON file.
@@ -772,100 +825,6 @@ class BackOffGenerator:
 
         Returns:
             Optional[list[tuple[int, float]]]: Next tokens for sequence
-            continuation
-
-        In case of corrupt input arguments return None.
-        """
-class NGramLanguageModelReader:
-    """
-    Factory for loading language models ngrams from external JSON.
-
-    Attributes:
-        _json_path (str): Local path to assets file
-        _eow_token (str): Special token for text processor
-        _text_processor (TextProcessor): A TextProcessor instance to handle text processing
-    """
-
-    def __init__(self, json_path: str, eow_token: str) -> None:
-        """
-        Initialize reader instance.
-
-        Args:
-            json_path (str): Local path to assets file
-            eow_token (str): Special token for text processor
-        """
-
-    def load(self, n_gram_size: int) -> Optional[NGramLanguageModel]:
-        """
-        Fill attribute `_n_gram_frequencies` from dictionary with N-grams.
-
-        The N-grams taken from dictionary must be cleaned from digits and punctuation,
-        their length must match n_gram_size, and spaces must be replaced with EoW token.
-
-        Args:
-            n_gram_size (int): Size of ngram
-
-        Returns:
-            NGramLanguageModel: Built language model.
-
-        In case of corrupt input arguments or unexpected behaviour of methods used, return 1.
-        """
-
-    def get_text_processor(self) -> TextProcessor:  # type: ignore[empty-body]
-        """
-        Get method for the processor created for the current JSON file.
-
-        Returns:
-            TextProcessor: processor created for the current JSON file.
-        """
-
-
-class BackOffGenerator:
-    """
-    Language model for back-off based text generation.
-
-    Attributes:
-        _language_models (dict[int, NGramLanguageModel]): Language models for next token prediction
-        _text_processor (NGramLanguageModel): A TextProcessor instance to handle text processing
-    """
-
-    def __init__(
-        self,
-        language_models: tuple[NGramLanguageModel, ...],
-        text_processor: TextProcessor,
-    ):
-        """
-        Initializes an instance of BackOffGenerator.
-
-        Args:
-            language_models (tuple[NGramLanguageModel]): Language models to use for text generation
-            text_processor (TextProcessor): A TextProcessor instance to handle text processing
-        """
-
-    def run(self, seq_len: int, prompt: str) -> Optional[str]:
-        """
-        Generate sequence based on NGram language model and prompt provided.
-
-        Args:
-            seq_len (int): Number of tokens to generate
-            prompt (str): Beginning of sequence
-
-        Returns:
-            str: Generated sequence
-
-        In case of corrupt input arguments or methods used return None,
-        None is returned
-        """
-
-    def _get_next_token(self, sequence_to_continue: tuple[int, ...]) -> Optional[dict[int, float]]:
-        """
-        Retrieve next tokens for sequence continuation.
-
-        Args:
-            sequence_to_continue (tuple[int, ...]): Sequence to continue
-
-        Returns:
-            Optional[dict[int, float]]: Next tokens for sequence
             continuation
 
         In case of corrupt input arguments return None.
