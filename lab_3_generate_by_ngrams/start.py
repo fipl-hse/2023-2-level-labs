@@ -16,7 +16,7 @@ def main() -> None:
     result = None
     assert result
 
-    processor = 'TextProcessor'('_')
+    processor = TextProcessor('_')
     encoded = processor.encode(text)
 
     if not encoded:
@@ -25,14 +25,14 @@ def main() -> None:
 
             print(result)
 
-            model_for_build = 'NGramLanguageModel'(encoded[:10], 2)
+            model_for_build = NGramLanguageModel(encoded[:10], 2)
             print(model_for_build.build())
 
-            model = 'NGramLanguageModel'(encoded, 7)
-            greedy_text_generator = 'GreedyTextGenerator'(model, processor)
+            model = NGramLanguageModel(encoded, 7)
+            greedy_text_generator = GreedyTextGenerator(model, processor)
             print(greedy_text_generator.run(51, 'Vernon'))
 
-            beam_search_generator = 'BeamSearchTextGenerator'(model, processor, 7)
+            beam_search_generator = BeamSearchTextGenerator(model, processor, 7)
             print(beam_search_generator.run('Vernon', 56))
 
         assert result
