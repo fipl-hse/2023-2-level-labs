@@ -14,8 +14,7 @@ def main() -> None:
     result = TextProcessor('_')
     encoded_corpus = result.encode(text)
     if isinstance(encoded_corpus, tuple):
-        res = result.decode(encoded_corpus)
-    print(res)
+        print(result.decode(encoded_corpus))
     assert result
 
 

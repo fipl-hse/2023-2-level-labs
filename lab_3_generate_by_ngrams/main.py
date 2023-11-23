@@ -255,11 +255,13 @@ class TextProcessor:
 
         result = ''
 
-        for el in decoded_corpus:
-            if el != self._end_of_word_token:
-                result += el
-            else:
-                result += ' '
+        # for el in decoded_corpus:
+            # if el != self._end_of_word_token:
+                # result += el
+            # else:
+                # result += ' '
+
+        result = result.join(f"{el if el != self._end_of_word_token else ' '}" for el in decoded_corpus)
 
         result = result.capitalize()
         result = result.rstrip(' ')
