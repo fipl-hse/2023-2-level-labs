@@ -53,7 +53,7 @@ class TextProcessor:
                 alpha_cnt += 1
             elif word.isspace() and tokens[-1] != self._end_of_word_token:
                 tokens.append(self._end_of_word_token)
-        if not text[-1].isalnum() and tokens[-1] != self._end_of_word_token:
+        if not text[-1].isalnum():
             tokens.append(self._end_of_word_token)
         if alpha_cnt == 0:
             return None
