@@ -25,7 +25,7 @@ def main() -> None:
         greedy_text_generator = GreedyTextGenerator(model2, text_processor)
         print(greedy_text_generator.run(51, 'Vernon'))
 
-    assert result
+        assert result
 
 
 if __name__ == "__main__":
