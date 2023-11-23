@@ -1,7 +1,6 @@
 """
 Generation by NGrams starter
 """
-
 from main import (TextProcessor, NGramLanguageModel, GreedyTextGenerator)
 
 
