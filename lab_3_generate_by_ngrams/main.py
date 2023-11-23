@@ -27,7 +27,7 @@ class TextProcessor:
             end_of_word_token (str): A token denoting word boundary
         """
         self._end_of_word_token = end_of_word_token
-        self._storage = {}
+        self._storage = {self._end_of_word_token: 0}
 
     def _tokenize(self, text: str) -> Optional[tuple[str, ...]]:
         """
@@ -78,6 +78,7 @@ class TextProcessor:
         None is returned
         """
 
+
     def get_end_of_word_token(self) -> str:
         """
         Retrieve value stored in self._end_of_word_token attribute.
@@ -126,6 +127,13 @@ class TextProcessor:
         In case of corrupt input arguments or invalid argument length,
         an element is not added to storage
         """
+        if not (isinstance(element, str) and len(element) == 1) or element in self._storage:
+            return None
+
+        self._storage[element] = len(self._storage)
+
+        return None
+
 
     def decode(self, encoded_corpus: tuple[int, ...]) -> Optional[str]:
         """
