@@ -372,6 +372,17 @@ class GreedyTextGenerator:
         if not isinstance(seq_len, int) or not isinstance(
                 prompt, str) or not prompt:
             return None
+        encoded_corpus = self._text_processor.encode(prompt)
+        n_gram_size = self._model.get_n_gram_size()
+        if not encoded_corpus or not n_gram_size:
+            return None
+        for i in range(seq_len):
+            next_token = self._model.generate_next_token(encoded_corpus[-(n_gram_size - 1):])
+            if not next_token:
+                break
+            candidates = [key for key, value in next_token.items() if max(next_token.values()) == value]
+            encoded_corpus += (sorted(candidates)[0],)
+        return self._text_processor.decode(encoded_corpus)
 
 
 class BeamSearcher:
