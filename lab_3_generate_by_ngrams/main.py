@@ -407,8 +407,7 @@ class GreedyTextGenerator:
                                     tokens.items())
             encoded += (sorted(candidates_max)[0][0],)
 
-        text = self._text_processor.decode(encoded)
-        return text
+        return self._text_processor.decode(encoded)
 
 
 class BeamSearcher:
@@ -605,10 +604,7 @@ class BeamSearchTextGenerator:
         """
         if not (isinstance(sequence_to_continue, tuple) and sequence_to_continue):
             return None
-        tokens = self.beam_searcher.get_next_token(sequence_to_continue)
-        if not tokens:
-            return None
-        return tokens
+        return self.beam_searcher.get_next_token(sequence_to_continue)
 
 
 class NGramLanguageModelReader:
