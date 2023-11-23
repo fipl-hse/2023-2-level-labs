@@ -91,6 +91,7 @@ class TextProcessor:
         Returns:
             str: EoW token
         """
+        return self._end_of_word_token
 
 
     def get_token(self, element_id: int) -> Optional[str]:
@@ -182,6 +183,19 @@ class TextProcessor:
         In case of corrupt input arguments, None is returned.
         In case any of methods used return None, None is returned.
         """
+        if not (encoded_corpus or isinstance(encoded_corpus, tuple)):
+            return None
+
+        first_decode = self._decode(encoded_corpus)
+
+        if not first_decode:
+            return None
+
+        result = self._postprocess_decoded_text(first_decode)
+        if not result:
+            return None
+
+        return result
 
 
     def fill_from_ngrams(self, content: dict) -> None:
