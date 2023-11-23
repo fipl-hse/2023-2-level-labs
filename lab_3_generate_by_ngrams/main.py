@@ -50,8 +50,8 @@ class TextProcessor:
         tokenized_text = []
         lower_split_text = list(text.lower().split())
 
-        for i in lower_split_text:
-            word = list(filter(str.isalpha, i))
+        for token in lower_split_text:
+            word = list(filter(str.isalpha, token))
             if word:
                 tokenized_text.extend(word)
                 tokenized_text.append(self._end_of_word_token)
@@ -315,10 +315,13 @@ class NGramLanguageModel:
         if not isinstance(corpus, tuple) or len(corpus) == 0:
             return 1
 
-        for i in set(corpus):
-            if str(corpus).count(str(i[:-1])[:-1]):
-                self._n_gram_frequencies.update({i: corpus.count(i)/str(corpus).count(
-                    str(i[:-1])[:-1])})
+        str_corpus = str(corpus)
+
+        for n_gram in set(corpus):
+            str_ngram = str(n_gram[:-1])[:-1]
+            if str_corpus.count(str_ngram):
+                self._n_gram_frequencies.update({n_gram: corpus.count(n_gram)/str_corpus.count(
+                    str_ngram)})
 
         return 0
 
@@ -348,7 +351,7 @@ class NGramLanguageModel:
 
         for key, value in sort_data.items():
             if key[:self._n_gram_size-1] == context:
-                tokens.update({key[-1]: value})
+                tokens[key[-1]] = value
 
         return tokens
 
@@ -524,7 +527,7 @@ class BeamSearcher:
             sequence_candidates.update({sequence+(i[0],): sequence_candidates[sequence] - math.log(
                 i[1])})
 
-        del sequence_candidates[sequence]
+        sequence_candidates.pop(sequence)
 
         return sequence_candidates
 
