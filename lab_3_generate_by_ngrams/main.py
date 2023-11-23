@@ -3,8 +3,8 @@ Lab 3.
 
 Beam-search and natural language generation evaluation
 """
-import math
 import json
+import math
 # pylint:disable=too-few-public-methods
 from typing import Optional
 
@@ -162,6 +162,7 @@ class TextProcessor:
         if element not in self._storage:
             self._storage[element] = len(self._storage)
 
+        return None
 
     def decode(self, encoded_corpus: tuple[int, ...]) -> Optional[str]:
         """
@@ -335,10 +336,13 @@ class NGramLanguageModel:
             return 1
 
         for ngram in set(ngrams):
-            if not isinstance(ngram, tuple) or not (all(isinstance(num, int) for num in ngram)):
+            if not (isinstance(ngram, tuple) \
+                    or (all(isinstance(num, int) for num in ngram))
+            ):
                 return 1
 
-            self._n_gram_frequencies[ngram] = ngrams.count(ngram) / len([occurence for occurence in ngrams if occurence[:-1] == ngram[:-1]])
+            self._n_gram_frequencies[ngram] = \
+                ngrams.count(ngram) / len([occurence for occurence in ngrams if occurence[:-1] == ngram[:-1]])
 
         return 0
 
@@ -542,7 +546,8 @@ class BeamSearcher:
             return None
 
         for token in next_tokens:
-            sequence_candidates[sequence + (token[0],)] = sequence_candidates[sequence] - math.log(token[1])
+            sequence_candidates[sequence + (token[0],)] = \
+                sequence_candidates[sequence] - math.log(token[1])
 
         sequence_candidates.pop(sequence)
 
@@ -566,7 +571,8 @@ class BeamSearcher:
             return None
 
         sorted_sequences = sorted(sequence_candidates.items(), key=lambda x: (x[1], x[0]))
-        pruned_sequences_dict = {sequence: frequency for sequence, frequency in sorted_sequences[:self._beam_width]}
+        pruned_sequences_dict = {sequence: frequency for sequence, frequency
+                                 in sorted_sequences[:self._beam_width]}
 
         return pruned_sequences_dict
 
@@ -633,9 +639,11 @@ class BeamSearchTextGenerator:
                 if not possible_tokens:
                     return None
 
-                possible_sequences = self.beam_searcher.continue_sequence(sequence, possible_tokens, new_sequences)
+                possible_sequences = self.beam_searcher.continue_sequence\
+                    (sequence, possible_tokens, new_sequences)
                 if not possible_sequences:
-                    return self._text_processor.decode(sorted(tuple(sequences_candidates_dict), key=lambda pair: pair[1])[0])
+                    return self._text_processor.decode(sorted(tuple(sequences_candidates_dict),
+                                                              key=lambda pair: pair[1])[0])
 
             best_sequences = self.beam_searcher.prune_sequence_candidates(new_sequences)
             if not best_sequences:
@@ -643,7 +651,8 @@ class BeamSearchTextGenerator:
 
             sequences_candidates_dict = best_sequences
 
-        decoded_sequence = self._text_processor.decode(sorted(tuple(sequences_candidates_dict), key=lambda pair: pair[1])[0])
+        decoded_sequence = self._text_processor.decode(sorted(tuple(sequences_candidates_dict),
+                                                              key=lambda pair: pair[1])[0])
 
         return decoded_sequence
 
@@ -806,7 +815,8 @@ class BackOffGenerator:
                 break
 
             max_probability = max(candidates.values())
-            best_candidate = [token for token, freq in candidates.items() if freq == max_probability]
+            best_candidate = [token for token, freq in candidates.items()
+                              if freq == max_probability]
             encoded_prompt += (best_candidate[0],)
         decoded_sequence = self._text_processor.decode(encoded_prompt)
 
