@@ -309,7 +309,7 @@ class NGramLanguageModel:
 
         In case of corrupt input arguments, None is returned
         """
-        if not isinstance(sequence, tuple) or not sequence or self._n_gram_size => len(sequence):
+        if not isinstance(sequence, tuple) or not sequence or self._n_gram_size - 1 > len(sequence):
             return None
         context_freq = {}
         context = sequence[-self._n_gram_size + 1:]
