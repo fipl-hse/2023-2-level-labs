@@ -1,7 +1,7 @@
 """
 Generation by NGrams starter
 """
-from lab_3_generate_by_ngrams.main import (TextProcessor)
+from lab_3_generate_by_ngrams.main import (TextProcessor, NGramLanguageModel, GreedyTextGenerator)
 
 
 def main() -> None:
@@ -19,9 +19,15 @@ def main() -> None:
         return
 
     decoded = str(processor.decode(encoded))
-    result = decoded
+
+    language_model = NGramLanguageModel(encoded, 7)
+    language_model.build()
+    generator = GreedyTextGenerator(language_model, processor)
+
+    result = generator.run(51, "Vernon")
 
     assert result
+
 
 
 if __name__ == "__main__":
