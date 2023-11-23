@@ -51,7 +51,7 @@ class TextProcessor:
         for token in text.lower():
             if token.isalpha():
                 tokens.append(token)
-            elif token == ' ' and len(tokens) > 0 and tokens[-1] != self._end_of_word_token:
+            elif token.isspace() and len(tokens) > 0 and tokens[-1] != self._end_of_word_token:
                 tokens.append(self._end_of_word_token)
         if not tokens:
             return None
@@ -122,7 +122,7 @@ class TextProcessor:
         In case of corrupt input arguments, None is returned.
         In case any of methods used return None, None is returned.
         """
-        if not isinstance(text, str) or str == ' ':
+        if not isinstance(text, str) or not text:
             return None
 
         tokens = self._tokenize(text)
@@ -209,7 +209,7 @@ class TextProcessor:
         decoded_corpus = []
         for i in corpus:
             token = self.get_token(i)
-            if token is None:
+            if not token:
                 return None
             decoded_corpus.append(token)
 
@@ -299,14 +299,18 @@ class NGramLanguageModel:
         n_grams = self._extract_n_grams(self._encoded_corpus)
         if not n_grams:
             return 1
-        freq = 0
+
         for n_gram in n_grams:
-            for i in n_gram:
-                count_n_grams = n_grams.count(n_gram)
-                start_of_n_gram = tuple(n_gram[:self._n_gram_size - 1])
-                if n_gram[:self._n_gram_size - 1] == start_of_n_gram:
+            count_n_grams = n_grams.count(n_gram)
+            freq = 0
+            for i in n_grams:
+                start_of_n_gram = n_gram[: self._n_gram_size - 1]
+                if i[: self._n_gram_size - 1] == start_of_n_gram:
                     freq += 1
-                self._n_gram_frequencies[n_gram] = count_n_grams / freq
+            self._n_gram_frequencies[n_gram] = count_n_grams / freq
+
+            if not self._n_gram_frequencies:
+                return 1
 
         return 0
 
@@ -322,12 +326,12 @@ class NGramLanguageModel:
 
         In case of corrupt input arguments, None is returned
         """
-        if not (isinstance(sequence, tuple) and sequence):
+        if not (isinstance(sequence, tuple)
+                and sequence and len(sequence) >= self._n_gram_size - 1):
             return None
 
         context = sequence[- (self._n_gram_size-1):]
-        if sequence < context:
-            return None
+
         tokens_freq = {}
         for n_gram, freq in self._n_gram_frequencies.items():
             if n_gram[:self._n_gram_size-1] == context:
@@ -354,10 +358,9 @@ class NGramLanguageModel:
             return None
 
         n_grams = []
-        for i in range(len(encoded_corpus) + 1 - self._n_gram_size):
-            n_grams.append((tuple(encoded_corpus[i: i + self._n_gram_size])))
+        for i in range(len(encoded_corpus) - self._n_gram_size + 1):
+            n_grams.append(tuple(encoded_corpus[i: i + self._n_gram_size]))
         return tuple(n_grams)
-
 
 class GreedyTextGenerator:
     """
@@ -393,7 +396,27 @@ class GreedyTextGenerator:
         In case of corrupt input arguments or methods used return None,
         None is returned
         """
+        if not (isinstance(seq_len, int) and isinstance(prompt, str) and prompt):
+            return None
 
+        encoded_prompt = self._text_processor.encode(prompt)
+        if not encoded_prompt:
+            return None
+
+        n_gram_size = self._model.get_n_gram_size()
+        if not n_gram_size:
+            return None
+
+        for i in range(seq_len):
+            tokens = self._model.generate_next_token(encoded_prompt[-n_gram_size+1:])
+            if not tokens:
+                break
+            max_freq = max(tokens.values())
+            candidates = dict(filter(lambda item: item[1] == max_freq, tokens.items()))
+            best_candidates = list(candidates.keys())
+            encoded_prompt += (best_candidates[0],)
+        decoded_prompt = self._text_processor.decode(encoded_prompt)
+        return decoded_prompt
 
 class BeamSearcher:
     """
