@@ -378,21 +378,22 @@ class GreedyTextGenerator:
         In case of corrupt input arguments or methods used return None,
         None is returned
         """
-        if not isinstance(seq_len, int) or not isinstance(prompt, str) or len(prompt) == 0:
+        if not isinstance(seq_len, int) or not isinstance(prompt, str) or not prompt:
             return None
         encoded_text = self._text_processor.encode(prompt)
         n_gram_size = self._model.get_n_gram_size()
         if not encoded_text or not n_gram_size:
             return None
         while seq_len > 0:
-            candidates = self._model.generate_next_token(encoded[n_gram_size + 1:])
+            candidates = self._model.generate_next_token(encoded)
             if not candidates:
                 break
-            best_candidate = [letter for letter, freq in candidates.items() if freq == max(candidates.values())]
+            max_freq = max(candidates.values())
+            best_candidate = [letter for letter, freq in candidates.items() if freq == max_freq]
             max_freq_letters = sorted(best_candidate)
             encoded += (max_freq_letters[0])
             seq_len -= 1
-        decoded_prompt = self._text_processor.decode(encoded)
+        decoded_prompt = self._text_processor.decode(encoded_text)
         if decoded_prompt is None:
             return None
         return decoded_prompt
