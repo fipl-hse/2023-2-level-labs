@@ -4,8 +4,8 @@ Lab 3.
 Beam-search and natural language generation evaluation
 """
 # pylint:disable=too-few-public-methods
-from typing import Optional
 import string
+from typing import Optional
 
 
 class TextProcessor:
@@ -144,10 +144,9 @@ class TextProcessor:
         In case of corrupt input arguments or invalid argument length,
         an element is not added to storage
         """
-        if not isinstance(element, str) or not len(element) == 1:
-            return None
-        if element not in self._storage:
-            self._storage[element] = len(self._storage)
+        if isinstance(element, str) and len(element) == 1:
+            if element not in self._storage:
+                self._storage[element] = len(self._storage)
         return None
 
     def decode(self, encoded_corpus: tuple[int, ...]) -> Optional[str]:
@@ -172,8 +171,6 @@ class TextProcessor:
         if not decoded_text:
             return None
         post_text = self._postprocess_decoded_text(decoded_text)
-        if not post_text:
-            return None
         return post_text
 
     def fill_from_ngrams(self, content: dict) -> None:
@@ -317,7 +314,7 @@ class NGramLanguageModel:
         return next_token
 
     def _extract_n_grams(
-            self, encoded_corpus: tuple[int, ...]
+        self, encoded_corpus: tuple[int, ...]
     ) -> Optional[tuple[tuple[int, ...], ...]]:
         """
         Split encoded sequence into n-grams.
