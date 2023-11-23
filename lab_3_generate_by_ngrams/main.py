@@ -218,7 +218,7 @@ class TextProcessor:
             return None
         decoded_text = decoded_corpus.capitalize()
         for element in decoded_corpus[1:-1]:
-            if element = self._end_of_word_token:
+            if element == self._end_of_word_token:
                 decoded_text = f'{decoded_text} '
             else:
                 decoded_text += element
