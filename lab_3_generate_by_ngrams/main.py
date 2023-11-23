@@ -51,9 +51,9 @@ class TextProcessor:
             if word.isalpha():
                 tokens.append(word)
                 alpha_cnt += 1
-            elif word == " " and tokens[-1] != self._end_of_word_token:
+            elif word.isspace() and tokens[-1] != self._end_of_word_token:
                 tokens.append(self._end_of_word_token)
-        if not text[-1].isalnum():
+        if not text[-1].isalnum() and tokens[-1] != self._end_of_word_token:
             tokens.append(self._end_of_word_token)
         if alpha_cnt == 0:
             return None
@@ -99,8 +99,8 @@ class TextProcessor:
         """
         if not isinstance(element_id, int) or element_id not in self._storage.values():
             return None
-        result = tuple(filter(lambda item: item[1] == element_id, self._storage.items()))
-        return result[0][0]
+        result = tuple(filter(lambda item: self._storage[item] == element_id, self._storage))
+        return result[0]
 
     def encode(self, text: str) -> Optional[tuple[int, ...]]:
         """
@@ -220,15 +220,14 @@ class TextProcessor:
         """
         if not isinstance(decoded_corpus, tuple) or not decoded_corpus:
             return None
-        result_text = ""
-        for i, token in enumerate(decoded_corpus):
-            if token == self._end_of_word_token and i != len(decoded_corpus) - 1:
-                result_text += " "
-            else:
-                result_text += token
-        result_text = result_text.replace("_", "")
-        result_text = f"{result_text.capitalize()}."
-        return result_text
+        final_text = []
+        if decoded_corpus[-1] == self._end_of_word_token:
+            final_text = decoded_corpus[:len(decoded_corpus)-1]
+        else:
+            final_text = decoded_corpus
+        final_text = "".join(final_text)
+        final_text = final_text.replace("_", " ")
+        return f"{final_text.capitalize()}."
 
 
 class NGramLanguageModel:
@@ -311,13 +310,16 @@ class NGramLanguageModel:
 
         In case of corrupt input arguments, None is returned
         """
-        if not isinstance(sequence, tuple) or not sequence or (len(sequence) < self._n_gram_size - 1):
+        if not isinstance(sequence, tuple) or not sequence:
             return None
         context = sequence[-self._n_gram_size+1:]
+        if len(sequence) < len(context):
+            return None
         results = {}
-        for key, value in self._n_gram_frequencies.items():
-            if context == key[:self._n_gram_size-1]:
-                results.update({key[self._n_gram_size-1]: value})
+        sorted_dict = dict(sorted(self._n_gram_frequencies.items(), key=lambda item: (item[1], list(item[0]))))
+        for key, value in sorted_dict.items():
+            if context == key[:-1]:
+                results.update({key[-1]: value})
         return results
 
     def _extract_n_grams(
@@ -337,7 +339,7 @@ class NGramLanguageModel:
         if not isinstance(encoded_corpus, tuple) or not encoded_corpus:
             return None
         n_grams = []
-        for i in range(len(encoded_corpus) - 1):
+        for i in range(len(encoded_corpus) - self._n_gram_size + 1):
             n_grams.append(tuple(encoded_corpus[i: i + self._n_gram_size]))
         return tuple(n_grams)
 
