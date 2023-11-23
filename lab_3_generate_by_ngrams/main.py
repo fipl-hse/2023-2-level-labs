@@ -165,7 +165,7 @@ class TextProcessor:
         In case of corrupt input arguments, None is returned.
         In case any of methods used return None, None is returned.
         """
-        if not isinstance(encoded_corpus, tuple) or not encoded_corpus:
+        if not (isinstance(encoded_corpus, tuple) and encoded_corpus):
             return None
         decoded_corp = self._decode(encoded_corpus)
         if not decoded_corp:
@@ -386,10 +386,10 @@ class GreedyTextGenerator:
             return None
         n_gram_size = self._model.get_n_gram_size()
         encoded_prompt = self._text_processor.encode(prompt)
-        if not n_gram_size or not encoded_prompt:
+        if not (n_gram_size and encoded_prompt):
             return None
         for last_token in range(seq_len):
-            next_cand = self._model.generate_next_token(encoded_prompt[-n_gram_size + 1:])
+            next_cand = self._model.generate_next_token(encoded_prompt)
             if not next_cand:
                 break
             max_freq = max(next_cand.values())
