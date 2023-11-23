@@ -7,6 +7,7 @@ Beam-search and natural language generation evaluation
 from typing import Optional
 import string
 import math
+import json
 
 
 class TextProcessor:
@@ -298,6 +299,9 @@ class NGramLanguageModel:
         Args:
             frequencies (dict): Computed in advance frequencies for n-grams
         """
+        if not (isinstance(frequencies, dict) and frequencies):
+            return None
+        self._n_gram_frequencies = frequencies
 
     def build(self) -> int:
         """
@@ -651,6 +655,13 @@ class NGramLanguageModelReader:
             json_path (str): Local path to assets file
             eow_token (str): Special token for text processor
         """
+        self._json_path = json_path
+        self._eow_token = eow_token
+        with open(self._json_path, 'r', encoding='utf-8') as file:
+            content = json.load(file)
+        self._content = content
+        self._text_processor = TextProcessor(eow_token)
+        self._text_processor.fill_from_ngrams(content)
 
     def load(self, n_gram_size: int) -> Optional[NGramLanguageModel]:
         """
@@ -675,7 +686,7 @@ class NGramLanguageModelReader:
         Returns:
             TextProcessor: processor created for the current JSON file.
         """
-
+        return self._text_processor
 
 class BackOffGenerator:
     """
@@ -698,6 +709,7 @@ class BackOffGenerator:
             language_models (tuple[NGramLanguageModel]): Language models to use for text generation
             text_processor (TextProcessor): A TextProcessor instance to handle text processing
         """
+
 
     def run(self, seq_len: int, prompt: str) -> Optional[str]:
         """
