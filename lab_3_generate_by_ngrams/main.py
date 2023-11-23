@@ -203,13 +203,13 @@ class TextProcessor:
         In case of corrupt input arguments, None is returned.
         In case any of methods used return None, None is returned.
         """
-        if not isinstance(corpus, tuple) or not corpus:
+        if not (isinstance(corpus, tuple) and corpus):
             return None
         decoded_corp = []
         for ident in corpus:
             token = self.get_token(ident)
             if token is None:
-                return
+                return None
             decoded_corp.append(token)
         return tuple(decoded_corp)
 
@@ -572,10 +572,11 @@ class BeamSearchTextGenerator:
             best_cands = self.beam_searcher.prune_sequence_candidates(cands_new)
             if not best_cands:
                 return None
-            needed_tokens = sorted([cand for cand, value_prob in cands.items() if
-                                    value_prob == min(cands.values())])
-            result = self._text_processor.decode(needed_tokens[0])
-            return result
+            cands = best_cands
+        needed_tokens = sorted([cand for cand, value_prob in cands.items() if
+                                value_prob == min(cands.values())])
+        result = self._text_processor.decode(needed_tokens[0])
+        return result
 
     def _get_next_token(
             self, sequence_to_continue: tuple[int, ...]
