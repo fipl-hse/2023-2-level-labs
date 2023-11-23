@@ -96,7 +96,7 @@ class TextProcessor:
         In case of corrupt input arguments or arguments not included in storage, None is returned
         """
         if not isinstance(element_id, int) or not element_id in self._storage.values():
-            return None
+            return
         for element, ident in self._storage.items():
             if ident == element_id:
                 return element
@@ -126,7 +126,6 @@ class TextProcessor:
             return None
         for token in tokenized_text:
             self._put(token)
-        for token in tokenized_text:
             if self.get_id(token) is None:
                 return None
             encoded_text.append(self.get_id(token))
@@ -142,8 +141,11 @@ class TextProcessor:
         In case of corrupt input arguments or invalid argument length,
         an element is not added to storage
         """
-        if isinstance(element, str) and len(element) == 1 and element not in self._storage:
+        if not isinstance(element, str) or len(element) != 1:
+            return None
+        if element not in self._storage:
             self._storage[element] = len(self._storage)
+        return None
 
     def decode(self, encoded_corpus: tuple[int, ...]) -> Optional[str]:
         """
@@ -164,12 +166,9 @@ class TextProcessor:
         if not isinstance(encoded_corpus, tuple):
             return None
         decoded_corpus = self._decode(encoded_corpus)
-        if decoded_corpus is None:
+        if not decoded_corpus:
             return None
-        post_processed_text = self._postprocess_decoded_text(decoded_corpus)
-        if post_processed_text is None:
-            return None
-        return post_processed_text
+        return self._postprocess_decoded_text(decoded_corpus)
 
     def fill_from_ngrams(self, content: dict) -> None:
         """
@@ -226,17 +225,11 @@ class TextProcessor:
 
         In case of corrupt input arguments, None is returned
         """
-        if not isinstance(decoded_corpus, tuple) or not decoded_corpus:
+        if not (isinstance(decoded_corpus, tuple) and decoded_corpus):
             return None
-        postprocessed_text = ''
-        for index, token in enumerate(decoded_corpus):
-            if token == self._end_of_word_token and index == len(decoded_corpus) - 1:
-                postprocessed_text += '.'
-            elif token == self._end_of_word_token:
-                postprocessed_text += ' '
-            else:
-                postprocessed_text += token
-        return postprocessed_text.capitalize()
+        if decoded_corpus[-1] == self._end_of_word_token:
+            decoded_corpus = decoded_corpus[:-1]
+        return f"{''.join(decoded_corpus).capitalize()}.".replace(self._end_of_word_token, ' ')
 
 
 class NGramLanguageModel:
