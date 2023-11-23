@@ -7,6 +7,7 @@ Beam-search and natural language generation evaluation
 from typing import Optional
 
 
+
 class TextProcessor:
     """
     Handle text tokenization, encoding and decoding.
