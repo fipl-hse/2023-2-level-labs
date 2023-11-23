@@ -256,7 +256,8 @@ class TextProcessor:
         if not isinstance(decoded_corpus, tuple) or not decoded_corpus:
             return None
 
-        capitalized_corpus = ''.join(decoded_corpus).capitalize().replace(self._end_of_word_token, ' ')
+        capitalized_corpus = ''.join(decoded_corpus).capitalize().replace\
+            (self._end_of_word_token, ' ')
         if capitalized_corpus[-1] == ' ':
             capitalized_corpus = capitalized_corpus[:-1]
         result = capitalized_corpus + '.'
@@ -444,7 +445,8 @@ class GreedyTextGenerator:
                 break
 
             max_frequency = max(tokens.values())
-            candidates_max = [candidate for candidate, frequency in tokens.items() if frequency == max_frequency]
+            candidates_max = [candidate for candidate, frequency in tokens.items()
+                              if frequency == max_frequency]
             encoded = encoded + (sorted(candidates_max)[0],)
             best_candidate = self._text_processor.get_token(encoded[-1])
 
@@ -566,8 +568,7 @@ class BeamSearcher:
             return None
 
         sorted_sequences = sorted(sequence_candidates.items(), key=lambda x: (x[1], x[0]))
-        pruned_sequences_dict = {sequence: frequency for sequence, frequency
-                                 in sorted_sequences[:self._beam_width]}
+        pruned_sequences_dict = dict(sorted_sequences[:self._beam_width])
 
         return pruned_sequences_dict
 
