@@ -115,7 +115,7 @@ class TextProcessor:
         In case of corrupt input arguments, None is returned.
         In case any of methods used return None, None is returned.
         """
-        if not isinstance(text, str):
+        if not isinstance(text, str) or not text:
             return None
         tokenized_text = self._tokenize(text)
         encoded_text = []
@@ -124,9 +124,11 @@ class TextProcessor:
         for token in tokenized_text:
             self._put(token)
             token_id = self.get_id(token)
-            if token_id is None:
+            if not isinstance(token_id, int):
                 return None
             encoded_text.append(token_id)
+        if not encoded_text:
+            return None
         return tuple(encoded_text)
     def _put(self, element: str) -> None:
         """
@@ -155,6 +157,15 @@ class TextProcessor:
         In case of corrupt input arguments, None is returned.
         In case any of methods used return None, None is returned.
         """
+        if not isinstance(encoded_corpus, tuple) or not encoded_corpus:
+            return None
+        decoded_corpus = self._decode(encoded_corpus)
+        if decoded_corpus is None:
+            return None
+        decoded_text = self._postprocess_decoded_text(decoded_corpus)
+        if decoded_text is None:
+            return None
+        return decoded_text
 
     def fill_from_ngrams(self, content: dict) -> None:
         """
@@ -202,7 +213,17 @@ class TextProcessor:
 
         In case of corrupt input arguments, None is returned
         """
-
+        if not isinstance(decoded_corpus, tuple) or not decoded_corpus:
+            return None
+        decoded_text = ''
+        for ident, token in enumerate(decoded_corpus):
+            if token == self._end_of_word_token and ident != len(decoded_corpus) - 1:
+                decoded_text += ' '
+            else:
+                decoded_text += token
+        decoded_text = decoded_text.replace('_', '')
+        decoded_text = f'{decoded_text.capitalize()}.'
+        return decoded_text
 
 class NGramLanguageModel:
     """
