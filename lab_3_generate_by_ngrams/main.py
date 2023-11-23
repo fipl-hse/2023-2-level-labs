@@ -364,10 +364,10 @@ class NGramLanguageModel:
 
         for n_gram, freq in self._n_gram_frequencies.items():
             if n_gram[:-1] == context:
-                possibility_of_being_next_token[n_gram[-1]] = freq
+                token = n_gram[-1]
+                possibility_of_being_next_token[token] = freq
 
         return possibility_of_being_next_token
-
 
     def _extract_n_grams(
         self, encoded_corpus: tuple[int, ...]
