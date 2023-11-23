@@ -126,9 +126,10 @@ class TextProcessor:
         encoded_text = []
         for token in tokenized_text:
             self._put(token)
-            if not isinstance(self.get_id(token), int):
+            token_id = self.get_id(token)
+            encoded_text.append(token_id)
+            if not isinstance(token_id, int):
                 return None
-            encoded_text.append(self.get_id(token))
         return tuple(encoded_text)
 
     def _put(self, element: str) -> None:
@@ -274,6 +275,7 @@ class NGramLanguageModel:
         if not isinstance(frequencies, dict) or not frequencies:
             return None
         self._n_gram_frequencies = frequencies
+        return None
 
     def build(self) -> int:
         """
@@ -719,12 +721,14 @@ class BackOffGenerator:
         encoded = self._text_processor.encode(prompt)
         if not encoded:
             return None
+        biggest_prob = []
         for iteration in range(seq_len):
             next_candidates = self._get_next_token(encoded)
             if not next_candidates:
                 break
-            biggest_prob = max(next_candidates.values())
-            best_candidate = list(filter(lambda x: x[1] == biggest_prob, next_candidates.items()))
+            biggest_prob.append(next_candidates.values())
+            biggest_prob.sort()
+            best_candidate = list(filter(lambda x: x[1] == biggest_prob[-1], next_candidates.items()))
             encoded += (best_candidate[0],)
         decoded = self._text_processor.decode(encoded)
         if not decoded:
