@@ -366,7 +366,6 @@ class NGramLanguageModel:
         list_encoded_corpus = list(encoded_corpus)
         for index in range(len(encoded_corpus) + 1 - self._n_gram_size):
             n_grams.append(tuple(list_encoded_corpus[index: index + self._n_gram_size]))
-
         return tuple(n_grams)
 
 
@@ -496,27 +495,18 @@ class BeamSearcher:
 
         In case of corrupt input arguments or unexpected behaviour of methods used return None.
         """
-        if (not isinstance(sequence, tuple) or not isinstance(next_tokens, list) or
-                not isinstance(sequence_candidates, dict) or not sequence):
-            return None
-        if (not next_tokens or not sequence_candidates or
-                sequence not in sequence_candidates or
-                len(next_tokens) > self._beam_width):
+        if not (isinstance(sequence, tuple) and isinstance(next_tokens, list)
+                and isinstance(sequence_candidates, dict) and sequence
+                and next_tokens and sequence_candidates and len(next_tokens) <= self._beam_width
+                and sequence in sequence_candidates):
             return None
 
-        new_sequence_candidates = {}
-        for key, value in sequence_candidates.items():
-            if key != sequence:
-                probability = value
-                for token, token_probability in next_tokens:
-                    new_sequence = key + (token,)
-                    new_probability = probability + (-1) * math.log(token_probability)
-                    new_sequence_candidates[new_sequence] = new_probability
-
-        if len(new_sequence_candidates) > self._beam_width:
-            new_sequence_candidates = dict(sorted(
-                new_sequence_candidates.items(), key=lambda x: x[1], reverse=True)[:self._beam_width])
-        return new_sequence_candidates
+        for token_tuple in next_tokens:
+            new_sequence = sequence + (token_tuple[0],)
+            new_freq = sequence_candidates[sequence] - math.log(token_tuple[1])
+            sequence_candidates[new_sequence] = new_freq
+        sequence_candidates.pop(sequence)
+        return sequence_candidates
 
     def prune_sequence_candidates(
         self, sequence_candidates: dict[tuple[int, ...], float]
@@ -532,12 +522,11 @@ class BeamSearcher:
 
         In case of corrupt input arguments return None.
         """
-        if not isinstance(sequence_candidates, dict) or len(sequence_candidates) == 0:
+        if not isinstance(sequence_candidates, dict) or not sequence_candidates:
             return None
 
-        sorted_candidates = dict(sorted(sequence_candidates.items(),
-                                        key=lambda x: (x[1], x[0]), reverse=True))
-        return dict(list(sorted_candidates.items())[:self._beam_width])
+        sorted_candidates = sorted(sequence_candidates.items(), key=lambda x: (x[1], x[0]))
+        return dict(sorted_candidates[:self._beam_width])
 
 
 class BeamSearchTextGenerator:
@@ -601,20 +590,19 @@ class BeamSearchTextGenerator:
                     return None
 
                 continued_candidates = (self.beam_searcher.continue_sequence(
-                    sequence, next_tokens, new_sequence_candidates))
+                                      sequence, next_tokens, new_sequence_candidates))
                 if not continued_candidates:
                     break
 
-            best_sequence_candidates = self.beam_searcher.prune_sequence_candidates(
-                new_sequence_candidates)
+                best_sequence = self.beam_searcher.prune_sequence_candidates(
+                                      new_sequence_candidates)
 
-            if not best_sequence_candidates:
-                return None
-            sequence_candidates = best_sequence_candidates
-
-        decoded = self._text_processor.decode(min(candidates,
-                                                  key=lambda x: sequence_candidates[x]))
-        return decoded
+                if best_sequence is None:
+                    return None
+                candidates = best_sequence
+        best_candidate = sorted([candidate for candidate, probability in candidates.items() if
+                                 probability == min(candidates.values())])[0]
+        return self._text_processor.decode(best_candidate)
 
     def _get_next_token(
         self, sequence_to_continue: tuple[int, ...]
