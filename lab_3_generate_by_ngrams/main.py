@@ -278,7 +278,7 @@ class NGramLanguageModel:
         In case of corrupt input arguments or methods used return None,
         1 is returned
         """
-        n_grams = self._extract_n_grams(encoded_corpus)
+        n_grams = self._extract_n_grams(self._encoded_corpus)
         if not isinstance(n_grams, tuple) or not n_grams:
             return 1
         beginning_freq = {}
