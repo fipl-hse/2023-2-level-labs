@@ -629,9 +629,9 @@ class BackOffGenerator:
     """
 
     def __init__(
-            self,
-            language_models: tuple[NGramLanguageModel, ...],
-            text_processor: TextProcessor,
+        self,
+        language_models: tuple[NGramLanguageModel, ...],
+        text_processor: TextProcessor,
     ):
         """
         Initializes an instance of BackOffGenerator.
