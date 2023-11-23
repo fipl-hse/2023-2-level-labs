@@ -164,10 +164,10 @@ class TextProcessor:
         if not isinstance(encoded_corpus, tuple) or not encoded_corpus:
             return None
         decoded_text = self._decode(encoded_corpus)
-        if decoded_text is None:
+        if not decoded_text:
             return None
         postproc_text = self._postprocess_decoded_text(decoded_text)
-        if postproc_text is None:
+        if not postproc_text:
             return None
         return postproc_text
 
@@ -199,7 +199,7 @@ class TextProcessor:
             if not isinstance(id_, int):
                 return None
             token = self.get_token(id_)
-            if token is None:
+            if not token:
                 return None
             decoded_corp.append(token)
         return tuple(decoded_corp)
@@ -222,7 +222,7 @@ class TextProcessor:
         if not isinstance(decoded_corpus, tuple) or not decoded_corpus:
             return None
         decoded_list = list(decoded_corpus)
-        if decoded_list[-1] == self._end_of_word_token :
+        if decoded_list[-1] == self._end_of_word_token:
             del decoded_list[-1]
         decoded = ''.join(decoded_list)
         decoded = decoded.replace(self._end_of_word_token, ' ')
@@ -247,6 +247,9 @@ class NGramLanguageModel:
             encoded_corpus (tuple): Encoded text
             n_gram_size (int): A size of n-grams to use for language modelling
         """
+        self._encoded_corpus = encoded_corpus
+        self._n_gram_size = n_gram_size
+        self._n_gram_frequencies = {}
 
     def get_n_gram_size(self) -> int:
         """
@@ -255,6 +258,7 @@ class NGramLanguageModel:
         Returns:
             int: Size of stored n_grams
         """
+        return self._n_gram_size
 
     def set_n_grams(self, frequencies: dict) -> None:
         """
@@ -276,6 +280,16 @@ class NGramLanguageModel:
         In case of corrupt input arguments or methods used return None,
         1 is returned
         """
+        if not isinstance(self._encoded_corpus, tuple) or not self._encoded_corpus:
+            return 1
+        n_grams = self._extract_n_grams(self._encoded_corpus)
+        if not isinstance(n_grams, tuple) or not n_grams:
+            return 1
+        for n_gram in n_grams:
+            n_gram_counter = n_grams.count(n_gram)
+            context_counter = len(list(filter(lambda x: x[:-1] == n_gram[:-1], n_grams)))
+            self._n_gram_frequencies[n_gram] = n_gram_counter / context_counter
+        return 0
 
     def generate_next_token(self, sequence: tuple[int, ...]) -> Optional[dict]:
         """
@@ -289,6 +303,15 @@ class NGramLanguageModel:
 
         In case of corrupt input arguments, None is returned
         """
+        if not isinstance(sequence, tuple) or not sequence or (
+                len(sequence) < (self._n_gram_size - 1)):
+            return None
+        following_token = {}
+        context = sequence[-(self._n_gram_size - 1):]
+        for n_gram, freq in self._n_gram_frequencies.items():
+            if context == n_gram[:-1]:
+                following_token[n_gram[-1]] = freq
+        return following_token
 
     def _extract_n_grams(
         self, encoded_corpus: tuple[int, ...]
@@ -304,6 +327,12 @@ class NGramLanguageModel:
 
         In case of corrupt input arguments, None is returned
         """
+        if not isinstance(encoded_corpus, tuple) or not encoded_corpus:
+            return None
+        listed_ngs = []
+        for i in range(len(encoded_corpus) - 1):
+            listed_ngs.append(tuple(encoded_corpus[i:i + self._n_gram_size]))
+        return tuple(listed_ngs)
 
 
 class GreedyTextGenerator:
@@ -323,6 +352,8 @@ class GreedyTextGenerator:
             language_model (NGramLanguageModel): A language model to use for text generation
             text_processor (TextProcessor): A TextProcessor instance to handle text processing
         """
+        self._model = language_model
+        self._text_processor = text_processor
 
     def run(self, seq_len: int, prompt: str) -> Optional[str]:
         """
@@ -338,6 +369,9 @@ class GreedyTextGenerator:
         In case of corrupt input arguments or methods used return None,
         None is returned
         """
+        if not isinstance(seq_len, int) or not isinstance(
+                prompt, str) or not prompt:
+            return None
 
 
 class BeamSearcher:
