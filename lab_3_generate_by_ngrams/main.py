@@ -315,10 +315,10 @@ class NGramLanguageModel:
         context = sequence[-self._n_gram_size + 1:]
         result = {}
         for n_gram, freq in self._n_gram_frequencies.items():
-            if n_gram[:-1] == context:
+            if context == n_gram[:-1]:
                 result[n_gram[-1]] = freq
-        sorted_result = dict(sorted(result.items(), key=lambda item: (-item[1], item[0])))
-        return sorted_result
+        # sorted_result = dict(sorted(result.items(), key=lambda item: (-item[1], item[0])))
+        return result
 
     def _extract_n_grams(
         self, encoded_corpus: tuple[int, ...]
@@ -388,7 +388,7 @@ class GreedyTextGenerator:
             if not next_cand:
                 break
             max_freq = max(next_cand.values())
-            best = [k for k in next_cand if next_cand[k] == max_freq]
+            best = [k for k, v in next_cand.items() if v == max_freq]
             sorted_best = sorted(best)
             encoded_prompt += (sorted_best[0],)
         result = self._text_processor.decode(encoded_prompt)
