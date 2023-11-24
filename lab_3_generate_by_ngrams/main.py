@@ -455,9 +455,7 @@ class GreedyTextGenerator:
 
         return decoded_text
 
-            best_candidates = [token for token, freq in new_tokens.items() if freq == max(new_tokens.values())]
-            encoded += (sorted(best_candidates)[0],)
-        return self._text_processor.decode(encoded)
+
 class BeamSearcher:
     """
     Beam Search algorithm for diverse text generation.
