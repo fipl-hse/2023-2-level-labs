@@ -217,6 +217,7 @@ mac
 macos
 made
 main
+math
 max
 mean
 merge
@@ -313,6 +314,7 @@ pyproject
 pytest
 python
 qualitychecker
+question
 questions
 random
 range
