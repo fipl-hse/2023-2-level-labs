@@ -46,7 +46,7 @@ class TextProcessor:
             return None
         tokens = []
         for i in text.lower():
-            if i.isspace() and tokens[-1] != self._end_of_word_token:
+            if tokens and i.isspace() and tokens[-1] != self._end_of_word_token:
                 tokens.append(self._end_of_word_token)
             elif i.isalpha():
                 tokens.append(i)
