@@ -774,14 +774,14 @@ class BackOffGenerator:
         if not encoded:
             return None
 
-        maximum = 0
+        maximum = 0.0
         for i in range(seq_len):
             candidates = self._get_next_token(encoded)
             if not candidates:
                 break
 
             maximum = max(candidates.values())
-            best_candidate = list(filter(lambda x: candidates[x] == maximum, candidates))
+            best_candidate = list(filter(lambda int(x): candidates[x] == maximum, candidates))
             encoded += (best_candidate[0],)
         decoded_sequence = self._text_processor.decode(encoded)
         return decoded_sequence
