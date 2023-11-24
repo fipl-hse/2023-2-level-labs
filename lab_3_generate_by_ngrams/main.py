@@ -317,8 +317,8 @@ class NGramLanguageModel:
         for n_gram, freq in self._n_gram_frequencies.items():
             if context == n_gram[:-1]:
                 result[n_gram[-1]] = freq
-        # sorted_result = dict(sorted(result.items(), key=lambda item: (-item[1], item[0])))
-        return result
+        sorted_result = dict(sorted(result.items(), key=lambda item: (-item[1], item[0])))
+        return sorted_result
 
     def _extract_n_grams(
         self, encoded_corpus: tuple[int, ...]
