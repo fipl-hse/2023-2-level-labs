@@ -21,7 +21,8 @@ def main() -> None:
     model = NGramLanguageModel(encoded[:100], n_gram_size=3)
     print(model.build())
 
-    model2 = NGramLanguageModel(encoded, 7)
+    model2 = NGramLanguageModel(encoded, n_gram_size=7)
+    print(model2.build())
     greedy_text_generator = GreedyTextGenerator(model2, processor)
     print(greedy_text_generator.run(51, 'Vernon'))
 

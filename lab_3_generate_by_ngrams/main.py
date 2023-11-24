@@ -303,16 +303,24 @@ class NGramLanguageModel:
             return 1
 
         n_grams = self._extract_n_grams(self._encoded_corpus)
-        if not isinstance(n_grams, tuple) or len(n_grams) == 0:
+        if not isinstance(n_grams, tuple) or not n_grams:
             return 1
 
+        prefixes = {}
         for n_gram in n_grams:
             prefix = n_gram[:-1]
-            prefix_count = len([gram for gram in n_grams if gram[:-1] == prefix])
-            frequency = n_grams.count(n_gram) / prefix_count
-            self._n_gram_frequencies[n_gram] = frequency
-        return 0
+            if prefix not in prefixes:
+                prefixes[prefix] = {}
 
+            if n_gram not in prefixes[prefix]:
+                prefixes[prefix][n_gram] = 0.
+            prefixes[prefix][n_gram] += 1.
+
+        for same_context_ngrams in prefixes.values():
+            same_context_count = sum(same_context_ngrams.values())
+            for n_gram, freq in same_context_ngrams.items():
+                self._n_gram_frequencies[n_gram] = freq/same_context_count
+        return 0
     def generate_next_token(self, sequence: tuple[int, ...]) -> Optional[dict]:
         """
         Retrieve tokens that can continue the given sequence along with their probabilities.
