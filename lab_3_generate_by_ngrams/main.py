@@ -217,7 +217,7 @@ class TextProcessor:
         """
         if not isinstance(decoded_corpus, tuple) or not decoded_corpus:
             return None
-        decoded_text = decoded_corpus.capitalize()
+        decoded_text = decoded_corpus[0].upper()
         for element in decoded_corpus[1:-1]:
             if element == self._end_of_word_token:
                 decoded_text = f'{decoded_text} '
