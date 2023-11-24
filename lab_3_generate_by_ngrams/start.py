@@ -11,14 +11,14 @@ def main() -> None:
     """
     with open("./assets/Harry_Potter.txt", "r", encoding="utf-8") as text_file:
         text = text_file.read()
-    text_processor = TextProcessor('_')
+    text_processor = main_py.TextProcessor('_')
     encoded = text_processor.encode(text)
     decoded = text_processor.decode(encoded)
     result = decoded
     print(result)
-    n_gram_language_model = NGramLanguageModel(encoded[:100], 7)
+    n_gram_language_model = main_py.NGramLanguageModel(encoded[:100], 7)
     print(n_gram_language_model.build())
-    greedy_text_generator = GreedyTextGenerator(n_gram_language_model, text_processor)
+    greedy_text_generator = main_py.GreedyTextGenerator(n_gram_language_model, text_processor)
     generated_text = greedy_text_generator.run(51, 'Vernon')
     result = generated_text
     print(generated_text)
