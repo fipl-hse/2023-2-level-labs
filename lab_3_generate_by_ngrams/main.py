@@ -553,12 +553,13 @@ class BeamSearchTextGenerator:
             return None
         cands = {encoded_prompt: 0.0}
         for _ in range(seq_len):
-            cands_copy = cands.copy()
+            cands_copy = dict(cands)
             for cand in cands:
                 next_tokens = self._get_next_token(cand)
                 if not next_tokens:
                     return None
-                possible_tokens = self.beam_searcher.continue_sequence(cand, next_tokens, cands_copy)
+                possible_tokens = self.beam_searcher.continue_sequence(cand,
+                                                                       next_tokens, cands_copy)
                 if not possible_tokens:
                     break
             best_cands = self.beam_searcher.prune_sequence_candidates(cands_copy)
