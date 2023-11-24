@@ -5,9 +5,6 @@ from lab_3_generate_by_ngrams.main import (BeamSearchTextGenerator, GreedyTextGe
                                            NGramLanguageModel, TextProcessor)
 
 
-from lab_3_generate_by_ngrams.main import GreedyTextGenerator, NGramLanguageModel, TextProcessor
-
-
 def main() -> None:
     """
     Launches an implementation.
