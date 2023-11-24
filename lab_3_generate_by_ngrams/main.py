@@ -781,7 +781,7 @@ class BackOffGenerator:
                 break
 
             maximum = max(candidates.values())
-            best_candidate = list(filter(lambda int(x): candidates[x] == maximum, candidates))
+            best_candidate = list(filter(lambda x: candidates[int(x)] == maximum, candidates))
             encoded += (best_candidate[0],)
         decoded_sequence = self._text_processor.decode(encoded)
         return decoded_sequence
