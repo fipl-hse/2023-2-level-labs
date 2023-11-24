@@ -53,17 +53,11 @@ class TextProcessor:
         for word in text_words:
             word_tokens = [alpha for alpha in word if alpha.isalpha()]
             tokens.extend(word_tokens)
-            tokens.append(self._end_of_word_token)
+            if word_tokens:
+                tokens.append(self._end_of_word_token)
 
-        if not tokens or len(set(tokens)) == 1:
+        if not tokens:
             return None
-
-        tokens_copy = tokens[:]
-        for i in range(len(tokens_copy) - 1):
-            if tokens_copy[i] == tokens_copy[i + 1] == self._end_of_word_token:
-                tokens_copy[i] = ' '
-
-        tokens = [i for i in tokens_copy if i != ' ']
 
         if text[-1].isdigit() or text[-1].isalpha():
             tokens.pop(-1)
