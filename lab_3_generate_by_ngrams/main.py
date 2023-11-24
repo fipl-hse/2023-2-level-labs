@@ -3,11 +3,11 @@ Lab 3.
 
 Beam-search and natural language generation evaluation
 """
+import json
+import math
+import string
 # pylint:disable=too-few-public-methods
 from typing import Optional
-import string
-import math
-import json
 
 
 class TextProcessor:
@@ -203,7 +203,7 @@ class TextProcessor:
         """
         if not(isinstance(content, dict) and content):
             return None
-        n_grams = [n_gram for n_gram in content['freq']]
+        n_grams = list(content['freq'])
         n_grams = ''.join(n_grams).replace(' ', self._end_of_word_token).lower()
         n_grams = [x for x in n_grams if x.isalpha()]
         for n_gram in n_grams:
@@ -303,6 +303,7 @@ class NGramLanguageModel:
         if not (isinstance(frequencies, dict) and frequencies):
             return None
         self._n_gram_frequencies = frequencies
+        return None
 
     def build(self) -> int:
         """
@@ -705,7 +706,7 @@ class NGramLanguageModelReader:
             all_n_grams[tuple(encoded_n_gram)] += self._content['freq'][n_gram]
 
         for n_gram, freq in all_n_grams.items():
-            if isinstance(n_gram, tuple):
+            if isinstance(n_gram, tuple) and len(n_gram) == n_gram_size:
                 same_context = [context_freq for context, context_freq in all_n_grams.items()
                                 if context[-n_gram_size:-1] == n_gram[-n_gram_size:-1]]
                 needed_n_grams[n_gram] = freq / sum(same_context)
@@ -772,6 +773,7 @@ class BackOffGenerator:
         if not encoded:
             return None
 
+        maximum = 0
         for i in range(seq_len):
             candidates = self._get_next_token(encoded)
             if not candidates:
@@ -781,8 +783,6 @@ class BackOffGenerator:
             best_candidate = list(filter(lambda x: candidates[x] == maximum, candidates))
             encoded += (best_candidate[0],)
         decoded_sequence = self._text_processor.decode(encoded)
-        # if not decoded_sequence:
-        #     return None
 
         return decoded_sequence
 
@@ -805,6 +805,7 @@ class BackOffGenerator:
         n_gram_sizes = sorted(self._language_models.keys(), reverse=True)
         for size in n_gram_sizes:
             model = self._language_models[size]
-            candidates = model.generate_next_token(sequence_to_continue)
-            if candidates:
-                return {token: freq / sum(candidates.values()) for token, freq in candidates.items()}
+            candidate = model.generate_next_token(sequence_to_continue)
+            if candidate:
+                return {token: freq / sum(candidate.values()) for token, freq in candidate.items()}
+        return None
