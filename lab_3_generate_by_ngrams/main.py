@@ -187,13 +187,15 @@ class TextProcessor:
         """
         if not isinstance(corpus, tuple) or not corpus:
             return None
-        decoded_corpus = []
+        listed_corpus = []
         for element_id in corpus:
+            if not isinstance(element_id, int):
+                return None
             token = self.get_token(element_id)
             if not token:
                 return None
-            decoded_corpus.append(token)
-        return tuple(decoded_corpus)
+            listed_corpus.append(token)
+        return tuple(listed_corpus)
 
     def _postprocess_decoded_text(self, decoded_corpus: tuple[str, ...]) -> Optional[str]:
         """
