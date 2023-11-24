@@ -47,7 +47,7 @@ class TextProcessor:
             return None
         tokens = []
         listed_text = text.lower().split()
-        for token in list_text:
+        for token in listed_text:
             word = list(filter(str.isalpha, token))
             if word:
                 tokens.extend(word)
