@@ -545,22 +545,23 @@ class BeamSearchTextGenerator:
         In case of corrupt input arguments or methods used return None,
         None is returned
         """
-        if not (isinstance(prompt, str) and prompt and isinstance(seq_len, int) and seq_len and seq_len <= 0):
+        if not (isinstance(prompt, str) and prompt
+                and isinstance(seq_len, int) and seq_len):
             return None
         encoded_prompt = self._text_processor.encode(prompt)
         if not encoded_prompt:
             return None
         cands = {encoded_prompt: 0.0}
-        for last_token in range(seq_len):
-            cands_new = cands.copy()
+        for _ in range(seq_len):
+            cands_copy = cands.copy()
             for cand in cands:
                 next_tokens = self._get_next_token(cand)
                 if not next_tokens:
                     return None
-                possible_tokens = self.beam_searcher.continue_sequence(cand, next_tokens, cands_new)
+                possible_tokens = self.beam_searcher.continue_sequence(cand, next_tokens, cands_copy)
                 if not possible_tokens:
                     break
-            best_cands = self.beam_searcher.prune_sequence_candidates(cands_new)
+            best_cands = self.beam_searcher.prune_sequence_candidates(cands_copy)
             if not best_cands:
                 return None
             cands = best_cands
