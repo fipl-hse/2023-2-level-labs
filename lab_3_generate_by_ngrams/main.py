@@ -45,21 +45,18 @@ class TextProcessor:
         """
         if not isinstance(text, str) or not text:
             return None
-        clear_text = ''
-        for symbol in text.lower():
-            if not symbol.isalpha() or symbol.isdigit():
-                symbol = self._end_of_word_token
-            clear_text += symbol
-        i = 0
-        while i < len(clear_text) - 1:
-            if clear_text[i] == clear_text[i + 1] and clear_text[i] == self._end_of_word_token:
-                clear_text = clear_text[:i] + clear_text[i + 1:]
-                i -= 1
-            i += 1
-        if clear_text == self._end_of_word_token or not clear_text:
+        tokens = []
+        listed_text = text.lower().split()
+        for token in list_text:
+            word = list(filter(str.isalpha, token))
+            if word:
+                tokens.extend(word)
+                tokens.append(self._end_of_word_token)
+        if not tokens:
             return None
-        tokens = tuple(clear_text)
-        return tokens
+        if text[-1].isalnum():
+            tokens.pop()
+        return tuple(tokens)
 
     def get_id(self, element: str) -> Optional[int]:
         """
