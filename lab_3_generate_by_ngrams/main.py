@@ -204,8 +204,8 @@ class TextProcessor:
         if not(isinstance(content, dict) and content):
             return None
         n_grams = list(content['freq'])
-        n_grams = ''.join(n_grams).replace(' ', self._end_of_word_token).lower()
-        n_grams = [x for x in n_grams if x.isalpha()]
+        n_grams_str = ''.join(n_grams).replace(' ', self._end_of_word_token).lower()
+        n_grams = [x for x in n_grams_str if x.isalpha()]
         for n_gram in n_grams:
             self._put(n_gram)
         return None
@@ -487,7 +487,8 @@ class BeamSearcher:
             return None
         if not variants:
             return []
-        sorted_variants = sorted(variants.items(), key=lambda x: x[1], reverse=True)
+        sorted_variants = variants.items().sort(key=lambda x: x[1], reverse=True)
+        # sorted_variants = sorted(variants.items(), key=lambda x: x[1], reverse=True)
         return sorted_variants[:self._beam_width]
 
     def continue_sequence(
