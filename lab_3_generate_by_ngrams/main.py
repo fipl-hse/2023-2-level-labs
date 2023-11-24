@@ -524,8 +524,8 @@ class BeamSearcher:
             return None
 
         for token in next_tokens:
-            sequence_candidates.update({sequence+(token[0],): sequence_candidates[sequence] - math.log(
-                token[1])})
+            sequence_candidates.update({sequence+(
+                token[0],): sequence_candidates[sequence] - math.log(token[1])})
 
         sequence_candidates.pop(sequence)
 
