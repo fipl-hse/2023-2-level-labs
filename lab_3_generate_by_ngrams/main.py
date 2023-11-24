@@ -474,13 +474,18 @@ class BeamSearcher:
                 and len(next_tokens) <= self._beam_width
                 and sequence in sequence_candidates):
             return None
-        new_sequence_candidates = dict(sequence_candidates)
         for token in next_tokens:
-            new_sequence = sequence + (token[0],)
-            new_value = new_sequence_candidates[sequence] - math.log(token[1])
-            new_sequence_candidates[new_sequence] = new_value
-        del new_sequence_candidates[sequence]
-        return new_sequence_candidates
+            sequence_candidates.update({sequence+(token[0],): sequence_candidates[sequence] - math.log(
+                token[1])})
+        sequence_candidates.pop(sequence)
+        return sequence_candidates
+        # new_sequence_candidates = dict(sequence_candidates)
+        # for token in next_tokens:
+        #     new_sequence = sequence + (token[0],)
+        #     new_value = new_sequence_candidates[sequence] - math.log(token[1])
+        #     new_sequence_candidates[new_sequence] = new_value
+        # del new_sequence_candidates[sequence]
+        # return new_sequence_candidates
 
     def prune_sequence_candidates(
         self, sequence_candidates: dict[tuple[int, ...], float]
