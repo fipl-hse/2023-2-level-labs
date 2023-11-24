@@ -25,7 +25,8 @@ def main() -> None:
     result = language_model.build()
     print(result)
 
-    greedy_generator = GreedyTextGenerator(language_model, text_processor)
+    other_language_model = NGramLanguageModel(encoded_text, 7)
+    greedy_generator = GreedyTextGenerator(other_language_model, text_processor)
     result = greedy_generator.run(51, "Vernon")
     print(result)
 
