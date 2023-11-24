@@ -783,7 +783,6 @@ class BackOffGenerator:
             best_candidate = list(filter(lambda x: candidates[x] == maximum, candidates))
             encoded += (best_candidate[0],)
         decoded_sequence = self._text_processor.decode(encoded)
-
         return decoded_sequence
 
     def _get_next_token(self, sequence_to_continue: tuple[int, ...]) -> Optional[dict[int, float]]:
