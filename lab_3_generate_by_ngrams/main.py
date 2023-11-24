@@ -152,7 +152,7 @@ class TextProcessor:
         an element is not added to storage
         """
         if not isinstance(element, str) or len(element) != 1 or element in self._storage:
-            return None
+            return
 
         self._storage[element] = len(self._storage)
 
