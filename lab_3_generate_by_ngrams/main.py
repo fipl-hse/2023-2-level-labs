@@ -774,9 +774,6 @@ class BackOffGenerator:
         self._language_models = {model.get_n_gram_size(): model for model in language_models}
         self._text_processor = text_processor
 
-        self._language_models = {model.get_n_gram_size(): model for model in language_models}
-        self._text_processor = text_processor
-
     def run(self, seq_len: int, prompt: str) -> Optional[str]:
         """
         Generate sequence based on NGram language model and prompt provided.
