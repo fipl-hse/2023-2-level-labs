@@ -32,7 +32,7 @@ class TextProcessor:
         """
         Tokenize text into unigrams, separating words with special token.
 
-        Punctuation and digits are removed. EoW token is appended after the last word in two cases:
+        Punctuation  digits are removed. EoW token is appended after the last word in two cases:
         1. It is followed by punctuation
         2. It is followed by space symbol
 
@@ -50,7 +50,7 @@ class TextProcessor:
 
         tokens = []
         for token in text.lower():
-            if token.isalpha(): 
+            if token.isalpha():
                 tokens.append(token)
             elif token.isspace() and tokens[-1] != self._end_of_word_token:
                 tokens.append(self._end_of_word_token)
@@ -172,7 +172,7 @@ class TextProcessor:
         """
         if not isinstance(encoded_corpus, tuple):
             return None
-        
+
         decoded_elements = self._decode(encoded_corpus)
         if not decoded_elements:
             return None
@@ -215,8 +215,8 @@ class TextProcessor:
             return None
 
         decoded_corpus = []
-        for id in corpus:
-            element = self.get_token(id)
+        for ident in corpus:
+            element = self.get_token(ident)
             if element is None:
                 return None
 
@@ -364,8 +364,8 @@ class NGramLanguageModel:
 
         n_grams = []
 
-        for id in range(len(encoded_corpus) - 1):
-            n_grams.append(encoded_corpus[id: id + self._n_gram_size])
+        for ident in range(len(encoded_corpus) - 1):
+            n_grams.append(encoded_corpus[ident: ident + self._n_gram_size])
 
         return tuple(n_grams)
 
@@ -417,7 +417,8 @@ class GreedyTextGenerator:
             if not next_prediction:
                 break
 
-            best_predictions = [key for key in next_prediction if next_prediction[key] == max(next_prediction.values())]
+            best_predictions = [key for key in next_prediction 
+                                if next_prediction[key] == max(next_prediction.values())]
             encoded_text += (best_predictions[0],)
 
         decoded_text = self._text_processor.decode(encoded_text)
@@ -510,7 +511,8 @@ class BeamSearcher:
             return None
 
         for token in next_tokens:
-            sequence_candidates[sequence + (token[0],)] = sequence_candidates[sequence] - math.log(token[1])
+            sequence_candidates[sequence + (token[0],)] \
+                                = sequence_candidates[sequence] - math.log(token[1])
 
         del sequence_candidates[sequence]
         return sequence_candidates
@@ -596,9 +598,9 @@ class BeamSearchTextGenerator:
                 next_tokens = self._get_next_token(seq)
                 if not next_tokens:
                     return None
-        
+
                 possible_continuations = self.beam_searcher.continue_sequence(seq, next_tokens,
-                                                                                     new_seqs)       
+                                                                                     new_seqs)
                 if not possible_continuations:
                     return self._text_processor.decode(sorted(tuple(
                             seq_candidates), key=lambda x: x[1])[0])
@@ -611,9 +613,9 @@ class BeamSearchTextGenerator:
 
         decoded_seq = self._text_processor.decode(sorted(tuple(
                             seq_candidates), key=lambda x: x[1])[0])
-    
+
         return decoded_seq
-    
+
     def _get_next_token(
         self, sequence_to_continue: tuple[int, ...]
     ) -> Optional[list[tuple[int, float]]]:
@@ -689,8 +691,8 @@ class NGramLanguageModelReader:
             encoded_seq = []
             for token in ngram:
                 if token.isalpha():
-                    id = self._text_processor.get_id(token.lower())
-                    encoded_seq.append(id)
+                    ident = self._text_processor.get_id(token.lower())
+                    encoded_seq.append(ident)
                 elif token.isspace():
                     encoded_seq.append(0)
 
@@ -701,7 +703,7 @@ class NGramLanguageModelReader:
         sized_ngrams = {}
         for n_gram, freq in n_grams.items():
             if isinstance(n_gram, tuple) and len(n_gram) == n_gram_size:
-                same_beginning = [n_grams[beginning] for beginning in n_grams
+                same_beginning = [freq for beginning, freq in n_grams.items()
                                     if beginning[-n_gram_size:-1] == n_gram[-n_gram_size:-1]]
                 sized_ngrams[n_gram] = freq / sum(same_beginning)
 
@@ -799,7 +801,7 @@ class BackOffGenerator:
 
         for size in n_gram_sizes:
             n_gram_model = self._language_models[size]
-        
+
             candidates = n_gram_model.generate_next_token(sequence_to_continue)
 
             if candidates is not None and len(candidates) > 0:
