@@ -105,9 +105,9 @@ class GeneratorTypes:
     A class that represents types of generators.
 
     Attributes:
-        greedy (int): Identifier of Greedy generator
-        top_p (int): Identifier of Top-P generator
-        beam_search (int): Identifier of Beam Search generator
+        greedy (int): Numeric type of Greedy generator
+        top_p (int): Numeric type of Top-P generator
+        beam_search (int): Numeric type of Beam Search generator
     """
 
     def __init__(self) -> None:
@@ -134,7 +134,7 @@ class GenerationResultDTO:
     Attributes:
         __text (str): Text that used to calculate perplexity
         __perplexity (float): Calculated perplexity score
-        __type (int): Identifier of the generator
+        __type (int): Numeric type of the generator
     """
 
     def __init__(self, text: str, perplexity: float, generation_type: int):
@@ -144,7 +144,8 @@ class GenerationResultDTO:
         Args:
             text (str): The text used to calculate perplexity
             perplexity (float): Calculated perplexity score
-            generation_type (int): Name of the generator for which perplexity was calculated
+            generation_type (int):
+                Numeric type of the generator for which perplexity was calculated
         """
 
     def get_perplexity(self) -> float:  # type: ignore
@@ -197,19 +198,18 @@ class QualityChecker:
         Initialize an instance of QualityChecker.
 
         Args:
-            generators (dict): Dictionary in the form of {name: generator}
+            generators (dict): Dictionary in the form of {numeric type: generator}
             language_model (NGramLanguageModel):
                 NGramLanguageModel instance to use for text generation
             word_processor (WordProcessor): WordProcessor instance to handle text processing
         """
 
-    def _calculate_perplexity(self, generated_text: str, prompt: str) -> float:  # type: ignore
+    def _calculate_perplexity(self, generated_text: str) -> float:  # type: ignore
         """
         Calculate perplexity for the text made by generator.
 
         Args:
             generated_text (str): Text made by generator
-            prompt (str): Beginning of the sequence
 
         Returns:
             float: Perplexity score for generated text
@@ -217,7 +217,6 @@ class QualityChecker:
         Raises:
             ValueError: In case of inappropriate type input argument,
                 or if input argument is empty,
-                or if generated text started without prompt,
                 or if methods used return None,
                 or if nothing was generated.
         """
@@ -302,12 +301,10 @@ class Examiner:
 class GeneratorRuleStudent:
     """
     Base class for students generators.
-
-    Attributes:
-        _generator_type (str): Name of generator
     """
 
     _generator: GreedyTextGenerator | TopPGenerator | BeamSearchTextGenerator
+    _generator_type: int
 
     def __init__(
         self, generator_type: int, language_model: NGramLanguageModel, word_processor: WordProcessor
@@ -316,7 +313,7 @@ class GeneratorRuleStudent:
         Initialize an instance of GeneratorRuleStudent.
 
         Args:
-            generator_type (int): Identifier of the generator
+            generator_type (int): Numeric type of the generator
             language_model (NGramLanguageModel):
                 NGramLanguageModel instance to use for text generation
             word_processor (WordProcessor): WordProcessor instance to handle text processing
