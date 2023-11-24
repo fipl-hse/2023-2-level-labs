@@ -16,8 +16,13 @@ def main() -> None:
     decoded = text_processor.decode(encoded)
     result = decoded
     print(result)
+    n_gram_language_model = NGramLanguageModel(encoded_corpus=encoded[:100], n_gram_size=7)
+    print(n_gram_language_model.build())
+    greedy_text_generator = GreedyTextGenerator(n_gram_language_model, text_processor)
+    generated_text = greedy_text_generator.run(51, 'Vernon')
+    result = generated_text
+    print(generated_text)
     assert result
-
 
 if __name__ == "__main__":
     main()
