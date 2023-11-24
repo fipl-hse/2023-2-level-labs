@@ -49,10 +49,10 @@ class TextProcessor:
             return None
         listed_text = list(text.lower())
         tokenized_text = []
-        for i in listed_text:
-            if i.isalpha():
-                tokenized_text.append(i)
-            elif i in string.punctuation or i == ' ':
+        for element in listed_text:
+            if element.isalpha():
+                tokenized_text.append(element)
+            elif element in string.punctuation or element == ' ':
                 if tokenized_text[-1] != self._end_of_word_token:
                     tokenized_text.append(self._end_of_word_token)
         return tuple(tokenized_text)
@@ -116,6 +116,19 @@ class TextProcessor:
         In case of corrupt input arguments, None is returned.
         In case any of methods used return None, None is returned.
         """
+        if not isinstance(text, str) or not text:
+            return None
+        encoded_text = []
+        tokenized_text = self._tokenize(text)
+        if not tokenized_text:
+            return None
+        for element in tokenized_text:
+            self._put(element)
+            ident = self.get_id(element)
+            if not isinstance(ident, int):
+                return None
+            encoded_text.append(ident)
+        return tuple(encoded_text)
 
     def _put(self, element: str) -> None:
         """
@@ -147,7 +160,12 @@ class TextProcessor:
         In case of corrupt input arguments, None is returned.
         In case any of methods used return None, None is returned.
         """
-
+        if not (isinstance(encoded_corpus, tuple) and encoded_corpus):
+            return None
+        decoded_text = self._decode(encoded_corpus)
+        if not decoded_text:
+            return None
+        return self._postprocess_decoded_text(decoded_text)
     def fill_from_ngrams(self, content: dict) -> None:
         """
         Fill internal storage with letters from external JSON.
@@ -169,7 +187,17 @@ class TextProcessor:
         In case of corrupt input arguments, None is returned.
         In case any of methods used return None, None is returned.
         """
-
+        if not isinstance(corpus, tuple) or not corpus:
+            return None
+        decoded_tokens = []
+        for element in corpus:
+            if not isinstance(element, int):
+                return None
+            token = self.get_token(element)
+            if not token:
+                return None
+            decoded_tokens.append(token)
+        return tuple(decoded_tokens)
     def _postprocess_decoded_text(self, decoded_corpus: tuple[str, ...]) -> Optional[str]:
         """
         Convert decoded sentence into the string sequence.
@@ -190,9 +218,9 @@ class TextProcessor:
         string_text = ''
         string_text = ''.join([string_text, decoded_corpus[0].upper()])
         print(string_text)
-        for i in decoded_corpus[1:-1]:
-            if i.isalpha():
-                string_text = ''.join([string_text, i])
+        for element in decoded_corpus[1:-1]:
+            if element.isalpha():
+                string_text = ''.join([string_text, element])
             else:
                 string_text = ''.join([string_text, ' '])
         print(string_text)
