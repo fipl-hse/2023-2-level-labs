@@ -387,9 +387,9 @@ class GreedyTextGenerator:
             next_cand = self._model.generate_next_token(encoded_prompt)
             if not next_cand:
                 break
-            max_freq = max(next_cand.values())
-            best = [k for k, v in next_cand.items() if v == max_freq]
-            encoded_prompt += sorted(best[0],)
+            best = [k for k, v in next_cand.items() if v == max(next_cand.values())]
+            sorted_best = sorted(best)
+            encoded_prompt += (sorted_best[0],)
         result = self._text_processor.decode(encoded_prompt)
         return result
 
