@@ -329,7 +329,7 @@ class NGramLanguageModel:
                 continue
             count_current = n_grams.count(n_gram)
             cut_ngram = n_gram[:self._n_gram_size-1]
-            starts_from_n_gram = len([i for i in n_grams if i[:self._n_gram_size-1] == cut_ngram])
+            starts_from_n_gram = len([i for i in n_grams if i[:-1] == cut_ngram])
             self._n_gram_frequencies[n_gram] = count_current / starts_from_n_gram
 
         return 0
@@ -487,7 +487,8 @@ class BeamSearcher:
             return None
         if not variants:
             return []
-        sorted_variants: list[tuple[int, float]] = sorted(variants.items(), key=lambda x: x[1], reverse=True)
+        sorted_variants: list[tuple[int, float]] \
+            = sorted(variants.items(), key=lambda x: x[1], reverse=True)
         return sorted_variants[:self._beam_width]
 
     def continue_sequence(
@@ -779,10 +780,7 @@ class BackOffGenerator:
                 break
             maximum = max(candidates.values())
             best_candidate = [k for k, v in candidates.items() if v == maximum]
-
-            # best_candidate = list(filter(lambda x: candidates[int(x)] == maximum, candidates))
             encoded += (best_candidate[0],)
-            # encoded += (maximum,)
         decoded_sequence = self._text_processor.decode(encoded)
         return decoded_sequence
 
