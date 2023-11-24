@@ -128,9 +128,11 @@ class TextProcessor:
         for token in tokenized:
             self._put(token)
             identifier = self.get_id(token)
-            if not identifier:
+            if not isinstance(identifier, int):
                 return None
             encoded_text.append(identifier)
+        if not encoded_text:
+            return None
         return tuple(encoded_text)
 
     def _put(self, element: str) -> None:
@@ -200,6 +202,8 @@ class TextProcessor:
             return None
         decoded_corp = []
         for ident in corpus:
+            if ident is None:
+                return None
             token = self.get_token(ident)
             if token is None:
                 return None
@@ -223,7 +227,10 @@ class TextProcessor:
         """
         if not isinstance(decoded_corpus, tuple) or not decoded_corpus:
             return None
-        decoded_txt = ''.join(list(decoded_corpus)).replace(self._end_of_word_token, ' ').strip()
+        decoded_list = list(decoded_corpus)
+        if decoded_list[-1] == self._end_of_word_token:
+            del decoded_list[-1]
+        decoded_txt = ''.join(decoded_list).replace(self._end_of_word_token, ' ').strip()
         return f'{decoded_txt.capitalize()}.'
 
 
