@@ -313,6 +313,8 @@ class NGramLanguageModel:
                 len(sequence) < self._n_gram_size - 1):
             return None
         context = sequence[-self._n_gram_size + 1:]
+        if len(context) > len(sequence):
+            return None
         result = {}
         for n_gram, freq in self._n_gram_frequencies.items():
             if context == n_gram[:-1]:
@@ -440,10 +442,8 @@ class BeamSearcher:
             return None
         if not tokens:
             return []
-        result = []
-        for token, freq in tokens.items():
-            result.append((token, float(freq)))
-        result = sorted(result, key=lambda x: x[1], reverse=True)
+        result = sorted([(token, float(freq)) for token, freq in tokens.items()],
+                        key=lambda x: x[1], reverse=True)
         return result[:self._beam_width]
 
     def continue_sequence(
@@ -474,18 +474,12 @@ class BeamSearcher:
                 and len(next_tokens) <= self._beam_width
                 and sequence in sequence_candidates):
             return None
+        new_sequence_candidates = sequence_candidates.copy()
         for token in next_tokens:
-            sequence_candidates.update({sequence+(token[0],): sequence_candidates[sequence] - math.log(
-                token[1])})
-        sequence_candidates.pop(sequence)
-        return sequence_candidates
-        # new_sequence_candidates = dict(sequence_candidates)
-        # for token in next_tokens:
-        #     new_sequence = sequence + (token[0],)
-        #     new_value = new_sequence_candidates[sequence] - math.log(token[1])
-        #     new_sequence_candidates[new_sequence] = new_value
-        # del new_sequence_candidates[sequence]
-        # return new_sequence_candidates
+            new_sequence = sequence + (token[0],)
+            new_sequence_candidates[new_sequence] = sequence_candidates[sequence] - math.log(token[1])
+        new_sequence_candidates.pop(sequence)
+        return new_sequence_candidates
 
     def prune_sequence_candidates(
         self, sequence_candidates: dict[tuple[int, ...], float]
