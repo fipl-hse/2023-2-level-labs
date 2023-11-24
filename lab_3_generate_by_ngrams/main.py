@@ -3,9 +3,6 @@ Lab 3.
 
 Beam-search and natural language generation evaluation
 """
-import json
-import math
-import string
 # pylint:disable=too-few-public-methods
 import json
 import math
@@ -397,9 +394,6 @@ class NGramLanguageModel:
 
         return tuple(n_grams)
 
-        ngrams = ([tuple(encoded_corpus[i:i + self._n_gram_size])
-                   for i in range(len(encoded_corpus) - self._n_gram_size + 1)])
-        return tuple(ngrams)
 
 class GreedyTextGenerator:
     """
