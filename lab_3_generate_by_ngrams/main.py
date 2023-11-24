@@ -379,8 +379,8 @@ class GreedyTextGenerator:
         """
         if not (isinstance(seq_len, int) and isinstance(prompt, str) and prompt):
             return None
-        n_gram_size = self._model.get_n_gram_size()
         encoded_prompt = self._text_processor.encode(prompt)
+        n_gram_size = self._model.get_n_gram_size()
         if not (n_gram_size and encoded_prompt):
             return None
         for last_token in range(seq_len):
