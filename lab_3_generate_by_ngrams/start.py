@@ -11,12 +11,12 @@ def main() -> None:
     """
     with open("./assets/Harry_Potter.txt", "r", encoding="utf-8") as text_file:
         text = text_file.read()
-    result = None
     text_processed = TextProcessor('_')
     encoded_text = text_processed.encode(text)
     print(encoded_text)
     decoded_text = text_processed.decode(encoded_text)
     print(decoded_text)
-
+    result = decoded_text
+    assert result
 if __name__ == "__main__":
     main()
