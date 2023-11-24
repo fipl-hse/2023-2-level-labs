@@ -471,19 +471,19 @@ class BeamSearcher:
                 and len(next_tokens) <= self._beam_width
                 and sequence in sequence_candidates):
             return None
-        # new_sequence_candidates = sequence_candidates.copy()
-        # for token in next_tokens:
-        #     new_sequence = sequence + (token[0],)
-        #     new_sequence_candidates[new_sequence] = (sequence_candidates[sequence]
-        #                                              - math.log(token[1]))
-        # new_sequence_candidates.pop(sequence)
-        # return new_sequence_candidates
+        new_sequence_candidates = sequence_candidates.copy()
         for token in next_tokens:
             new_sequence = sequence + (token[0],)
-            new_value = sequence_candidates[sequence] - math.log(token[1])
-            sequence_candidates[new_sequence] = new_value
-        del sequence_candidates[sequence]
-        return sequence_candidates
+            new_sequence_candidates[new_sequence] = (sequence_candidates[sequence]
+                                                     - math.log(token[1]))
+        new_sequence_candidates.pop(sequence)
+        return new_sequence_candidates
+        # for token in next_tokens:
+        #     new_sequence = sequence + (token[0],)
+        #     new_value = sequence_candidates[sequence] - math.log(token[1])
+        #     sequence_candidates[new_sequence] = new_value
+        # del sequence_candidates[sequence]
+        # return sequence_candidates
 
     def prune_sequence_candidates(
             self, sequence_candidates: dict[tuple[int, ...], float]
@@ -502,7 +502,7 @@ class BeamSearcher:
         if not (isinstance(sequence_candidates, dict)
                 and sequence_candidates):
             return None
-        sorted_dict = sorted(sequence_candidates.items(), key=lambda x: (x[1], x[0]), reverse=True)
+        sorted_dict = sorted(sequence_candidates.items(), key=lambda x: (x[1], x[0]))
         return {x[0]: x[1] for x in sorted_dict[:self._beam_width]}
 
 class BeamSearchTextGenerator:
