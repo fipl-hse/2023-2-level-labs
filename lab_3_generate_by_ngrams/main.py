@@ -328,7 +328,7 @@ class NGramLanguageModel:
 
         In case of corrupt input arguments, None is returned
         """
-        if not isinstance(encoded_corpus, tuple):
+        if not isinstance(encoded_corpus, tuple) or not encoded_corpus:
             return None
         n_grams = []
         listed_encoded_corpus = list(encoded_corpus)
