@@ -50,8 +50,8 @@ class TextProcessor:
                 tokens.append(self._end_of_word_token)
             elif i.isalpha():
                 tokens.append(i)
-        if not text[-1].isalnum():
-            tokens.append(self._end_of_word_token)
+        if not text[-1].isalnum(): #Разделитель добавляется после последнего слова, если текст заканчивается пробелом или знаком препинания.
+            tokens.append(self._end_of_word_token) # В противном случае, разделитель после последнего слова не добавляется.
         if tokens.count(self._end_of_word_token) == len(tokens):
             return None
         return tuple(tokens)
@@ -308,7 +308,7 @@ class NGramLanguageModel:
 
         for n_gram in n_grams:
             prefix = n_gram[:-1]
-            prefix_count = sum(1 for gram in n_grams if gram[:-1] == prefix)
+            prefix_count = len([gram for gram in n_grams if gram[:-1] == prefix])
             frequency = n_grams.count(n_gram) / prefix_count
             self._n_gram_frequencies[n_gram] = frequency
         return 0
