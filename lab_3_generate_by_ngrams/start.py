@@ -18,7 +18,7 @@ def main() -> None:
     encoded_text = text_processor.encode(text)
     if isinstance(encoded_text, tuple) and encoded_text:
         result = str(text_processor.decode(encoded_text))
-        print("\n", result[:200])
+        print("\n", result[:4000])
 
         language_model = NGramLanguageModel(encoded_text, 7)
 
