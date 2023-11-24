@@ -31,6 +31,5 @@ def main() -> None:
     assert result
 
 
-
 if __name__ == "__main__":
     main()
