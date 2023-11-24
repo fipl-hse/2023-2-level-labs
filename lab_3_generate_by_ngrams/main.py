@@ -7,7 +7,6 @@ Beam-search and natural language generation evaluation
 import json
 import math
 from typing import Optional
-import string
 
 
 class TextProcessor:
