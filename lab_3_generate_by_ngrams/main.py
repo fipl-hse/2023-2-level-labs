@@ -51,7 +51,7 @@ class TextProcessor:
                 tokenized_text.append(token)
             elif token.isspace() and tokenized_text[-1] != self._end_of_word_token:
                 tokenized_text.append(self._end_of_word_token)
-        if not text[-1].isalnum() and tokenized_text[-1] != self._end_of_word_token:
+        if not text[-1].isalnum():
             tokenized_text.append(self._end_of_word_token)
         if len(tokenized_text) == tokenized_text.count(self._end_of_word_token):
             return None
@@ -177,13 +177,6 @@ class TextProcessor:
         Args:
             content (dict): ngrams from external JSON
         """
-        if not isinstance(content, dict) or not content:
-            return None
-        for key in content['freq']:
-            for element in key:
-                if element.isalpha():
-                    self._put(element.lower())
-        return None
 
     def _decode(self, corpus: tuple[int, ...]) -> Optional[tuple[str, ...]]:
         """
