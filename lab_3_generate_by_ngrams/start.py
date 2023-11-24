@@ -30,21 +30,6 @@ def main() -> None:
     print(beam_search_generator.run('Vernon', 56))
     assert result
 
-    decoded_story = str(story.decode(encoded))
-    result = decoded_story
-    print(result[:100])
-
-    lang_model = NGramLanguageModel(encoded[:50], 3)
-    print("checks if the building is successful: ", lang_model.build())
-
-    model2 = NGramLanguageModel(encoded, 7)
-    greedy = GreedyTextGenerator(model2, story)
-    print(greedy.run(51, "Vernon"))
-
-    beam_search = BeamSearchTextGenerator(model2, story, 7)
-    print(beam_search.run('Vernon', 56))
-
-    assert result
 
 if __name__ == "__main__":
     main()
