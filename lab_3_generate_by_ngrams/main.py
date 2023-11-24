@@ -346,8 +346,8 @@ class NGramLanguageModel:
         if len(context) > len(sequence):
             return None
 
-        tokens = {}
-        sort_data = dict(sorted(self._n_gram_frequencies.items(), key=lambda x: (
+
+       sort_data = dict(sorted(self._n_gram_frequencies.items(), key=lambda x: (
             x[1], list(x[0]))))
 
         for key, value in sort_data.items():
