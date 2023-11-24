@@ -20,14 +20,13 @@ def main() -> None:
         return
     result = text_processor.decode(encoded)[:100]
     print(result)
-    n_gram_model = NGramLanguageModel(encoded[:100], n_gram_size=3)
+    n_gram_model = NGramLanguageModel(encoded[:100], n_gram_size=7)
     freq = n_gram_model.build()
     if not freq:
         return
     result = freq
     print(result)
-    other_n_gram_model = NGramLanguageModel(encoded, n_gram_size=7)
-    greedy_generator = GreedyTextGenerator(other_n_gram_model, text_processor)
+    greedy_generator = GreedyTextGenerator(n_gram_model, text_processor)
     result = greedy_generator.run(51, "Vernon")
     print(result)
 

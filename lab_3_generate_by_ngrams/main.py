@@ -326,7 +326,7 @@ class NGramLanguageModel:
         In case of corrupt input arguments, None is returned
         """
         if not (isinstance(sequence, tuple)
-                and sequence and len(sequence) >= self._n_gram_size - 1):
+                and sequence and len(sequence) > self._n_gram_size - 1):
             return None
 
         context = sequence[- (self._n_gram_size - 1):]
