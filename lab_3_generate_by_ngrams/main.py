@@ -777,11 +777,12 @@ class BackOffGenerator:
             candidates = self._get_next_token(encoded)
             if not candidates:
                 break
+            maximum = max(candidates.values())
+            best_candidate = [k for k, v in candidates.items() if v == maximum]
 
-            maximum = max(list(candidates.keys()), key=lambda x: candidates[x])
             # best_candidate = list(filter(lambda x: candidates[int(x)] == maximum, candidates))
-            # encoded += (best_candidate[0],)
-            encoded += (maximum,)
+            encoded += (best_candidate[0],)
+            # encoded += (maximum,)
         decoded_sequence = self._text_processor.decode(encoded)
         return decoded_sequence
 
