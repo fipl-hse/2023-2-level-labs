@@ -27,6 +27,7 @@ def main() -> None:
     result = generated_text
     print(generated_text)
 
+    assert result
 
 
 if __name__ == "__main__":
