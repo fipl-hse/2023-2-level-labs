@@ -333,7 +333,7 @@ class NGramLanguageModel:
         n_grams = []
         listed_encoded_corpus = list(encoded_corpus)
         for i in range(len(encoded_corpus) + 1 - self._n_gram_size):
-            n_gram = tuple(list_encoded_corpus[i: i + self._n_gram_size])
+            n_gram = tuple(listed_encoded_corpus[i: i + self._n_gram_size])
             n_grams.append(n_gram)
         return tuple(n_grams)
 
