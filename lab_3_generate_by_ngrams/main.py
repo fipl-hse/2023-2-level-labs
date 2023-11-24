@@ -53,11 +53,17 @@ class TextProcessor:
         for word in text_words:
             word_tokens = [alpha for alpha in word if alpha.isalpha()]
             tokens.extend(word_tokens)
-            if word_tokens:
-                tokens.append(self._end_of_word_token)
+            tokens.append(self._end_of_word_token)
 
-        if not tokens:
+        if not tokens or len(set(tokens)) == 1:
             return None
+
+        tokens_copy = tokens[:]
+        for i in range(len(tokens_copy) - 1):
+            if tokens_copy[i] == tokens_copy[i + 1] == self._end_of_word_token:
+                tokens_copy[i] = ' '
+
+        tokens = [i for i in tokens_copy if i != ' ']
 
         if text[-1].isdigit() or text[-1].isalpha():
             tokens.pop(-1)
@@ -77,10 +83,7 @@ class TextProcessor:
         In case of corrupt input arguments or arguments not included in storage,
         None is returned
         """
-        if not isinstance(element, str):
-            return None
-
-        if element not in self._storage:
+        if not (isinstance(element, str) and element in self._storage):
             return None
 
         return self._storage[element]
@@ -511,10 +514,10 @@ class BeamSearcher:
                       key=lambda pair: pair[1], reverse=True)[:self._beam_width]
 
     def continue_sequence(
-            self,
-            sequence: tuple[int, ...],
-            next_tokens: list[tuple[int, float]],
-            sequence_candidates: dict[tuple[int, ...], float],
+        self,
+        sequence: tuple[int, ...],
+        next_tokens: list[tuple[int, float]],
+        sequence_candidates: dict[tuple[int, ...], float],
     ) -> Optional[dict[tuple[int, ...], float]]:
         """
         Generate new sequences from the base sequence with next tokens provided.
@@ -547,7 +550,7 @@ class BeamSearcher:
         return sequence_candidates
 
     def prune_sequence_candidates(
-            self, sequence_candidates: dict[tuple[int, ...], float]
+        self, sequence_candidates: dict[tuple[int, ...], float]
     ) -> Optional[dict[tuple[int, ...], float]]:
         """
         Remove those sequence candidates that do not make top-N most probable sequences.
@@ -579,10 +582,10 @@ class BeamSearchTextGenerator:
     """
 
     def __init__(
-            self,
-            language_model: NGramLanguageModel,
-            text_processor: TextProcessor,
-            beam_width: int,
+        self,
+        language_model: NGramLanguageModel,
+        text_processor: TextProcessor,
+        beam_width: int,
     ):
         """
         Initializes an instance of BeamSearchTextGenerator.
@@ -649,7 +652,7 @@ class BeamSearchTextGenerator:
         return decoded
 
     def _get_next_token(
-            self, sequence_to_continue: tuple[int, ...]
+        self, sequence_to_continue: tuple[int, ...]
     ) -> Optional[list[tuple[int, float]]]:
         """
         Retrieve next tokens for sequence continuation.
@@ -763,9 +766,9 @@ class BackOffGenerator:
     """
 
     def __init__(
-            self,
-            language_models: tuple[NGramLanguageModel, ...],
-            text_processor: TextProcessor,
+        self,
+        language_models: tuple[NGramLanguageModel, ...],
+        text_processor: TextProcessor,
     ):
         """
         Initializes an instance of BackOffGenerator.
