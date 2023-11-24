@@ -191,7 +191,7 @@ class TextProcessor:
             content (dict): ngrams from external JSON
         """
         if not isinstance(content, dict) or len(content) == 0:
-            return None
+            return
 
         for n_gram in content["freq"]:
             for token in n_gram:
@@ -242,12 +242,10 @@ class TextProcessor:
         if not isinstance(decoded_corpus, tuple) or len(decoded_corpus) == 0:
             return None
 
-        decoded_list = [token for token in decoded_corpus]
+        if decoded_corpus[-1] == self._end_of_word_token:
+            decoded_corpus = decoded_corpus[:-1]
 
-        if decoded_list[-1] == self._end_of_word_token:
-            del decoded_list[-1]
-
-        return f"{''.join(decoded_list).capitalize()}."\
+        return f"{''.join(decoded_corpus).capitalize()}."\
                 .replace(self._end_of_word_token, " ")
 
 class NGramLanguageModel:
@@ -289,7 +287,7 @@ class NGramLanguageModel:
             frequencies (dict): Computed in advance frequencies for n-grams
         """
         if not isinstance(frequencies, dict) or len(frequencies) == 0:
-            return None
+            return
         self._n_gram_frequencies = frequencies
 
     def build(self) -> int:
@@ -412,12 +410,12 @@ class GreedyTextGenerator:
         if not encoded_text or not n_gram_size:
             return None
 
-        for round in range(seq_len):
+        for _ in range(seq_len):
             next_prediction = self._model.generate_next_token(encoded_text[-n_gram_size+1:])
             if not next_prediction:
                 break
 
-            best_predictions = [key for key in next_prediction 
+            best_predictions = [key for key in next_prediction
                                 if next_prediction[key] == max(next_prediction.values())]
             encoded_text += (best_predictions[0],)
 
@@ -536,8 +534,7 @@ class BeamSearcher:
 
         sorted_dict = sorted(sequence_candidates.items(), key=lambda x: (x[1], x[0]))
 
-        return {seq: freq for seq, freq in sorted_dict[:self._beam_width]}
-
+        return dict(sorted_dict[:self._beam_width])
 
 class BeamSearchTextGenerator:
     """
@@ -592,7 +589,7 @@ class BeamSearchTextGenerator:
 
         seq_candidates = {encoded_prompt: 0.0}
 
-        for round in range(seq_len):
+        for _ in range(seq_len):
             new_seqs = seq_candidates.copy()
             for seq in seq_candidates:
                 next_tokens = self._get_next_token(seq)
@@ -765,14 +762,14 @@ class BackOffGenerator:
         if not encoded_prompt:
             return None
 
-        for round in range(seq_len):
-            candidates = self._get_next_token(encoded_prompt)
-            if not candidates:
+        for _ in range(seq_len):
+            candidates_d = self._get_next_token(encoded_prompt)
+            if not candidates_d:
                 break
 
-            max_probability = max(candidates.values())
-            the_candidate = [token for token in candidates
-                            if candidates[token] == max_probability]
+            max_probability = max(candidates_d.values())
+            the_candidate = [token for token in candidates_d
+                            if candidates_d[token] == max_probability]
 
             encoded_prompt += (the_candidate[0],)
 
