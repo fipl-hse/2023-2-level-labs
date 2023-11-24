@@ -195,7 +195,7 @@ class TextProcessor:
                 if token.isalpha():
                     self._put(token)
                 if token in (' ', self._end_of_word_token):
-                    self._put(self._end_of_word_token
+                    self._put(self._end_of_word_token)
         return None
 
     def _decode(self, corpus: tuple[int, ...]) -> Optional[tuple[str, ...]]:
