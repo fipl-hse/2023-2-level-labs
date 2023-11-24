@@ -330,15 +330,22 @@ class NGramLanguageModel:
                 or not n_grams:
             return 1
 
-        unique_n_grams = set(n_grams)
-        number_of_n_grams_with_common_beginning = 0
+        contexts = {}
 
-        for n_gram in unique_n_grams:
-            its_frequency = n_grams.count(n_gram)
-            for n_gram_to_compare in n_grams:
-                if n_gram_to_compare[:-1] == n_gram[:-1]:
-                    number_of_n_grams_with_common_beginning += 1
-            self._n_gram_frequencies[n_gram] = its_frequency / number_of_n_grams_with_common_beginning
+        for n_gram in n_grams:
+
+            context = n_gram[:-1]
+            if context not in contexts:
+                contexts[context] = {}
+
+            if n_gram not in contexts[context]:
+                contexts[context][n_gram] = 0
+            contexts[context][n_gram] += 1
+
+        for same_context_ngrams in contexts.values():
+            same_context_count = sum(same_context_ngrams.values())
+            for n_gram, freq in same_context_ngrams.items():
+                self._n_gram_frequencies[n_gram] = freq / same_context_count
 
         return 0
 
