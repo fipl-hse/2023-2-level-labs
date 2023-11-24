@@ -148,7 +148,7 @@ class TextProcessor:
         if isinstance(element, str) and len(element) == 1:
             if element not in self._storage:
                 self._storage[element] = len(self._storage)
-        return None
+        # return None
 
     def decode(self, encoded_corpus: tuple[int, ...]) -> Optional[str]:
         """
@@ -377,7 +377,7 @@ class GreedyTextGenerator:
         if not encoded_corpus or not n_size:
             return None
         for i in range(seq_len):
-            next_tokens = self._model.generate_next_token(encoded_corpus)
+            next_tokens = self._model.generate_next_token(encoded_corpus[-n_size + 1:])
             if not next_tokens:
                 break
             tokens = [key for key, value in next_tokens.items() if value == max(next_tokens.values())]
@@ -438,10 +438,10 @@ class BeamSearcher:
         return tokens[:self._beam_width]
 
     def continue_sequence(
-            self,
-            sequence: tuple[int, ...],
-            next_tokens: list[tuple[int, float]],
-            sequence_candidates: dict[tuple[int, ...], float],
+        self,
+        sequence: tuple[int, ...],
+        next_tokens: list[tuple[int, float]],
+        sequence_candidates: dict[tuple[int, ...], float],
     ) -> Optional[dict[tuple[int, ...], float]]:
         """
         Generate new sequences from the base sequence with next tokens provided.
@@ -538,10 +538,19 @@ class BeamSearchTextGenerator:
         # encoded_prompt = self._text_processor.encode(prompt)
         # if not encoded_prompt:
         #     return None
-        # candidates_dict = {encoded_prompt: 0.0}
+        # sequence_dict = {encoded_prompt: 0.0}
         # for i in range(seq_len):
-
-
+        #     for seq in sequence_dict.keys():
+        #         next_token = self._get_next_token(seq)
+        #         if not next_token:
+        #             return None
+        #         continued = self.beam_searcher.continue_sequence(seq, next_token, sequence_dict)
+        #         if not continued:
+        #             return None
+        #         filtered = self.beam_searcher.prune_sequence_candidates(sequence_dict)
+        #         if not filtered:
+        #             return None
+        #         return self._text_processor.decode(sorted(tuple(filtered), key=lambda x: x[1])[0])
 
     def _get_next_token(
             self, sequence_to_continue: tuple[int, ...]
