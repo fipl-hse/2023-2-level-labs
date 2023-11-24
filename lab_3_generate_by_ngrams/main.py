@@ -487,7 +487,7 @@ class BeamSearcher:
             return None
         if not variants:
             return []
-        sorted_variants = sorted(variants.items(), key=lambda x: x[1], reverse=True)
+        sorted_variants: list[tuple[int, float]] = sorted(variants.items(), key=lambda x: x[1], reverse=True)
         return sorted_variants[:self._beam_width]
 
     def continue_sequence(
