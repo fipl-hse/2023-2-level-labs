@@ -257,7 +257,6 @@ class NGramLanguageModel:
         Returns:
             int: Size of stored n_grams
         """
-
     def set_n_grams(self, frequencies: dict) -> None:
         """
         Setter method for n-gram frequencies.
@@ -265,7 +264,6 @@ class NGramLanguageModel:
         Args:
             frequencies (dict): Computed in advance frequencies for n-grams
         """
-
     def build(self) -> int:
         """
         Fill attribute `_n_gram_frequencies` from encoded corpus.
