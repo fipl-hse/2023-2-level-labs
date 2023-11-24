@@ -9,7 +9,6 @@ from lab_2_tokenize_by_bpe.main import (calculate_bleu, collect_frequencies, dec
 
 from lab_3_generate_by_ngrams.main import GreedyTextGenerator, NGramLanguageModel, TextProcessor
 
-
 def main() -> None:
     """
     Launches an implementation
