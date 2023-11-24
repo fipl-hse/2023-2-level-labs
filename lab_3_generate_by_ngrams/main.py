@@ -149,6 +149,11 @@ class TextProcessor:
         In case of corrupt input arguments or invalid argument length,
         an element is not added to storage
         """
+        if not isinstance(element, str) or len(element) != 1:
+            return None
+        if element not in self._storage:
+            self._storage[element] = len(self._storage)
+        return None
 
     def decode(self, encoded_corpus: tuple[int, ...]) -> Optional[str]:
         """
@@ -166,7 +171,15 @@ class TextProcessor:
         In case of corrupt input arguments, None is returned.
         In case any of methods used return None, None is returned.
         """
+        if not (isinstance(encoded_corpus, tuple) and encoded_corpus):
+            return None
 
+        decoded_corpus = self._decode(encoded_corpus)
+        if decoded_corpus is None:
+            return None
+
+        decoded_text = self._postprocess_decoded_text(decoded_corpus)
+        return decoded_text
     def fill_from_ngrams(self, content: dict) -> None:
         """
         Fill internal storage with letters from external JSON.
@@ -174,6 +187,16 @@ class TextProcessor:
         Args:
             content (dict): ngrams from external JSON
         """
+        if not isinstance(content, dict) or not content:
+            return None
+
+        for element in content['freq']:
+            for token in element:
+                if token.isalpha():
+                    self._put(token)
+                if token in (' ', self._end_of_word_token):
+                    self._put(self._end_of_word_token
+        return None
 
     def _decode(self, corpus: tuple[int, ...]) -> Optional[tuple[str, ...]]:
         """
@@ -188,6 +211,18 @@ class TextProcessor:
         In case of corrupt input arguments, None is returned.
         In case any of methods used return None, None is returned.
         """
+        if not (isinstance(corpus, tuple)
+                and corpus):
+            return None
+        decoded_corpus = []
+
+        for index in corpus:
+            letter = self.get_token(index)
+            if letter is None:
+                return None
+            decoded_corpus.append(letter)
+
+        return tuple(decoded_corpus)
 
     def _postprocess_decoded_text(self, decoded_corpus: tuple[str, ...]) -> Optional[str]:
         """
