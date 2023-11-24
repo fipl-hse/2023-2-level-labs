@@ -4,7 +4,7 @@ Language detection
 """
 
 
-def tokenize(text: str) -> list[str] | None:
+def tokenize(text):
     text = text.lower()
     text = text.replace(' ', '')
     text = text.replace('\n', 'replace')
