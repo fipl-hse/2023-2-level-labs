@@ -156,8 +156,6 @@ class TextProcessor:
 
         self._storage[element] = len(self._storage)
 
-        return None
-
     def decode(self, encoded_corpus: tuple[int, ...]) -> Optional[str]:
         """
         Decode and postprocess encoded corpus by converting integer identifiers to string.
