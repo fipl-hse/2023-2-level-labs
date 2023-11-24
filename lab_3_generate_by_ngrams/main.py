@@ -247,9 +247,8 @@ class TextProcessor:
         if decoded_list[-1] == self._end_of_word_token:
             del decoded_list[-1]
 
-        decoded_text = ''.join(decoded_list)
-        decoded_text = decoded_text.replace(self._end_of_word_token, " ")
-        return decoded_text.capitalize() + "."
+        return f"{''.join(decoded_list).capitalize()}."\
+                .replace(self._end_of_word_token, " ")
 
 class NGramLanguageModel:
     """
@@ -717,8 +716,7 @@ class NGramLanguageModelReader:
         Returns:
             TextProcessor: processor created for the current JSON file.
         """
-
-
+        return self._text_processor
 
 class BackOffGenerator:
     """
@@ -741,6 +739,8 @@ class BackOffGenerator:
             language_models (tuple[NGramLanguageModel]): Language models to use for text generation
             text_processor (TextProcessor): A TextProcessor instance to handle text processing
         """
+        self._language_models = {model.get_n_gram_size(): model for model in language_models}
+        self._text_processor = text_processor
 
     def run(self, seq_len: int, prompt: str) -> Optional[str]:
         """
@@ -756,6 +756,28 @@ class BackOffGenerator:
         In case of corrupt input arguments or methods used return None,
         None is returned
         """
+        if not(isinstance(seq_len, int) and isinstance(prompt, str) and prompt):
+            return None
+
+        encoded_prompt = self._text_processor.encode(prompt)
+        if not encoded_prompt:
+            return None
+
+        for round in range(seq_len):
+            candidates = self._get_next_token(encoded_prompt)
+            if not candidates:
+                break
+
+            max_probability = max(candidates.values())
+            the_candidate = [token for token in candidates
+                            if candidates[token] == max_probability]
+
+            encoded_prompt += (the_candidate[0],)
+
+        decoded_str = self._text_processor.decode(encoded_prompt)
+        if not decoded_str:
+            return None
+        return decoded_str
 
     def _get_next_token(self, sequence_to_continue: tuple[int, ...]) -> Optional[dict[int, float]]:
         """
@@ -770,58 +792,19 @@ class BackOffGenerator:
 
         In case of corrupt input arguments return None.
         """
-    """
-    Class for text generation with BeamSearch.
+        if not isinstance(sequence_to_continue, tuple) and sequence_to_continue:
+            return None
 
-    Attributes:
-        _language_model (tuple[NGramLanguageModel]): Language models for next token prediction
-        _text_processor (NGramLanguageModel): A TextProcessor instance to handle text processing
-        _beam_width (NGramLanguageModel): Beam width parameter for generation
-        beam_searcher (NGramLanguageModel): Searcher instances for each language model
-    """
+        n_gram_sizes = sorted(self._language_models.keys(), reverse=True)
 
-    def __init__(
-        self,
-        language_model: NGramLanguageModel,
-        text_processor: TextProcessor,
-        beam_width: int,
-    ):
-        """
-        Initializes an instance of BeamSearchTextGenerator.
+        for size in n_gram_sizes:
+            n_gram_model = self._language_models[size]
+        
+            candidates = n_gram_model.generate_next_token(sequence_to_continue)
 
-        Args:
-            language_model (NGramLanguageModel): Language model to use for text generation
-            text_processor (TextProcessor): A TextProcessor instance to handle text processing
-            beam_width (int): Beam width parameter for generation
-        """
-
-    def run(self, prompt: str, seq_len: int) -> Optional[str]:
-        """
-        Generate sequence based on NGram language model and prompt provided.
-
-        Args:
-            seq_len (int): Number of tokens to generate
-            prompt (str): Beginning of sequence
-
-        Returns:
-            str: Generated sequence
-
-        In case of corrupt input arguments or methods used return None,
-        None is returned
-        """
-
-    def _get_next_token(
-        self, sequence_to_continue: tuple[int, ...]
-    ) -> Optional[list[tuple[int, float]]]:
-        """
-        Retrieve next tokens for sequence continuation.
-
-        Args:
-            sequence_to_continue (tuple[int, ...]): Sequence to continue
-
-        Returns:
-            Optional[list[tuple[int, float]]]: Next tokens for sequence
-            continuation
-
-        In case of corrupt input arguments return None.
-        """
+            if candidates is not None and len(candidates) > 0:
+                predictions = {token: freq / sum(candidates.values())
+                                       for token, freq in candidates.items()}
+                return predictions
+        return None
+            
