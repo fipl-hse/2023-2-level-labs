@@ -215,8 +215,8 @@ class TextProcessor:
             return None
 
         decoded = []
-        for i in corpus:
-            token = self.get_token(i)
+        for digit in corpus:
+            token = self.get_token(digit)
 
             if token is None:
                 return None
@@ -523,9 +523,9 @@ class BeamSearcher:
                 and sequence in sequence_candidates):
             return None
 
-        for i in next_tokens:
-            sequence_candidates.update({sequence+(i[0],): sequence_candidates[sequence] - math.log(
-                i[1])})
+        for token in next_tokens:
+            sequence_candidates.update({sequence+(token[0],): sequence_candidates[sequence] - math.log(
+                token[1])})
 
         sequence_candidates.pop(sequence)
 
@@ -549,7 +549,7 @@ class BeamSearcher:
             return None
 
         sorted_dict = sorted(sequence_candidates.items(), key=lambda x: (x[1], x[0]))
-        return {x[0]: x[1] for x in sorted_dict[:self._beam_width]}
+        return {pair[0]: pair[1] for pair in sorted_dict[:self._beam_width]}
 
 
 class BeamSearchTextGenerator:
