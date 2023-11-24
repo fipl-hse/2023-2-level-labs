@@ -4,8 +4,6 @@ Generation by NGrams starter
 from lab_3_generate_by_ngrams.main import (BeamSearchTextGenerator, GreedyTextGenerator,
                                            NGramLanguageModel, TextProcessor)
 
-import lab_3_generate_by_ngrams.main as main_py
-
 
 def main() -> None:
     """
