@@ -102,9 +102,8 @@ class TextProcessor:
         if (not isinstance(element_id, int) or
             element_id not in self._storage.values()):
             return None
-        for el, id_ in self._storage.items():
-            if id_ == element_id:
-                return el
+        element = list(filter(lambda x: x[1] == element_id, self._storage.items()))
+        return element[0][0]
 
     def encode(self, text: str) -> Optional[tuple[int, ...]]:
         """
@@ -124,14 +123,16 @@ class TextProcessor:
         """
         if not isinstance(text, str) or not text:
             return None
+        encoded_corpus = []
         tokens = self._tokenize(text)
-        if tokens is None:
+        if not tokens:
             return None
         for element in tokens:
             self._put(element)
-        encoded_corpus = []
-        for element in tokens:
-            encoded_corpus.append(self.get_id(element))
+            element_id = self.get_id(element)
+            if not isinstance(element_id, int):
+                return None
+            encoded_corpus.append(element_id)
         return tuple(encoded_corpus)
 
     def _put(self, element: str) -> None:
@@ -278,23 +279,18 @@ class NGramLanguageModel:
         In case of corrupt input arguments or methods used return None,
         1 is returned
         """
-        n_grams = self._extract_n_grams(self._encoded_corpus)
-        if not isinstance(n_grams, tuple) or not n_grams:
+        if not isinstance(self._encoded_corpus, tuple) or len(self._encoded_corpus) == 0:
             return 1
-        beginning_freq = {}
-        n_gram_freq = {}
-        for n_gram in n_grams:
-            if n_gram not in n_gram_freq:
-                n_gram_freq[n_gram] = 0
-            n_gram_freq[n_gram] += 1
-        for n_gram in n_grams:
-            if n_gram[:self._n_gram_size - 1] not in beginning_freq:
-                beginning_freq[n_gram[:self._n_gram_size - 1]] = 0
-            beginning_freq[n_gram[:self._n_gram_size - 1]] += 1
-        for n_gram, freq_n in n_gram_freq.items():
-            for beginning, freq_b in beginning_freq.items():
-                if beginning == n_gram[:self._n_gram_size - 1]:
-                    self._n_gram_frequencies[n_gram] = freq_n / freq_b
+        n_grams = self._extract_n_grams(self._encoded_corpus)
+        if not n_grams:
+            return 1
+        for n_gram in set(n_grams):
+            if not isinstance(n_gram, tuple):
+                return 1
+            n_gram_freq = n_grams.count(n_gram)
+            beginning_freq = len([id for id in n_grams if
+                                       id[:-1] == n_gram[:-1]])
+            self._n_gram_frequencies[n_gram] = n_gram_freq / beginning_freq
         return 0
 
     def generate_next_token(self, sequence: tuple[int, ...]) -> Optional[dict]:
