@@ -163,6 +163,14 @@ class TextProcessor:
         In case of corrupt input arguments, None is returned.
         In case any of methods used return None, None is returned.
         """
+        if not isinstance(encoded_corpus, tuple):
+            return None
+        decoded_tokens = self._decode(encoded_corpus)
+        if not decoded_tokens:
+            return None
+        if not self._postprocess_decoded_text(decoded_tokens):
+            return None
+        return self._postprocess_decoded_text(decoded_tokens)
 
     def fill_from_ngrams(self, content: dict) -> None:
         """
