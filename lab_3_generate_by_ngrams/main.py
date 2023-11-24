@@ -49,7 +49,7 @@ class TextProcessor:
         for word in text.lower():
             if word.isalpha():
                 tokenized_text.append(word)
-            elif word is ' ' and tokenized_text[-1] != self._end_of_word_token:
+            elif word.isspace() and tokenized_text[-1] != self._end_of_word_token:
                 tokenized_text.append(self._end_of_word_token)
         if not text[-1].isalnum():
             tokenized_text.append(self._end_of_word_token)
@@ -221,9 +221,9 @@ class TextProcessor:
         result = ''
         for index, symbol in enumerate(decoded_corpus):
             if symbol == self._end_of_word_token and index == len(decoded_corpus)-1:
-                result += '.'
+                result = f'{result}.'
             elif symbol == self._end_of_word_token:
-                result += ' '
+                result = f'{result} '
             else:
                 result += symbol
         return result.capitalize()
