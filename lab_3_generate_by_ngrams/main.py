@@ -261,11 +261,6 @@ class TextProcessor:
 
         return f"{decoded_text}."
 
-        if decoded_corpus[-1] == self._end_of_word_token:
-            decoded_corpus = decoded_corpus[:-1]
-
-        return f"{''.join(decoded_corpus).capitalize()}." \
-            .replace(self._end_of_word_token, ' ')
 
 class NGramLanguageModel:
     """
