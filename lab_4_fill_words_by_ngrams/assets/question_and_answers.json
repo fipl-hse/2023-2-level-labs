@@ -1,0 +1,51 @@
+[
+  {
+    "question": "A sign overhead said Express eleven o'clock.",
+    "location": 21,
+    "answer": "A sign overhead said Hogwarts Express eleven o'clock."
+  },
+  {
+    "question": "Professor rolled up her scroll and took the sorting hat away.",
+    "location": 10,
+    "answer": "Professor mcgonagall rolled up her scroll and took the sorting hat away."
+  },
+  {
+    "question": "Hagrid came striding toward them out the dark fang at his heel.",
+    "location": 37,
+    "answer":  "Hagrid came striding toward them out of the dark fang at his heel."
+  },
+  {
+    "question":  "In danger of being speared on the end of an umbrella by a bearded giant uncle courage failed again.",
+    "location": 78,
+    "answer":  "In danger of being speared on the end of an umbrella by a bearded giant uncle vernon courage failed again."
+  },
+  {
+    "question":  "Gryffindor will in even more trouble.",
+    "location": 16,
+    "answer": "Gryffindor will be in even more trouble."
+  },
+  {
+    "question":  "Soon there a huddle of limp black players slumped along the wall.",
+    "location": 11,
+    "answer": "Soon there was a huddle of limp black players slumped along the wall."
+  },
+  {
+    "question":  "I m holding the house cup and the cup.",
+    "location": 22,
+    "answer": "I m holding the house cup and the quidditch cup"
+  },
+  {
+    "question":  "Wingardium is a levitation charm.",
+    "location": 11,
+    "answer": "Wingardium leviosa is a levitation charm."
+  },
+  {
+    "question":  "Harry looked behind him and saw a wrought iron archway where the barrier had been with the words platform and three quarters on it.",
+    "location": 106,
+    "answer": "Harry looked behind him and saw a wrought iron archway where the barrier had been with the words platform nine and three quarters on it."
+  },
+  {
+    "question":  "Albus is the headmaster of the wizarding school hogwarts.",
+    "location": 6,
+    "answer": "Albus dumbledore is the headmaster of the wizarding school hogwarts."
+  }]
