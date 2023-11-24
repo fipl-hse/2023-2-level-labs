@@ -313,8 +313,6 @@ class NGramLanguageModel:
                 len(sequence) >= self._n_gram_size - 1):
             return None
         context = sequence[-self._n_gram_size + 1:]
-        # if len(context) > len(sequence):
-        #     return None
         result = {}
         for n_gram, freq in self._n_gram_frequencies.items():
             if n_gram[:-1] == context:
