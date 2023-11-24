@@ -46,16 +46,14 @@ class TextProcessor:
         if not isinstance(text, str) or not text:
             return None
         tokens = []
-        alpha_cnt = 0
         for word in text.lower():
             if word.isalpha():
                 tokens.append(word)
-                alpha_cnt += 1
             elif word.isspace() and tokens[-1] != self._end_of_word_token:
                 tokens.append(self._end_of_word_token)
         if not text[-1].isalnum():
             tokens.append(self._end_of_word_token)
-        if alpha_cnt == 0:
+        if not tokens:
             return None
         return tuple(tokens)
 
@@ -126,9 +124,10 @@ class TextProcessor:
         encoded_text = []
         for token in tokenized_text:
             self._put(token)
-            encoded_text.append(self.get_id(token))
-        if None in encoded_text:
-            return None
+            id_of_token = self.get_id(token)
+            if id_of_token is None:
+                return None
+            encoded_text.append(id_of_token)
         return tuple(encoded_text)
 
     def _put(self, element: str) -> None:
@@ -220,11 +219,9 @@ class TextProcessor:
         """
         if not isinstance(decoded_corpus, tuple) or not decoded_corpus:
             return None
-        final_text = []
+        final_text = decoded_corpus
         if decoded_corpus[-1] == self._end_of_word_token:
-            final_text = decoded_corpus[:len(decoded_corpus)-1]
-        else:
-            final_text = decoded_corpus
+            final_text = decoded_corpus[:-1]
         final_text = "".join(final_text)
         final_text = final_text.replace("_", " ")
         return f"{final_text.capitalize()}."
