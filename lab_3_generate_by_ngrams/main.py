@@ -310,14 +310,14 @@ class NGramLanguageModel:
         In case of corrupt input arguments, None is returned
         """
         if not (isinstance(sequence, tuple) and sequence and
-                len(sequence) < self._n_gram_size - 1):
+                len(sequence) >= self._n_gram_size - 1):
             return None
         context = sequence[-self._n_gram_size + 1:]
-        if len(context) > len(sequence):
-            return None
+        # if len(context) > len(sequence):
+        #     return None
         result = {}
         for n_gram, freq in self._n_gram_frequencies.items():
-            if context == n_gram[:-1]:
+            if n_gram[:-1] == context:
                 result[n_gram[-1]] = freq
         sorted_result = dict(sorted(result.items(), key=lambda item: (-item[1], item[0])))
         return sorted_result
@@ -385,15 +385,14 @@ class GreedyTextGenerator:
         n_gram_size = self._model.get_n_gram_size()
         if not (n_gram_size and encoded_prompt):
             return None
-        for last_token in range(seq_len):
+        for _ in range(seq_len):
             next_cand = self._model.generate_next_token(encoded_prompt)
             if not next_cand:
                 break
-            best = [k for k, v in next_cand.items() if v == max(next_cand.values())]
+            best = [key for key, value in next_cand.items() if value == max(next_cand.values())]
             sorted_best = sorted(best)
             encoded_prompt += (sorted_best[0],)
-        result = self._text_processor.decode(encoded_prompt)
-        return result
+        return self._text_processor.decode(encoded_prompt)
 
 
 class BeamSearcher:
@@ -474,11 +473,12 @@ class BeamSearcher:
                 and len(next_tokens) <= self._beam_width
                 and sequence in sequence_candidates):
             return None
+        new_sequence_candidates = sequence_candidates.copy()
         for token in next_tokens:
-            sequence_candidates.update({sequence + (token[0],): sequence_candidates[sequence]
-                                                                - math.log(token[1])})
-        sequence_candidates.pop(sequence)
-        return sequence_candidates
+            new_sequence = sequence + (token[0],)
+            new_sequence_candidates[new_sequence] = sequence_candidates[sequence] - math.log(token[1])
+        new_sequence_candidates.pop(sequence)
+        return new_sequence_candidates
 
     def prune_sequence_candidates(
             self, sequence_candidates: dict[tuple[int, ...], float]
