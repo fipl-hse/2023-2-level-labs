@@ -14,7 +14,11 @@ def main() -> None:
         text = text_file.read()
     corpus = TextProcessor('_')
     encoded_corpus = corpus.encode(text)
-    result = corpus.decode(encoded_corpus)
+    if encoded_corpus:
+        result = corpus.decode(encoded_corpus)
+    model = NGramLanguageModel(encoded_corpus, 7)
+    greedy_text_generator = GreedyTextGenerator(model, processor)
+    greedy_text_generator.run(51, 'Vernon')
     assert result
 
 
