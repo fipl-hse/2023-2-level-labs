@@ -444,10 +444,10 @@ class BeamSearcher:
         return result[:self._beam_width]
 
     def continue_sequence(
-            self,
-            sequence: tuple[int, ...],
-            next_tokens: list[tuple[int, float]],
-            sequence_candidates: dict[tuple[int, ...], float],
+        self,
+        sequence: tuple[int, ...],
+        next_tokens: list[tuple[int, float]],
+        sequence_candidates: dict[tuple[int, ...], float],
     ) -> Optional[dict[tuple[int, ...], float]]:
         """
         Generate new sequences from the base sequence with next tokens provided.
@@ -474,7 +474,8 @@ class BeamSearcher:
         new_sequence_candidates = sequence_candidates.copy()
         for token in next_tokens:
             new_sequence = sequence + (token[0],)
-            new_sequence_candidates[new_sequence] = sequence_candidates[sequence] - math.log(token[1])
+            new_sequence_candidates[new_sequence] = (sequence_candidates[sequence]
+                                                     - math.log(token[1]))
         new_sequence_candidates.pop(sequence)
         return new_sequence_candidates
 
@@ -544,7 +545,7 @@ class BeamSearchTextGenerator:
         In case of corrupt input arguments or methods used return None,
         None is returned
         """
-        if not (isinstance(prompt, str) and prompt and isinstance(seq_len, int) and seq_len):
+        if not (isinstance(prompt, str) and prompt and isinstance(seq_len, int) and seq_len and seq_len <= 0):
             return None
         encoded_prompt = self._text_processor.encode(prompt)
         if not encoded_prompt:
@@ -565,8 +566,7 @@ class BeamSearchTextGenerator:
             cands = best_cands
         needed_tokens = sorted([cand for cand, value_prob in cands.items() if
                                 value_prob == min(cands.values())])
-        result = self._text_processor.decode(needed_tokens[0])
-        return result
+        return self._text_processor.decode(needed_tokens[0])
 
     def _get_next_token(
             self, sequence_to_continue: tuple[int, ...]
