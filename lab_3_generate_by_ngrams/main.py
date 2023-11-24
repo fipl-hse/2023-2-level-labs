@@ -369,16 +369,6 @@ class NGramLanguageModel:
 
         return token_frequencies
 
-        if not (isinstance(sequence, tuple) and sequence
-                and len(sequence) >= self._n_gram_size - 1):
-            return None
-        next_tokens = {}
-        context = sequence[- self._n_gram_size + 1:]
-        for n_gram, freq in self._n_gram_frequencies.items():
-            if n_gram[:- 1] == context:
-                next_tokens[n_gram[- 1]] = freq
-        return next_tokens
-
     def _extract_n_grams(
         self, encoded_corpus: tuple[int, ...]
     ) -> Optional[tuple[tuple[int, ...], ...]]:
@@ -704,7 +694,6 @@ class NGramLanguageModelReader:
             self._content = json.load(file)
         self._text_processor = TextProcessor(self._eow_token)
         self._text_processor.fill_from_ngrams(self._content)
-
 
     def load(self, n_gram_size: int) -> Optional[NGramLanguageModel]:
         """
