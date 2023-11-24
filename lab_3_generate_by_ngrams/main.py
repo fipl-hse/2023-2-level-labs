@@ -773,15 +773,15 @@ class BackOffGenerator:
         if not encoded:
             return None
 
-        maximum = 0.0
         for i in range(seq_len):
             candidates = self._get_next_token(encoded)
             if not candidates:
                 break
 
-            maximum = max(candidates.values())
-            best_candidate = list(filter(lambda x: candidates[int(x)] == maximum, candidates))
-            encoded += (best_candidate[0],)
+            maximum = max(list(candidates.keys()), key=lambda x: candidates[x])
+            # best_candidate = list(filter(lambda x: candidates[int(x)] == maximum, candidates))
+            # encoded += (best_candidate[0],)
+            encoded += (maximum,)
         decoded_sequence = self._text_processor.decode(encoded)
         return decoded_sequence
 
