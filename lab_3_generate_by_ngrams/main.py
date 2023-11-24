@@ -36,7 +36,6 @@ class TextProcessor:
         1. It is followed by punctuation
         2. It is followed by space symbol
 
-
         Args:
             text (str): Original text
 
