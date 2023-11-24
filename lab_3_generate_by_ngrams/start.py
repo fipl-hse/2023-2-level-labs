@@ -20,10 +20,7 @@ def main() -> None:
         result = decoded
         print('Text:', text[:100], '\nDecoded:', decoded[:100], sep='\n', end='\n\n')
 
-        model = NGramLanguageModel(encoded, n_gram_size=3)
-        print(model.build())
-
-        model_6 = NGramLanguageModel(encoded, 7)
+        model_6 = NGramLanguageModel(encoded[:1500], 3)
         print(model_6.build())
         greedy_text_generator = GreedyTextGenerator(model_6, text_processor)
         print(greedy_text_generator.run(51, 'Vernon'))
