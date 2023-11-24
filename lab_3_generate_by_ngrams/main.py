@@ -331,11 +331,10 @@ class NGramLanguageModel:
         if not isinstance(encoded_corpus, tuple):
             return None
         n_grams = []
-        for i in range(len(encoded_corpus) - (self._n_gram_size - 1)):
-            n_gram = []
-            for k in range(self._n_gram_size):
-                n_gram.append(encoded_corpus[i + k])
-            n_grams.append(tuple(n_gram))
+        listed_encoded_corpus = list(encoded_corpus)
+        for i in range(len(encoded_corpus) + 1 - self._n_gram_size):
+            n_gram = tuple(list_encoded_corpus[i: i + self._n_gram_size])
+            n_grams.append(n_gram)
         return tuple(n_grams)
 
 class GreedyTextGenerator:
