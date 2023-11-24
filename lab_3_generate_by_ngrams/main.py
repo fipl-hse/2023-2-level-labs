@@ -316,7 +316,6 @@ class NGramLanguageModel:
         if (not isinstance(sequence, tuple) or not sequence
                 or len(sequence) < self._n_gram_size - 1):
             return None
-
         context = sequence[-self._n_gram_size + 1:]
         tokens = {}
         for k, v in self._n_gram_frequencies.items():
@@ -392,7 +391,7 @@ class GreedyTextGenerator:
                 break
             frequency = max(letter_candidates.values())
             the_best_candidate = ([i for i, j in letter_candidates.items() if j == frequency])
-            freq_letters = sorted(the_best_candidate)
+            freq_letters = sorted(the_best_candidate, reverse=True)
             encoded += (freq_letters[0],)
             seq_len -= 1
         return self._text_processor.decode(encoded)
