@@ -24,7 +24,7 @@ class TextProcessor:
             end_of_word_token (str): A token denoting word boundary
         """
         self._end_of_word_token = end_of_word_token
-        self._storage = {"_": 0}
+        self._storage = {end_of_word_token: 0}
 
     def _tokenize(self, text: str) -> Optional[tuple[str, ...]]:
         """
@@ -43,21 +43,20 @@ class TextProcessor:
         In case of corrupt input arguments, None is returned.
         In case any of methods used return None, None is returned.
         """
-        if not isinstance(text, str) or text == '':
+        if not isinstance(text, str):
             return None
-        no_letters = 0
-        for i in text:
-            if not i.isalpha():
-                no_letters += 1
-                if len(text) == no_letters:
-                    return None
-        tokenized_list = []
-        for token in text.lower().split():
-            word = list(''.join(symbol.lower() for symbol in token if symbol.isalpha()))
+        tokenized_text = []
+        lower_split_text = list(text.lower().split())
+        for i in lower_split_text:
+            word = list(''.join(token for token in i if token.isalpha()))
             if word:
-                tokenized_list += word
-                tokenized_list.append(self._end_of_word_token)
-        return tuple(tokenized_list)
+                tokenized_text.extend(word)
+                tokenized_text.append(self._end_of_word_token)
+        if not tokenized_text:
+            return None
+        if text[-1].isalnum():
+            del tokenized_text[-1]
+        return tuple(tokenized_text)
 
     def get_id(self, element: str) -> Optional[int]:
         """
@@ -223,18 +222,12 @@ class TextProcessor:
 
         In case of corrupt input arguments, None is returned
         """
-        if not isinstance(decoded_corpus, tuple) or decoded_corpus == ():
+        if not isinstance(decoded_corpus, tuple) or not decoded_corpus:
             return None
-        string_with_small_letters = ""
-        first_capital_letter_str = ""
-        final_text = ""
-        for letters in decoded_corpus:
-            string_with_small_letters += letters
-            first_capital_letter_str = string_with_small_letters.capitalize()
-        if self._end_of_word_token in first_capital_letter_str:
-            sentence_with_gaps = first_capital_letter_str.replace(self._end_of_word_token, " ")
-            final_text = sentence_with_gaps[:-1] + "."
-        return final_text
+        decoded_list = list(decoded_corpus)
+        if decoded_list[-1] == self._end_of_word_token:
+            del decoded_list[-1]
+        return f"{''.join(decoded_list).capitalize()}.".replace(self._end_of_word_token, ' ')
 
 
 class NGramLanguageModel:
@@ -379,22 +372,31 @@ class GreedyTextGenerator:
         In case of corrupt input arguments or methods used return None,
         None is returned
         """
-        if not isinstance(seq_len, int) or not isinstance(prompt, str) or len(prompt) == 0:
+        if not isinstance(seq_len, int) or not isinstance(prompt, str):
             return None
+
         encoded = self._text_processor.encode(prompt)
-        n_gram = self._model.get_n_gram_size()
-        if not encoded or not n_gram:
+        ngram_size = self._model.get_n_gram_size()
+
+        if not encoded or not ngram_size:
             return None
-        while seq_len > 0:
-            letter_candidates = self._model.generate_next_token(encoded)
-            if not letter_candidates:
+
+        max_value = []
+        for i in range(seq_len):
+            next_candidate = self._model.generate_next_token(encoded[-ngram_size + 1:])
+
+            if not next_candidate:
                 break
-            frequency = max(letter_candidates.values())
-            the_best_candidate = ([i for i, j in letter_candidates.items() if j == frequency])
-            freq_letters = sorted(the_best_candidate, reverse=True)
-            encoded += (freq_letters[0],)
-            seq_len -= 1
-        return self._text_processor.decode(encoded)
+
+            max_value.append(max(next_candidate.values()))
+            best_dict = dict(filter(lambda x: x[1] == max_value[-1], next_candidate.items()))
+            best_candidates = list(best_dict.keys())
+
+            encoded += (best_candidates[0],)
+
+        decoded = self._text_processor.decode(encoded)
+
+        return decoded
 
 
 class BeamSearcher:
