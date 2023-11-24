@@ -10,14 +10,4 @@ Submodules
    :undoc-members:
    :show-inheritance:
    :private-members:
-   :special-members:
-
-Module contents
----------------
-
-.. automodule:: lab_3_generate_by_ngrams
-   :members:
-   :undoc-members:
-   :show-inheritance:
-   :private-members:
-   :special-members:
+   :special-members: __init__, __str__

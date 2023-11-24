@@ -35,7 +35,6 @@ class QualityCheckerTest(unittest.TestCase):
         }
 
     @pytest.mark.lab_4_fill_words_by_ngrams
-    @pytest.mark.mark6
     @pytest.mark.mark8
     @pytest.mark.mark10
     def test_quality_checker_fields(self):
@@ -58,7 +57,7 @@ class QualityCheckerTest(unittest.TestCase):
         checker = QualityChecker(self.generators, self.language_model,
                                  self.word_processor)
         expected = 2.449489742783178
-        actual = checker._calculate_perplexity('Dinner and so the plate.', 'Dinner')
+        actual = checker._calculate_perplexity('Dinner and so the plate.')
         self.assertAlmostEqual(expected, actual)
 
     @pytest.mark.lab_4_fill_words_by_ngrams
@@ -74,7 +73,7 @@ class QualityCheckerTest(unittest.TestCase):
 
         with self.assertRaises(ValueError):
             for bad_input in bad_inputs:
-                checker._calculate_perplexity(bad_input, 'Dinner')
+                checker._calculate_perplexity(bad_input)
 
     @pytest.mark.lab_4_fill_words_by_ngrams
     @pytest.mark.mark8
@@ -88,21 +87,7 @@ class QualityCheckerTest(unittest.TestCase):
         bad_input = ''
 
         with self.assertRaises(ValueError):
-            checker._calculate_perplexity(bad_input, 'Dinner')
-
-    @pytest.mark.lab_4_fill_words_by_ngrams
-    @pytest.mark.mark8
-    @pytest.mark.mark10
-    def test_quality_checker_calculate_perplexity_text_started_without_prompt(self):
-        """
-        Checks QualityChecker calculate_perplexity method with generated text started
-        without prompt
-        """
-        checker = QualityChecker(self.generators, self.language_model,
-                                 self.word_processor)
-
-        with self.assertRaises(ValueError):
-            checker._calculate_perplexity('The Fox had', 'Dinner')
+            checker._calculate_perplexity(bad_input)
 
     @pytest.mark.lab_4_fill_words_by_ngrams
     @pytest.mark.mark8
@@ -115,7 +100,7 @@ class QualityCheckerTest(unittest.TestCase):
                                  self.word_processor)
 
         with self.assertRaises(ValueError):
-            checker._calculate_perplexity(' ', ' ')
+            checker._calculate_perplexity(' ')
 
     @pytest.mark.lab_4_fill_words_by_ngrams
     @pytest.mark.mark8
@@ -128,7 +113,7 @@ class QualityCheckerTest(unittest.TestCase):
                                  self.word_processor)
 
         with self.assertRaises(ValueError):
-            checker._calculate_perplexity('1 the', '1')
+            checker._calculate_perplexity('1 the')
 
     @pytest.mark.lab_4_fill_words_by_ngrams
     @pytest.mark.mark8
@@ -142,7 +127,7 @@ class QualityCheckerTest(unittest.TestCase):
         self.language_model.generate_next_token = lambda x: None
 
         with self.assertRaises(ValueError):
-            checker._calculate_perplexity('Dinner and so the plate.', 'Dinner')
+            checker._calculate_perplexity('Dinner and so the plate.')
 
     @pytest.mark.lab_4_fill_words_by_ngrams
     @pytest.mark.mark8
@@ -155,7 +140,7 @@ class QualityCheckerTest(unittest.TestCase):
         checker = QualityChecker(self.generators, self.language_model,
                                  self.word_processor)
         with self.assertRaises(ValueError):
-            checker._calculate_perplexity('.', '.')
+            checker._calculate_perplexity('.')
 
     @pytest.mark.lab_4_fill_words_by_ngrams
     @pytest.mark.mark8
@@ -228,6 +213,6 @@ class QualityCheckerTest(unittest.TestCase):
         """
         checker = QualityChecker(self.generators, self.language_model,
                                  self.word_processor)
-        checker._calculate_perplexity = lambda x, y: None
+        checker._calculate_perplexity = lambda x: None
         with self.assertRaises(ValueError):
             checker.run(10, 'Dinner')
