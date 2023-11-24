@@ -189,8 +189,6 @@ class TextProcessor:
             return None
         decoded_corpus = []
         for element_id in corpus:
-            if not isinstance(element_id, int):
-                return None
             token = self.get_token(element_id)
             if not token:
                 return None
