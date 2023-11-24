@@ -18,7 +18,7 @@ def main() -> None:
     if encoded_corpus and isinstance(encoded_corpus, tuple):
       result = corpus.decode(encoded_corpus)
     model = NGramLanguageModel(encoded_corpus, 7)
-    greedy_text_generator = GreedyTextGenerator(model, processor)
+    greedy_text_generator = GreedyTextGenerator(model, corpus)
     greedy_text_generator.run(51, 'Vernon')
     assert result
 
