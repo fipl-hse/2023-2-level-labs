@@ -130,8 +130,6 @@ class TextProcessor:
             if not isinstance(token_id, int):
                 return None
             encoded_text.append(token_id)
-        if not encoded_text:
-            return None
         return tuple(encoded_text)
 
     def _put(self, element: str) -> None:
@@ -197,9 +195,9 @@ class TextProcessor:
         decoded_tuple = []
         for ident in corpus:
             token = self.get_token(ident)
-        if token is None:
-            return None
-        decoded_tuple.append(token)
+            if token is None:
+                return None
+            decoded_tuple.append(token)
         return tuple(decoded_tuple)
 
     def _postprocess_decoded_text(self, decoded_corpus: tuple[str, ...]) -> Optional[str]:
@@ -305,16 +303,16 @@ class NGramLanguageModel:
         """
         if not (isinstance(sequence, tuple) and sequence and len(sequence) >=
                 self._n_gram_size - 1):
-             return None
+            return None
         new_tokens = {}
         context = sequence[-self._n_gram_size + 1:]
         for n_gram, freq in self._n_gram_frequencies.items():
             if n_gram[:-1] == context:
-                new_tokens[n_gram[-1]] =freq
+                new_tokens[n_gram[-1]] = freq
         return new_tokens
 
     def _extract_n_grams(
-        self, encoded_corpus: tuple[int, ...]
+            self, encoded_corpus: tuple[int, ...]
     ) -> Optional[tuple[tuple[int, ...], ...]]:
         """
         Split encoded sequence into n-grams.
@@ -422,10 +420,10 @@ class BeamSearcher:
         """
 
     def continue_sequence(
-        self,
-        sequence: tuple[int, ...],
-        next_tokens: list[tuple[int, float]],
-        sequence_candidates: dict[tuple[int, ...], float],
+            self,
+            sequence: tuple[int, ...],
+            next_tokens: list[tuple[int, float]],
+            sequence_candidates: dict[tuple[int, ...], float],
     ) -> Optional[dict[tuple[int, ...], float]]:
         """
         Generate new sequences from the base sequence with next tokens provided.
@@ -444,7 +442,7 @@ class BeamSearcher:
         """
 
     def prune_sequence_candidates(
-        self, sequence_candidates: dict[tuple[int, ...], float]
+            self, sequence_candidates: dict[tuple[int, ...], float]
     ) -> Optional[dict[tuple[int, ...], float]]:
         """
         Remove those sequence candidates that do not make top-N most probable sequences.
@@ -471,10 +469,10 @@ class BeamSearchTextGenerator:
     """
 
     def __init__(
-        self,
-        language_model: NGramLanguageModel,
-        text_processor: TextProcessor,
-        beam_width: int,
+            self,
+            language_model: NGramLanguageModel,
+            text_processor: TextProcessor,
+            beam_width: int,
     ):
         """
         Initializes an instance of BeamSearchTextGenerator.
@@ -501,7 +499,7 @@ class BeamSearchTextGenerator:
         """
 
     def _get_next_token(
-        self, sequence_to_continue: tuple[int, ...]
+            self, sequence_to_continue: tuple[int, ...]
     ) -> Optional[list[tuple[int, float]]]:
         """
         Retrieve next tokens for sequence continuation.
@@ -571,9 +569,9 @@ class BackOffGenerator:
     """
 
     def __init__(
-        self,
-        language_models: tuple[NGramLanguageModel, ...],
-        text_processor: TextProcessor,
+            self,
+            language_models: tuple[NGramLanguageModel, ...],
+            text_processor: TextProcessor,
     ):
         """
         Initializes an instance of BackOffGenerator.
