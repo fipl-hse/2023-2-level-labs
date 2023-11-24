@@ -389,10 +389,8 @@ class GreedyTextGenerator:
                 break
             max_freq = max(next_cand.values())
             best = [k for k, v in next_cand.items() if v == max_freq]
-            sorted_best = sorted(best)
-            encoded_prompt += (sorted_best[0],)
-        result = self._text_processor.decode(encoded_prompt)
-        return result
+            encoded_prompt += sorted(best)[0],
+        return self._text_processor.decode(encoded_prompt)
 
 
 class BeamSearcher:
