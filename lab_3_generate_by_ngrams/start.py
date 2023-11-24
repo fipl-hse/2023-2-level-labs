@@ -12,9 +12,7 @@ def main() -> None:
     """
     with open("./assets/Harry_Potter.txt", "r", encoding="utf-8") as text_file:
         text = text_file.read()
-    result = None
-
-
+    text_processor = main_py.TextProcessor('_')
     encoded_text = text_processor.encode(text)
     decoded_text = text_processor.decode(encoded_text)
     print(decoded_text)
@@ -27,7 +25,7 @@ def main() -> None:
     result = generated_text
     print(generated_text)
 
-     assert result
+    assert result
 
 
 
