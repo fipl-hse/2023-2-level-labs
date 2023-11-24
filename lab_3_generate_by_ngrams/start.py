@@ -1,6 +1,7 @@
 """
 Generation by NGrams starter
 """
+
 from lab_3_generate_by_ngrams.main import TextProcessor
 
 def main() -> None:
@@ -18,5 +19,7 @@ def main() -> None:
     print(decoded_text)
     result = decoded_text
     assert result
+
+
 if __name__ == "__main__":
     main()

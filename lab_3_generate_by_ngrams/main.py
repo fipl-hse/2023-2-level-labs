@@ -3,6 +3,7 @@ Lab 3.
 
 Beam-search and natural language generation evaluation
 """
+
 # pylint:disable=too-few-public-methods
 from typing import Optional
 import string
@@ -144,6 +145,7 @@ class TextProcessor:
             return None
         if self._storage.get(element) is None:
             self._storage[element] = len(self._storage)
+
     def decode(self, encoded_corpus: tuple[int, ...]) -> Optional[str]:
         """
         Decode and postprocess encoded corpus by converting integer identifiers to string.
@@ -166,6 +168,7 @@ class TextProcessor:
         if not decoded_text:
             return None
         return self._postprocess_decoded_text(decoded_text)
+
     def fill_from_ngrams(self, content: dict) -> None:
         """
         Fill internal storage with letters from external JSON.
@@ -198,6 +201,7 @@ class TextProcessor:
                 return None
             decoded_tokens.append(token)
         return tuple(decoded_tokens)
+
     def _postprocess_decoded_text(self, decoded_corpus: tuple[str, ...]) -> Optional[str]:
         """
         Convert decoded sentence into the string sequence.
@@ -257,6 +261,7 @@ class NGramLanguageModel:
         Returns:
             int: Size of stored n_grams
         """
+
     def set_n_grams(self, frequencies: dict) -> None:
         """
         Setter method for n-gram frequencies.
@@ -264,6 +269,7 @@ class NGramLanguageModel:
         Args:
             frequencies (dict): Computed in advance frequencies for n-grams
         """
+
     def build(self) -> int:
         """
         Fill attribute `_n_gram_frequencies` from encoded corpus.
