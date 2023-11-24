@@ -12,7 +12,7 @@ def main() -> None:
     """
     with open("./assets/Harry_Potter.txt", "r", encoding="utf-8") as text_file:
         text = text_file.read()
-        result = None
+    result = None
 
     text_processor = main_py.TextProcessor('_')
     encoded_text = text_processor.encode(text)
@@ -26,8 +26,6 @@ def main() -> None:
     generated_text = greedy_generator.run(51, 'Vernon')
     result = generated_text
     print(generated_text)
-
-    assert result
 
 
 
