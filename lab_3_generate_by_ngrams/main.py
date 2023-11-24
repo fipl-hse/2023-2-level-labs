@@ -521,7 +521,7 @@ class BeamSearcher:
         Args:
             sequence (tuple[int, ...]): Base sequence to continue
             next_tokens (list[tuple[int, float]]): Token for sequence continuation
-            sequence_candidates (dict[tuple[int, ...], float]): Storage with all sequences generated
+            sequence_candidates (dict[tuple[int, ...], dict]): Storage with all sequences generated
 
         Returns:
             Optional[dict[tuple[int, ...], float]]: Updated sequence candidates
@@ -550,7 +550,7 @@ class BeamSearcher:
         Remove those sequence candidates that do not make top-N most probable sequences.
 
         Args:
-            sequence_candidates (dict[tuple[int, ...], float]): Current candidate sequences
+            sequence_candidates (int): Current candidate sequences
 
         Returns:
             dict[tuple[int, ...], float]: Pruned sequences
@@ -570,9 +570,9 @@ class BeamSearchTextGenerator:
 
     Attributes:
         _language_model (tuple[NGramLanguageModel]): Language models for next token prediction
-        _text_processor (TextProcessor): A TextProcessor instance to handle text processing
-        _beam_width (int): Beam width parameter for generation
-        beam_searcher (BeamSearcher): Searcher instances for each language model
+        _text_processor (NGramLanguageModel): A TextProcessor instance to handle text processing
+        _beam_width (NGramLanguageModel): Beam width parameter for generation
+        beam_searcher (NGramLanguageModel): Searcher instances for each language model
     """
 
     def __init__(
@@ -678,7 +678,6 @@ class NGramLanguageModelReader:
         _json_path (str): Local path to assets file
         _eow_token (str): Special token for text processor
         _text_processor (TextProcessor): A TextProcessor instance to handle text processing
-        _content (dict): ngrams from external JSON
     """
 
     def __init__(self, json_path: str, eow_token: str) -> None:
@@ -757,7 +756,7 @@ class BackOffGenerator:
 
     Attributes:
         _language_models (dict[int, NGramLanguageModel]): Language models for next token prediction
-        _text_processor (TextProcessor): A TextProcessor instance to handle text processing
+        _text_processor (NGramLanguageModel): A TextProcessor instance to handle text processing
     """
 
     def __init__(
