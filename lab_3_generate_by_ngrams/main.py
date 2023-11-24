@@ -145,10 +145,9 @@ class TextProcessor:
         In case of corrupt input arguments or invalid argument length,
         an element is not added to storage
         """
-        if not isinstance(element, str) or len(element) != 1:
+        if not isinstance(element, str) or len(element) != 1 or element in self._storage:
             return None
-        if element not in self._storage:
-            self._storage[element] = len(self._storage)
+        self._storage[element] = len(self._storage)
         return None
 
     def decode(self, encoded_corpus: tuple[int, ...]) -> Optional[str]:
@@ -390,19 +389,16 @@ class GreedyTextGenerator:
         n_gram_size = self._model.get_n_gram_size()
         if not prompt_encoded or not n_gram_size:
             return None
-        list_encoded = list(prompt_encoded)
+        m_freq = []
         for prediction in range(seq_len):
-            seq = tuple(list_encoded[-n_gram_size + 1:])
+            seq = tuple(prompt_encoded[-n_gram_size + 1:])
             variants = self._model.generate_next_token(seq)
             if not variants:
                 break
-            best_choice = sorted([pred for pred, freq in variants.items() if
-                                  freq == max(variants.values())])[0]
-            list_encoded.append(best_choice)
-        predicted = self._text_processor.decode(tuple(list_encoded))
-        if not predicted:
-            return None
-        return predicted
+            m_freq.append(max(variants.values()))
+            candidates = filter(lambda freq: freq[1] == m_freq[-1], variants.items())
+            prompt_encoded += (sorted(candidates)[0][0],)
+        return self._text_processor.decode(prompt_encoded)
 
 
 class BeamSearcher:
