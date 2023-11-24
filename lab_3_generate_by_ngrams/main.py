@@ -3,8 +3,6 @@ Lab 3.
 
 Beam-search and natural language generation evaluation
 """
-import json
-import math
 # pylint:disable=too-few-public-methods
 import json
 import math
@@ -263,13 +261,6 @@ class TextProcessor:
 
         return f"{decoded_text}."
 
-        capitalized_corpus = ''.join(decoded_corpus).capitalize().replace\
-            (self._end_of_word_token, ' ')
-        if capitalized_corpus[-1] == ' ':
-            capitalized_corpus = capitalized_corpus[:-1]
-        result = capitalized_corpus + '.'
-
-        return result
 
 class NGramLanguageModel:
     """
@@ -464,36 +455,6 @@ class GreedyTextGenerator:
 
         return decoded_text
 
-        n_gram_size = self._model.get_n_gram_size()
-        encoded = self._text_processor.encode(prompt)
-
-        if not (encoded and n_gram_size):
-            return None
-
-        text = prompt
-        for i in range(seq_len):
-            tokens = self._model.generate_next_token(encoded)
-
-            if not tokens:
-                break
-
-            max_frequency = max(tokens.values())
-            candidates_max = [candidate for candidate, frequency in tokens.items()
-                              if frequency == max_frequency]
-            encoded = encoded + (sorted(candidates_max)[0],)
-            best_candidate = self._text_processor.get_token(encoded[-1])
-
-            if not best_candidate:
-                return None
-
-            text += best_candidate
-
-        decoded_text = self._text_processor.decode(encoded)
-
-        if not decoded_text:
-            return None
-
-        return decoded_text
 
 class BeamSearcher:
     """
