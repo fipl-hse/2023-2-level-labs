@@ -1,13 +1,8 @@
 """
 BPE Tokenizer starter
 """
-import json
-from pathlib import Path
-
-from lab_2_tokenize_by_bpe.main import (calculate_bleu, collect_frequencies, decode, encode,
-                                        get_vocabulary, train)
-
-from lab_3_generate_by_ngrams.main import GreedyTextGenerator, NGramLanguageModel, TextProcessor
+from lab_3_generate_by_ngrams.main import (GreedyTextGenerator,
+                                           NGramLanguageModel, TextProcessor)
 
 def main() -> None:
     """
