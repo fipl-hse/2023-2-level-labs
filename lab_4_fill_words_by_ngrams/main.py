@@ -35,8 +35,10 @@ class WordProcessor(TextProcessor):
 
         great_text = ''
 
-        bad_punctuation = '''"#$%&'()*+,-/:;<=>@[\\]^_`{|}~'''
+        # bad_punctuation = '''"#$%&'()*+,-/:;<=>@[\\]^_`{|}~'''
         good_punctuation = '!.?'
+
+        '''
 
         for word in text.lower():
             if not (word in bad_punctuation or word.isdigit()):
@@ -44,7 +46,20 @@ class WordProcessor(TextProcessor):
                     great_text += f' {word[:-1]} {self._end_of_word_token}'
                     continue
                 great_text += f'{word}'
+        
+        '''
+
+        for word in text.lower():
+            if not word.isalnum():
+                if word in good_punctuation:
+                    great_text += f' {self._end_of_word_token}'
+                elif word.isspace():
+                    great_text += f'{word}'
+            elif not word.isdigit():
+                great_text += f'{word}'
+
         return tuple(great_text.split())
+
 
     def _put(self, element: str) -> None:
         """
