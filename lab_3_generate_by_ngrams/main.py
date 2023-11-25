@@ -122,7 +122,7 @@ class TextProcessor:
         In case of corrupt input arguments, None is returned.
         In case any of methods used return None, None is returned.
         """
-        if not isinstance(text, str) or len(text) == 0:
+        if not (isinstance(text, str) and text):
             return None
 
         tokenized_text = self._tokenize(text)
@@ -176,7 +176,7 @@ class TextProcessor:
         In case of corrupt input arguments, None is returned.
         In case any of methods used return None, None is returned.
         """
-        if not isinstance(encoded_corpus, tuple) or len(encoded_corpus) == 0:
+        if not (isinstance(encoded_corpus, tuple) and encoded_corpus):
             return None
 
         decoded_corpus = self._decode(encoded_corpus)
@@ -217,15 +217,16 @@ class TextProcessor:
             return None
 
         decoded_corpus = []
-        for element in corpus:
-            if not isinstance(element, int):
+
+        for id in corpus:
+            if not isinstance(id, int):
                 return None
-            token = self.get_token(element)
+            token = self.get_token(id)
             if not token:
                 return None
             decoded_corpus.append(token)
 
-            return tuple(decoded_corpus)
+        return tuple(decoded_corpus)
 
     def _postprocess_decoded_text(self, decoded_corpus: tuple[str, ...]) -> Optional[str]:
         """
@@ -246,13 +247,13 @@ class TextProcessor:
             return None
 
         postprocessed_text = []
-        for i in decoded_corpus:
-            postprocessed_text += i
+        for element in decoded_corpus:
+            postprocessed_text.append(element)
 
         if postprocessed_text[-1] == self._end_of_word_token:
             del postprocessed_text[-1]
 
-        return ''.join(postprocessed_text).capitalize().replace(self._end_of_word_token, ' ') + '.'
+        return f"{''.join(postprocessed_text).capitalize()}.".replace(self._end_of_word_token, ' ')
 
 
 
@@ -311,6 +312,17 @@ class NGramLanguageModel:
         In case of corrupt input arguments or methods used return None,
         1 is returned
         """
+        if not isinstance(self._encoded_corpus, tuple) or not self._encoded_corpus:
+            return 1
+        n_grams = self._extract_n_grams(self._encoded_corpus)
+        if not isinstance(n_grams, tuple) or len(n_grams) == 0:
+            return 1
+        for n_gram in set(n_grams):
+            context_count = list(filter(lambda context: context[:-1] == n_gram[:-1], n_grams))
+            self._n_gram_frequencies[n_gram] = n_grams.count(n_gram) / len(context_count)
+
+        return 0
+
 
     def generate_next_token(self, sequence: tuple[int, ...]) -> Optional[dict]:
         """
