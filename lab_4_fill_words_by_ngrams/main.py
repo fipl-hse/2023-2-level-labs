@@ -39,7 +39,7 @@ class WordProcessor(TextProcessor):
         good_punctuation = '!.?'
 
         for word in text.lower():
-            if word not in bad_punctuation:
+            if not (word in bad_punctuation or word.isdigit()):
                 if word[-1] in good_punctuation:
                     great_text += f' {word[:-1]} {self._end_of_word_token}'
                     continue
