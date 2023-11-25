@@ -3,6 +3,8 @@ Lab 4.
 
 Top-p sampling generation and filling gaps with ngrams
 """
+import re
+
 # pylint:disable=too-few-public-methods, too-many-arguments
 from lab_3_generate_by_ngrams.main import (BeamSearchTextGenerator, GreedyTextGenerator,
                                            NGramLanguageModel, TextProcessor)
@@ -28,6 +30,20 @@ class WordProcessor(TextProcessor):
         Raises:
             ValueError: In case of inappropriate type input argument or if input argument is empty.
         """
+        if not isinstance(text, str) or len(text) == 0:
+            raise ValueError
+
+        great_text = ''
+
+        bad_punctuation = '''!"#$%&'()*+,-/:;<=?>@[\\]^_`{|.}~'''
+
+        for word in text.lower():
+            if not (word in bad_punctuation and word[-1] in bad_punctuation):
+                great_text += f'{word}'
+            else:
+                great_text += f' {word[:-1]} {self._end_of_word_token}'
+        return tuple(great_text.split())
+
 
     def _put(self, element: str) -> None:
         """
