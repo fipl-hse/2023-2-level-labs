@@ -23,8 +23,8 @@ class TextProcessor:
         Args:
             end_of_word_token (str): A token denoting word boundary
         """
-        self.end_of_word_token = end_of_word_token
-        self._storage = {}
+        self._end_of_word_token = end_of_word_token
+        self._storage = {self._end_of_word_token: 0}
 
     def _tokenize(self, text: str) -> Optional[tuple[str, ...]]:
         """
@@ -50,10 +50,10 @@ class TextProcessor:
         for index, token in enumerate(text.lower()):
             if token.isalpha():
                 list_of_tokens.append(token)
-            elif list_of_tokens[- 1] != self.end_of_word_token:
-                list_of_tokens.append(self.end_of_word_token)
+            elif len(list_of_tokens) != 0 and list_of_tokens[-1] != self._end_of_word_token:
+                list_of_tokens.append(self._end_of_word_token)
             else:
-                pass
+                continue
 
         if len(list_of_tokens) == 0:
             return None
@@ -85,7 +85,7 @@ class TextProcessor:
         Returns:
             str: EoW token
         """
-        return self.end_of_word_token
+        return self._end_of_word_token
 
     def get_token(self, element_id: int) -> Optional[str]:
         """
@@ -122,7 +122,7 @@ class TextProcessor:
         In case of corrupt input arguments, None is returned.
         In case any of methods used return None, None is returned.
         """
-        if not isinstance(text, str) or not text:
+        if not isinstance(text, str) or len(text) == 0:
             return None
 
         tokenized_text = self._tokenize(text)
@@ -134,12 +134,12 @@ class TextProcessor:
             self._put(token)
             token_id = self.get_id(token)
 
-            if token_id is None:
+            if not isinstance(token_id, int):
                 return None
 
             encoded_text.append(token_id)
 
-            return tuple(encoded_text)
+        return tuple(encoded_text)
 
     def _put(self, element: str) -> None:
         """
@@ -151,8 +151,11 @@ class TextProcessor:
         In case of corrupt input arguments or invalid argument length,
         an element is not added to storage
         """
-        if self.end_of_word_token not in self._storage:
-            self._storage[self.end_of_word_token] = 0
+        if not isinstance(element, str) or len(element) != 1:
+            return None
+
+        if self._end_of_word_token not in self._storage:
+            self._storage[self._end_of_word_token] = 0
 
         if isinstance(element, str) and len(element) == 1 and element not in self._storage:
             self._storage[element] = len(self._storage)
@@ -173,18 +176,14 @@ class TextProcessor:
         In case of corrupt input arguments, None is returned.
         In case any of methods used return None, None is returned.
         """
-        if not isinstance(encoded_corpus, tuple):
+        if not isinstance(encoded_corpus, tuple) or len(encoded_corpus) == 0:
             return None
 
         decoded_corpus = self._decode(encoded_corpus)
-        if decoded_corpus is None:
+        if not decoded_corpus:
             return None
 
-        postprocessed_text = self._postprocess_decoded_text(decoded_corpus)
-        if not postprocessed_text:
-            return None
-
-        return postprocessed_text
+        return self._postprocess_decoded_text(decoded_corpus)
 
     def fill_from_ngrams(self, content: dict) -> None:
         """
@@ -193,13 +192,13 @@ class TextProcessor:
         Args:
             content (dict): ngrams from external JSON
         """
-        if not isinstance(content, dict) or not content:
+        if not isinstance(content, dict) or not len(content) == 0:
             return None
 
         for key in content['freq']:
             for element in key:
                 if element.isalpha():
-                    self._put(element)
+                    self._put(element.lower())
 
     def _decode(self, corpus: tuple[int, ...]) -> Optional[tuple[str, ...]]:
         """
@@ -214,16 +213,17 @@ class TextProcessor:
         In case of corrupt input arguments, None is returned.
         In case any of methods used return None, None is returned.
         """
-        if not isinstance(corpus, tuple) or not corpus:
+        if not isinstance(corpus, tuple) or len(corpus) == 0:
             return None
 
         decoded_corpus = []
         for element in corpus:
-            if self.get_token(element) is None:
-                decoded_corpus.append(element)
-
-            if not decoded_corpus:
+            if not isinstance(element, int):
                 return None
+            token = self.get_token(element)
+            if not token:
+                return None
+            decoded_corpus.append(token)
 
             return tuple(decoded_corpus)
 
@@ -250,11 +250,9 @@ class TextProcessor:
             postprocessed_text += i
 
         if postprocessed_text[-1] == self._end_of_word_token:
-            postprocessed_text[-1] = '.'
+            del postprocessed_text[-1]
 
-        text_string = ''.join(postprocessed_text)
-        text_string = text_string.replace(self._end_of_word_token, ' ')
-        return text_string.capitalize()
+        return ''.join(postprocessed_text).capitalize().replace(self._end_of_word_token, ' ') + '.'
 
 
 
@@ -276,6 +274,9 @@ class NGramLanguageModel:
             encoded_corpus (tuple): Encoded text
             n_gram_size (int): A size of n-grams to use for language modelling
         """
+        self._encoded_corpus = encoded_corpus
+        self._n_gram_size = n_gram_size
+        self._n_gram_frequencies = {}
 
     def get_n_gram_size(self) -> int:
         """
@@ -284,6 +285,7 @@ class NGramLanguageModel:
         Returns:
             int: Size of stored n_grams
         """
+        return self._n_gram_size
 
     def set_n_grams(self, frequencies: dict) -> None:
         """
@@ -292,6 +294,10 @@ class NGramLanguageModel:
         Args:
             frequencies (dict): Computed in advance frequencies for n-grams
         """
+        if not isinstance(frequencies, dict):
+            return None
+        self._n_gram_frequencies = frequencies
+        return None
 
     def build(self) -> int:
         """
