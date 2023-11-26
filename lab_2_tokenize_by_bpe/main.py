@@ -85,18 +85,18 @@ def merge_tokens(
     :param pair: a pair of tokens to be merged
     :return: dictionary in the form of <preprocessed word: number of occurrences>
     """
-    if not (isinstance(freq_dict, dict) and
+    if not (isinstance(word_frequencies, dict) and
             isinstance(pair, tuple)):
         return None
     merged_dict = {}
-    for word in freq_dict:
+    for word in word_frequencies:
         pending_word = list(word)
         for i in range(len(pending_word) - 1):
             current_pair = (pending_word[i], pending_word[i + 1])
             if current_pair == pair:
                 pending_word[i] = ''.join(pair)
                 pending_word.pop(i + 1)
-        merged_dict[tuple(pending_word)] = freq_dict[word]
+        merged_dict[tuple(pending_word)] = word_frequencies[word]
     return merged_dict
 
 
