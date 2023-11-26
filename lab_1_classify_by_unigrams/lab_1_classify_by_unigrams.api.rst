@@ -12,6 +12,9 @@ Submodules
    :private-members:
    :special-members:
 
+<<<<<<< main
+   :special-members:
+
 Module contents
 ---------------
 
@@ -21,3 +24,8 @@ Module contents
    :show-inheritance:
    :private-members:
    :special-members:
+=======
+   :special-members: __init__, __str__
+>>>>>>> main
+
+
