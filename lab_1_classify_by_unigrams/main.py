@@ -17,7 +17,7 @@ def tokenize(text: str) -> list[str] | None:
     text = text.replace(' ', '')
     text = text.replace('\n', '')
     for punc in text:
-        if punc in string.punctuation and punc.isdigit():
+        if punc in string.punctuation or punc.isdigit():
             text = text.replace(punc, "")
     return list(text)
 
