@@ -68,7 +68,7 @@ def count_tokens_pairs(
     pair_dict = {}
     for word in word_frequencies:
         for i in range(len(word) - 1):
-            pair = word[i] + word[i + 1]
+            pair = (word[i], word[i + 1])
             if pair in pair_dict:
                 pair_dict[pair] += word_frequencies[word]
             else:
@@ -109,7 +109,7 @@ def train(
     :param num_merges: required number of new tokens
     :return: dictionary in the form of <preprocessed word: number of occurrences>
     """
-    if not (isinstance(word_frequencies, dict) or not word_frequencies and
+    if not (isinstance(word_frequencies, dict) and
             isinstance(num_merges, int)):
         return None
     dict_with_pairs = count_tokens_pairs(word_frequencies)
