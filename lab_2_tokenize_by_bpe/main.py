@@ -63,16 +63,16 @@ def count_tokens_pairs(
     :param word_frequencies: dictionary in the form of <preprocessed word: number of occurrences>
     :return: dictionary in the form of <token pair: number of occurrences>
     """
-    if not isinstance(freq_dict, dict):
+    if not isinstance(word_frequencies, dict):
         return None
     pair_dict = {}
-    for word in freq_dict:
+    for word in word_frequencies:
         for i in range(len(word) - 1):
             pair = word[i] + word[i + 1]
             if pair in pair_dict:
-                pair_dict[pair] += freq_dict[word]
+                pair_dict[pair] += word_frequencies[word]
             else:
-                pair_dict[pair] = freq_dict[word]
+                pair_dict[pair] = word_frequencies[word]
     return pair_dict
 
 
