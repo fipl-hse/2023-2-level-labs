@@ -6,7 +6,7 @@ Top-p sampling generation and filling gaps with ngrams
 # pylint:disable=too-few-public-methods, too-many-arguments
 from lab_3_generate_by_ngrams.main import (BeamSearchTextGenerator, GreedyTextGenerator,
                                            NGramLanguageModel, TextProcessor)
-
+import re
 
 class WordProcessor(TextProcessor):
     """
@@ -28,6 +28,15 @@ class WordProcessor(TextProcessor):
         Raises:
             ValueError: In case of inappropriate type input argument or if input argument is empty.
         """
+        if not (isinstance(text, str) and text):
+            raise ValueError
+        punctuation_to_replace = '.?!'
+        text = text.lower()
+        for char in punctuation_to_replace:
+            if char in text:
+                text = text.replace(char, ' ' + self._end_of_word_token)
+        tokens = text.split()
+        return tuple(tokens)
 
     def _put(self, element: str) -> None:
         """
@@ -39,6 +48,13 @@ class WordProcessor(TextProcessor):
         Raises:
             ValueError: In case of inappropriate type input argument or if input argument is empty.
         """
+        if not(isinstance(element, str) and element):
+            raise ValueError
+        if element in self._storage:
+            return None
+        self._storage[element] = len(self._storage)
+        return None
+
 
     def _postprocess_decoded_text(self, decoded_corpus: tuple[str, ...]) -> str:  # type: ignore
         """
@@ -56,7 +72,21 @@ class WordProcessor(TextProcessor):
         Raises:
             ValueError: In case of inappropriate type input argument or if input argument is empty.
         """
-
+        if not (isinstance(decoded_corpus, tuple)
+                and decoded_corpus):
+            raise ValueError
+        decoded_sentences = ''
+        list_of_tokens = list(decoded_corpus)
+        sentences = (' '.join(list_of_tokens)).split(self._end_of_word_token)
+        for i, sentence in enumerate(sentences):
+            sentence = sentence.strip().capitalize()
+            if not sentence:
+                break
+            sentence = sentence + '.'
+            if i != len(sentences) - 1:
+                sentence = sentence + ' '
+            decoded_sentences += sentence
+        return decoded_sentences.strip()
 
 class TopPGenerator:
     """
