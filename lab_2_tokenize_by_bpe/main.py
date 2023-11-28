@@ -177,12 +177,6 @@ def get_vocabulary(
 
     return dict_ident
 
-print(get_vocabulary({('Часовня</s>',): 1, ('окружена</s>',): 1,
-                                 ('низким</s>',): 1, ('белым</s>',): 1,
-                                 ('заборчиком,</s>',): 1, ('который</s>',): 1,
-                                 ('должен</s>',): 1, ('бы</s>',): 1,
-                                 ('преграждать</s>',): 1, ('сюда</s>',): 1,
-                                 ('путь</s>',): 1, ('альбатросам.</s>',): 1}, "unk"))
 
 def decode(
     encoded_text: list[int] | None, vocabulary: dict[str, int] | None, end_of_word_token: str | None
