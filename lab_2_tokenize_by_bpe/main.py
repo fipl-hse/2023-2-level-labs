@@ -118,7 +118,11 @@ def train(
     dict_with_pairs = count_tokens_pairs(word_frequencies)
     if not dict_with_pairs:
         return None
-    merges = min(num_merges, len(dict_with_pairs))
+    if num_merges > len(dict_with_pairs):
+        merges = len(dict_with_pairs)
+    else:
+        merges = num_merges
+
     for i in range(merges):
         max_values = max(dict_with_pairs.values())
         pairs_max_values = [i for i in dict_with_pairs if dict_with_pairs[i] == max_values]
@@ -150,13 +154,19 @@ def get_vocabulary(
         return None
 
     dict_ident = {}
-    unique_tokens = set()
+    tokens = []
 
-    for tuple_tokens in word_frequencies.keys():
-        for word in tuple_tokens:
-            unique_tokens.update(tuple_tokens, word)
+    for word in word_frequencies:
+        for token in word:
+            list_word = list(word)
+            join_list_word = ''.join(list_word)
+            tokens.append(join_list_word)
+            for i in range(len(token)):
+                tokens.append(token[i])
 
-    unique_tokens.add(unknown_token)
+    tokens.append(unknown_token)
+    unique_tokens = set(tokens)
+
     lex_sorted = sorted(unique_tokens)
     len_sorted = sorted(lex_sorted, key=len, reverse=True)
     index = 0
@@ -167,6 +177,12 @@ def get_vocabulary(
 
     return dict_ident
 
+print(get_vocabulary({('Часовня</s>',): 1, ('окружена</s>',): 1,
+                                 ('низким</s>',): 1, ('белым</s>',): 1,
+                                 ('заборчиком,</s>',): 1, ('который</s>',): 1,
+                                 ('должен</s>',): 1, ('бы</s>',): 1,
+                                 ('преграждать</s>',): 1, ('сюда</s>',): 1,
+                                 ('путь</s>',): 1, ('альбатросам.</s>',): 1}, "unk"))
 
 def decode(
     encoded_text: list[int] | None, vocabulary: dict[str, int] | None, end_of_word_token: str | None
@@ -182,17 +198,15 @@ def decode(
             end_of_word_token, str) or end_of_word_token is None):
         return None
     decoded = ''
-    for identifier in encoded_text:
-        token_list = [key for key in vocabulary if vocabulary[key] == identifier]
-
-        for token in token_list:
-            decoded += token
+    for i in encoded_text:
+        for word in vocabulary:
+            if i == vocabulary.get(word):
+                decoded += word
 
     if end_of_word_token:
         decoded = decoded.replace(end_of_word_token, ' ')
 
     return decoded
-
 
 def tokenize_word(
     word: tuple[str, ...], vocabulary: dict[str, int], end_of_word: str | None, unknown_token: str
