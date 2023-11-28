@@ -162,7 +162,7 @@ def get_vocabulary(
             join_list_word = ''.join(list_word)
             tokens.append(join_list_word)
             for count, value in enumerate(token):
-                tokens.append(token[value])
+                tokens.append(token[count])
 
     tokens.append(unknown_token)
     unique_tokens = set(tokens)
