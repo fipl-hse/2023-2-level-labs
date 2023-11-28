@@ -3,7 +3,6 @@ Lab 4.
 
 Top-p sampling generation and filling gaps with ngrams
 """
-import re
 
 # pylint:disable=too-few-public-methods, too-many-arguments
 from lab_3_generate_by_ngrams.main import (BeamSearchTextGenerator, GreedyTextGenerator,
@@ -53,13 +52,12 @@ class WordProcessor(TextProcessor):
             if not word.isalnum():
                 if word in good_punctuation:
                     great_text += f' {self._end_of_word_token}'
-                elif word.isspace():
+                elif word.isspace() and not great_text[-1].isspace():
                     great_text += f'{word}'
             elif not word.isdigit():
                 great_text += f'{word}'
 
         return tuple(great_text.split())
-
 
     def _put(self, element: str) -> None:
         """
@@ -71,6 +69,11 @@ class WordProcessor(TextProcessor):
         Raises:
             ValueError: In case of inappropriate type input argument or if input argument is empty.
         """
+        if not isinstance(element, str) or len(element) == 0:
+            raise ValueError
+
+        if element not in self._storage:
+            self._storage[element] = len(self._storage)
 
     def _postprocess_decoded_text(self, decoded_corpus: tuple[str, ...]) -> str:  # type: ignore
         """
@@ -88,6 +91,27 @@ class WordProcessor(TextProcessor):
         Raises:
             ValueError: In case of inappropriate type input argument or if input argument is empty.
         """
+        if not isinstance(decoded_corpus, tuple) or len(decoded_corpus) == 0:
+            raise ValueError
+
+        great_text = ''
+
+        for word in decoded_corpus:
+            if word != self._end_of_word_token:
+                if not great_text:
+                    great_text += f'{word.capitalize()}'
+                elif great_text and great_text[-1] == '.':
+                    great_text += f' {word.capitalize()}'
+                else:
+                    great_text += f' {word}'
+            else:
+                great_text += '.'
+
+        if great_text[-1] != '.':
+            great_text += '.'
+            return great_text
+
+        return great_text
 
 
 class TopPGenerator:
