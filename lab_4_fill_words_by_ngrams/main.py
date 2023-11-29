@@ -150,10 +150,11 @@ class TopPGenerator:
             if not next_tokens:
                 break
 
+            sorted_dict = dict(sorted(next_tokens.items(), key=lambda x: (x[1], x[0])))
             probability = 0
             possible_tokens = []
 
-            for key, value in sorted(next_tokens.items()):
+            for key, value in sorted_dict.items():
                 probability += value
                 possible_tokens.append(key)
                 if probability >= self._p_value:
