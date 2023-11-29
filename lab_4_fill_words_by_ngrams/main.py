@@ -5,9 +5,10 @@ Top-p sampling generation and filling gaps with ngrams
 """
 # pylint:disable=too-few-public-methods, too-many-arguments
 import random
+
 from lab_3_generate_by_ngrams.main import (BeamSearchTextGenerator, GreedyTextGenerator,
                                            NGramLanguageModel, TextProcessor)
-import re
+
 
 class WordProcessor(TextProcessor):
     """
@@ -136,6 +137,7 @@ class TopPGenerator:
         encoded_text = self._word_processor.encode(prompt)
         if not encoded_text:
             raise ValueError
+        encoded = list(encoded_text)
         for iteration in range(seq_len):
             next_tokens = self._model.generate_next_token(encoded_text)
             if next_tokens is None:
@@ -150,9 +152,10 @@ class TopPGenerator:
             if probability >= self._p_value:
                 break
             sorted_words = sorted(probable_words, key=lambda x: x[1])
-            random_word = random.choice(sorted_words)
-            encoded_text = list(encoded_text).append(random_word)
-        decoded = self._word_processor.decode(tuple(encoded_text))
+            words = [pair[0] for pair in sorted_words]
+            random_word = random.choice(words)
+            encoded.append(random_word)
+        decoded = self._word_processor.decode(tuple(encoded))
         if not decoded:
             raise ValueError
         return decoded
