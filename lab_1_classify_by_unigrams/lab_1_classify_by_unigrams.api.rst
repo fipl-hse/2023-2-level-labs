@@ -12,4 +12,13 @@ Submodules
    :private-members:
    :special-members:
 
+Module contents
+---------------
+
+.. automodule:: lab_1_classify_by_unigrams
+   :members:
+   :undoc-members:
+   :show-inheritance:
+   :private-members:
+   :special-members:
 
