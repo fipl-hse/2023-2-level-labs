@@ -347,10 +347,13 @@ class NGramLanguageModel:
 
         possible_tokens = {}
 
-        context = sequence[-(self._n_gram_size - 1)::]
-        for n_gram in self._n_gram_frequencies:
+        context = sequence[-(self._n_gram_size - 1):]
+
+        sort_data = dict(sorted(self._n_gram_frequencies.items(), key=lambda x: (x[1], list(x[0]))))
+
+        for n_gram, freq in sort_data.items():
             if n_gram[:self._n_gram_size - 1] == context:
-                possible_tokens[n_gram[-1]] = self._n_gram_frequencies[n_gram]
+                possible_tokens[n_gram[-1]] = freq
 
         return possible_tokens
 
@@ -427,7 +430,7 @@ class GreedyTextGenerator:
         for i in range(seq_len):
             possible_tokens = self._model.generate_next_token(encoded_text_tuple)
             if possible_tokens is None:
-                return prompt + '.'
+                return None
             if not possible_tokens:
                 break
             possible_tokens_list = list(possible_tokens.items())
@@ -534,7 +537,7 @@ class BeamSearcher:
             possible_seq = tuple(list_sequence)
             freq = sequence_candidates[sequence] - math.log(token[-1])
             copy_seq_candidates[possible_seq] = freq
-            list_sequence.remove(token[0])
+            list_sequence = list_sequence[:-1]
 
         copy_seq_candidates.pop(sequence)
 
@@ -617,8 +620,11 @@ class BeamSearchTextGenerator:
             return None
         candidates = {encoded_prompt: 0.0}
 
+        updated_candidates = candidates.copy()
+
         for _ in range(seq_len):
-            updated_candidates = candidates.copy()
+            candidates = updated_candidates
+            not_sorted_candidates = {}
 
             for sequence in candidates:
                 next_tokens = self._get_next_token(sequence)
@@ -627,16 +633,21 @@ class BeamSearchTextGenerator:
 
                 possible_sequences = self.beam_searcher.continue_sequence(sequence, next_tokens, updated_candidates)
                 if not possible_sequences:
-                    return self._text_processor.decode(sorted(tuple(
-                        candidates), key=lambda x: x[1])[0])
+                    return self._text_processor.decode(sorted(tuple(updated_candidates), key=lambda x: x[1])[0])
 
-                sorted_candidates = self.beam_searcher.prune_sequence_candidates(updated_candidates)
-                if not sorted_candidates:
-                    return None
+                not_sorted_candidates.update(possible_sequences)
 
-                candidates = sorted_candidates
+            for candidate in candidates:
+                if candidate in not_sorted_candidates:
+                    del not_sorted_candidates[candidate]
 
-        return self._text_processor.decode(sorted(tuple(candidates), key=lambda x: x[1])[0])
+            sorted_candidates = self.beam_searcher.prune_sequence_candidates(not_sorted_candidates)
+            if not sorted_candidates:
+                return None
+
+            updated_candidates = sorted_candidates
+
+        return self._text_processor.decode(sorted(tuple(updated_candidates), key=lambda x: x[1])[0])
 
     def _get_next_token(
         self, sequence_to_continue: tuple[int, ...]
