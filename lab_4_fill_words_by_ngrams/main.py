@@ -28,6 +28,18 @@ class WordProcessor(TextProcessor):
         Raises:
             ValueError: In case of inappropriate type input argument or if input argument is empty.
         """
+        if not isinstance(text, str) or len(text) == 0:
+            raise ValueError
+        text_words = text.lower().split()
+
+        tokens = []
+        for word in text_words:
+            if word[-1] in '!?.':
+                tokens.extend([word[:len(word) - 1], self._end_of_word_token])
+            elif word.isalpha():
+                tokens.append(word)
+
+        return tuple(tokens)
 
     def _put(self, element: str) -> None:
         """
@@ -39,6 +51,13 @@ class WordProcessor(TextProcessor):
         Raises:
             ValueError: In case of inappropriate type input argument or if input argument is empty.
         """
+        if not isinstance(element, str) or len(element) == 0:
+            raise ValueError
+
+        if element not in self._storage:
+            self._storage[element] = len(self._storage)
+
+        return None
 
     def _postprocess_decoded_text(self, decoded_corpus: tuple[str, ...]) -> str:  # type: ignore
         """
@@ -56,6 +75,18 @@ class WordProcessor(TextProcessor):
         Raises:
             ValueError: In case of inappropriate type input argument or if input argument is empty.
         """
+        if not isinstance(decoded_corpus, tuple) or len(decoded_corpus) == 0:
+            raise ValueError
+
+        words_list = list(decoded_corpus)
+        sentences = (' '.join(words_list)).split('<eos>')
+        decoded_text = ''
+        for i, sentence in enumerate(sentences):
+            sentence = sentence.strip().capitalize()
+            decoded_text += f'{sentence}. '
+        if decoded_corpus[-1] == '<eos>':
+            return decoded_text[:len(decoded_text) - 2].strip()
+        return decoded_text.strip()
 
 
 class TopPGenerator:
