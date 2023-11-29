@@ -2,9 +2,11 @@
 Filling word by ngrams starter
 """
 # pylint:disable=too-many-locals,unused-import
+from config.constants import PROJECT_ROOT
 from lab_3_generate_by_ngrams.main import BeamSearchTextGenerator, GreedyTextGenerator
-from lab_4_fill_words_by_ngrams.main import (GeneratorTypes, NGramLanguageModel, QualityChecker,
-                                             TopPGenerator, WordProcessor)
+from lab_4_fill_words_by_ngrams.main import (Examiner, GeneratorRuleStudent, GeneratorTypes,
+                                             NGramLanguageModel, QualityChecker, TopPGenerator,
+                                             WordProcessor)
 
 
 def main() -> None:
@@ -30,6 +32,19 @@ def main() -> None:
     # for check in checks:
     #     result = str(check)
     #     print(result)
+
+    students = []
+    for student_id in range(3):
+        students.append(GeneratorRuleStudent(student_id, model, processor))
+    json_path = str(PROJECT_ROOT / 'lab_4_fill_words_by_ngrams' / 'assets' /
+                    'question_and_answers.json')
+    examiner = Examiner(json_path)
+
+    for student in students:
+        # ValueError...
+        student_answers = student.take_exam(examiner.provide_questions())
+        score = examiner.assess_exam(student_answers)
+        print(student, score)
 
     assert result
 

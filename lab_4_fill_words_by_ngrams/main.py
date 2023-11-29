@@ -430,11 +430,10 @@ class Examiner:
             raise ValueError
 
         true_answers = 0.0
-        questions = []
         for question, answer in answers.items():
-            questions.append(question)
-            actual_answer = next(filter(lambda qa: questions[-1] in qa[0],
-                                 tuple(self._questions_and_answers.items())))
+            actual_answer = next(ans for (que, loc), ans
+                                 in self._questions_and_answers.items()
+                                 if que == question)
             if actual_answer == answer:
                 true_answers += 1.
         return true_answers / len(answers)
