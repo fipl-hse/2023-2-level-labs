@@ -3,6 +3,7 @@ Lab 3.
 
 Beam-search and natural language generation evaluation
 """
+import string
 # pylint:disable=too-few-public-methods
 from typing import Optional
 
@@ -47,8 +48,16 @@ class TextProcessor:
         if not isinstance(text, str):
             return None
 
-        lower_list_text = tuple(filter(lambda x: x == " " or str.isalpha, text.lower()))
-        return lower_list_text
+        tokenized = []
+        for symbol in text.lower():
+            if symbol.isalpha():
+                tokenized.append(symbol)
+            elif ((symbol.isspace() or symbol in string.punctuation)
+                  and tokenized[-1] != self._end_of_word_token):
+                tokenized.append(self._end_of_word_token)
+        if not tokenized:
+            return None
+        return tuple(tokenized)
 
     def get_id(self, element: str) -> Optional[int]:
         """
@@ -63,7 +72,10 @@ class TextProcessor:
         In case of corrupt input arguments or arguments not included in storage,
         None is returned
         """
-        if not isinstance(element, str) or element not in self._storage:
+        if not (
+                isinstance(element, str)
+                and element in self._storage
+        ):
             return None
         return self._storage[element]
 
@@ -88,10 +100,12 @@ class TextProcessor:
 
         In case of corrupt input arguments or arguments not included in storage, None is returned
         """
-        if not isinstance(element_id, int) or element_id not in self._storage.values():
+        if not (
+                isinstance(element_id, int)
+                and element_id in self._storage.values()
+        ):
             return None
-        position = list(self._storage.values()).index(element_id)
-        return list(self._storage.keys())[position]
+        return ''.join(filter(lambda key: self._storage[key] == element_id, self._storage))
 
     def encode(self, text: str) -> Optional[tuple[int, ...]]:
         """
@@ -110,6 +124,9 @@ class TextProcessor:
         In case any of methods used return None, None is returned.
         """
 
+        if not (isinstance(text, str) and text):
+            return None
+
     def _put(self, element: str) -> None:
         """
         Put an element into the storage, assign a unique id to it.
@@ -120,6 +137,12 @@ class TextProcessor:
         In case of corrupt input arguments or invalid argument length,
         an element is not added to storage
         """
+        if not (
+                isinstance(element, str) and len(element) == 1
+        ):
+            return None
+        if element not in self._storage:
+            self._storage[element] = len(self._storage)
 
     def decode(self, encoded_corpus: tuple[int, ...]) -> Optional[str]:
         """
