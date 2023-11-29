@@ -4,6 +4,7 @@ Lab 4.
 Top-p sampling generation and filling gaps with ngrams
 """
 # pylint:disable=too-few-public-methods, too-many-arguments
+import random
 from lab_3_generate_by_ngrams.main import (BeamSearchTextGenerator, GreedyTextGenerator,
                                            NGramLanguageModel, TextProcessor)
 import re
@@ -78,13 +79,11 @@ class WordProcessor(TextProcessor):
         decoded_sentences = ''
         list_of_tokens = list(decoded_corpus)
         sentences = (' '.join(list_of_tokens)).split(self._end_of_word_token)
-        for i, sentence in enumerate(sentences):
+        for sentence in sentences:
             sentence = sentence.strip().capitalize()
             if not sentence:
                 break
-            sentence = sentence + '.'
-            if i != len(sentences) - 1:
-                sentence = sentence + ' '
+            sentence = sentence + '. '
             decoded_sentences += sentence
         return decoded_sentences.strip()
 
@@ -110,6 +109,9 @@ class TopPGenerator:
             word_processor (WordProcessor): WordProcessor instance to handle text processing
             p_value (float): Collective probability mass threshold
         """
+        self._model = language_model
+        self._word_processor = word_processor
+        self._p_value = p_value
 
     def run(self, seq_len: int, prompt: str) -> str:  # type: ignore
         """
@@ -128,7 +130,32 @@ class TopPGenerator:
                 or if sequence has inappropriate length,
                 or if methods used return None.
         """
-
+        if not(isinstance(seq_len, int) and seq_len > 0
+               and isinstance(prompt, str) and prompt):
+            raise ValueError
+        encoded_text = self._word_processor.encode(prompt)
+        if not encoded_text:
+            raise ValueError
+        for iteration in range(seq_len):
+            next_tokens = self._model.generate_next_token(encoded_text)
+            if next_tokens is None:
+                raise ValueError
+            if not next_tokens:
+                break
+            probable_words = []
+            probability = 0
+            for word, value in next_tokens.items():
+                probability += value
+                probable_words.append((word, value))
+            if probability >= self._p_value:
+                break
+            sorted_words = sorted(probable_words, key=lambda x: x[1])
+            random_word = random.choice(sorted_words)
+            encoded_text = list(encoded_text).append(random_word)
+        decoded = self._word_processor.decode(tuple(encoded_text))
+        if not decoded:
+            raise ValueError
+        return decoded
 
 class GeneratorTypes:
     """
