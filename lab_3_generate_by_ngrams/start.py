@@ -14,7 +14,7 @@ def main() -> None:
         text = text_file.read()
     split_text = main_py.TextProcessor('_')
     encoded_text = split_text.encode(text)
-    if not (isinstance(encoded, tuple) and encoded):
+    if not (isinstance(encoded_text, tuple) and encoded_text):
         return
     result = split_text.decode(encoded_text)
     print(result)
