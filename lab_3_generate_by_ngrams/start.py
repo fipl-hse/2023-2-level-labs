@@ -14,18 +14,19 @@ def main() -> None:
         text = text_file.read()
     split_text = main_py.TextProcessor('_')
     encoded_text = split_text.encode(text)
-    if encoded_text:
-        result = split_text.decode(encoded_text)
-        print(result)
-        model = main_py.NGramLanguageModel(encoded_text[:100], 3)
-        print(model.build())
-        lang_model = main_py.NGramLanguageModel(encoded_text, 7)
-        greedy_text = main_py.GreedyTextGenerator(lang_model, split_text)
-        print(greedy_text.run(51, 'Vernon'))
-        greedy = main_py.BeamSearchTextGenerator(lang_model, split_text, 7)
-        print(greedy.run('Vernon', 56))
+    if not (isinstance(encoded, tuple) and encoded):
+        return
+    result = split_text.decode(encoded_text)
+    print(result)
+    model = main_py.NGramLanguageModel(encoded_text[:100], 3)
+    print(model.build())
+    lang_model = main_py.NGramLanguageModel(encoded_text, 7)
+    greedy_text = main_py.GreedyTextGenerator(lang_model, split_text)
+    print(greedy_text.run(51, 'Vernon'))
+    greedy = main_py.BeamSearchTextGenerator(lang_model, split_text, 7)
+    print(greedy.run('Vernon', 56))
 
-        assert result
+    assert result
 
 
 if __name__ == "__main__":
