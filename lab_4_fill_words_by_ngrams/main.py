@@ -28,6 +28,16 @@ class WordProcessor(TextProcessor):
         Raises:
             ValueError: In case of inappropriate type input argument or if input argument is empty.
         """
+        if not (isinstance(text, str)) and not text:
+            raise ValueError
+
+        tokens = []
+        for token in text.lower().split():
+            if token in ('!', '?', '.'):
+                tokens.extend([token[-1], self._end_of_word_token])
+            if token.isalpha:
+                tokens.append(token)
+        return tuple(tokens)
 
     def _put(self, element: str) -> None:
         """
@@ -39,6 +49,12 @@ class WordProcessor(TextProcessor):
         Raises:
             ValueError: In case of inappropriate type input argument or if input argument is empty.
         """
+        if not isinstance(element, str) and not element:
+            raise ValueError
+        if element not in self._storage:
+            self._storage[element] = len(self._storage)
+        return None
+
 
     def _postprocess_decoded_text(self, decoded_corpus: tuple[str, ...]) -> str:  # type: ignore
         """
