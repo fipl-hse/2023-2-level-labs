@@ -28,6 +28,8 @@ class WordProcessor(TextProcessor):
         Raises:
             ValueError: In case of inappropriate type input argument or if input argument is empty.
         """
+        if not(isinstance(text, str) and text):
+            raise ValueError
 
     def _put(self, element: str) -> None:
         """
