@@ -21,6 +21,7 @@ extensions = [
     'sphinx.ext.autosummary',
     'sphinx.ext.napoleon',
 ]
+
 exclude_patterns = [
     'venv/*',
     'docs/private/*'
