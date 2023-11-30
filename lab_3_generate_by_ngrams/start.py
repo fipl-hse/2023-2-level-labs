@@ -21,7 +21,7 @@ def main() -> None:
     model = NGramLanguageModel(encoded_corpus, 7)
     greedy_text_generator = GreedyTextGenerator(model, corpus)
     greedy_text_generator.run(51, 'Vernon')
-    beam_search_generator = BeamSearchTextGenerator(model, processor, 7)
+    beam_search_generator = BeamSearchTextGenerator(model, corpus, 7)
     beam_search_generator.run('Vernon', 56)
     assert result
 
