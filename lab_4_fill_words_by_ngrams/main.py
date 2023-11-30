@@ -301,12 +301,10 @@ class Examiner:
 class GeneratorRuleStudent:
     """
     Base class for students generators.
-
-    Attributes:
-        _generator_type (str): Name of generator
     """
 
     _generator: GreedyTextGenerator | TopPGenerator | BeamSearchTextGenerator
+    _generator_type: int
 
     def __init__(
         self, generator_type: int, language_model: NGramLanguageModel, word_processor: WordProcessor
