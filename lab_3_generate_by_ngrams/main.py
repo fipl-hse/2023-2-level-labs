@@ -55,11 +55,10 @@ class TextProcessor:
                 tokenized_text.append(element)
             elif element.isdigit():
                 pass
-            else:
-                if not index:
-                    pass
-                elif tokenized_text[-1] != self._end_of_word_token:
-                    tokenized_text.append(self._end_of_word_token)
+            elif not index:
+                pass
+            elif tokenized_text[-1] != self._end_of_word_token:
+                tokenized_text.append(self._end_of_word_token)
 
         if not tokenized_text:
             return None
@@ -202,9 +201,9 @@ class TextProcessor:
             return None
 
         for key in content['freq']:
-            for n_gram in key:
-                if n_gram.isalpha():
-                    self._put(n_gram)
+            for element in key:
+                if element.isalpha():
+                    self._put(element.lower())
 
     def _decode(self, corpus: tuple[int, ...]) -> Optional[tuple[str, ...]]:
         """
@@ -385,16 +384,8 @@ class NGramLanguageModel:
         """
         if not isinstance(encoded_corpus, tuple) or not encoded_corpus:
             return None
-
-        n_grams_list = []
-        for index, number in enumerate(encoded_corpus):
-            if index == len(encoded_corpus) - (self._n_gram_size - 1):
-                break
-            n_gram = []
-            n_gram.extend(encoded_corpus[index:index + self._n_gram_size])
-            n_grams_list.append(tuple(n_gram))
-
-        return tuple(n_grams_list)
+        return tuple(encoded_corpus[index:index + self._n_gram_size]
+                     for index in range(len(encoded_corpus) - 1))
 
 
 class GreedyTextGenerator:
@@ -434,26 +425,25 @@ class GreedyTextGenerator:
         if not isinstance(seq_len, int) or not isinstance(prompt, str) or not prompt:
             return None
 
-        encoded_text_tuple = self._text_processor.encode(prompt)
-        if encoded_text_tuple is None:
+        n_gram_size = self._model.get_n_gram_size()
+        encoded = self._text_processor.encode(prompt)
+        if not encoded or not n_gram_size:
             return None
-        encoded_text_list = list(encoded_text_tuple)
 
-        for i in range(seq_len):
-            possible_tokens = self._model.generate_next_token(encoded_text_tuple)
-            if possible_tokens is None:
-                return None
-            if not possible_tokens:
+        max_freq = []
+        for _ in range(seq_len):
+            tokens = self._model.generate_next_token(encoded[-n_gram_size + 1:])
+            if not tokens:
                 break
-            possible_tokens_list = list(possible_tokens.items())
-            possible_tokens_list.sort(key=operator.itemgetter(1,0), reverse=True)
+            max_freq.append(max(tokens.values()))
+            candidates_max = filter(lambda token_freq: token_freq[1] == max_freq[-1],
+                                    tokens.items())
+            encoded += (sorted(candidates_max)[0][0],)
 
-            encoded_text_list.append(possible_tokens_list[0][0])
-            encoded_text_tuple = tuple(encoded_text_list)
-
-        decoded_text = self._text_processor.decode(encoded_text_tuple)
-
-        return decoded_text
+        text = self._text_processor.decode(encoded)
+        if not text:
+            return None
+        return text
 
 
 class BeamSearcher:
@@ -679,11 +669,7 @@ class BeamSearchTextGenerator:
         if not isinstance(sequence_to_continue, tuple) or not sequence_to_continue:
             return None
 
-        next_token = self.beam_searcher.get_next_token(sequence_to_continue)
-        if next_token is None:
-            return None
-
-        return next_token
+        return self.beam_searcher.get_next_token(sequence_to_continue)
 
 
 class NGramLanguageModelReader:
@@ -766,6 +752,7 @@ class NGramLanguageModelReader:
         Returns:
             TextProcessor: processor created for the current JSON file.
         """
+        return self._text_processor
 
 
 class BackOffGenerator:
@@ -789,7 +776,8 @@ class BackOffGenerator:
             language_models (tuple[NGramLanguageModel]): Language models to use for text generation
             text_processor (TextProcessor): A TextProcessor instance to handle text processing
         """
-
+        self._language_models = {lang_model.get_n_gram_size(): lang_model for lang_model in language_models}
+        self._text_processor = text_processor
 
     def run(self, seq_len: int, prompt: str) -> Optional[str]:
         """
@@ -805,6 +793,26 @@ class BackOffGenerator:
         In case of corrupt input arguments or methods used return None,
         None is returned
         """
+        if not isinstance(seq_len, int) or not isinstance(prompt, str) or not prompt:
+            return None
+
+        encoded_sequence = self._text_processor.encode(prompt)
+        if not encoded_sequence:
+            return None
+        for _ in range(seq_len):
+            candidates = self._get_next_token(encoded_sequence)
+            if not candidates:
+                break
+            max_probability = max(candidates.values())
+            best_candidates = []
+            for element, freq in candidates.items():
+                if freq == max_probability:
+                    best_candidates.append(element)
+            encoded_sequence += (best_candidates[0],)
+        decoded = self._text_processor.decode(encoded_sequence)
+        if not decoded:
+            return None
+        return decoded
 
     def _get_next_token(self, sequence_to_continue: tuple[int, ...]) -> Optional[dict[int, float]]:
         """
@@ -819,3 +827,20 @@ class BackOffGenerator:
 
         In case of corrupt input arguments return None.
         """
+        if not isinstance(sequence_to_continue, tuple) or not sequence_to_continue:
+            return None
+
+        ngram_size_list = list(self._language_models.keys())
+        if not ngram_size_list:
+            return None
+        ngram_size_list.sort(reverse=True)
+        for ngram_size in ngram_size_list:
+            candidates = self._language_models[ngram_size].generate_next_token(sequence_to_continue)
+            if candidates is None:
+                return None
+            if not candidates:
+                continue
+            else:
+                return candidates
+
+        return None
