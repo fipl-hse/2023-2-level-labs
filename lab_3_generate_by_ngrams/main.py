@@ -4,6 +4,7 @@ Lab 3.
 Beam-search and natural language generation evaluation
 """
 # pylint:disable=too-few-public-methods
+import math
 from typing import Optional
 
 
@@ -142,9 +143,7 @@ class TextProcessor:
         In case of corrupt input arguments or invalid argument length,
         an element is not added to storage
         """
-        if not isinstance(element, str):
-            return None
-        if len(element) == 1 and element not in self._storage:
+        if isinstance(element, str) and len(element) == 1 and element not in self._storage:
             self._storage[element] = len(self._storage)
 
     def decode(self, encoded_corpus: tuple[int, ...]) -> Optional[str]:
@@ -464,10 +463,10 @@ class BeamSearcher:
 
         In case of corrupt input arguments or unexpected behaviour of methods used return None.
         """
-        if (not isinstance(sequence, tuple) and not isinstance(next_tokens, list)
-            and not isinstance(sequence_candidates, dict) and not sequence
-            and not next_tokens and not sequence_candidates and len(next_tokens) > self._beam_width
-            and sequence not in sequence_candidates):
+        if not (isinstance(sequence, tuple) and isinstance(next_tokens, list)
+                and isinstance(sequence_candidates, dict) and sequence
+                and next_tokens and sequence_candidates and len(next_tokens) <= self._beam_width
+                and sequence in sequence_candidates):
             return None
         for token in next_tokens:
             new_sequence = sequence + (token[0],)
