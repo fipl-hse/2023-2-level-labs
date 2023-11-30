@@ -7,6 +7,7 @@ Beam-search and natural language generation evaluation
 from typing import Optional
 import math
 import operator
+import json
 
 
 class TextProcessor:
@@ -197,6 +198,13 @@ class TextProcessor:
         Args:
             content (dict): ngrams from external JSON
         """
+        if not isinstance(content, dict) or not content:
+            return None
+
+        for key in content['freq']:
+            for n_gram in key:
+                if n_gram.isalpha():
+                    self._put(n_gram)
 
     def _decode(self, corpus: tuple[int, ...]) -> Optional[tuple[str, ...]]:
         """
@@ -297,6 +305,10 @@ class NGramLanguageModel:
         Args:
             frequencies (dict): Computed in advance frequencies for n-grams
         """
+        if not isinstance(frequencies, dict) or not frequencies:
+            return None
+
+        self._n_gram_frequencies.update(frequencies)
 
     def build(self) -> int:
         """
@@ -692,6 +704,14 @@ class NGramLanguageModelReader:
             json_path (str): Local path to assets file
             eow_token (str): Special token for text processor
         """
+        self._json_path = json_path
+        self._eow_token = eow_token
+        self._text_processor = TextProcessor(self._eow_token)
+
+        with open(self._json_path, 'r', encoding='utf-8') as file:
+            json_text = json.load(file)
+        self._content = json_text
+        self._text_processor.fill_from_ngrams(self._content)
 
     def load(self, n_gram_size: int) -> Optional[NGramLanguageModel]:
         """
@@ -708,6 +728,36 @@ class NGramLanguageModelReader:
 
         In case of corrupt input arguments or unexpected behaviour of methods used, return 1.
         """
+        if not isinstance(n_gram_size, int) or not n_gram_size or n_gram_size < 2:
+            return None
+
+        frequencies = {}
+        for key in self._content['freq']:
+            encoded = []
+            for element in key:
+                if element == ' ':
+                    encoded.append(0)
+                elif element.isalpha():
+                    encoded.append(self._text_processor.get_id(element.lower()))
+
+            if tuple(encoded) not in frequencies:
+                frequencies[tuple(encoded)] = 0
+            frequencies[tuple(encoded)] += self._content['freq'][key]
+
+        right_ngrams = {}
+        for ngram in frequencies:
+            if len(ngram) == n_gram_size:
+                abs_freq = frequencies[ngram]
+                rel_freq = 0
+                for ngram_to_compare in frequencies:
+                    if ngram_to_compare[:n_gram_size - 1] == ngram[:n_gram_size - 1]:
+                        rel_freq += 1
+                freq = abs_freq / rel_freq
+                right_ngrams[ngram] = freq
+
+        lang_model = NGramLanguageModel(None, n_gram_size)
+        lang_model.set_n_grams(right_ngrams)
+        return lang_model
 
     def get_text_processor(self) -> TextProcessor:  # type: ignore[empty-body]
         """
@@ -739,6 +789,7 @@ class BackOffGenerator:
             language_models (tuple[NGramLanguageModel]): Language models to use for text generation
             text_processor (TextProcessor): A TextProcessor instance to handle text processing
         """
+
 
     def run(self, seq_len: int, prompt: str) -> Optional[str]:
         """
