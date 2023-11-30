@@ -12,6 +12,7 @@ andreikashchikhin
 andrey
 answers
 apidoc
+apple
 are
 arg
 args
@@ -74,6 +75,7 @@ content
 contents
 context
 continue
+conversion
 corncob
 corpus
 count
@@ -98,6 +100,7 @@ docstring
 done
 download
 drive
+dto
 dursley
 edit
 edition
@@ -117,6 +120,7 @@ error
 es
 escape
 est
+estimation
 evaluation
 exam
 examiner
@@ -155,10 +159,7 @@ generate
 generationresultdto
 generator
 generatorrulestudent
-generatorrulestudent
 generators
-generators
-generatortypes
 generatortypes
 geo
 geometric
@@ -195,6 +196,7 @@ itertools
 javascript
 join
 json
+juice
 kashchikhin
 knn
 kwargs
@@ -212,18 +214,19 @@ ln
 load
 locations
 log
+love
 lutz
 mac
 macos
 made
 main
+math
 max
 mean
 merge
 message
 meth
 metric
-missing
 missing
 mle
 model
@@ -313,6 +316,7 @@ pyproject
 pytest
 python
 qualitychecker
+question
 questions
 random
 range
@@ -323,6 +327,7 @@ report
 repository
 request
 requests
+result
 return
 rst
 ru
@@ -387,6 +392,7 @@ top-p
 toppgenerator
 topprulestudent
 train
+transfer
 translation
 trigram
 trigrams
@@ -429,11 +435,3 @@ working-pipeline
 xfplx
 xx
 you
-DTO
-Transfer
-conversion
-apple
-estimation
-juice
-love
-result
