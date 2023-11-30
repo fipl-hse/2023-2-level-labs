@@ -289,8 +289,8 @@ class NGramLanguageModel:
             if not isinstance(n_gram, tuple):
                 return 1
             n_gram_freq = n_grams.count(n_gram)
-            beginning_freq = len([id for id in n_grams if
-                                       id[:-1] == n_gram[:-1]])
+            beginning_freq = len([n_gram_id for n_gram_id in n_grams if
+                                       n_gram_id[:-1] == n_gram[:-1]])
             self._n_gram_frequencies[n_gram] = n_gram_freq / beginning_freq
         return 0
 
