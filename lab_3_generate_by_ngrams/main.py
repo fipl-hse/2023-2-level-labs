@@ -221,11 +221,10 @@ class TextProcessor:
         """
         if not isinstance(decoded_corpus, tuple) or not decoded_corpus:
             return None
-        decoded_text = decoded_corpus[0].upper()
-        for element in decoded_corpus[1:]:
-            decoded_text = (decoded_text.replace(self._end_of_word_token, '') + element
-                            if element != self._end_of_word_token else f'{decoded_text}')         
-        return f'{decoded_text}.'
+        decoded_text = "".join(decoded_corpus)
+        decoded_text = decoded_text.replace(self._end_of_word_token, " ")
+        decoded_text = decoded_text[0].upper() + decoded_text[1:]         
+        return f"{text[:-1:]}."
 
 
 class NGramLanguageModel:
