@@ -3,9 +3,10 @@ Lab 3.
 
 Beam-search and natural language generation evaluation
 """
+import math
 # pylint:disable=too-few-public-methods
 from typing import Optional
-import math
+
 
 
 class TextProcessor:
@@ -633,7 +634,6 @@ class BeamSearchTextGenerator:
                 return None
 
             sequences_candidates_dict = best_sequences
-
         decoded_sequence = self._text_processor.decode(sorted(tuple(sequences_candidates_dict), key=lambda pair: pair[1])[0])
 
         return decoded_sequence
