@@ -17,7 +17,7 @@ def main() -> None:
     if not isinstance(encoded_text, tuple) and encoded_text:
         return
 
-    result = text_processor.decode(encoded_text)[:100]
+    result = str(text_processor.decode(encoded_text))
     print(result)
 
     model = main_py.NGramLanguageModel(encoded_text[:100], n_gram_size=3)
