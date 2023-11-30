@@ -222,13 +222,9 @@ class TextProcessor:
         if not isinstance(decoded_corpus, tuple) or not decoded_corpus:
             return None
         decoded_text = decoded_corpus[0].upper()
-        for element in decoded_corpus[1:-1]:
-            if element == self._end_of_word_token:
-                decoded_text = f'{decoded_text} '
-            else:
-                decoded_text += element
-        if decoded_corpus[-1] != self._end_of_word_token:
-            decoded_text += decoded_corpus[-1]
+        for element in decoded_corpus[1:]:
+            decoded_text = (decoded_text.replace(self._end_of_word_token, '') + element
+                            if element != self._end_of_word_token else f'{decoded_text}')         
         return f'{decoded_text}.'
 
 
