@@ -32,9 +32,11 @@ class WordProcessor(TextProcessor):
         """
         if not isinstance(text, str) or not text:
             raise ValueError
+
         for symbol in ['.', '!', '?']:
             if symbol in text:
                 text = text.replace(symbol, f" {self._end_of_word_token} ")
+
         clean_text = []
         for word in text.lower().split():
             if word == self._end_of_word_token or word.isalpha() or word.isspace():
@@ -46,6 +48,7 @@ class WordProcessor(TextProcessor):
                         clean_word.append(alpha)
                 if clean_word:
                     clean_text.append("".join(clean_word))
+
         return tuple(clean_text)
 
     def _put(self, element: str) -> None:
@@ -86,10 +89,13 @@ class WordProcessor(TextProcessor):
         """
         if not isinstance(decoded_corpus, tuple) or not decoded_corpus:
             raise ValueError
+
         decoded_corpus = " ".join(decoded_corpus).replace(f" {self._end_of_word_token}", ".")
         decoded_corpus = ". ".join([sentence.capitalize() for sentence in decoded_corpus.split(". ")])
+
         if decoded_corpus[-1] != ".":
             decoded_corpus += "."
+
         return decoded_corpus
 
 
@@ -136,25 +142,37 @@ class TopPGenerator:
                 or if sequence has inappropriate length,
                 or if methods used return None.
         """
-        if not isinstance(seq_len, int) or not isinstance(prompt, str) or not prompt:
+        if not isinstance(seq_len, int) or seq_len < 0 or not isinstance(prompt, str) or not prompt:
             raise ValueError
-        cur_seq_len = 0
+
         encoded = self._word_processor.encode(prompt)
         if not encoded:
             raise ValueError
-        while cur_seq_len <= seq_len:
-            next_tokens = dict(sorted(self._model.generate_next_token(encoded)), reverse=True)
-            if not next_tokens or None in next_tokens:
+
+        cur_seq_len = 0
+        while cur_seq_len < seq_len:
+            next_tokens = self._model.generate_next_token(encoded)
+            if next_tokens is None:
                 raise ValueError
+            if not next_tokens:
+                break
+
+            sorted_next_tokens = sorted(next_tokens.items(), key=lambda item: (item[1], -item[0]), reverse=True)
+
             sum_p = 0
             taken_n = []
-            for token, freq in next_tokens.items():
+            for token in sorted_next_tokens:
                 if sum_p < self._p_value:
-                    sum_p += freq
-                    taken_n.append(token)
+                    sum_p += token[1]
+                    taken_n.append(token[0])
             chosen = random.choice(taken_n)
             encoded += (chosen,)
+            cur_seq_len += 1
+
         decoded = self._word_processor.decode(encoded)
+        if decoded is None:
+            raise ValueError
+
         return decoded
 
 

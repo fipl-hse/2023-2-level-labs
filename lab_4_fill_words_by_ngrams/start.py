@@ -12,9 +12,10 @@ def main() -> None:
     """
     with open("./assets/Harry_Potter.txt", "r", encoding="utf-8") as text_file:
         text = text_file.read()
-    word_proc = WordProcessor('<eos>')
+    word_proc = WordProcessor('<eow>')
     encoded = word_proc.encode(text)
-    lang_model = NGramLanguageModel(encoded, n_gram_size=2)
+    lang_model = NGramLanguageModel(encoded[:20000], n_gram_size=2)
+    lang_model.build()
     top_p = TopPGenerator(language_model=lang_model, word_processor=word_proc, p_value=0.5)
     result = top_p.run(51, "Vernon")
     print(result)
