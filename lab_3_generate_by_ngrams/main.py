@@ -639,7 +639,8 @@ class BeamSearchTextGenerator:
                     return None
 
                 possible_sequences = self.beam_searcher.continue_sequence(sequence,
-                                                                          next_tokens, updated_candidates)
+                                                                          next_tokens,
+                                                                          updated_candidates)
                 if not possible_sequences:
                     return self._text_processor.decode(sorted(tuple(updated_candidates),
                                                               key=lambda x: x[1])[0])
@@ -738,15 +739,15 @@ class NGramLanguageModelReader:
             frequencies[tuple(encoded)] += self._content['freq'][key]
 
         right_ngrams = {}
-        for ngram in frequencies:
-            if len(ngram) == n_gram_size:
-                abs_freq = frequencies[ngram]
+        for key, value in frequencies.items():
+            if len(key) == n_gram_size:
+                abs_freq = value
                 rel_freq = 0
-                for ngram_to_compare in frequencies:
-                    if ngram_to_compare[:n_gram_size - 1] == ngram[:n_gram_size - 1]:
-                        rel_freq += frequencies[ngram_to_compare]
+                for ngram_to_compare, frequency in frequencies.items():
+                    if ngram_to_compare[:n_gram_size - 1] == key[:n_gram_size - 1]:
+                        rel_freq += frequency
                 freq = abs_freq / rel_freq
-                right_ngrams[ngram] = freq
+                right_ngrams[key] = freq
 
         lang_model = NGramLanguageModel(None, n_gram_size)
         lang_model.set_n_grams(right_ngrams)
@@ -848,7 +849,6 @@ class BackOffGenerator:
                 return None
             if not candidates:
                 continue
-            else:
-                return candidates
+            return candidates
 
         return None
