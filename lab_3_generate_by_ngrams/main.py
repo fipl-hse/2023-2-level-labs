@@ -184,11 +184,11 @@ class TextProcessor:
         if decoded_corpus is None:
             return None
 
-        postpocessed_text = self._postprocess_decoded_text(decoded_corpus)
-        if postpocessed_text is None:
+        postprocessed_text = self._postprocess_decoded_text(decoded_corpus)
+        if postprocessed_text is None:
             return None
 
-        return postpocessed_text
+        return postprocessed_text
 
     def fill_from_ngrams(self, content: dict) -> None:
         """
@@ -495,7 +495,7 @@ class BeamSearcher:
             return []
 
         possible_tokens_list = list(possible_tokens.items())
-        sorted_tokens_list = sorted(possible_tokens_list, key=operator.itemgetter(1,0), reverse=True)
+        sorted_tokens_list = sorted(possible_tokens_list, key=operator.itemgetter(1, 0), reverse=True)
         best_tokens = sorted_tokens_list[:self._beam_width]
 
         return best_tokens
