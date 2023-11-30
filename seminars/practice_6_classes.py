@@ -206,15 +206,15 @@ class Insect:
      def introduce(self):
          print(f'Hi! My name is {self.name} and I have {self.legs} legs')
 
- bee = Insect('Bee', 6)
- bee.introduce()  # Hi! My name is Bee and I have 6 legs
- spider = Insect('Spider', 8)
- spider.introduce()  # Hi! My name is Spider and I have 8 legs
+ #bee = Insect('Bee', 6)
+ #bee.introduce()  # Hi! My name is Bee and I have 6 legs
+ #spider = Insect('Spider', 8)
+ #spider.introduce()  # Hi! My name is Spider and I have 8 legs
 
 
 # Task 4
 # medium level
- class Student:
+ #class Student:
     """
 #     If I have less than three deadlines, my mood is Good!
 #     If I have from 3 to 5 deadlines, my mood is So-so...
