@@ -223,8 +223,10 @@ class TextProcessor:
             return None
         decoded_text = "".join(decoded_corpus)
         decoded_text = decoded_text.replace(self._end_of_word_token, " ")
-        decoded_text = decoded_text[0].upper() + decoded_text[1:]
-        return f"{decoded_text[:-1:]}."
+        decoded_text = (decoded_text[0].upper() + decoded_text[1:-1] if
+                        decoded_text[-1] == " " else
+                        decoded_text[0].upper() + decoded_text[1:])
+        return f"{decoded_text}."
 
 
 class NGramLanguageModel:
