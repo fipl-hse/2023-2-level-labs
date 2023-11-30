@@ -178,7 +178,7 @@ print('*' * 15 + ' TASKS ' + '*' * 15)
 class Deadline:
 
      def __init__(self):
-         print("Oh, no! It is another deadline!"
+         print("Oh, no! It is another deadline!")
 
 # fill the gaps so that the next line prints: "Oh, no! It is another deadline!"
 deadline = Deadline()
