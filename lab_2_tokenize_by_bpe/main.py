@@ -21,8 +21,7 @@ def prepare_word(
     word = []
     if start_of_word:
         word.append(start_of_word)
-    for i in raw_word:
-        word.append(i)
+    word.extend(raw_word)
     if end_of_word:
         word.append(end_of_word)
     return tuple(word)
@@ -118,10 +117,9 @@ def train(
     dict_with_pairs = count_tokens_pairs(word_frequencies)
     if not dict_with_pairs:
         return None
+    merges = num_merges
     if num_merges > len(dict_with_pairs):
         merges = len(dict_with_pairs)
-    else:
-        merges = num_merges
 
     for i in range(merges):
         max_values = max(dict_with_pairs.values())
