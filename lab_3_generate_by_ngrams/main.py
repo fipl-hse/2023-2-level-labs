@@ -294,10 +294,8 @@ class NGramLanguageModel:
         Args:
             frequencies (dict): Computed in advance frequencies for n-grams
         """
-        if not isinstance(frequencies, dict) or len(frequencies) == 0:
-            return None
-        self._n_gram_frequencies = frequencies
-        return None
+        if isinstance(frequencies, dict) and frequencies:
+            self._n_gram_frequencies = frequencies
 
     def build(self) -> int:
         """
