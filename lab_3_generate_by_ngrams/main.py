@@ -623,7 +623,8 @@ class BeamSearchTextGenerator:
                 possible_tokens = self._get_next_token(sequence)
                 if not possible_tokens:
                     return None
-                possible_sequences = self.beam_searcher.continue_sequence(sequence, possible_tokens, new_sequences)
+                possible_sequences = (
+                    self.beam_searcher.continue_sequence(sequence, possible_tokens, new_sequences))
                 if not possible_sequences:
                     return self._text_processor.decode(
                         sorted(tuple(sequences_candidates_dict), key=lambda pair: pair[1])[0])
