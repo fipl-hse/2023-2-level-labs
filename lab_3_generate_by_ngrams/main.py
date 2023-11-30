@@ -557,7 +557,7 @@ class BeamSearcher:
             return None
 
         sorted_sequences = sorted(sequence_candidates.items(), key=lambda x: (x[1], x[0]))
-        pruned_sequences_dict = {sequence: frequency for sequence, frequency in sorted_sequences[:self._beam_width]}
+        pruned_sequences_dict = dict(sorted_sequences[:self._beam_width])
 
         return pruned_sequences_dict
 
