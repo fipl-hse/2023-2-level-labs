@@ -62,6 +62,18 @@ def calculate_mse(predicted: list, actual: list) -> float | None:
     :param actual: a list of actual values
     :return: the score
     """
+    if not isinstance(predicted, list):
+        return None
+    if not isinstance(actual, list):
+        return None
+    if not len(predicted) == len(actual):
+        return None
+
+    sum_diff = 0
+    for freq_value in zip(predicted, actual):
+        sum_diff += (freq_value[0] - freq_value[1]) ** 2
+    mse = sum_diff / len(predicted)
+    return mse
 
 
 def compare_profiles(
@@ -74,6 +86,27 @@ def compare_profiles(
     :param profile_to_compare: a dictionary of a profile to compare the unknown profile to
     :return: the distance between the profiles
     """
+    if not isinstance(unknown_profile, dict):
+        return None
+    if 'name' not in unknown_profile:
+        return None
+    if 'freq' not in unknown_profile:
+        return None
+    if not isinstance(profile_to_compare, dict):
+        return None
+    if 'name' not in profile_to_compare:
+        return None
+    if 'freq' not in profile_to_compare:
+        return None
+
+    all_tokens = set(unknown_profile['freq'].keys()) | set(profile_to_compare['freq'].keys())
+    lang1_freq = []
+    lang2_freq = []
+    for token in all_tokens:
+        lang1_freq.append(unknown_profile['freq'].get(token, 0))
+        lang2_freq.append(profile_to_compare['freq'].get(token, 0))
+
+    return calculate_mse(lang1_freq, lang2_freq)
 
 
 def detect_language(
@@ -88,6 +121,27 @@ def detect_language(
     :param profile_2: a dictionary of a known profile
     :return: a language
     """
+    if not isinstance(unknown_profile, dict):
+        return None
+    if not isinstance(profile_1, dict):
+        return None
+    if not isinstance(profile_2, dict):
+        return None
+
+    profile_1_mse = compare_profiles(unknown_profile, profile_1)
+    profile_2_mse = compare_profiles(unknown_profile, profile_2)
+
+    if not isinstance(profile_1_mse, float):
+        return None
+    if not isinstance(profile_2_mse, float):
+        return None
+
+    if profile_1_mse > profile_2_mse:
+        return str(profile_2['name'])
+    if profile_1_mse < profile_2_mse:
+        return str(profile_1['name'])
+    else:
+        return [profile_1['name'], profile_2['name']].sort()
 
 
 def load_profile(path_to_file: str) -> dict | None:
