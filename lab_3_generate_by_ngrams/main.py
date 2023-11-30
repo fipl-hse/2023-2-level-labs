@@ -8,7 +8,6 @@ import math
 from typing import Optional
 
 
-
 class TextProcessor:
     """
     Handle text tokenization, encoding and decoding.
