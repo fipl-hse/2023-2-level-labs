@@ -134,21 +134,16 @@ class TextProcessor:
             return None
 
         tokenized_text = self._tokenize(text)
-        if tokenized_text is None:
+        if tokenized_text is None or not tokenized_text:
             return None
-
-        for token in tokenized_text:
-            self._put(token)
 
         processed_text = []
         for token in tokenized_text:
-            if self.get_id(token) is None:
+            self._put(token)
+            identifier = self.get_id(token)
+            if not isinstance(identifier, int):
                 return None
-            processed_text.append(self.get_id(token))
-
-        for ident in processed_text:
-            if not isinstance(ident, int):
-                return None
+            processed_text.append(identifier)
 
         return tuple(processed_text)
 
@@ -229,17 +224,14 @@ class TextProcessor:
 
         decoded_corpus = []
         for identifier in corpus:
-            if self.get_token(identifier) is not None:
-                decoded_corpus.append(self.get_token(identifier))
-
-        if decoded_corpus is None or not decoded_corpus:
-            return None
-
-        for token in decoded_corpus:
-            if not isinstance(token, str):
+            if not isinstance(identifier, int):
                 return None
+            token = self.get_token(identifier)
+            if not token:
+                return None
+            decoded_corpus.append(token)
 
-        return (*decoded_corpus, )
+        return tuple(decoded_corpus)
 
     def _postprocess_decoded_text(self, decoded_corpus: tuple[str, ...]) -> Optional[str]:
         """
