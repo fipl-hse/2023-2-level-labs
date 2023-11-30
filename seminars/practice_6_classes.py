@@ -212,43 +212,6 @@ class Insect:
  #spider.introduce()  # Hi! My name is Spider and I have 8 legs
 
 
-# Task 4
-# medium level
- #class Student:
-    """
-#     If I have less than three deadlines, my mood is Good!
-#     If I have from 3 to 5 deadlines, my mood is So-so...
-#     If I have more than 5 deadlines, my mood is Bad!!!
-#     """
-
-
-# implement a class so that the following code works
-# student = Student(2)
-# print(student.mood())  # Good
-# student.deadlines = 4
-# print(student.mood())  # So-so
-# student.deadlines = 1000
-# print(student.mood())  # Bad
-
-# Task 5
-# medium level
- class Square:
-     def __init__(self, side_length: float) -> None:
-         self.side_length = side_length
-
-     def get_area(self) -> float:
-         return self.side_length**2
-
-     def get_perimeter(self) -> float:
-         return self.side_length*4
-
- square1 = Square(side_length=2)
- print(square1.get_area(), square1.get_perimeter())  # 4 8
-#
- square2 = Square(side_length=5.12)
- print(square2.get_area(), square2.get_perimeter())  # 26.2144 20.48
-
-
 # Task 6
 # hard level
 # Imagine you have to create a class to represent a learning discipline.
