@@ -131,8 +131,8 @@ class TopPGenerator:
                 or if sequence has inappropriate length,
                 or if methods used return None.
         """
-        if not(isinstance(seq_len, int) and seq_len > 0
-               and isinstance(prompt, str) and prompt):
+        if not (isinstance(seq_len, int) and seq_len > 0
+                and isinstance(prompt, str) and prompt):
             raise ValueError
         encoded_text = self._word_processor.encode(prompt)
         if not encoded_text:
@@ -148,8 +148,8 @@ class TopPGenerator:
             for word, value in next_tokens.items():
                 probability += value
                 probable_words.append((word, value))
-            if probability < self._p_value:
-                break
+                if probability >= self._p_value:
+                    break
             sorted_words = sorted(probable_words, key=lambda x: (x[1], x[0]), reverse=True)
             words = [pair[0] for pair in sorted_words]
             random_word = random.choice(words)
