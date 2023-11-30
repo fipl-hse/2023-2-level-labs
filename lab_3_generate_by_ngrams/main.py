@@ -533,7 +533,8 @@ class BeamSearcher:
             return None
 
         for token in next_tokens:
-            sequence_candidates[sequence + (token[0],)] = sequence_candidates[sequence] - math.log(token[1])
+            sequence_candidates[sequence + (token[0],)] = (
+                    sequence_candidates[sequence] - math.log(token[1]))
 
         del sequence_candidates[sequence]
 
@@ -622,7 +623,6 @@ class BeamSearchTextGenerator:
                 possible_tokens = self._get_next_token(sequence)
                 if not possible_tokens:
                     return None
-
                 possible_sequences = self.beam_searcher.continue_sequence(sequence, possible_tokens, new_sequences)
                 if not possible_sequences:
                     return self._text_processor.decode(
