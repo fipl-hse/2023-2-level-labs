@@ -14,7 +14,7 @@ def main() -> None:
     encoded_text = word_processor.encode(text)
     model = NGramLanguageModel(encoded_text, 2)
     model.build()
-    top_p = TopPGenerator(model, word_processor, 0,5)
+    top_p = TopPGenerator(model, word_processor, 0.5)
     result = top_p.run(51, 'Vernon')
     print(result)
     assert result
