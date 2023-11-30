@@ -67,7 +67,7 @@ def calculate_mse(predicted: list, actual: list) -> float | None:
         return None
     if not isinstance(actual, list):
         return None
-    if not len(predicted) == len(actual):
+    if len(predicted) != len(actual):
         return None
 
     sum_diff = 0
