@@ -25,6 +25,8 @@ def main() -> None:
         greedy_text_generator = main_py.GreedyTextGenerator(model2, text_processor)
         print(greedy_text_generator.run(51, 'Vernon'))
 
+        greedy = main_py.BeamSearchTextGenerator(model2, text_processor, 7)
+        print(greedy.run('Vernon', 56))
         assert result
 
 
