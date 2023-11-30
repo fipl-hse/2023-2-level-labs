@@ -137,7 +137,6 @@ class TopPGenerator:
         encoded_text = self._word_processor.encode(prompt)
         if not encoded_text:
             raise ValueError
-        encoded = list(encoded_text)
         for iteration in range(seq_len):
             next_tokens = self._model.generate_next_token(encoded_text)
             if next_tokens is None:
@@ -151,11 +150,11 @@ class TopPGenerator:
                 probable_words.append((word, value))
             if probability >= self._p_value:
                 break
-            sorted_words = sorted(probable_words, key=lambda x: x[1])
+            sorted_words = sorted(probable_words, key=lambda x: (x[1], x[0]), reverse=True)
             words = [pair[0] for pair in sorted_words]
             random_word = random.choice(words)
-            encoded.append(random_word)
-        decoded = self._word_processor.decode(tuple(encoded))
+            encoded_text += (random_word,)
+        decoded = self._word_processor.decode(encoded_text)
         if not decoded:
             raise ValueError
         return decoded
@@ -174,6 +173,9 @@ class GeneratorTypes:
         """
         Initialize an instance of GeneratorTypes.
         """
+        self.greedy = 0
+        self.top_p = 1
+        self.beam_search = 2
 
     def get_conversion_generator_type(self, generator_type: int) -> str:  # type: ignore
         """
