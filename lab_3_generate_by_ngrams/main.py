@@ -144,7 +144,8 @@ class TextProcessor:
         for token in tokenized_text:
             if self.get_id(token) is None:
                 return None
-            processed_text.append(self.get_id(token))
+            elif isinstance(self.get_id(token), int):
+                processed_text.append(self.get_id(token))
 
         return (*processed_text, )
 
@@ -225,7 +226,7 @@ class TextProcessor:
 
         decoded_corpus = []
         for identifier in corpus:
-            if self.get_token(identifier) is not None:
+            if isinstance(self.get_token(identifier), str):
                 decoded_corpus.append(self.get_token(identifier))
 
         if decoded_corpus is None or not decoded_corpus:
