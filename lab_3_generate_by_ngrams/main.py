@@ -25,7 +25,7 @@ class TextProcessor:
             end_of_word_token (str): A token denoting word boundary
         """
         self._end_of_word_token = end_of_word_token
-        self._storage = {self._end_of_word_token: 0}
+        self._storage = {end_of_word_token: 0}
 
     def _tokenize(self, text: str) -> Optional[tuple[str, ...]]:
         """
@@ -53,7 +53,7 @@ class TextProcessor:
         for element in listed_text:
             if element.isalpha():
                 tokenized_text.append(element)
-            elif element in string.punctuation or element == ' ':
+            elif element in string.punctuation or element.isspace():
                 if tokenized_text[-1] != self._end_of_word_token:
                     tokenized_text.append(self._end_of_word_token)
         return tuple(tokenized_text)
@@ -221,7 +221,6 @@ class TextProcessor:
             return None
         string_text = ''
         string_text = ''.join([string_text, decoded_corpus[0].upper()])
-        print(string_text)
         for element in decoded_corpus[1:-1]:
             if element.isalpha():
                 string_text = ''.join([string_text, element])
