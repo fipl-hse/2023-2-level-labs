@@ -144,10 +144,13 @@ class TextProcessor:
         for token in tokenized_text:
             if self.get_id(token) is None:
                 return None
-            elif isinstance(self.get_id(token), int):
-                processed_text.append(self.get_id(token))
+            processed_text.append(self.get_id(token))
 
-        return (*processed_text, )
+        for ident in processed_text:
+            if not isinstance(ident, int):
+                return None
+
+        return tuple(processed_text)
 
     def _put(self, element: str) -> None:
         """
@@ -226,11 +229,15 @@ class TextProcessor:
 
         decoded_corpus = []
         for identifier in corpus:
-            if isinstance(self.get_token(identifier), str):
+            if self.get_token(identifier) is not None:
                 decoded_corpus.append(self.get_token(identifier))
 
         if decoded_corpus is None or not decoded_corpus:
             return None
+
+        for token in decoded_corpus:
+            if not isinstance(token, str):
+                return None
 
         return (*decoded_corpus, )
 
