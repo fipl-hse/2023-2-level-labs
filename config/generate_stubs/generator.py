@@ -57,7 +57,8 @@ def cleanup_code(source_code_path: Path) -> str:
     with source_code_path.open(encoding='utf-8') as file:
         data_2 = ast_comments.parse(file.read(), source_code_path.name)
 
-    accepted_modules: dict[str, list[str]] = {'typing': ['*'], 'pathlib': ['Path']}
+    accepted_modules: dict[str, list[str]] = {'typing': ['*'], 'pathlib': ['Path'],
+                                              'lab_3_generate_by_ngrams.main': ['*']}
 
     new_decl: list[stmt] = []
 
