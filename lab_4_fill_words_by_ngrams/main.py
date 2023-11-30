@@ -148,7 +148,7 @@ class TopPGenerator:
             for word, value in next_tokens.items():
                 probability += value
                 probable_words.append((word, value))
-            if probability >= self._p_value:
+            if probability < self._p_value:
                 break
             sorted_words = sorted(probable_words, key=lambda x: (x[1], x[0]), reverse=True)
             words = [pair[0] for pair in sorted_words]
