@@ -751,7 +751,7 @@ class NGramLanguageModelReader:
                 rel_freq = 0
                 for ngram_to_compare in frequencies:
                     if ngram_to_compare[:n_gram_size - 1] == ngram[:n_gram_size - 1]:
-                        rel_freq += 1
+                        rel_freq += frequencies[ngram_to_compare]
                 freq = abs_freq / rel_freq
                 right_ngrams[ngram] = freq
 
