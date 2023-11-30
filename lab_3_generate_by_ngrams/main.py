@@ -4,8 +4,6 @@ Lab 3.
 Beam-search and natural language generation evaluation
 """
 # pylint:disable=too-few-public-methods
-import json
-import math
 from typing import Optional
 import math
 import operator
@@ -768,7 +766,6 @@ class NGramLanguageModelReader:
         Returns:
             TextProcessor: processor created for the current JSON file.
         """
-        return self._text_processor
 
 
 class BackOffGenerator:
@@ -792,8 +789,6 @@ class BackOffGenerator:
             language_models (tuple[NGramLanguageModel]): Language models to use for text generation
             text_processor (TextProcessor): A TextProcessor instance to handle text processing
         """
-        self._language_models = {model.get_n_gram_size(): model for model in language_models}
-        self._text_processor = text_processor
 
 
     def run(self, seq_len: int, prompt: str) -> Optional[str]:
@@ -810,39 +805,6 @@ class BackOffGenerator:
         In case of corrupt input arguments or methods used return None,
         None is returned
         """
-        if not (
-                isinstance(seq_len, int) and isinstance(prompt, str) and prompt
-        ):
-            return None
-
-        encoded_prompt = self._text_processor.encode(prompt)
-
-        if encoded_prompt is None:
-            return None
-
-        iteration = 1
-        generated_sequence = list(encoded_prompt)
-        while iteration <= seq_len:
-            next_token_candidates = None
-            for n_gram_size in sorted(self._language_models.keys(), reverse=True):
-                next_token_candidates = self._get_next_token(
-                    tuple(generated_sequence[-(n_gram_size - 1):]))
-                if next_token_candidates is not None and len(next_token_candidates) > 0:
-                    break
-
-            if next_token_candidates is None or len(next_token_candidates) == 0:
-                break
-
-            max_prob = max(next_token_candidates.values())
-            max_probability_token = [token for token, prob in next_token_candidates.items()
-                                     if prob == max_prob]
-            generated_sequence.append(max_probability_token[0])
-
-            iteration += 1
-
-        decoded_sequence = self._text_processor.decode(tuple(generated_sequence))
-
-        return decoded_sequence
 
     def _get_next_token(self, sequence_to_continue: tuple[int, ...]) -> Optional[dict[int, float]]:
         """
@@ -857,20 +819,3 @@ class BackOffGenerator:
 
         In case of corrupt input arguments return None.
         """
-        if not (isinstance(sequence_to_continue, tuple) and sequence_to_continue
-                and self._language_models):
-            return None
-
-        n_gram_sizes = sorted(self._language_models.keys(), reverse=True)
-
-        for n_gram_size in n_gram_sizes:
-            n_gram_model = self._language_models[n_gram_size]
-
-            token_candidates = n_gram_model.generate_next_token(sequence_to_continue)
-
-            if token_candidates is not None and len(token_candidates) > 0:
-                token_probabilities = {token: freq / sum(token_candidates.values())
-                                       for token, freq in token_candidates.items()}
-                return token_probabilities
-
-        return None
