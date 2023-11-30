@@ -130,7 +130,7 @@ class TextProcessor:
         In case of corrupt input arguments, None is returned.
         In case any of methods used return None, None is returned.
         """
-        if not isinstance(text, str) or not len(text):
+        if not isinstance(text, str) or not text:
             return None
 
         tokenized_text = self._tokenize(text)
@@ -204,6 +204,8 @@ class TextProcessor:
             for element in key:
                 if element.isalpha():
                     self._put(element.lower())
+
+        return None
 
     def _decode(self, corpus: tuple[int, ...]) -> Optional[tuple[str, ...]]:
         """
@@ -308,6 +310,7 @@ class NGramLanguageModel:
             return None
 
         self._n_gram_frequencies.update(frequencies)
+        return None
 
     def build(self) -> int:
         """
@@ -495,7 +498,8 @@ class BeamSearcher:
             return []
 
         possible_tokens_list = list(possible_tokens.items())
-        sorted_tokens_list = sorted(possible_tokens_list, key=operator.itemgetter(1, 0), reverse=True)
+        sorted_tokens_list = sorted(possible_tokens_list,
+                                    key=operator.itemgetter(1, 0), reverse=True)
         best_tokens = sorted_tokens_list[:self._beam_width]
 
         return best_tokens
@@ -614,7 +618,8 @@ class BeamSearchTextGenerator:
         In case of corrupt input arguments or methods used return None,
         None is returned
         """
-        if not isinstance(seq_len, int) or seq_len <= 0 or not isinstance(prompt, str) or not prompt:
+        if (not isinstance(seq_len, int) or seq_len <= 0 or
+                not isinstance(prompt, str) or not prompt):
             return None
 
         encoded_prompt = self._text_processor.encode(prompt)
@@ -633,9 +638,11 @@ class BeamSearchTextGenerator:
                 if not next_tokens:
                     return None
 
-                possible_sequences = self.beam_searcher.continue_sequence(sequence, next_tokens, updated_candidates)
+                possible_sequences = self.beam_searcher.continue_sequence(sequence,
+                                                                          next_tokens, updated_candidates)
                 if not possible_sequences:
-                    return self._text_processor.decode(sorted(tuple(updated_candidates), key=lambda x: x[1])[0])
+                    return self._text_processor.decode(sorted(tuple(updated_candidates),
+                                                              key=lambda x: x[1])[0])
 
                 not_sorted_candidates.update(possible_sequences)
 
@@ -776,7 +783,8 @@ class BackOffGenerator:
             language_models (tuple[NGramLanguageModel]): Language models to use for text generation
             text_processor (TextProcessor): A TextProcessor instance to handle text processing
         """
-        self._language_models = {lang_model.get_n_gram_size(): lang_model for lang_model in language_models}
+        self._language_models = {lang_model.get_n_gram_size(): lang_model
+                                 for lang_model in language_models}
         self._text_processor = text_processor
 
     def run(self, seq_len: int, prompt: str) -> Optional[str]:
