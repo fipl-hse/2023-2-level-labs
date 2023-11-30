@@ -17,10 +17,10 @@ def main() -> None:
     if not isinstance(encoded_text, tuple) and encoded_text:
         return
 
-    result = str(text_processor.decode(tuple(encoded_text)))
+    result = str(tuple(text_processor.decode(encoded_text)))
     print(result)
 
-    model = main_py.NGramLanguageModel(encoded_text[:100], n_gram_size=3)
+    model = main_py.NGramLanguageModel(encoded_text[:100], 3)
     print(model.build())
 
     model2 = main_py.NGramLanguageModel(encoded_text, 7)
