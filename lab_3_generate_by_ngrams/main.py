@@ -146,7 +146,7 @@ class TextProcessor:
                 return None
             processed_text.append(self.get_id(token))
 
-        return tuple(processed_text)
+        return (*processed_text, )
 
     def _put(self, element: str) -> None:
         """
@@ -231,7 +231,7 @@ class TextProcessor:
         if decoded_corpus is None or not decoded_corpus:
             return None
 
-        return tuple(decoded_corpus)
+        return (*decoded_corpus, )
 
     def _postprocess_decoded_text(self, decoded_corpus: tuple[str, ...]) -> Optional[str]:
         """
@@ -732,7 +732,9 @@ class NGramLanguageModelReader:
                 if element == ' ':
                     encoded.append(0)
                 elif element.isalpha():
-                    encoded.append(self._text_processor.get_id(element.lower()))
+                    ident = self._text_processor.get_id(element.lower())
+                    if isinstance(ident, int):
+                        encoded.append(ident)
 
             if tuple(encoded) not in frequencies:
                 frequencies[tuple(encoded)] = 0
