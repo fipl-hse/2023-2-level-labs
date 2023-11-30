@@ -12,22 +12,24 @@ def main() -> None:
     """
     with open("./assets/Harry_Potter.txt", "r", encoding="utf-8") as text_file:
         text = text_file.read()
-    text_processor = main_py.TextProcessor('_')
+    text_processor = main_py.TextProcessor(end_of_word_token='_')
     encoded_text = text_processor.encode(text)
-    if isinstance(encoded_text, tuple) and encoded_text:
-        result = text_processor.decode(encoded_text)[:100]
-        print(result)
+    if not isinstance(encoded_text, tuple) and encoded_text:
+        return
 
-        model = main_py.NGramLanguageModel(encoded_text[:100], n_gram_size=3)
-        print(model.build())
+    result = text_processor.decode(encoded_text)[:100]
+    print(result)
 
-        model2 = main_py.NGramLanguageModel(encoded_text, 7)
-        greedy_text_generator = main_py.GreedyTextGenerator(model2, text_processor)
-        print(greedy_text_generator.run(51, 'Vernon'))
+    model = main_py.NGramLanguageModel(encoded_text[:100], n_gram_size=3)
+    print(model.build())
 
-        greedy = main_py.BeamSearchTextGenerator(model2, text_processor, 7)
-        print(greedy.run('Vernon', 56))
-        assert result
+    model2 = main_py.NGramLanguageModel(encoded_text, 7)
+    greedy_text_generator = main_py.GreedyTextGenerator(model2, text_processor)
+    print(greedy_text_generator.run(51, 'Vernon'))
+
+    greedy = main_py.BeamSearchTextGenerator(model2, text_processor, 7)
+    print(greedy.run('Vernon', 51))
+    assert result
 
 
 if __name__ == "__main__":
