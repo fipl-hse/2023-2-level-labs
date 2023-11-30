@@ -15,6 +15,7 @@
     lab_1_classify_by_unigrams/README.rst
     lab_2_tokenize_by_bpe/README.rst
     lab_3_generate_by_ngrams/README.rst
+    lab_4_fill_words_by_ngrams/README.rst
 
     docs/public/FAQ.rst
     docs/public/actions_ru.rst
