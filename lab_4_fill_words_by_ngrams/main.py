@@ -434,7 +434,7 @@ class Examiner:
             actual_answer = next(ans for (que, loc), ans
                                  in self._questions_and_answers.items()
                                  if que == question)
-            if actual_answer == answer:
+            if actual_answer.lower() == answer.lower():
                 true_answers += 1.
         return true_answers / len(answers)
 

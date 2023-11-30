@@ -18,6 +18,7 @@ def main() -> None:
     processor = WordProcessor('<eow>')
     encoded = processor.encode(text)
     model = NGramLanguageModel(encoded, 2)
+    model.build()
     generator = TopPGenerator(model, processor, 0.5)
     result = generator.run(51, 'Vernon')
     print(result)
@@ -28,10 +29,10 @@ def main() -> None:
             gen_types.beam_search: BeamSearchTextGenerator(model, processor, 5)}
     quality_checker = QualityChecker(gens, model, processor)
     print(quality_checker)  # run has None => raises ValueError
-    # checks = quality_checker.run(100, 'The')
-    # for check in checks:
-    #     result = str(check)
-    #     print(result)
+    checks = quality_checker.run(100, 'The')
+    for check in checks:
+        result = str(check)
+        print(result)
 
     students = []
     for student_id in range(3):
@@ -39,12 +40,13 @@ def main() -> None:
     json_path = str(PROJECT_ROOT / 'lab_4_fill_words_by_ngrams' / 'assets' /
                     'question_and_answers.json')
     examiner = Examiner(json_path)
+    print(examiner)
 
-    for student in students:
-        # ValueError...
-        student_answers = student.take_exam(examiner.provide_questions())
-        score = examiner.assess_exam(student_answers)
-        print(student, score)
+    # for student in students:
+    #     # ValueError...
+    #     student_answers = student.take_exam(examiner.provide_questions())
+    #     score = examiner.assess_exam(student_answers)
+    #     print(student, score)
 
     assert result
 
