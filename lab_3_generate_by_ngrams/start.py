@@ -3,6 +3,7 @@ Generation by NGrams starter
 """
 from lab_3_generate_by_ngrams.main import TextProcessor
 
+
 def main() -> None:
     """
     Launches an implementation.
@@ -15,6 +16,7 @@ def main() -> None:
     encoded_corpus = text_processor.encode(text)
     decoded_text = text_processor.decode(encoded_corpus)
     result = decoded_text
+    print(result)
     assert result
 
 
