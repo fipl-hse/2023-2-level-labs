@@ -23,9 +23,10 @@ def main() -> None:
                   'assets/profiles/tr.json']
 
 
-if __name__ == "__main__":
-    main()
+    if __name__ == "__main__":
+        main()
 import main
 f = open('assets/texts/en.txt', 'r')
 f_text = f.read()
 print(main.tokenize(f_text))
+
