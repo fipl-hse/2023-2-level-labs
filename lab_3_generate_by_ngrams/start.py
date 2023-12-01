@@ -16,8 +16,8 @@ def main() -> None:
     encoded_corpus = text_processor.encode(text)
     if not (isinstance(encoded_corpus, tuple) or encoded_corpus):
         return
-    decoded_text = text_processor.decode(encoded_corpus)
-    language_model = NGramLanguageModel(encoded_corpus, 7)
+    decoded_text = text_processor.decode(encoded_corpus[:100])
+    language_model = NGramLanguageModel(encoded_corpus[:100], 7)
     language_model.build()
     generator = GreedyTextGenerator(language_model, text_processor)
     result = generator.run(51, "Vernon")
