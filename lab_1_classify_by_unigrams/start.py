@@ -4,6 +4,7 @@ Language detection starter
 from lab_1_classify_by_unigrams.main import (collect_profiles, create_language_profile,
                                              detect_language_advanced, print_report)
 
+
 def main() -> None:
     """
     Launches an implementation
@@ -31,9 +32,6 @@ def main() -> None:
 
     assert result, "Detection result is None"
 
-    if __name__ == "__main__":
-        main()
-import main
-f = open('assets/texts/en.txt', 'r')
-f_text = f.read()
-print(main.tokenize(f_text))
+
+if __name__ == "__main__":
+    main()
