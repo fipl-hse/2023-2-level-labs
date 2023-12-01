@@ -230,8 +230,7 @@ class TextProcessor:
         """
         if not (isinstance(decoded_corpus, tuple) or decoded_corpus):
             return None
-        tokens = []
-        tokens.extend(decoded_corpus)
+        tokens = list(decoded_corpus)
         text = ''.join(tokens).replace(self._end_of_word_token, ' ').capitalize().rstrip()
         return f'{text}.'
 
