@@ -43,17 +43,17 @@ class TextProcessor:
         In case of corrupt input arguments, None is returned.
         In case any of methods used return None, None is returned.
         """
-        if not isinstance(text, str):
+        if not isinstance(text, str) or not text:
             return None
 
         list_of_tokens = []
         for index, token in enumerate(text.lower()):
-            if token.isalpha():
-                list_of_tokens.append(token)
-            elif len(list_of_tokens) != 0 and list_of_tokens[-1] != self._end_of_word_token:
+            if token.isspace() and list_of_tokens[-1] != self._end_of_word_token:
                 list_of_tokens.append(self._end_of_word_token)
-            else:
-                continue
+            elif token.isalpha():
+                list_of_tokens.append(token)
+        if not text[-1].isalnum() and list_of_tokens[-1] != self._end_of_word_token:
+            list_of_tokens.append(self._end_of_word_token)
 
         if len(list_of_tokens) == 0:
             return None
