@@ -185,6 +185,9 @@ class GeneratorTypes:
         """
         Initialize an instance of GeneratorTypes.
         """
+        self.greedy = 0
+        self.top_p = 1
+        self.beam_search = 2
 
     def get_conversion_generator_type(self, generator_type: int) -> str:  # type: ignore
         """
@@ -196,6 +199,8 @@ class GeneratorTypes:
         Returns:
             (str): Name of the generator.
         """
+        generators = ['Greedy Generator', 'Top-P Generator', 'Beam Search Generator']
+        return generators[generator_type]
 
 
 class GenerationResultDTO:
@@ -218,6 +223,9 @@ class GenerationResultDTO:
             generation_type (int):
                 Numeric type of the generator for which perplexity was calculated
         """
+        self.__text = text
+        self.__perplexity = perplexity
+        self.__type = generation_type
 
     def get_perplexity(self) -> float:  # type: ignore
         """
@@ -226,6 +234,7 @@ class GenerationResultDTO:
         Returns:
             (float): Perplexity value
         """
+        return self.__perplexity
 
     def get_text(self) -> str:  # type: ignore
         """
@@ -234,6 +243,7 @@ class GenerationResultDTO:
         Returns:
             (str): Text for which the perplexity was count
         """
+        return self.__text
 
     def get_type(self) -> int:  # type: ignore
         """
@@ -242,6 +252,7 @@ class GenerationResultDTO:
         Returns:
             (int): Numeric type of the generator
         """
+        return self.__type
 
     def __str__(self) -> str:  # type: ignore
         """
@@ -250,6 +261,8 @@ class GenerationResultDTO:
         Returns:
             (str): String with report
         """
+        return f"Perplexity score: {self.__perplexity}\n" \
+               f"{GeneratorTypes().get_conversion_generator_type(self.__type)}\nText: {self.__text}\n"
 
 
 class QualityChecker:
@@ -274,6 +287,9 @@ class QualityChecker:
                 NGramLanguageModel instance to use for text generation
             word_processor (WordProcessor): WordProcessor instance to handle text processing
         """
+        self._generators = generators
+        self._language_model = language_model
+        self._word_processor = word_processor
 
     def _calculate_perplexity(self, generated_text: str) -> float:  # type: ignore
         """
@@ -291,6 +307,14 @@ class QualityChecker:
                 or if methods used return None,
                 or if nothing was generated.
         """
+        if not isinstance(generated_text, str) or not generated_text:
+            raise ValueError
+
+        encoded = self._word_processor.encode(generated_text)
+        if not encoded:
+            raise ValueError
+        # for token in encoded:
+        #     self._language_model.
 
     def run(self, seq_len: int, prompt: str) -> list[GenerationResultDTO]:  # type: ignore
         """
