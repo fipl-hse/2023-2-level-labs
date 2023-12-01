@@ -16,8 +16,13 @@ def main() -> None:
         encoded_text = text_processor.encode(text)
         print(encoded_text)
         print(text_processor.decode(encoded_text))
-    # result = decoded_text
-    # assert result
+
+        model = main_py.NGramLanguageModel(encoded_text, 7)
+        greedy_text_generator = main_py.GreedyTextGenerator(model, text_processor)
+        generated_text = greedy_text_generator.run(51, 'Vernon')
+
+    result = generated_text
+    assert result
 
 
 if __name__ == "__main__":
