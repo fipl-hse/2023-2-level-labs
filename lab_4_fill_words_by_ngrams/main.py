@@ -33,8 +33,12 @@ class WordProcessor(TextProcessor):
         if not isinstance(text, str) or not text:
             raise ValueError
 
-        text_words = text.lower().replace('.', f' {self._end_of_word_token}').replace(
-            '!', f' {self._end_of_word_token}').replace('?', f' {self._end_of_word_token}').split()
+        text_words = []
+        for i in text.lower().split():
+            if i[-1] in ('.', '!', '?'):
+                text_words.extend([i[:-1], self._end_of_word_token])
+            else:
+                text_words.append(i)
 
         return tuple(text_words)
 
