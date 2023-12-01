@@ -16,6 +16,7 @@ apple
 are
 arg
 args
+ask
 assess
 assets
 assignees
@@ -27,6 +28,7 @@ back-off
 backoff
 backoffgenerator
 base
+baseexception
 basemodel
 bca
 bcd
@@ -36,6 +38,7 @@ beamsearch
 beamsearchalgorithm
 beamsearcher
 beamsearchtextgenerator
+before
 bigram
 bigrams
 bilingual
@@ -97,11 +100,14 @@ dictionary
 distance
 doc
 docstring
+docstrings
 done
 download
 drive
 dto
 dursley
+eafp
+easier
 edit
 edition
 elif
@@ -124,6 +130,8 @@ estimation
 evaluation
 exam
 examiner
+except
+exception
 expiration
 extract
 f-string
@@ -135,9 +143,11 @@ features
 filename
 fill
 filler
+finally
 find
 float
 for
+forgiveness
 fork
 forks
 four
@@ -192,6 +202,7 @@ int
 interpreter
 is
 it
+iter
 itertools
 javascript
 join
@@ -204,6 +215,8 @@ lab
 laboratory
 lang
 language
+lbyl
+leap
 learning
 lectures-content-label
 len
@@ -214,6 +227,7 @@ ln
 load
 locations
 log
+look
 love
 lutz
 mac
@@ -232,6 +246,7 @@ mle
 model
 models
 module
+mro
 mse
 much
 mypy
@@ -275,6 +290,7 @@ pat
 path
 people
 perfectly
+permission
 perplexity
 personal
 pipe
@@ -372,6 +388,7 @@ tf
 tf-idf
 tfidf
 th
+than
 thank
 that
 the
@@ -396,10 +413,12 @@ transfer
 translation
 trigram
 trigrams
+try
 tuple
 txt
 type
 typeerror
+uml
 understudy
 unigram
 unigrams
