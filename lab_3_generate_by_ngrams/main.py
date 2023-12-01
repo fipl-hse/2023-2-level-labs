@@ -135,6 +135,7 @@ class TextProcessor:
             encoded.append(self.get_id(token))
         return tuple(encoded)
 
+
     def _put(self, element: str) -> None:
         """
         Put an element into the storage, assign a unique id to it.
