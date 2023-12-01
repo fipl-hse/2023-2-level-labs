@@ -228,11 +228,11 @@ class TextProcessor:
 
         In case of corrupt input arguments, None is returned
         """
-        if not (isinstance(decoded_corpus, tuple) or decoded_corpus):
+        if not (isinstance(decoded_corpus, tuple) and decoded_corpus):
             return None
-        tokens = list(decoded_corpus)
-        text = ''.join(tokens).replace(self._end_of_word_token, ' ').capitalize().rstrip()
-        return f'{text}.'
+
+        return f"{''.join(decoded_corpus).replace(self._end_of_word_token, ' ').capitalize().rstrip()}."
+
 
 class NGramLanguageModel:
     """
