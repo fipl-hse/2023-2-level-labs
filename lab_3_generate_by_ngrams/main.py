@@ -3,11 +3,11 @@ Lab 3.
 
 Beam-search and natural language generation evaluation
 """
-# pylint:disable=too-few-public-methods
-from typing import Optional
+import json
 import math
 import operator
-import json
+# pylint:disable=too-few-public-methods
+from typing import Optional
 
 
 class TextProcessor:
@@ -46,24 +46,21 @@ class TextProcessor:
         In case of corrupt input arguments, None is returned.
         In case any of methods used return None, None is returned.
         """
-        if not isinstance(text, str):
+        if not isinstance(text, str) or not text:
             return None
 
-        tokenized_text = []
-        for index, element in enumerate(text.lower()):
-            if element.isalpha():
-                tokenized_text.append(element)
-            elif element.isdigit():
-                pass
-            elif not index:
-                pass
-            elif tokenized_text[-1] != self._end_of_word_token:
-                tokenized_text.append(self._end_of_word_token)
+        tokens = []
+        for token in text.lower():
+            if token.isspace() and tokens[-1] != self._end_of_word_token:
+                tokens.append(self._end_of_word_token)
+            elif token.isalpha():
+                tokens.append(token)
+        if not text[-1].isalnum() and tokens[-1] != self._end_of_word_token:
+            tokens.append(self._end_of_word_token)
 
-        if not tokenized_text:
+        if not tokens:
             return None
-
-        return tuple(tokenized_text)
+        return tuple(tokens)
 
     def get_id(self, element: str) -> Optional[int]:
         """
@@ -838,7 +835,8 @@ class BackOffGenerator:
 
         In case of corrupt input arguments return None.
         """
-        if not isinstance(sequence_to_continue, tuple) or not sequence_to_continue:
+        if not isinstance(sequence_to_continue, tuple) or not sequence_to_continue or \
+                not self._language_models:
             return None
 
         ngram_size_list = list(self._language_models.keys())
@@ -847,10 +845,9 @@ class BackOffGenerator:
         ngram_size_list.sort(reverse=True)
         for ngram_size in ngram_size_list:
             candidates = self._language_models[ngram_size].generate_next_token(sequence_to_continue)
-            if candidates is None:
-                return None
-            if not candidates:
-                continue
-            return candidates
+            if candidates is not None and len(candidates) > 0:
+                probabilities = {token: freq / sum(candidates.values())
+                                 for token, freq in candidates.items()}
+                return probabilities
 
         return None

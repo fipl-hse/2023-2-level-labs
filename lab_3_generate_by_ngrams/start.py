@@ -20,12 +20,12 @@ def main() -> None:
         decoded = str(processor.decode(encoded))
         result = decoded
 
-        ng_model = NGramLanguageModel(encoded, n_gram_size=3)
+        # ng_model = NGramLanguageModel(encoded, n_gram_size=3)
 
-        model_6 = NGramLanguageModel(encoded, 7)
-        greedy_text_generator = GreedyTextGenerator(model_6, processor)
+        model = NGramLanguageModel(encoded, 7)
+        # greedy_text_generator = GreedyTextGenerator(model_6, processor)
 
-        beam_search_generator = BeamSearchTextGenerator(model_6, processor, 7)
+        beam_search_generator = BeamSearchTextGenerator(model, processor, 7)
         print(beam_search_generator.run('Vernon', 56))
         # result = beam_search_generator.run('Vernon', 56)
         assert result
