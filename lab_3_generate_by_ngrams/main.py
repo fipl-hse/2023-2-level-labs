@@ -52,9 +52,10 @@ class TextProcessor:
         for symbol in text.lower():
             if symbol.isalpha():
                 tokenized.append(symbol)
-            elif ((symbol.isspace() or symbol in string.punctuation)
-                  and tokenized[-1] != self._end_of_word_token):
+            elif symbol.isspace() and tokenized[-1] != self._end_of_word_token:
                 tokenized.append(self._end_of_word_token)
+        if text[-1] in string.punctuation and tokenized[-1] != self._end_of_word_token:
+            tokenized.append(self._end_of_word_token)
         if not tokenized:
             return None
         return tuple(tokenized)
@@ -135,7 +136,6 @@ class TextProcessor:
             encoded.append(self.get_id(token))
         return tuple(encoded)
 
-
     def _put(self, element: str) -> None:
         """
         Put an element into the storage, assign a unique id to it.
@@ -179,7 +179,6 @@ class TextProcessor:
             return None
 
         return self._postprocess_decoded_text(self._decode(encoded_corpus))
-
 
     def fill_from_ngrams(self, content: dict) -> None:
         """
@@ -231,7 +230,8 @@ class TextProcessor:
         if not (isinstance(decoded_corpus, tuple) and decoded_corpus):
             return None
 
-        return f"{''.join(decoded_corpus).replace(self._end_of_word_token, ' ').capitalize().rstrip()}."
+        text = ''.join(decoded_corpus).replace(self._end_of_word_token, ' ').capitalize().rstrip()
+        return f"{text}."
 
 
 class NGramLanguageModel:
@@ -253,6 +253,10 @@ class NGramLanguageModel:
             n_gram_size (int): A size of n-grams to use for language modelling
         """
 
+        self._encoded_corpus = encoded_corpus
+        self._n_gram_size = n_gram_size
+        self._n_gram_frequencies = {}
+
     def get_n_gram_size(self) -> int:
         """
         Retrieve value stored in self._n_gram_size attribute.
@@ -260,6 +264,7 @@ class NGramLanguageModel:
         Returns:
             int: Size of stored n_grams
         """
+        return self._n_gram_size
 
     def set_n_grams(self, frequencies: dict) -> None:
         """
@@ -281,6 +286,23 @@ class NGramLanguageModel:
         In case of corrupt input arguments or methods used return None,
         1 is returned
         """
+        if not (
+                isinstance(self._encoded_corpus, tuple)
+                and self._encoded_corpus
+                and self._extract_n_grams(self._encoded_corpus)
+        ):
+            return 1
+
+        n_grams = self._extract_n_grams(self._encoded_corpus)
+        for n_gram in n_grams:
+            absolute_freq = n_grams.count(n_gram)
+            context_freq = 0
+            for i in n_grams:
+                start_of_n_gram = n_gram[: self._n_gram_size - 1]
+                if i[: self._n_gram_size - 1] == start_of_n_gram:
+                    context_freq += 1
+            self._n_gram_frequencies[n_gram] = absolute_freq / context_freq
+        return 0
 
     def generate_next_token(self, sequence: tuple[int, ...]) -> Optional[dict]:
         """
@@ -294,6 +316,19 @@ class NGramLanguageModel:
 
         In case of corrupt input arguments, None is returned
         """
+        if not (
+                isinstance(sequence, tuple)
+                and sequence
+                and len(sequence) >= self._n_gram_size - 1
+        ):
+            return None
+
+        context = sequence[-(self._n_gram_size - 1):]
+        tokens_freq = {}
+        for n_gram, freq in self._n_gram_frequencies.items():
+            if n_gram[:-1] == context:
+                tokens_freq[n_gram[-1]] = freq
+        return tokens_freq
 
     def _extract_n_grams(
         self, encoded_corpus: tuple[int, ...]
@@ -309,7 +344,13 @@ class NGramLanguageModel:
 
         In case of corrupt input arguments, None is returned
         """
+        if not (isinstance(encoded_corpus, tuple) and encoded_corpus):
+            return None
 
+        n_grams = []
+        for i in range(len(encoded_corpus) + 1 - self._n_gram_size):
+            n_grams.append(tuple(encoded_corpus[i: i + self._n_gram_size]))
+        return tuple(n_grams)
 
 class GreedyTextGenerator:
     """
