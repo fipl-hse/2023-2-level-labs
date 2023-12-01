@@ -150,8 +150,7 @@ class TopPGenerator:
                 probable_words.append((word, value))
                 if probability >= self._p_value:
                     break
-            sorted_words = sorted(probable_words, key=lambda x: (x[1], x[0]), reverse=True)
-            words = [pair[0] for pair in sorted_words]
+            words = [pair[0] for pair in probable_words]
             random_word = random.choice(words)
             encoded_text += (random_word,)
         decoded = self._word_processor.decode(encoded_text)
