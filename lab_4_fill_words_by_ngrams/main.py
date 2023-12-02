@@ -3,10 +3,10 @@ Lab 4.
 
 Top-p sampling generation and filling gaps with ngrams
 """
-
 # pylint:disable=too-few-public-methods, too-many-arguments
 from lab_3_generate_by_ngrams.main import (BeamSearchTextGenerator, GreedyTextGenerator,
                                            NGramLanguageModel, TextProcessor)
+import random
 
 
 class WordProcessor(TextProcessor):
@@ -34,19 +34,7 @@ class WordProcessor(TextProcessor):
 
         great_text = ''
 
-        # bad_punctuation = '''"#$%&'()*+,-/:;<=>@[\\]^_`{|}~'''
         good_punctuation = '!.?'
-
-        '''
-
-        for word in text.lower():
-            if not (word in bad_punctuation or word.isdigit()):
-                if word[-1] in good_punctuation:
-                    great_text += f' {word[:-1]} {self._end_of_word_token}'
-                    continue
-                great_text += f'{word}'
-        
-        '''
 
         for word in text.lower():
             if not word.isalnum():
@@ -136,6 +124,9 @@ class TopPGenerator:
             word_processor (WordProcessor): WordProcessor instance to handle text processing
             p_value (float): Collective probability mass threshold
         """
+        self._model = language_model
+        self._word_processor = word_processor
+        self._p_value = p_value
 
     def run(self, seq_len: int, prompt: str) -> str:  # type: ignore
         """
@@ -154,6 +145,45 @@ class TopPGenerator:
                 or if sequence has inappropriate length,
                 or if methods used return None.
         """
+        if not ((isinstance(seq_len, int) and seq_len > 0) and (isinstance(prompt, str) or len(prompt) == 0)):
+            raise ValueError
+
+        encoded_prompt = self._word_processor.encode(prompt)
+
+        if not encoded_prompt:
+            raise ValueError
+
+        while seq_len >= 1:
+            next_word_dict = self._model.generate_next_token(encoded_prompt)
+
+            if next_word_dict is None:
+                raise ValueError
+
+            if not next_word_dict:
+                break
+
+            sorted_word_dict = sorted(next_word_dict.items(),
+                                      key=lambda pair: (float(pair[1]), -pair[0]), reverse=True)
+
+            min_prob = 0
+            prob_tokens = tuple()
+
+            for token, prob in dict(sorted_word_dict).items():
+                min_prob += prob
+                prob_tokens += (token,)
+                if min_prob >= self._p_value:
+                    random_token = random.choice(prob_tokens)
+                    encoded_prompt += (random_token,)
+                    break
+
+            seq_len -= 1
+
+        decoded_seq = self._word_processor.decode(encoded_prompt)
+
+        if not decoded_seq:
+            raise ValueError
+
+        return decoded_seq
 
 
 class GeneratorTypes:
