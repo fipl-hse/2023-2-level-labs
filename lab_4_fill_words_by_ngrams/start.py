@@ -3,6 +3,7 @@ Filling word by ngrams starter
 """
 # pylint:disable=too-many-locals,unused-import
 
+
 def main() -> None:
     """
     Launches an implementation.
