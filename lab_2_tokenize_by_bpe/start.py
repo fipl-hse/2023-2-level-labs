@@ -31,7 +31,7 @@ def main() -> None:
 
     #for mark 8:
     if not trained_dict:
-        return None
+        return
     dict_of_tokens = get_vocabulary(trained_dict, '<unk>')
     decoded_text = decode(to_encode, dict_of_tokens, "</s>")
     print(decoded_text)
