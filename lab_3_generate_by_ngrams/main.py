@@ -157,10 +157,10 @@ class TextProcessor:
         an element is not added to storage
         """
         if not isinstance(element, str) or len(element) != 1:
-            return
+            return None
 
         if element in self._storage:
-            return
+            return None
 
         self._storage[element] = len(self._storage)
 
@@ -201,7 +201,7 @@ class TextProcessor:
             content (dict): ngrams from external JSON
         """
         if not isinstance(content, dict) or len(content) == 0:
-            return
+            return None
 
         for token in (char for n_gram in content['freq']
                       for char in n_gram.lower() if char.isalpha()):
@@ -297,7 +297,7 @@ class NGramLanguageModel:
             frequencies (dict): Computed in advance frequencies for n-grams
         """
         if not isinstance(frequencies, dict) or len(frequencies) == 0:
-            return
+            return None
 
         self._n_gram_frequencies = frequencies
 
