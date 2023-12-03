@@ -157,14 +157,12 @@ class TextProcessor:
         an element is not added to storage
         """
         if not isinstance(element, str) or len(element) != 1:
-            return None
+            return
 
         if element in self._storage:
-            return None
+            return
 
         self._storage[element] = len(self._storage)
-
-        return None
 
     def decode(self, encoded_corpus: tuple[int, ...]) -> Optional[str]:
         """
@@ -203,13 +201,11 @@ class TextProcessor:
             content (dict): ngrams from external JSON
         """
         if not isinstance(content, dict) or len(content) == 0:
-            return None
+            return
 
         for token in (char for n_gram in content['freq']
                       for char in n_gram.lower() if char.isalpha()):
             self._put(token)
-
-        return None
 
     def _decode(self, corpus: tuple[int, ...]) -> Optional[tuple[str, ...]]:
         """
@@ -301,11 +297,9 @@ class NGramLanguageModel:
             frequencies (dict): Computed in advance frequencies for n-grams
         """
         if not isinstance(frequencies, dict) or len(frequencies) == 0:
-            return None
+            return
 
         self._n_gram_frequencies = frequencies
-
-        return None
 
     def build(self) -> int:
         """
@@ -328,15 +322,16 @@ class NGramLanguageModel:
 
         context_freq_dict = {}
 
-        for n_gram in set(n_grams):
-            absolute_freq = n_grams.count(n_gram)
-            context = n_gram[:-1]
-            if context not in context_freq_dict:
-                context_freq_dict[context] = [n_gram_1[:-1] == context
-                                              for n_gram_1 in n_grams].count(True)
-            context_freq = context_freq_dict[context]
+        for n_gram in n_grams:
+            context_freq_dict[n_gram] = context_freq_dict.get(n_gram, 0) + 1
 
-            self._n_gram_frequencies[n_gram] = absolute_freq / context_freq
+        lower_ngram_counts = {}
+        for ngram, freq in context_freq_dict.items():
+            context = ngram[:-1]
+            lower_ngram_counts[context] = lower_ngram_counts.get(context, 0) + freq
+
+        self._n_gram_frequencies = {ngram: freq / lower_ngram_counts[ngram[:-1]]
+                                    for ngram, freq in context_freq_dict.items()}
 
         return 0
 
@@ -444,7 +439,7 @@ class GreedyTextGenerator:
 
             max_freq = max(tokens.values())
             max_freq_tokens = [token for token, freq in tokens.items() if freq == max_freq]
-            max_freq_tokens = sorted(max_freq_tokens)
+            max_freq_tokens = sorted(max_freq_tokens, reverse=True)
             encoded_prompt += (max_freq_tokens[0],)
 
             seq_len -= 1
@@ -622,14 +617,13 @@ class BeamSearchTextGenerator:
 
             for sequence in sequence_candidates:
                 tokens = self._get_next_token(sequence)
-                if not tokens:
+                if tokens is None:
                     return None
 
                 continuation_candidates = self.beam_searcher.continue_sequence(
                     sequence, tokens, new_sequence_candidates)
-                if not continuation_candidates:
-                    return self._text_processor.decode(sorted(tuple(sequence_candidates),
-                                                              key=lambda x: x[1])[0])
+                if continuation_candidates is None:
+                    break
 
             if not new_sequence_candidates:
                 break
@@ -664,8 +658,6 @@ class BeamSearchTextGenerator:
             return None
 
         tokens = self.beam_searcher.get_next_token(sequence_to_continue)
-        if not tokens:
-            return None
 
         return tokens
 
@@ -730,13 +722,17 @@ class NGramLanguageModelReader:
 
         n_grams_cleared_by_size = {}
         for n_gram, freq in n_grams.items():
-            if len(n_gram) == n_gram_size and isinstance(n_gram, tuple):
-                same_context = [context_freq for context, context_freq in n_grams.items()
-                                if context[-n_gram_size:-1] == n_gram[-n_gram_size:-1]]
-                n_grams_cleared_by_size[n_gram] = freq / sum(same_context)
+            n_grams_cleared_by_size[n_gram[:-1]] = n_grams_cleared_by_size.get(
+                n_gram[:-1], 0) + freq
 
         n_gram_model = NGramLanguageModel(None, n_gram_size)
-        n_gram_model.set_n_grams(n_grams_cleared_by_size)
+        n_gram_model.set_n_grams(
+            {
+                ngram: freq / n_grams_cleared_by_size[ngram[:-1]]
+                for ngram, freq in n_grams.items()
+                if len(ngram) == n_gram_size
+            }
+        )
 
         return n_gram_model
 
