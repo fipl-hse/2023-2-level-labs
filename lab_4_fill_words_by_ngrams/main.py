@@ -186,6 +186,12 @@ class GeneratorTypes:
         Returns:
             (str): Name of the generator.
         """
+        if generator_type == 0:
+            return 'Greedy Generator'
+        if generator_type == 1:
+            return 'Top-P Generator'
+        if generator_type == 2:
+            return 'Beam Search Generator'
 
 
 class GenerationResultDTO:
@@ -198,6 +204,7 @@ class GenerationResultDTO:
         __type (int): Numeric type of the generator
     """
 
+
     def __init__(self, text: str, perplexity: float, generation_type: int):
         """
         Initialize an instance of GenerationResultDTO.
@@ -208,6 +215,9 @@ class GenerationResultDTO:
             generation_type (int):
                 Numeric type of the generator for which perplexity was calculated
         """
+        self.__text = text
+        self.__perplexity = perplexity
+        self.__type = generation_type
 
     def get_perplexity(self) -> float:  # type: ignore
         """
@@ -216,6 +226,7 @@ class GenerationResultDTO:
         Returns:
             (float): Perplexity value
         """
+        return self.__perplexity
 
     def get_text(self) -> str:  # type: ignore
         """
@@ -224,6 +235,7 @@ class GenerationResultDTO:
         Returns:
             (str): Text for which the perplexity was count
         """
+        return self.__text
 
     def get_type(self) -> int:  # type: ignore
         """
@@ -232,6 +244,7 @@ class GenerationResultDTO:
         Returns:
             (int): Numeric type of the generator
         """
+        return self.__type
 
     def __str__(self) -> str:  # type: ignore
         """
