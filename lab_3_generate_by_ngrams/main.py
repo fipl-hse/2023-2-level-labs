@@ -164,6 +164,8 @@ class TextProcessor:
 
         self._storage[element] = len(self._storage)
 
+        return None
+
     def decode(self, encoded_corpus: tuple[int, ...]) -> Optional[str]:
         """
         Decode and postprocess encoded corpus by converting integer identifiers to string.
@@ -206,6 +208,8 @@ class TextProcessor:
         for token in (char for n_gram in content['freq']
                       for char in n_gram.lower() if char.isalpha()):
             self._put(token)
+
+        return None
 
     def _decode(self, corpus: tuple[int, ...]) -> Optional[tuple[str, ...]]:
         """
@@ -300,6 +304,8 @@ class NGramLanguageModel:
             return None
 
         self._n_gram_frequencies = frequencies
+
+        return None
 
     def build(self) -> int:
         """
