@@ -160,7 +160,24 @@ def get_vocabulary(
     :param unknown_token: a token to signify an unknown token
     :return: dictionary in the form of <token: identifier>
     """
+    if not isinstance(word_frequencies, dict):
+        return None
+    if not isinstance(unknown_token, str):
+        return None
 
+    tokens = set()
+    tokens.add(unknown_token)
+    for keys in word_frequencies.keys():
+        for token in keys:
+            tokens.add(token)
+            for symbol in token:
+                tokens.add(symbol)
+    new_tokens = sorted(tokens)
+    new_tokens.sort(key=len, reverse=True)
+    ident_tokens = {}
+    for index, token in enumerate(new_tokens):
+        ident_tokens[token] = index
+    return ident_tokens
 
 def decode(
     encoded_text: list[int] | None, vocabulary: dict[str, int] | None, end_of_word_token: str | None
@@ -172,6 +189,21 @@ def decode(
     :param end_of_word_token: an end-of-word token
     :return: decoded sequence
     """
+    if not isinstance(encoded_text, list):
+        return None
+    if not isinstance(vocabulary, dict):
+        return None
+    if not (isinstance(end_of_word_token, str) or end_of_word_token is None):
+        return None
+
+    decoded = ''
+    for identifier in encoded_text:
+        for key, value in vocabulary.items():
+            if identifier == value:
+                decoded += key
+    if end_of_word_token:
+        decoded = decoded.replace(end_of_word_token, ' ')
+    return decoded
 
 
 def tokenize_word(
