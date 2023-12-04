@@ -154,7 +154,7 @@ class TopPGenerator:
             if not next_tokens:
                 break
 
-            sorted_dict = dict(sorted(next_tokens.items(), key=lambda x: (-x[1], x[0])))
+            sorted_dict = dict(sorted(next_tokens.items(), key=lambda x: (-x[1], -x[0])))
             probability = 0
             possible_tokens = []
 
@@ -164,8 +164,10 @@ class TopPGenerator:
                 if probability >= self._p_value:
                     break
             encoded_list.append(random.choice(possible_tokens))
+            print(encoded_list)
 
         decoded = self._word_processor.decode(tuple(encoded_list))
+        print(decoded)
 
         if not decoded:
             raise ValueError
@@ -448,7 +450,7 @@ class GeneratorRuleStudent:
     _generator_type: int
 
     def __init__(
-            self, generator_type: int, language_model: NGramLanguageModel, word_processor: WordProcessor
+        self, generator_type: int, language_model: NGramLanguageModel, word_processor: WordProcessor
     ) -> None:
         """
         Initialize an instance of GeneratorRuleStudent.
