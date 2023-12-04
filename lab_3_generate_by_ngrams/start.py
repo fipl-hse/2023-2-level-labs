@@ -1,9 +1,9 @@
 """
 Generation by NGrams starter
 """
-from lab_3_generate_by_ngrams.main import (BeamSearchTextGenerator, GreedyTextGenerator,
-                                           NGramLanguageModel, TextProcessor)
 
+from lab_3_generate_by_ngrams.main import (GreedyTextGenerator,
+                                           NGramLanguageModel, TextProcessor)
 
 def main() -> None:
     """
@@ -13,21 +13,22 @@ def main() -> None:
     """
     with open("./assets/Harry_Potter.txt", "r", encoding="utf-8") as text_file:
         text = text_file.read()
-    processor = TextProcessor(end_of_word_token='_')
-    encoded = processor.encode(text)
-    if not(isinstance(encoded, tuple) and encoded):
-        return
-
-    decoded = str(processor.decode(encoded))
-    result = decoded
-
-    n_gram_model = NGramLanguageModel(encoded[:100], n_gram_size=3)
-    model_7 = NGramLanguageModel(encoded, 7)
-    greedy_text_generator = GreedyTextGenerator(model_7, processor)
-    print(greedy_text_generator.run(51, 'Vernon'))
-
-    beam_search_generator = BeamSearchTextGenerator(model_7, processor, 7)
-    print(beam_search_generator.run('Vernon', 56))
+    text_processed = TextProcessor('_')
+#     encoded_text = text_processed.encode('''Mr. and Mrs. Dursley, of number four, Privet Drive, were proud to say
+# that they were perfectly normal, thank you very much.''')
+#     print(encoded_text)
+#     decoded_text = text_processed.decode(encoded_text)
+#     print(decoded_text)
+#     result = decoded_text
+    encoded_text = text_processor.encode(text)
+    decoded_text = text_processor.decode(encoded_text)
+    print(encoded_text[:40], decoded_text[:40], sep='\n')
+    language_model = NGramLanguageModel(encoded_text, 7)
+    # freqs = n_grams.build()
+    greedy_gen = GreedyTextGenerator(language_model, text_processor)
+    generate = greedy_gen.run(51, 'Vernon')
+    result = generate
+    print(result)
     assert result
 
 
