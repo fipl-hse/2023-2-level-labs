@@ -17,9 +17,11 @@ class TopPGeneratorTest(unittest.TestCase):
     """
 
     def setUp(self) -> None:
-        text = '''And so the Crane came to the Fox for the dinner party.
-        The Fox had cooked semolina for the dinner and smeared it over the 
-        plate. Then she served it and treated her guest.'''
+        text = '''Then she served it and treated her guest. The Crane went
+                peck-peck with his beak, knocked and knocked but couldn’t pick even
+                a bit of fare. The Fox kept licking the cereal until she had eaten
+                it all. When there’s no cereal at all, the Fox said,
+                «Don’t feel offended, buddy. There’s nothing more to treat you”'''
         self.word_processor = WordProcessor('<eos>')
         self.encoded = self.word_processor.encode(text)
         self.language_model = NGramLanguageModel(self.encoded, 2)
@@ -42,13 +44,28 @@ class TopPGeneratorTest(unittest.TestCase):
     @pytest.mark.mark6
     @pytest.mark.mark8
     @pytest.mark.mark10
-    def test_top_p_generator_run(self):
+    def test_top_p_generator_run_sorting_prob(self):
         """
-        Checks TopPGenerator run method ideal scenario
+        Checks TopPGenerator run method ideal scenario with correct sorting
+        of the probabilities
         """
-        generator = TopPGenerator(self.language_model, self.word_processor, 0.5)
-        expected = ['And smeared.', 'And so.']
-        actual = generator.run(1, 'and')
+        generator = TopPGenerator(self.language_model, self.word_processor, 0.2)
+        expected = 'The fox.'
+        actual = generator.run(1, 'the')
+        self.assertIn(actual, expected)
+
+    @pytest.mark.lab_4_fill_words_by_ngrams
+    @pytest.mark.mark6
+    @pytest.mark.mark8
+    @pytest.mark.mark10
+    def test_top_p_generator_run_sorting_candidates(self):
+        """
+        Checks TopPGenerator run method ideal scenario with correct sorting
+        of the next candidates
+        """
+        generator = TopPGenerator(self.language_model, self.word_processor, 0.2)
+        expected = 'Fox said.'
+        actual = generator.run(1, 'Fox')
         self.assertIn(actual, expected)
 
     @pytest.mark.lab_4_fill_words_by_ngrams
