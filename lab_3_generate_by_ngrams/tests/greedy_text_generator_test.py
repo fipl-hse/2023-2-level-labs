@@ -3,7 +3,6 @@
 Checks the third lab's GreedyTextGenerator class
 """
 import unittest
-from pathlib import Path
 
 import pytest
 
@@ -16,10 +15,11 @@ class GreedyTextGeneratorTest(unittest.TestCase):
     """
 
     def setUp(self) -> None:
-        path_to_test_directory = Path(__file__).parent.parent
-        with open(path_to_test_directory / 'assets' /
-                  'Anna Karenina - Chapter 1.txt', 'r', encoding='utf-8') as text_file:
-            text = text_file.read()
+        text = '''Most unpleasant of all was the first minute when, on coming, happy and
+        good-humored, from the theater, with a huge pear in his hand for his
+        wife, he had not found his wife in the drawing-room, to his surprise
+        had not found her in the study either, and saw her at last in her
+        bedroom with the unlucky letter that revealed everything in her hand.'''
         self.processor = TextProcessor('_')
         self.encoded = self.processor.encode(text)
         self.language_model = NGramLanguageModel(self.encoded, 3)
@@ -46,9 +46,8 @@ class GreedyTextGeneratorTest(unittest.TestCase):
         Checks GreedyTextGenerator run method ideal scenario
         """
         greedy_text_generator = GreedyTextGenerator(self.language_model, self.processor)
-        actual = greedy_text_generator.run(70, 'This')
-        self.assertEqual('This the his the his the his the '
-                         'his the his the his the his the his the h.', actual)
+        actual = greedy_text_generator.run(4, 'He')
+        self.assertEqual('He had.', actual)
 
     @pytest.mark.lab_3_generate_by_ngrams
     @pytest.mark.mark6
@@ -60,7 +59,7 @@ class GreedyTextGeneratorTest(unittest.TestCase):
         """
         greedy_text_generator = GreedyTextGenerator(self.language_model, self.processor)
         greedy_text_generator._text_processor.encode = lambda x: None
-        actual = greedy_text_generator.run(70, 'This')
+        actual = greedy_text_generator.run(4, 'He')
         expected = None
         self.assertEqual(expected, actual)
 
@@ -75,8 +74,8 @@ class GreedyTextGeneratorTest(unittest.TestCase):
         """
         greedy_text_generator = GreedyTextGenerator(self.language_model, self.processor)
         greedy_text_generator._model.generate_next_token = lambda sequence: None
-        actual = greedy_text_generator.run(70, 'This')
-        expected = 'This.'
+        actual = greedy_text_generator.run(4, 'He')
+        expected = 'He.'
         self.assertEqual(expected, actual)
 
     @pytest.mark.lab_3_generate_by_ngrams
@@ -89,8 +88,8 @@ class GreedyTextGeneratorTest(unittest.TestCase):
         """
         greedy_text_generator = GreedyTextGenerator(self.language_model, self.processor)
         greedy_text_generator._model.generate_next_token = lambda sequence: {}
-        actual = greedy_text_generator.run(70, 'This')
-        expected = 'This.'
+        actual = greedy_text_generator.run(4, 'He')
+        expected = 'He.'
         self.assertEqual(expected, actual)
 
     @pytest.mark.lab_3_generate_by_ngrams
@@ -106,9 +105,9 @@ class GreedyTextGeneratorTest(unittest.TestCase):
         seq_len_bad_input = [[None], {}, None, (), 1.1, 'string']
         prompt_bad_input = [1, [None], {}, None, (), 1.1, '', 0]
         for bad_input in seq_len_bad_input:
-            actual = greedy_text_generator.run(bad_input, 'This')
+            actual = greedy_text_generator.run(bad_input, 'He')
             self.assertEqual(expected, actual)
 
         for bad_input in prompt_bad_input:
-            actual = greedy_text_generator.run(70, bad_input)
+            actual = greedy_text_generator.run(4, bad_input)
             self.assertEqual(expected, actual)
