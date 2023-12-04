@@ -59,8 +59,6 @@ class WordProcessor(TextProcessor):
         if element not in self._storage:
             self._storage[element] = len(self._storage)
 
-        return None
-
     def _postprocess_decoded_text(self, decoded_corpus: tuple[str, ...]) -> str:  # type: ignore
         """
         Convert decoded sentence into the string sequence.
@@ -80,7 +78,8 @@ class WordProcessor(TextProcessor):
         if not isinstance(decoded_corpus, tuple) or not decoded_corpus:
             raise ValueError
 
-        decoded_text = ' '.join(decoded_corpus).replace(f' {self._end_of_word_token}', '.').capitalize()
+        decoded_text = ' '.join(decoded_corpus).replace(
+            f' {self._end_of_word_token}', '.').capitalize()
 
         sentences = decoded_text.split('. ')
         capitalized_sentences = [sentence[0].capitalize() + sentence[1:] for sentence in sentences]
@@ -204,9 +203,9 @@ class GeneratorTypes:
         """
         if generator_type == 0:
             return 'Greedy Generator'
-        elif generator_type == 1:
+        if generator_type == 1:
             return 'Top-P Generator'
-        elif generator_type == 2:
+        if generator_type == 2:
             return 'Beam Search Generator'
 
 
@@ -269,11 +268,11 @@ class GenerationResultDTO:
             (str): String with report
         """
         generator = GeneratorTypes()
-        str_type = generator.get_conversion_generator_type(int(self.__text))
+        str_type = generator.get_conversion_generator_type(self.__type)
 
         return (f'Perplexity score: {self.__perplexity}\n'
                 f'{str_type}\n'
-                f'Text: {self.__type}\n')
+                f'Text: {self.__text}\n')
         # it seems like there is some problem with self.__type and self.__text
         # self.__type is str, self.__text is int
 
@@ -289,7 +288,7 @@ class QualityChecker:
     """
 
     def __init__(
-            self, generators: dict, language_model: NGramLanguageModel, word_processor: WordProcessor
+        self, generators: dict, language_model: NGramLanguageModel, word_processor: WordProcessor
     ) -> None:
         """
         Initialize an instance of QualityChecker.
