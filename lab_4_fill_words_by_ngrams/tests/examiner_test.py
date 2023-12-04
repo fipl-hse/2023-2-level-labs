@@ -19,11 +19,14 @@ class ExaminerTest(unittest.TestCase):
     """
 
     def setUp(self) -> None:
-        text = '''It didn't come... he kept on running... he opened his eyes. A scarlet
-                steam engine was waiting next to a platform packed with people. A sign
-                overhead said Hogwarts Express, eleven O'clock. Harry looked behind him
-                and saw a wrought-iron archway where the barrier had been, with the
-                words Platform Nine and Three-Quarters on it, He had done it.'''
+        text = '''"That's your problem, isn't it?" said Filch, his voice cracking with
+        glee. "Should've thought of them werewolves before you got in trouble,
+        shouldn't you?"
+        Hagrid came striding toward them out of the dark, Fang at his heel. He
+        was carrying his large crossbow, and a quiver of arrows hung over his
+        shoulder.
+        "Abou' time," he said. "I bin waitin' fer half an hour already. All
+        right, Harry, Hermione?"'''
         self.json_path = str(PROJECT_ROOT / 'lab_4_fill_words_by_ngrams' / 'assets' /
                              'question_and_answers.json')
         self.word_processor = WordProcessor('<eos>')
@@ -161,7 +164,7 @@ class ExaminerTest(unittest.TestCase):
         Checks Examiner provide_questions method ideal scenario
         """
         examiner = Examiner(self.json_path)
-        expected = [0.1, 0.0, 0.0]
+        expected = [0.1, 0.1, 0.1]
         for index, student in enumerate(self.generators):
             student_answers = student.take_exam(examiner.provide_questions())
             actual = examiner.assess_exam(student_answers)
