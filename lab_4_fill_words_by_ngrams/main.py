@@ -87,7 +87,8 @@ class WordProcessor(TextProcessor):
             raise ValueError
 
         decoded_corpus = " ".join(decoded_corpus).replace(f" {self._end_of_word_token}", ".")
-        decoded_corpus = ". ".join([sentence.capitalize() for sentence in decoded_corpus.split(". ")])
+        decoded_corpus = ". ".join([sentence.capitalize()
+                                    for sentence in decoded_corpus.split(". ")])
 
         if decoded_corpus[-1] != ".":
             decoded_corpus += "."
@@ -153,7 +154,8 @@ class TopPGenerator:
             if not next_tokens:
                 break
 
-            sorted_next_tokens = sorted(next_tokens.items(), key=lambda item: (item[1], item[0]), reverse=True)
+            sorted_next_tokens = sorted(next_tokens.items(),
+                                        key=lambda item: (item[1], item[0]), reverse=True)
 
             sum_p = 0
             taken_n = []
@@ -263,7 +265,8 @@ class GenerationResultDTO:
             (str): String with report
         """
         return f"Perplexity score: {self.__perplexity}\n" \
-               f"{GeneratorTypes().get_conversion_generator_type(self.__type)}\nText: {self.__text}\n"
+               f"{GeneratorTypes().get_conversion_generator_type(self.__type)}\n" \
+               f"Text: {self.__text}\n"
 
 
 class QualityChecker:

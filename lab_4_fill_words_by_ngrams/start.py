@@ -2,8 +2,9 @@
 Filling word by ngrams starter
 """
 # pylint:disable=too-many-locals,unused-import
-from lab_3_generate_by_ngrams.main import NGramLanguageModel, GreedyTextGenerator, BeamSearchTextGenerator
-from lab_4_fill_words_by_ngrams.main import TopPGenerator, WordProcessor, GeneratorTypes, QualityChecker
+from lab_3_generate_by_ngrams.main import BeamSearchTextGenerator, GreedyTextGenerator
+from lab_4_fill_words_by_ngrams.main import (GeneratorTypes, NGramLanguageModel, QualityChecker,
+                                             TopPGenerator, WordProcessor)
 
 
 def main() -> None:
