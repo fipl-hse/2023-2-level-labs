@@ -207,8 +207,7 @@ class GeneratorTypes:
             return 'Greedy Generator'
         if generator_type == 1:
             return 'Top-P Generator'
-        else:
-            return 'Beam Search Generator'
+        return 'Beam Search Generator'
 
 
 class GenerationResultDTO:
