@@ -152,7 +152,7 @@ class TopPGenerator:
             if not next_tokens:
                 break
 
-            sorted_next_tokens = sorted(next_tokens.items(), key=lambda item: (item[1], -item[0]), reverse=True)
+            sorted_next_tokens = sorted(next_tokens.items(), key=lambda item: (item[1], item[0]), reverse=True)
 
             sum_p = 0
             taken_n = []
