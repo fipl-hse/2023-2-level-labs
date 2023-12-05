@@ -164,7 +164,7 @@ class TopPGenerator:
                 break
 
             sorted_word_dict = sorted(next_word_dict.items(),
-                                      key=lambda pair: (float(pair[1]), -pair[0]), reverse=True)
+                                      key=lambda pair: (float(pair[1]), pair[0]), reverse=True)
 
             min_prob = 0
             prob_tokens = tuple()
