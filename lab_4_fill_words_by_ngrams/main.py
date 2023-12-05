@@ -325,6 +325,7 @@ class QualityChecker:
             raise ValueError
 
         encoded = self._word_processor.encode(generated_text)
+        print(encoded)
 
         if not encoded:
             raise ValueError
@@ -343,6 +344,9 @@ class QualityChecker:
 
             if probability:
                 sum_log += math.log(probability)
+
+        if not sum_log:
+            raise ValueError
 
         return math.exp(-sum_log / (len(encoded) - n_gram_size))
 
