@@ -39,7 +39,9 @@ class WordProcessor(TextProcessor):
             if i[-1] in ('.', '!', '?'):
                 text_words.extend([i[:-1], self._end_of_word_token])
             else:
-                text_words.append(i)
+                cleared = [alpha for alpha in i if alpha.isalpha()]
+                if cleared:
+                    text_words.append(''.join(cleared))
 
         return tuple(text_words)
 
@@ -164,10 +166,8 @@ class TopPGenerator:
                 if probability >= self._p_value:
                     break
             encoded_list.append(random.choice(possible_tokens))
-            print(encoded_list)
 
         decoded = self._word_processor.decode(tuple(encoded_list))
-        print(decoded)
 
         if not decoded:
             raise ValueError
