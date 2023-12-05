@@ -4,6 +4,7 @@ Lab 4.
 Top-p sampling generation and filling gaps with ngrams
 """
 # pylint:disable=too-few-public-methods, too-many-arguments
+import math
 import random
 
 from lab_3_generate_by_ngrams.main import (BeamSearchTextGenerator, GreedyTextGenerator,
@@ -313,8 +314,21 @@ class QualityChecker:
         encoded = self._word_processor.encode(generated_text)
         if not encoded:
             raise ValueError
-        # for token in encoded:
-        #     self._language_model.
+
+        ngram_size = self._language_model.get_n_gram_size()
+        sum_logs = 0.0
+        for i in range(ngram_size - 1, len(encoded)):
+            context = tuple(encoded[i - ngram_size + 1: i])
+            next_tokens = self._language_model.generate_next_token(context)
+            if not next_tokens:
+                raise ValueError
+
+            prob = next_tokens.get(encoded[i])
+            if prob:
+                sum_logs += math.log(prob)
+        if not sum_logs:
+            raise ValueError
+        return math.exp(-sum_logs / (len(encoded) - ngram_size))
 
     def run(self, seq_len: int, prompt: str) -> list[GenerationResultDTO]:  # type: ignore
         """
@@ -334,6 +348,20 @@ class QualityChecker:
                 or if sequence has inappropriate length,
                 or if methods used return None.
         """
+        if not isinstance(seq_len, int) or seq_len < 0 or not isinstance(prompt, str) or not prompt:
+            raise ValueError
+        calculations = []
+        for num_type, name in self._generators.items():
+            generated = name.run(prompt=prompt, seq_len=seq_len)
+            if not generated:
+                raise ValueError
+
+            perplexity = self._calculate_perplexity(generated)
+            if not perplexity:
+                raise ValueError
+
+            calculations.append(GenerationResultDTO(generated, perplexity, num_type))
+        return sorted(calculations, key=lambda item: (perplexity, num_type))
 
 
 class Examiner:
