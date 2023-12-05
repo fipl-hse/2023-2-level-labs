@@ -28,6 +28,14 @@ class WordProcessor(TextProcessor):
         Raises:
             ValueError: In case of inappropriate type input argument or if input argument is empty.
         """
+        text_words = text.lower().split()
+        tokens = []
+        for word in text_words:
+            word.replace('!', self._end_of_word_token).replace('?', self._end_of_word_token)\
+                .replace('.', self._end_of_word_token)
+            if word.isalpha():
+                tokens.append(word)
+        return tuple(tokens)
 
     def _put(self, element: str) -> None:
         """
