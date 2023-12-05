@@ -9,7 +9,6 @@ import pytest
 from lab_4_fill_words_by_ngrams.main import GenerationResultDTO, GeneratorTypes
 
 
-@unittest.skip('changes in implementation')
 class GenerationResultDTOTest(unittest.TestCase):
     """
     Tests GenerationResultDTO class functionality
@@ -18,12 +17,11 @@ class GenerationResultDTOTest(unittest.TestCase):
     def setUp(self) -> None:
         self.text = 'Dinner and so the plate.'
         self.perplexity = 2.0476725110792193
-        generator_types = GeneratorTypes()
-        self.generators_types = [generator_types.greedy, generator_types.top_p,
-                                 generator_types.beam_search]
+        self.generator_type = GeneratorTypes()
+        self.generators_types = [self.generator_type.greedy, self.generator_type.top_p,
+                                 self.generator_type.beam_search]
 
     @pytest.mark.lab_4_fill_words_by_ngrams
-    @pytest.mark.mark6
     @pytest.mark.mark8
     @pytest.mark.mark10
     def test_generation_result_dto_fields(self):
@@ -37,15 +35,14 @@ class GenerationResultDTOTest(unittest.TestCase):
         self.assertEqual(1, generation_result_dto.get_type())
 
     @pytest.mark.lab_4_fill_words_by_ngrams
-    @pytest.mark.mark6
     @pytest.mark.mark8
     @pytest.mark.mark10
-    def test_generation_result_dto_get_string_generator_type(self):
+    def test_generation_result_dto_get_type(self):
         """
-        Checks GenerationResultDTO get_string_generator_type method
+        Checks GenerationResultDTO get_type method
         ideal scenario
         """
-        expected = ['Greedy Generator', 'Top-P Generator', 'Beam Search Generator']
+        expected = [0, 1, 2]
         for index, generator_type in enumerate(self.generators_types):
             generator_result_dto = GenerationResultDTO(self.text,
                                                        self.perplexity,
@@ -54,7 +51,6 @@ class GenerationResultDTOTest(unittest.TestCase):
             self.assertEqual(expected[index], actual)
 
     @pytest.mark.lab_4_fill_words_by_ngrams
-    @pytest.mark.mark6
     @pytest.mark.mark8
     @pytest.mark.mark10
     def test_generation_result_dto_get_perplexity(self):
@@ -70,20 +66,35 @@ class GenerationResultDTOTest(unittest.TestCase):
         self.assertEqual(expected, actual)
 
     @pytest.mark.lab_4_fill_words_by_ngrams
-    @pytest.mark.mark6
+    @pytest.mark.mark8
+    @pytest.mark.mark10
+    def test_generation_result_dto_get_text(self):
+        """
+        Checks GenerationResultDTO get_text method ideal scenario
+        """
+        generator_result_dto = GenerationResultDTO(self.text,
+                                                   self.perplexity,
+                                                   self.generators_types[0])
+
+        expected = self.text
+        actual = generator_result_dto.get_text()
+        self.assertEqual(expected, actual)
+
+    @pytest.mark.lab_4_fill_words_by_ngrams
     @pytest.mark.mark8
     @pytest.mark.mark10
     def test_generation_result_dto_get_result_in_str_format(self):
         """
         Checks GenerationResultDTO __str__ method
         """
-        generator_result_dto = GenerationResultDTO(self.text,
-                                                   self.perplexity,
-                                                   self.generators_types[0])
+        for generator_type in self.generators_types:
+            generator_result_dto = GenerationResultDTO(self.text,
+                                                       self.perplexity,
+                                                       generator_type)
+            actual = str(generator_result_dto)
 
-        expected = (f'Perplexity score: {self.perplexity}\n'
-                    f'{generator_result_dto.get_type()}\n'
-                    f'Text: {self.text}\n')
-        actual = str(generator_result_dto)
+            expected = (f'Perplexity score: {self.perplexity}\n'
+                        f'{self.generator_type.get_conversion_generator_type(generator_type)}\n'
+                        f'Text: {self.text}\n')
 
-        self.assertIn(expected, actual)
+            self.assertEqual(expected, actual)

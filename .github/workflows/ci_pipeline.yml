@@ -145,25 +145,6 @@ jobs:
         run: |
           bash config/spellcheck/_stage_spellcheck.sh
 
-  stubgen:
-    name: Stub generation
-    runs-on: ubuntu-latest
-    timeout-minutes: 5
-    needs: [
-      install-dependencies
-    ]
-    steps:
-      - uses: actions/checkout@master
-      - name: Install Aspell
-        run: |
-          sudo apt-get install aspell aspell-en aspell-ru
-      - name: Setup FIPL environment
-        uses: fipl-hse/setup-env-action@v0.9
-      - name: Stubgen check
-        if: ${{ env.REPOSITORY_TYPE == 'admin' }}
-        run: |
-          bash config/stage_1_style_tests/_stage_run_stubgen.sh
-
   flake8-checks:
     name: Import style checks
     runs-on: ubuntu-latest
