@@ -3,6 +3,8 @@ Lab 4.
 
 Top-p sampling generation and filling gaps with ngrams
 """
+import random
+
 # pylint:disable=too-few-public-methods, too-many-arguments
 from lab_3_generate_by_ngrams.main import (BeamSearchTextGenerator, GreedyTextGenerator,
                                            NGramLanguageModel, TextProcessor)
@@ -28,13 +30,21 @@ class WordProcessor(TextProcessor):
         Raises:
             ValueError: In case of inappropriate type input argument or if input argument is empty.
         """
-        text_words = text.lower().split()
+        if not isinstance(text, str) or not text:
+            raise ValueError
+        text_words = text.replace('!', f' {self._end_of_word_token} ').replace('?', f' {self._end_of_word_token} ')\
+            .replace('.', f' {self._end_of_word_token} ').lower().split()
         tokens = []
         for word in text_words:
-            word.replace('!', self._end_of_word_token).replace('?', self._end_of_word_token)\
-                .replace('.', self._end_of_word_token)
-            if word.isalpha():
+            if word.isalpha() or word.isspace() or word == self._end_of_word_token:
                 tokens.append(word)
+            else:
+                letters = []
+                for symbol in word:
+                    if symbol.isalpha():
+                        letters.append(symbol)
+                if letters:
+                    tokens.append(''.join(letters))
         return tuple(tokens)
 
     def _put(self, element: str) -> None:
@@ -47,6 +57,11 @@ class WordProcessor(TextProcessor):
         Raises:
             ValueError: In case of inappropriate type input argument or if input argument is empty.
         """
+        if not isinstance(element, str) or not element:
+            raise ValueError
+
+        if element not in self._storage:
+            self._storage[element] = len(self._storage)
 
     def _postprocess_decoded_text(self, decoded_corpus: tuple[str, ...]) -> str:  # type: ignore
         """
@@ -64,6 +79,16 @@ class WordProcessor(TextProcessor):
         Raises:
             ValueError: In case of inappropriate type input argument or if input argument is empty.
         """
+        if not isinstance(decoded_corpus, tuple) or not decoded_corpus:
+            raise ValueError
+        decoded_corpus = ' '.join(decoded_corpus).replace(f' {self._end_of_word_token}', '.')
+        result = []
+        for sentence in decoded_corpus.split('. '):
+            result.append(sentence.capitalize())
+        result = '. '.join(result)
+        if result[-1] != '.':
+            result += '.'
+        return result
 
 
 class TopPGenerator:
@@ -88,6 +113,9 @@ class TopPGenerator:
             word_processor (WordProcessor): WordProcessor instance to handle text processing
             p_value (float): Collective probability mass threshold
         """
+        self._model = language_model
+        self._word_processor = word_processor
+        self._p_value = p_value
 
     def run(self, seq_len: int, prompt: str) -> str:  # type: ignore
         """
@@ -106,6 +134,32 @@ class TopPGenerator:
                 or if sequence has inappropriate length,
                 or if methods used return None.
         """
+        if not isinstance(seq_len, int) or not isinstance(prompt, str) or seq_len < 0 or not prompt:
+            raise ValueError
+        text = self._word_processor.encode(prompt)
+        if not text:
+            raise ValueError
+        count = 0
+        while count < seq_len:
+            word = self._model.generate_next_token(text)
+            if word is None:
+                raise ValueError
+            if not word:
+                break
+            word = sorted(word.items(), key=lambda x: (x[1], x[0]), reverse=True)
+            sum_ = 0
+            tokens = []
+            for token in word:
+                if sum_ < self._p_value:
+                    sum_ += token[1]
+                    tokens.append(token[0])
+            randomized = random.choice(tokens)
+            text += (randomized, )
+            count += 1
+        decoded = self._word_processor.decode(text)
+        if decoded is None:
+            raise ValueError
+        return decoded
 
 
 class GeneratorTypes:
