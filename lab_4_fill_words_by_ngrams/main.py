@@ -28,6 +28,15 @@ class WordProcessor(TextProcessor):
         Raises:
             ValueError: In case of inappropriate type input argument or if input argument is empty.
         """
+        if not (isinstance(text, str) and text):
+            raise ValueError
+
+        text = text.lower()
+        for i in text:
+            if i in '.!?':
+                text = text.replace(i, ' ' + self._end_of_word_token)
+
+        return tuple(text.split())
 
     def _put(self, element: str) -> None:
         """
@@ -39,6 +48,12 @@ class WordProcessor(TextProcessor):
         Raises:
             ValueError: In case of inappropriate type input argument or if input argument is empty.
         """
+        if not (isinstance(element, str) and element):
+            raise ValueError
+
+        if element not in self._storage:
+            self._storage[element] = len(self._storage)
+        return None
 
     def _postprocess_decoded_text(self, decoded_corpus: tuple[str, ...]) -> str:  # type: ignore
         """
@@ -56,7 +71,30 @@ class WordProcessor(TextProcessor):
         Raises:
             ValueError: In case of inappropriate type input argument or if input argument is empty.
         """
+        if not (isinstance(decoded_corpus, tuple) and decoded_corpus):
+            raise ValueError
 
+        decoded_sentences = ''
+        sentences = ' '.join(list(decoded_corpus)).split(self._end_of_word_token)
+
+        for sentence in sentences:
+            sentence = sentence.strip().capitalize()
+            if not sentence:
+                break
+            sentence = f"{sentence}. "
+            decoded_sentences += sentence
+
+        return decoded_sentences.strip()
+
+        #list_of_tokens = list(decoded_corpus)
+        #sentences = (' '.join(list_of_tokens)).split(self._end_of_word_token)
+        #for sentence in sentences:
+            #sentence = sentence.strip().capitalize()
+            #if not sentence:
+                #break
+            #sentence = sentence + '. '
+            #decoded_sentences += sentence
+        #return decoded_sentences.strip()
 
 class TopPGenerator:
     """
@@ -80,6 +118,9 @@ class TopPGenerator:
             word_processor (WordProcessor): WordProcessor instance to handle text processing
             p_value (float): Collective probability mass threshold
         """
+        self._model = language_model
+        self._word_processor = word_processor
+        self._p_value = p_value
 
     def run(self, seq_len: int, prompt: str) -> str:  # type: ignore
         """
@@ -98,6 +139,7 @@ class TopPGenerator:
                 or if sequence has inappropriate length,
                 or if methods used return None.
         """
+        
 
 
 class GeneratorTypes:
