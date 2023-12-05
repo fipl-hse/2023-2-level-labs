@@ -86,15 +86,6 @@ class WordProcessor(TextProcessor):
 
         return decoded_sentences.strip()
 
-        #list_of_tokens = list(decoded_corpus)
-        #sentences = (' '.join(list_of_tokens)).split(self._end_of_word_token)
-        #for sentence in sentences:
-            #sentence = sentence.strip().capitalize()
-            #if not sentence:
-                #break
-            #sentence = sentence + '. '
-            #decoded_sentences += sentence
-        #return decoded_sentences.strip()
 
 class TopPGenerator:
     """
