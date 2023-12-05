@@ -28,7 +28,25 @@ class WordProcessor(TextProcessor):
         Raises:
             ValueError: In case of inappropriate type input argument or if input argument is empty.
         """
+        if not isinstance(text, str) or not text:
+            raise ValueError
 
+        for symbol in ['.', '!', '?']:
+            text = text.replace(symbol, f" {self._end_of_word_token} ")
+
+        clean_text = []
+        for word in text.lower().split():
+            if word == self._end_of_word_token or word.isalpha() or word.isspace():
+                clean_text.append(word)
+            else:
+                clean_word = []
+                for alpha in list(word):
+                    if alpha.isalpha():
+                        clean_word.append(alpha)
+                if clean_word:
+                    clean_text.append("".join(clean_word))
+
+        return tuple(clean_text)
     def _put(self, element: str) -> None:
         """
         Put an element into the storage, assign a unique id to it.
