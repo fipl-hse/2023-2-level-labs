@@ -86,14 +86,14 @@ class WordProcessor(TextProcessor):
         if not isinstance(decoded_corpus, tuple) or not decoded_corpus:
             raise ValueError
 
-        decoded_corpus = " ".join(decoded_corpus).replace(f" {self._end_of_word_token}", ".")
-        decoded_corpus = ". ".join([sentence.capitalize()
-                                    for sentence in decoded_corpus.split(". ")])
+        postprocessed = " ".join(decoded_corpus).replace(f" {self._end_of_word_token}", ".")
+        postprocessed = ". ".join([sentence.capitalize()
+                                   for sentence in postprocessed.split(". ")])
 
-        if decoded_corpus[-1] != ".":
-            decoded_corpus += "."
+        if postprocessed[-1] != ".":
+            postprocessed += "."
 
-        return decoded_corpus
+        return postprocessed
 
 
 class TopPGenerator:

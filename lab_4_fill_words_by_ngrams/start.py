@@ -18,8 +18,8 @@ def main() -> None:
     lang_model = NGramLanguageModel(encoded, n_gram_size=2)
     lang_model.build()
     top_p = TopPGenerator(language_model=lang_model, word_processor=word_proc, p_value=0.5)
-    result = top_p.run(51, "Vernon")
-    print(result)
+    generated_text = top_p.run(51, "Vernon")
+    print(generated_text)
 
     generators = GeneratorTypes()
     generators_dict = {generators.greedy: GreedyTextGenerator(lang_model, word_proc),
