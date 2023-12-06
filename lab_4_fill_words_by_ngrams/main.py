@@ -4,6 +4,7 @@ Lab 4.
 Top-p sampling generation and filling gaps with ngrams
 """
 # pylint:disable=too-few-public-methods, too-many-arguments
+import json
 import math
 import random
 
@@ -384,6 +385,8 @@ class Examiner:
         Args:
             json_path (str): Local path to assets file
         """
+        self._json_path = json_path
+        self._questions_and_answers = self._load_from_json()
 
     def _load_from_json(self) -> dict[tuple[str, int], str]:  # type: ignore
         """
@@ -399,6 +402,18 @@ class Examiner:
                 or if attribute _json_path has inappropriate extension,
                 or if inappropriate type loaded data.
         """
+        if not isinstance(self._json_path, str) or not self._json_path \
+                or self._json_path[-5:] != ".json":
+            raise ValueError
+
+        questions_and_answers = {}
+        with open(self._json_path, 'r', encoding='utf-8') as f:
+            test_dict = json.load(f)
+        if not isinstance(test_dict, list):
+            raise ValueError
+        for task in test_dict:
+            questions_and_answers.update({(task["question"], task["location"]): task["answer"]})
+        return questions_and_answers
 
     def provide_questions(self) -> list[tuple[str, int]]:  # type: ignore
         """
@@ -408,6 +423,8 @@ class Examiner:
             list[tuple[str, int]]:
                 List in the form of [(question, position of the word to be filled)]
         """
+        questions = [task for task in self._questions_and_answers.keys()]
+        return questions
 
     def assess_exam(self, answers: dict[str, str]) -> float:  # type: ignore
         """
@@ -422,6 +439,15 @@ class Examiner:
         Raises:
             ValueError: In case of inappropriate type input argument or if input argument is empty.
         """
+        if not isinstance(answers, dict) or not answers:
+            raise ValueError
+        correct_answers = list(self._questions_and_answers.values())
+        students_answers = list(answers.values())
+        correct = 0
+        for i in range(0, len(correct_answers)):
+            if correct_answers[i] == students_answers[i]:
+                correct += 1
+        return correct / len(correct_answers)
 
 
 class GeneratorRuleStudent:
@@ -444,6 +470,11 @@ class GeneratorRuleStudent:
                 NGramLanguageModel instance to use for text generation
             word_processor (WordProcessor): WordProcessor instance to handle text processing
         """
+        self._generator_type = generator_type
+        generators = (GreedyTextGenerator(language_model, word_processor),
+                      TopPGenerator(language_model, word_processor, 0.5),
+                      BeamSearchTextGenerator(language_model, word_processor, 5))
+        self._generator = generators[self._generator_type]
 
     def take_exam(self, tasks: list[tuple[str, int]]) -> dict[str, str]:  # type: ignore
         """
@@ -461,6 +492,21 @@ class GeneratorRuleStudent:
                 or if input argument is empty,
                 or if methods used return None.
         """
+        if not isinstance(tasks, list) or not tasks:
+            raise ValueError
+
+        final_dict = {}
+        for (question, position) in tasks:
+            left_context = question[:position]
+            right_context = question[position:]
+            next_seq = self._generator.run(seq_len=1, prompt=left_context)
+            if not next_seq:
+                raise ValueError
+            if next_seq[-1] == ".":
+                next_seq = next_seq[:-1] + " "
+            answer = next_seq + right_context
+            final_dict.update({question: answer})
+        return final_dict
 
     def get_generator_type(self) -> str:  # type: ignore
         """
@@ -469,3 +515,5 @@ class GeneratorRuleStudent:
         Returns:
             str: Generator type
         """
+        generator = GeneratorTypes()
+        return generator.get_conversion_generator_type(self._generator_type)
