@@ -30,6 +30,15 @@ class WordProcessor(TextProcessor):
         """
         if not(isinstance(text, str) and text):
             raise ValueError
+        words = []
+        for word in text.lower().split():
+            if word[-1] in '.?!':
+                words.extend([word[:-1], self._end_of_word_token])
+            else:
+                cleared_word = ''.join(filter(str.isalpha, word))
+                if cleared_word:
+                    words.append(cleared_word)
+        return tuple(words)
 
     def _put(self, element: str) -> None:
         """
@@ -41,6 +50,10 @@ class WordProcessor(TextProcessor):
         Raises:
             ValueError: In case of inappropriate type input argument or if input argument is empty.
         """
+        if not (isinstance(element, str) and element):
+            raise ValueError
+        if element not in self._storage:
+            self._storage[element] = len(self._storage)
 
     def _postprocess_decoded_text(self, decoded_corpus: tuple[str, ...]) -> str:  # type: ignore
         """
@@ -58,6 +71,14 @@ class WordProcessor(TextProcessor):
         Raises:
             ValueError: In case of inappropriate type input argument or if input argument is empty.
         """
+        if not (isinstance(decoded_corpus, tuple) and decoded_corpus):
+            raise ValueError
+        postprocessed_text = ''.join(decoded_corpus).replace(f'{self._end_of_word_token}', '.')
+        sentences = postprocessed_text.split('.')
+        result = '.'.join([sentence.capitalize() for sentence in sentences])
+        if result[-1] != '.':
+            result += '.'
+        return result
 
 
 class TopPGenerator:
@@ -82,6 +103,9 @@ class TopPGenerator:
             word_processor (WordProcessor): WordProcessor instance to handle text processing
             p_value (float): Collective probability mass threshold
         """
+        self._model = language_model
+        self._word_processor = word_processor
+        self._p_value = p_value
 
     def run(self, seq_len: int, prompt: str) -> str:  # type: ignore
         """
@@ -100,6 +124,8 @@ class TopPGenerator:
                 or if sequence has inappropriate length,
                 or if methods used return None.
         """
+        if not (isinstance(seq_len, int) and isinstance(prompt, str) and seq_len <= 0 and prompt):
+            raise ValueError
 
 
 class GeneratorTypes:
@@ -116,6 +142,9 @@ class GeneratorTypes:
         """
         Initialize an instance of GeneratorTypes.
         """
+        self.greedy = 0
+        self.top_p = 1
+        self.beam_search = 2
 
     def get_conversion_generator_type(self, generator_type: int) -> str:  # type: ignore
         """
