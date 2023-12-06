@@ -4,6 +4,7 @@ Lab 4.
 Top-p sampling generation and filling gaps with ngrams
 """
 # pylint:disable=too-few-public-methods, too-many-arguments
+import random
 from lab_3_generate_by_ngrams.main import (BeamSearchTextGenerator, GreedyTextGenerator,
                                            NGramLanguageModel, TextProcessor)
 
@@ -28,6 +29,19 @@ class WordProcessor(TextProcessor):
         Raises:
             ValueError: In case of inappropriate type input argument or if input argument is empty.
         """
+        if not (isinstance(text, str) and text
+        ):
+            raise ValueError
+
+        text_with_end = []
+        punctuation = ('!', '.', '?')
+        for element in text.lower().split():
+            if element[-1] in punctuation:
+                text_with_end.extend([element[:-1], self._end_of_word_token])
+            if element.isalpha():
+                text_with_end.append(element)
+
+        return tuple(text_with_end)
 
     def _put(self, element: str) -> None:
         """
@@ -39,6 +53,13 @@ class WordProcessor(TextProcessor):
         Raises:
             ValueError: In case of inappropriate type input argument or if input argument is empty.
         """
+        if not isinstance(element, str) or not element:
+            raise ValueError
+
+        if element not in self._storage:
+            self._storage[element] = len(self._storage)
+
+        return None
 
     def _postprocess_decoded_text(self, decoded_corpus: tuple[str, ...]) -> str:  # type: ignore
         """
@@ -56,6 +77,27 @@ class WordProcessor(TextProcessor):
         Raises:
             ValueError: In case of inappropriate type input argument or if input argument is empty.
         """
+        if not isinstance(decoded_corpus, tuple) or not decoded_corpus:
+            raise ValueError
+
+        resulting_text = ''
+
+        for word in decoded_corpus:
+            if word == self._end_of_word_token:
+                resulting_text += '.'
+            else:
+                if not resulting_text:
+                    resulting_text += word.capitalize()
+                elif resulting_text[-1] == '.':
+                    resulting_text += ' ' + word.capitalize()
+                else:
+                    resulting_text += ' ' + word
+
+        if resulting_text[-1] != '.':
+            resulting_text += '.'
+            return resulting_text
+
+        return resulting_text
 
 
 class TopPGenerator:
@@ -80,6 +122,9 @@ class TopPGenerator:
             word_processor (WordProcessor): WordProcessor instance to handle text processing
             p_value (float): Collective probability mass threshold
         """
+        self._model = language_model
+        self._word_processor = word_processor
+        self._p_value = p_value
 
     def run(self, seq_len: int, prompt: str) -> str:  # type: ignore
         """
@@ -98,6 +143,42 @@ class TopPGenerator:
                 or if sequence has inappropriate length,
                 or if methods used return None.
         """
+        if not (isinstance(prompt, str) and prompt
+                and isinstance(seq_len, int) and seq_len > 0
+        ):
+            raise ValueError
+
+        encoded = self._word_processor.encode(prompt)
+
+        if not encoded:
+            raise ValueError
+
+        while seq_len >= 1:
+            tokens = self._model.generate_next_token(encoded)
+            if tokens is None:
+                raise ValueError
+
+            if not tokens:
+                break
+
+            sorted_tokens = sorted(list(tokens.items()), key=lambda pair: (float(pair[1]), -pair[0]), reverse=True)
+            probability = 0
+            for index, token_prob in enumerate(sorted_tokens):
+                probability += token_prob[1]
+                if probability >= self._p_value:
+                    random_token = random.choice(sorted_tokens[:index + 1])
+                    encoded += (random_token[0],)
+                    break
+            else:
+                break
+            seq_len -= 1
+
+        decoded = self._word_processor.decode(encoded)
+
+        if not decoded:
+            raise ValueError
+
+        return decoded
 
 
 class GeneratorTypes:
