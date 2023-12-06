@@ -193,6 +193,22 @@ class TextProcessor:
 
         return decoded_text
 
+    def fill_from_ngrams(self, content: dict) -> None:
+        """
+        Fill internal storage with letters from external JSON.
+
+        Args:
+            content (dict): ngrams from external JSON
+        """
+        if not isinstance(content, dict) or not content:
+            return None
+
+        for token in (char for n_gram in content['freq']
+                      for char in n_gram.lower() if char.isalpha()):
+            self._put(token)
+
+        return None
+
     def _decode(self, corpus: tuple[int, ...]) -> Optional[tuple[str, ...]]:
         """
         Decode sentence by replacing ids with corresponding letters.
@@ -217,22 +233,6 @@ class TextProcessor:
             decoded_corpus.append(token)
 
         return tuple(decoded_corpus)
-
-    def fill_from_ngrams(self, content: dict) -> None:
-        """
-        Fill internal storage with letters from external JSON.
-
-        Args:
-            content (dict): ngrams from external JSON
-        """
-        if not isinstance(content, dict) or not content:
-            return None
-
-        for token in (char for n_gram in content['freq']
-                      for char in n_gram.lower() if char.isalpha()):
-            self._put(token)
-
-        return None
 
     def _postprocess_decoded_text(self, decoded_corpus: tuple[str, ...]) -> Optional[str]:
         """
