@@ -4,6 +4,8 @@ Lab 4.
 Top-p sampling generation and filling gaps with ngrams
 """
 # pylint:disable=too-few-public-methods, too-many-arguments
+import random
+
 from lab_3_generate_by_ngrams.main import (BeamSearchTextGenerator, GreedyTextGenerator,
                                            NGramLanguageModel, TextProcessor)
 
@@ -79,12 +81,12 @@ class WordProcessor(TextProcessor):
             raise ValueError
 
         words_list = list(decoded_corpus)
-        sentences = (' '.join(words_list)).split('<eos>')
+        sentences = (' '.join(words_list)).split(self._end_of_word_token)
         decoded_text = ''
         for i, sentence in enumerate(sentences):
             sentence = sentence.strip().capitalize()
             decoded_text += f'{sentence}. '
-        if decoded_corpus[-1] == '<eos>':
+        if decoded_corpus[-1] == self._end_of_word_token:
             return decoded_text[:len(decoded_text) - 2].strip()
         return decoded_text.strip()
 
@@ -111,6 +113,9 @@ class TopPGenerator:
             word_processor (WordProcessor): WordProcessor instance to handle text processing
             p_value (float): Collective probability mass threshold
         """
+        self._model = language_model
+        self._word_processor = word_processor
+        self._p_value = p_value
 
     def run(self, seq_len: int, prompt: str) -> str:  # type: ignore
         """
@@ -129,6 +134,35 @@ class TopPGenerator:
                 or if sequence has inappropriate length,
                 or if methods used return None.
         """
+        if not (isinstance(seq_len, int) and seq_len > 0
+                and isinstance(prompt, str) and prompt):
+            raise ValueError
+        encoded = self._word_processor.encode(prompt)
+        if not encoded:
+            raise ValueError
+
+        for i in range(seq_len):
+            next_tokens = self._model.generate_next_token(encoded)
+            if next_tokens is None:
+                raise ValueError
+            if not next_tokens:
+                break
+
+            sorted_dict = dict(sorted(list(next_tokens.items()), key=lambda x: (x[1], x[0]), reverse=True))
+            probability = 0
+            possible_tokens = ()
+            for word, value in sorted_dict.items():
+                probability += value
+                possible_tokens += (word,)
+                if probability >= self._p_value:
+                    break
+            encoded += (random.choice(possible_tokens),)
+
+        decoded = self._word_processor.decode(encoded)
+        if not decoded:
+            raise ValueError
+
+        return decoded
 
 
 class GeneratorTypes:
