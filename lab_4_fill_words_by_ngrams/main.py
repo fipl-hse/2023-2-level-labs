@@ -5,6 +5,7 @@ Top-p sampling generation and filling gaps with ngrams
 """
 # pylint:disable=too-few-public-methods, too-many-arguments
 import random
+import math
 
 from lab_3_generate_by_ngrams.main import (BeamSearchTextGenerator, GreedyTextGenerator,
                                            NGramLanguageModel, TextProcessor)
@@ -137,26 +138,27 @@ class TopPGenerator:
         encoded_text = self._word_processor.encode(prompt)
         if not encoded_text:
             raise ValueError
-        for iteration in range(seq_len):
+        for i in range(seq_len):
             next_tokens = self._model.generate_next_token(encoded_text)
             if next_tokens is None:
                 raise ValueError
             if not next_tokens:
                 break
-            probable_words = []
+            sorted_dict = dict(sorted(list(next_tokens.items()), key=lambda x: (-x[1], -x[0])))
             probability = 0
-            for word, value in next_tokens.items():
+            possible_tokens = ()
+            for word, value in sorted_dict.items():
                 probability += value
-                probable_words.append((word, value))
+                possible_tokens += (word,)
                 if probability >= self._p_value:
+                    random_word = random.choice(possible_tokens)
+                    encoded_text += (random_word,)
                     break
-            words = [pair[0] for pair in probable_words]
-            random_word = random.choice(words)
-            encoded_text += (random_word,)
         decoded = self._word_processor.decode(encoded_text)
         if not decoded:
             raise ValueError
         return decoded
+
 
 class GeneratorTypes:
     """
@@ -253,7 +255,8 @@ class GenerationResultDTO:
         Returns:
             (str): String with report
         """
-
+        return f'Perplexity score: {self.__perplexity}\n'\
+               f'{GeneratorTypes().get_conversion_generator_type(self.__type)}\nText: {self.__text}\n'
 
 class QualityChecker:
     """
@@ -277,6 +280,9 @@ class QualityChecker:
                 NGramLanguageModel instance to use for text generation
             word_processor (WordProcessor): WordProcessor instance to handle text processing
         """
+        self._generators = generators
+        self._language_model = language_model
+        self._word_processor = word_processor
 
     def _calculate_perplexity(self, generated_text: str) -> float:  # type: ignore
         """
@@ -294,6 +300,28 @@ class QualityChecker:
                 or if methods used return None,
                 or if nothing was generated.
         """
+        if not (isinstance(generated_text, str) and generated_text):
+            raise ValueError
+        encoded = self._word_processor.encode(generated_text)
+        if encoded is None:
+            raise ValueError
+        n_gram_size = self._language_model.get_n_gram_size()
+        log_prob_sum = 0.0
+        for index in range(n_gram_size -1, len(encoded)):
+            context = (encoded[index - n_gram_size + 1: index])
+            token = encoded[index]
+            tokens = self._language_model.generate_next_token(context)
+            if not tokens:
+                raise ValueError
+            prob = tokens.get(token)
+            if not prob:
+                raise ValueError
+            log_prob_sum += math.log(prob)
+        if not log_prob_sum:
+            raise ValueError
+        perplexity = math.exp(-log_prob_sum / (len(encoded) - n_gram_size))
+        return perplexity
+
 
     def run(self, seq_len: int, prompt: str) -> list[GenerationResultDTO]:  # type: ignore
         """
@@ -313,6 +341,9 @@ class QualityChecker:
                 or if sequence has inappropriate length,
                 or if methods used return None.
         """
+        if not (isinstance(seq_len, int) and seq_len > 0
+                and isinstance(prompt, str) and prompt):
+            raise ValueError
 
 
 class Examiner:
