@@ -144,7 +144,7 @@ class TopPGenerator:
                 raise ValueError
             if not next_tokens:
                 break
-            sorted_dict = dict(sorted(list(next_tokens.items()), key=lambda x: (-x[1], -x[0])))
+            sorted_dict = dict(sorted(list(next_tokens.items()), key=lambda x: (x[1], x[0]), reverse=True))
             probability = 0
             possible_tokens = ()
             for word, value in sorted_dict.items():
