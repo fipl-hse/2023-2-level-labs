@@ -37,10 +37,13 @@ class WordProcessor(TextProcessor):
 
         tokens = []
         for word in text.lower().split():
+            clear_word = ''.join(filter(str.isalpha, word))
+            if not clear_word:
+                continue
             if word[-1] in ('!', '.', '?'):
-                tokens.extend([word[:-1], self._end_of_word_token])
-            if word.isalpha():
-                tokens.append(word)
+                tokens.extend([clear_word, self._end_of_word_token])
+            else:
+                tokens.append(clear_word)
         return tuple(tokens)
 
     def _put(self, element: str) -> None:
@@ -142,7 +145,7 @@ class TopPGenerator:
             if not tokens:
                 break
             sorted_tokens = sorted(list(tokens.items()),
-                                   key=lambda pair: (float(pair[1]), -pair[0]), reverse=True)
+                                   key=lambda pair: (float(pair[1]), pair[0]), reverse=True)
             sum_probability = 0
             for index, token_prob in enumerate(sorted_tokens):
                 sum_probability += token_prob[1]
@@ -390,8 +393,7 @@ class Examiner:
                 or if attribute _json_path has inappropriate extension,
                 or if inappropriate type loaded data.
         """
-        if not (isinstance(self._json_path, str) and self._json_path and
-                self._json_path[-5:] == '.json'):
+        if not (isinstance(self._json_path, str) and self._json_path):
             raise ValueError
 
         with open(self._json_path, 'r', encoding='utf-8') as file:
