@@ -4,6 +4,9 @@ Lab 4.
 Top-p sampling generation and filling gaps with ngrams
 """
 # pylint:disable=too-few-public-methods, too-many-arguments
+import random
+from typing import Tuple
+
 from lab_3_generate_by_ngrams.main import (BeamSearchTextGenerator, GreedyTextGenerator,
                                            NGramLanguageModel, TextProcessor)
 
@@ -31,12 +34,16 @@ class WordProcessor(TextProcessor):
         if not (isinstance(text, str) and text):
             raise ValueError
 
-        text = text.lower()
-        for i in text:
-            if i in '.!?':
-                text = text.replace(i, ' ' + self._end_of_word_token)
+        cleaned_text = []
+        for word in text.lower().split():
+            if word[-1] in '.!?':
+                cleaned_text.extend([word[:-1], self._end_of_word_token])
+            else:
+                cleaned_word = [letter for letter in word if letter.isalpha()]
+                if cleaned_word:
+                    cleaned_text.append(''.join(cleaned_word))
 
-        return tuple(text.split())
+        return tuple(cleaned_text)
 
     def _put(self, element: str) -> None:
         """
@@ -50,10 +57,8 @@ class WordProcessor(TextProcessor):
         """
         if not (isinstance(element, str) and element):
             raise ValueError
-
         if element not in self._storage:
             self._storage[element] = len(self._storage)
-        return None
 
     def _postprocess_decoded_text(self, decoded_corpus: tuple[str, ...]) -> str:  # type: ignore
         """
@@ -130,7 +135,38 @@ class TopPGenerator:
                 or if sequence has inappropriate length,
                 or if methods used return None.
         """
-        
+        if not (isinstance(seq_len, int) and seq_len > 0 and isinstance(prompt, str) and prompt):
+            raise ValueError
+
+        encoded_text = self._word_processor.encode(prompt)
+        if not encoded_text:
+            raise ValueError
+
+        for i in range(seq_len):
+            next_tokens = self._model.generate_next_token(encoded_text)
+            if next_tokens is None:
+                raise ValueError
+            if not next_tokens:
+                break
+
+            sorted_tokens = dict(sorted(next_tokens.items(), key=lambda x: (x[1], x[0]), reverse=True))
+
+            sum_probability = 0
+            possible_tokens = []
+
+            for token, value in sorted_tokens.items():
+                if sum_probability < self._p_value:
+                    sum_probability += value
+                    possible_tokens.append(token)
+                chosen_token = random.choice(possible_tokens)
+                encoded_text += (chosen_token,)
+                break
+
+        decoded_text = self._word_processor.decode(encoded_text)
+        if not decoded_text:
+            raise ValueError
+
+        return decoded_text
 
 
 class GeneratorTypes:
