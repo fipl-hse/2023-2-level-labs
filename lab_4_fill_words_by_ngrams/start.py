@@ -3,7 +3,6 @@ Filling word by ngrams starter
 """
 # pylint:disable=too-many-locals,unused-import
 import lab_4_fill_words_by_ngrams.main as main_py
-#from  import WordProcessor, NGramLanguageModel, TopPGenerator
 
 
 def main() -> None:
