@@ -28,6 +28,19 @@ class WordProcessor(TextProcessor):
         Raises:
             ValueError: In case of inappropriate type input argument or if input argument is empty.
         """
+        if not isinstance(text, str) or not text:
+            raise ValueError
+
+        tokens = ''
+        end_of_word_punctuation = '?.!'
+        for word in text.lower():
+            if word in end_of_word_punctuation:
+                tokens += ' ' + self._end_of_word_token
+            elif word.isalpha() or word.isspace():
+                tokens += word
+
+        return tuple(tokens.split())
+
 
     def _put(self, element: str) -> None:
         """
@@ -39,6 +52,12 @@ class WordProcessor(TextProcessor):
         Raises:
             ValueError: In case of inappropriate type input argument or if input argument is empty.
         """
+        if not isinstance(element, str) or not element:
+            raise ValueError
+
+        if element not in self._storage:
+            self._storage[element] = len(self._storage)
+
 
     def _postprocess_decoded_text(self, decoded_corpus: tuple[str, ...]) -> str:  # type: ignore
         """
@@ -56,6 +75,12 @@ class WordProcessor(TextProcessor):
         Raises:
             ValueError: In case of inappropriate type input argument or if input argument is empty.
         """
+        if not isinstance(decoded_corpus, tuple) or not decoded_corpus:
+            raise ValueError
+
+        decoded = f"{''.join(decoded_corpus)}."
+        decoded.capitalize().replace(self._end_of_word_token, ' ')
+
 
 
 class TopPGenerator:
