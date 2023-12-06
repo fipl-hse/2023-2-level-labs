@@ -34,11 +34,14 @@ class WordProcessor(TextProcessor):
         if not (isinstance(text, str) and text):
             raise ValueError
         punctuation_to_replace = '.?!'
-        text = text.lower()
-        for char in punctuation_to_replace:
-            if char in text:
-                text = text.replace(char, ' ' + self._end_of_word_token)
-        tokens = text.split()
+        text = text.lower().split()
+        tokens = []
+        for word in text:
+            if word[-1] in punctuation_to_replace:
+                tokens.extend([word[:-1], self._end_of_word_token])
+            else:
+                tokens.append(''.join([char for char in word
+                                       if char.isalpha()]))
         return tuple(tokens)
 
     def _put(self, element: str) -> None:
@@ -307,7 +310,7 @@ class QualityChecker:
             raise ValueError
         n_gram_size = self._language_model.get_n_gram_size()
         log_prob_sum = 0.0
-        for index in range(n_gram_size -1, len(encoded)):
+        for index in range(n_gram_size - 1, len(encoded)):
             context = (encoded[index - n_gram_size + 1: index])
             token = encoded[index]
             tokens = self._language_model.generate_next_token(context)
