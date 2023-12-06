@@ -423,7 +423,7 @@ class Examiner:
             list[tuple[str, int]]:
                 List in the form of [(question, position of the word to be filled)]
         """
-        questions = [task for task in self._questions_and_answers.keys()]
+        questions = list(self._questions_and_answers.keys())
         return questions
 
     def assess_exam(self, answers: dict[str, str]) -> float:  # type: ignore
@@ -444,8 +444,8 @@ class Examiner:
         correct_answers = list(self._questions_and_answers.values())
         students_answers = list(answers.values())
         correct = 0
-        for i in range(0, len(correct_answers)):
-            if correct_answers[i] == students_answers[i]:
+        for i, answer in enumerate(correct_answers):
+            if answer == students_answers[i]:
                 correct += 1
         return correct / len(correct_answers)
 
