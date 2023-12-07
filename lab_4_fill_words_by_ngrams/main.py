@@ -130,10 +130,11 @@ class TopPGenerator:
                 or not prompt or seq_len <= 0:
             raise ValueError
         encoded = self._word_processor.encode(prompt)
-        if not encoded:
+        if encoded is None:
             raise ValueError
-        encoded_seq = []
+        encoded_seq = list(encoded)
         while seq_len > 0:
+            seq_len -= 1
             next_tokens = self._model.generate_next_token(encoded)
             if next_tokens is None:
                 raise ValueError
@@ -148,9 +149,8 @@ class TopPGenerator:
                 if probability >= self._p_value:
                     break
                 encoded_seq.append(choice(possible_tokens))
-            seq_len -= 1
         decoded = self._word_processor.decode(tuple(encoded_seq))
-        if not decoded:
+        if decoded is None:
             raise ValueError
         return decoded
 
