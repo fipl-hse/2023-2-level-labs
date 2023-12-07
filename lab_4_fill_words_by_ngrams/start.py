@@ -52,7 +52,7 @@ def main() -> None:
         answers = student.take_exam(questions)
         exam = examiner.assess_exam(answers)
         gen = student.get_generator_type()
-        result = exam
+        result = str(exam)
 
         print(gen, exam)
         print(' '.join(answers.values()))

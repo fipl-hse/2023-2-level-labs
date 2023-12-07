@@ -290,7 +290,7 @@ class QualityChecker:
     """
 
     def __init__(
-            self, generators: dict, language_model: NGramLanguageModel, word_processor: WordProcessor
+        self, generators: dict, language_model: NGramLanguageModel, word_processor: WordProcessor
     ) -> None:
         """
         Initialize an instance of QualityChecker.
@@ -421,7 +421,8 @@ class Examiner:
                 or if attribute _json_path has inappropriate extension,
                 or if inappropriate type loaded data.
         """
-        if not (isinstance(self._json_path, str) and self._json_path and '.json' in self._json_path):
+        if not (isinstance(self._json_path, str) and self._json_path and '.json'
+                in self._json_path):
             raise ValueError
 
         with open(self._json_path, 'r', encoding='utf-8') as file:
