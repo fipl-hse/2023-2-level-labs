@@ -306,6 +306,8 @@ class QualityChecker:
                 or if methods used return None,
                 or if nothing was generated.
         """
+        if generated_text is None:
+            raise ValueError
         if not (isinstance(generated_text, str) and generated_text):
             raise ValueError
         encoded = self._word_processor.encode(generated_text)
