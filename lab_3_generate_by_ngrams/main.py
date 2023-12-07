@@ -91,7 +91,6 @@ class TextProcessor:
         """
         return self._end_of_word_token
 
-
     def get_token(self, element_id: int) -> Optional[str]:
         """
         Retrieve an element by unique identifier.
