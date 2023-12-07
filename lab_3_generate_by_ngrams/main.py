@@ -28,6 +28,7 @@ class TextProcessor:
         self._end_of_word_token = end_of_word_token
         self._storage = {end_of_word_token: 0}
 
+
     def _tokenize(self, text: str) -> Optional[tuple[str, ...]]:
         """
         Tokenize text into unigrams, separating words with special token.
