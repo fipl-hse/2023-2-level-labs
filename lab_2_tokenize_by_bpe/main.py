@@ -189,7 +189,6 @@ def decode(
     if not isinstance(encoded_text, list) or not isinstance(vocabulary, dict) or not (isinstance(
             end_of_word_token, str) or end_of_word_token is None):
         return None
-<<<<<<< HEAD
     decoded = ''
     for identifier in encoded_text:
         token_list = [key for key in vocabulary if vocabulary[key] == identifier]
@@ -201,17 +200,6 @@ def decode(
         decoded = decoded.replace(end_of_word_token, ' ')
 
     return decoded
-=======
-    list_of_tokens = ''
-    for i in encoded_text:
-        for token, value in vocabulary.items():
-            if value == i:
-                list_of_tokens += token
-    if end_of_word_token is not None:
-        list_of_tokens = list_of_tokens.replace(end_of_word_token, ' ')
-
-    return list_of_tokens
->>>>>>> 77a4fa5 (some changes)
 
 
 def tokenize_word(
