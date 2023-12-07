@@ -4,15 +4,15 @@ Seminar 8
 Intoduction to class inheritance
 """
 # pylint:disable=missing-class-docstring,too-few-public-methods
-# Vehicle
-    # Attributes:
-        # max_speed
-        # colour
-    # Methods:
-        # move
-
 class Vehicle:
-    ...
+    def __init__(self, max_speed: int, color: str) -> None:
+        self._max_speed = max_speed
+        self._color = color
+
+    def move(self):
+        pass
+
+
 
 
 # Car
@@ -25,11 +25,23 @@ class Vehicle:
         # stay
 
 
-class Car:
-    ...
+class Car(Vehicle):
+    def __init__(self, max_speed: int, color: str, fuel: float):
+        super().__init__(max_speed, color)
+        self._fuel = fuel
+
+    def move(self):
+        while self._fuel > 0:
+            self._fuel -= 1
+            print(f'Moving...{self._fuel} litres of fuel for {}')
+        print('No fuel left')
 
 
-LADA = ...
+    def stay(self):
+        if self._fuel:
+            return None
+        print('The car is staying')
+LADA = Car( )
 
 
 # Bicycle
@@ -42,7 +54,17 @@ LADA = ...
         # freestyle
 
 class Bicycle(Vehicle):
-    ...
+
+    def __init__(self, color, max_speed, number_of_wheels):
+        self._number_of_wheels = number_of_wheels
+        self._color = color
+        self._max_speed = max_speed
+
+    def move(self):
+        pass
+
+    def freestyle(self):
+        pass
 
 
 # stels = Bicycle('yellow', 30, 2)
