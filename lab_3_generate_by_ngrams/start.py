@@ -27,9 +27,9 @@ def main() -> None:
 
     result = generator.run(51, "Vernon")
 
-    Beam_gen = BeamSearchTextGenerator(language_model, processor, 7)
+    beam_generator = BeamSearchTextGenerator(language_model, processor, 7)
 
-    result = Beam_gen.run("Vernon", 56)
+    result = beam_generator.run("Vernon", 56)
 
     assert result
 

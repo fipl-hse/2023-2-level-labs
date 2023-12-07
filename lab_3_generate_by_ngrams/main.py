@@ -344,9 +344,9 @@ class NGramLanguageModel:
                 or len(sequence) < self._n_gram_size - 1):
             return None
 
-        frequencies = {i[-1]: self._n_gram_frequencies[i]
-                       for i in self._n_gram_frequencies.keys()
-                       if i[:self._n_gram_size - 1]
+        frequencies = {key[-1]: val
+                       for key, val in self._n_gram_frequencies.items()
+                       if key[:self._n_gram_size - 1]
                        == sequence[-(self._n_gram_size-1):]}
 
         return frequencies
@@ -476,14 +476,16 @@ class BeamSearcher:
             return None
 
         tokens = self._model.generate_next_token(sequence)
-        if tokens is None or not tokens:
-            return tokens
+        if tokens is None:
+            return None
+        if not tokens:
+            return []
 
         values = tokens.values()
-        values = sorted(list(set(values)), reverse=True)
+        values_sorted = sorted(list(set(values)), reverse=True)
         result = []
 
-        for i in values:
+        for i in values_sorted:
             max_freq_tokens = [token for token, freq in tokens.items() if freq == i]
             result += ((token, tokens[token]) for token in max_freq_tokens)
             if len(result) >= self._beam_width:
