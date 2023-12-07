@@ -104,7 +104,8 @@ def remove_duplicates(data: dict[str, int]) -> dict[str, int]:
     Write a function that removes duplicates (key:value pairs with same values)
     """
     # student realisation goes here
-
+    for v in data.values():
+        if v1
 
 # Function calls with expected result
 # assert remove_duplicates({
