@@ -141,16 +141,19 @@ class TopPGenerator:
         encoded_text = self._word_processor.encode(prompt)
         if not encoded_text:
             raise ValueError
-        for i in range(seq_len):
+        for _ in range(seq_len):
             next_tokens = self._model.generate_next_token(encoded_text)
             if next_tokens is None:
                 raise ValueError
             if not next_tokens:
                 break
-            sorted_dict = dict(sorted(list(next_tokens.items()), key=lambda x: (x[1], x[0]), reverse=True))
+            candidates = []
+            for word, value in next_tokens.items():
+                candidates.append((word, value))
+            sorted_candidates = sorted(candidates, key=lambda x: (x[1], x[0]), reverse=True)
             probability = 0
             possible_tokens = ()
-            for word, value in sorted_dict.items():
+            for word, value in sorted_candidates:
                 probability += value
                 possible_tokens += (word,)
                 if probability >= self._p_value:
@@ -158,7 +161,7 @@ class TopPGenerator:
                     encoded_text += (random_word,)
                     break
         decoded = self._word_processor.decode(encoded_text)
-        if not decoded:
+        if decoded is None:
             raise ValueError
         return decoded
 
@@ -191,12 +194,12 @@ class GeneratorTypes:
         Returns:
             (str): Name of the generator.
         """
-        if generator_type == 0:
-            return 'Greedy Generator'
-        if generator_type == 1:
-            return 'Top-P Generator'
-        if generator_type == 2:
-            return 'Beam Search Generator'
+        generator_types = {
+            0: 'Greedy Generator',
+            1: 'Top-P Generator',
+            2: 'Beam Search Generator'
+        }
+        return generator_types.get(generator_type)
 
 
 class GenerationResultDTO:
@@ -306,7 +309,7 @@ class QualityChecker:
         if not (isinstance(generated_text, str) and generated_text):
             raise ValueError
         encoded = self._word_processor.encode(generated_text)
-        if encoded is None:
+        if not encoded:
             raise ValueError
         n_gram_size = self._language_model.get_n_gram_size()
         log_prob_sum = 0.0
@@ -314,17 +317,16 @@ class QualityChecker:
             context = (encoded[index - n_gram_size + 1: index])
             token = encoded[index]
             tokens = self._language_model.generate_next_token(context)
-            if not tokens:
+            if tokens is None:
                 raise ValueError
             prob = tokens.get(token)
-            if not prob:
+            if prob is None:
                 raise ValueError
             log_prob_sum += math.log(prob)
         if not log_prob_sum:
             raise ValueError
         perplexity = math.exp(-log_prob_sum / (len(encoded) - n_gram_size))
         return perplexity
-
 
     def run(self, seq_len: int, prompt: str) -> list[GenerationResultDTO]:  # type: ignore
         """
@@ -347,7 +349,15 @@ class QualityChecker:
         if not (isinstance(seq_len, int) and seq_len > 0
                 and isinstance(prompt, str) and prompt):
             raise ValueError
-
+        results = []
+        for numeric_type, generator in self._generators.items():
+            text = generator.run(seq_len, prompt)
+            perplexity = self._calculate_perplexity(text)
+            if perplexity is None:
+                raise ValueError
+            results.append(GenerationResultDTO(text, perplexity, numeric_type))
+        results.sort(key=lambda x: (x.get_perplexity(), x.get_type()))
+        return results
 
 class Examiner:
     """
