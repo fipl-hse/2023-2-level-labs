@@ -26,6 +26,8 @@ def main() -> None:
 
     result = generator.run(51, "Vernon")
 
+    print(result)
+
     assert result
 
 

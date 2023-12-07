@@ -422,10 +422,15 @@ class GreedyTextGenerator:
             tokens = self._model.generate_next_token(tuple(encoded))
             if tokens is None or len(tokens) == 0:
                 break
-            token = max(tokens, key=tokens.__getitem__)
-            encoded.append(token)
+            # token = max(tokens, key=tokens.__getitem__)
+            max_freq = max(tokens.values())
+            max_freq_tokens = [token for token, freq in tokens.items() if freq == max_freq]
+            max_freq_tokens = sorted(max_freq_tokens, reverse=True)
+
+            encoded.append(max_freq_tokens[0])
 
         return self._text_processor.decode(tuple(encoded))
+
 
 class BeamSearcher:
     """
