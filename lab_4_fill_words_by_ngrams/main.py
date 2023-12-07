@@ -143,7 +143,8 @@ class TopPGenerator:
         while seq_len >= 1:
             tokens = self._model.generate_next_token(encoded)
             if tokens is None:
-                raise ValueError("TopPGenerator.run: Model returned None instead of generated tokens.")
+                raise ValueError("TopPGenerator.run: "
+                                 "Model returned None instead of generated tokens.")
             if not tokens:
                 break
             sorted_tokens = sorted(list(tokens.items()),
@@ -323,7 +324,8 @@ class QualityChecker:
                 sum_log += log(probability)
 
         if not sum_log:
-            raise ValueError("QualityChecker._calculate_perplexity: Sum of token probabilities is 0.")
+            raise ValueError("QualityChecker._calculate_perplexity: "
+                             "Sum of token probabilities is 0.")
         sum_log /= -(len(encoded) - n_gram_size)
         return exp(sum_log)
 
