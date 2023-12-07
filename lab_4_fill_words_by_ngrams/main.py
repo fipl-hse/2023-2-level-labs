@@ -6,6 +6,7 @@ Top-p sampling generation and filling gaps with ngrams
 # pylint:disable=too-few-public-methods, too-many-arguments
 from lab_3_generate_by_ngrams.main import (BeamSearchTextGenerator, GreedyTextGenerator,
                                            NGramLanguageModel, TextProcessor)
+from random import choice
 
 
 class WordProcessor(TextProcessor):
@@ -28,6 +29,17 @@ class WordProcessor(TextProcessor):
         Raises:
             ValueError: In case of inappropriate type input argument or if input argument is empty.
         """
+        if not isinstance(text, str) or not text:
+            raise ValueError
+        new_text = []
+        for word in text.lower().split():
+            if word[-1] in '.!?':
+                new_text.extend([word[:-1], self._end_of_word_token])
+            else:
+                cleared = ''.join(filter(str.isalpha, word))
+                if cleared:
+                    new_text.append(cleared)
+        return tuple(new_text)
 
     def _put(self, element: str) -> None:
         """
@@ -39,6 +51,10 @@ class WordProcessor(TextProcessor):
         Raises:
             ValueError: In case of inappropriate type input argument or if input argument is empty.
         """
+        if not isinstance(element, str) or not element:
+            raise ValueError
+        if element not in self._storage:
+            self._storage[element] = len(self._storage)
 
     def _postprocess_decoded_text(self, decoded_corpus: tuple[str, ...]) -> str:  # type: ignore
         """
@@ -56,6 +72,15 @@ class WordProcessor(TextProcessor):
         Raises:
             ValueError: In case of inappropriate type input argument or if input argument is empty.
         """
+        if not isinstance(decoded_corpus, tuple) or not decoded_corpus:
+            raise ValueError
+        text = (' '.join(decoded_corpus).replace(f' {self._end_of_word_token}', '.').capitalize()).split('. ')
+        for num, sentence in enumerate(text):
+            text[num] = sentence.capitalize()
+        text = '. '.join(text)
+        if text[-1] != '.':
+            text += '.'
+        return text
 
 
 class TopPGenerator:
@@ -69,7 +94,7 @@ class TopPGenerator:
     """
 
     def __init__(
-        self, language_model: NGramLanguageModel, word_processor: WordProcessor, p_value: float
+            self, language_model: NGramLanguageModel, word_processor: WordProcessor, p_value: float
     ) -> None:
         """
         Initialize an instance of TopPGenerator.
@@ -80,6 +105,9 @@ class TopPGenerator:
             word_processor (WordProcessor): WordProcessor instance to handle text processing
             p_value (float): Collective probability mass threshold
         """
+        self._model = language_model
+        self._word_processor = word_processor
+        self._p_value = p_value
 
     def run(self, seq_len: int, prompt: str) -> str:  # type: ignore
         """
@@ -98,6 +126,33 @@ class TopPGenerator:
                 or if sequence has inappropriate length,
                 or if methods used return None.
         """
+        if not isinstance(seq_len, int) or not isinstance(prompt, str) \
+                or not prompt or seq_len <= 0:
+            raise ValueError
+        encoded = self._word_processor.encode(prompt)
+        if not encoded:
+            raise ValueError
+        encoded_seq = []
+        while seq_len > 0:
+            next_tokens = self._model.generate_next_token(encoded)
+            if next_tokens is None:
+                raise ValueError
+            if not next_tokens:
+                break
+            sorted_next_tokens = dict(sorted(next_tokens.items(), key=lambda x: (x[1], x[0]), reverse=True))
+            probability = 0
+            possible_tokens = []
+            for key, value in sorted_next_tokens.items():
+                probability += value
+                possible_tokens.append(key)
+                if probability >= self._p_value:
+                    break
+                encoded_seq.append(choice(possible_tokens))
+            seq_len -= 1
+        decoded = self._word_processor.decode(tuple(encoded_seq))
+        if not decoded:
+            raise ValueError
+        return decoded
 
 
 class GeneratorTypes:
@@ -192,7 +247,7 @@ class QualityChecker:
     """
 
     def __init__(
-        self, generators: dict, language_model: NGramLanguageModel, word_processor: WordProcessor
+            self, generators: dict, language_model: NGramLanguageModel, word_processor: WordProcessor
     ) -> None:
         """
         Initialize an instance of QualityChecker.
@@ -307,7 +362,7 @@ class GeneratorRuleStudent:
     _generator_type: int
 
     def __init__(
-        self, generator_type: int, language_model: NGramLanguageModel, word_processor: WordProcessor
+            self, generator_type: int, language_model: NGramLanguageModel, word_processor: WordProcessor
     ) -> None:
         """
         Initialize an instance of GeneratorRuleStudent.
