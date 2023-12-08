@@ -57,6 +57,7 @@ class WordProcessor(TextProcessor):
         """
         if not (isinstance(element, str) and element):
             raise ValueError
+
         if element not in self._storage:
             self._storage[element] = len(self._storage)
 
