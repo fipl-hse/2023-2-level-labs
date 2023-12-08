@@ -8,6 +8,7 @@ from lab_3_generate_by_ngrams.main import (BeamSearchTextGenerator, GreedyTextGe
                                            NGramLanguageModel, TextProcessor)
 
 
+
 class WordProcessor(TextProcessor):
     """
     Handle text tokenization, encoding and decoding.
