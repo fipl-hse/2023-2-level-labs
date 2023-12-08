@@ -75,7 +75,7 @@ class WordProcessor(TextProcessor):
         if not isinstance(decoded_corpus, tuple) or not decoded_corpus:
             raise ValueError
 
-        sentences = ''.join(decoded_corpus).split(self._end_of_word_token)
+        sentences = ' '.join(decoded_corpus).split(self._end_of_word_token)
         text = '.'.join([sentence.strip().capitalize() for sentence in sentences])
         if text[-1] == ' ':
             return text[:-1]
