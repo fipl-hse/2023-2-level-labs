@@ -141,7 +141,7 @@ class TopPGenerator:
                 or if methods used return None.
         """
         if not isinstance(seq_len, int) or seq_len < 0 or not isinstance(prompt, str) or not prompt:
-            raise ValueError
+            raise ValueError("Incorrect input")
 
         encoded = self._word_processor.encode(prompt)
         if not encoded:
@@ -353,7 +353,7 @@ class QualityChecker:
                 or if methods used return None.
         """
         if not isinstance(seq_len, int) or seq_len < 0 or not isinstance(prompt, str) or not prompt:
-            raise ValueError
+            raise ValueError("Incorrect input")
         calculations = []
         for num_type, name in self._generators.items():
             generated = name.run(prompt=prompt, seq_len=seq_len)
