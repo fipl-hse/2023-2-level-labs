@@ -3,6 +3,8 @@ Lab 4.
 
 Top-p sampling generation and filling gaps with ngrams
 """
+import random
+
 # pylint:disable=too-few-public-methods, too-many-arguments
 from lab_3_generate_by_ngrams.main import (BeamSearchTextGenerator, GreedyTextGenerator,
                                            NGramLanguageModel, TextProcessor)
@@ -70,12 +72,13 @@ class WordProcessor(TextProcessor):
         Raises:
             ValueError: In case of inappropriate type input argument or if input argument is empty.
         """
-        if not isinstance(decoded_corpus,tuple) or not decoded_corpus:
+        if not isinstance(decoded_corpus, tuple) or not decoded_corpus:
             raise ValueError
-        decoded_str = ''
-        for word in decoded_corpus:
-            if
-
+        corpus = ' '.join(decoded_corpus).split(self._end_of_word_token)
+        text = '. '.join([sent.strip().capitalize() for sent in corpus])
+        if text[-1] == ' ':
+            return text[:-1]
+        return text + '.'
 
 class TopPGenerator:
     """
@@ -99,6 +102,9 @@ class TopPGenerator:
             word_processor (WordProcessor): WordProcessor instance to handle text processing
             p_value (float): Collective probability mass threshold
         """
+        self._model = language_model
+        self._word_processor = word_processor
+        self._p_value = p_value
 
     def run(self, seq_len: int, prompt: str) -> str:  # type: ignore
         """
@@ -117,6 +123,32 @@ class TopPGenerator:
                 or if sequence has inappropriate length,
                 or if methods used return None.
         """
+        if (not isinstance(seq_len, int) or seq_len < 1 or
+           not isinstance(prompt, str) or not str):
+           raise ValueError
+        prompt_encoded = self._word_processor.encode(prompt)
+        if not prompt_encoded:
+            raise ValueError
+        while seq_len > 0:
+            tokens = self._model.generate_next_token(prompt_encoded)
+            if tokens is None:
+                raise ValueError
+            if not tokens:
+                break
+            tokens_sorted = sorted(tokens.items(), key=lambda pair: (pair[1], pair[0]),
+                                   reverse=True)
+            freq_sum = 0
+            tokens_to_choose_from = []
+            for token in tokens_sorted:
+                if freq_sum < self._p_value:
+                    freq_sum += token[1]
+                    tokens_to_choose_from.append(token[0])
+            prompt_encoded += (random.choice(tokens_to_choose_from),)
+            seq_len -= 1
+        text = self._word_processor.decode(prompt_encoded)
+        if not text:
+            raise ValueError
+        return text
 
 
 class GeneratorTypes:
