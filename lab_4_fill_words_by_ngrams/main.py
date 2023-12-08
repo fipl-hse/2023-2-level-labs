@@ -61,7 +61,6 @@ class WordProcessor(TextProcessor):
         self._storage[element] = len(self._storage)
         return None
 
-
     def _postprocess_decoded_text(self, decoded_corpus: tuple[str, ...]) -> str:  # type: ignore
         """
         Convert decoded sentence into the string sequence.
@@ -306,8 +305,6 @@ class QualityChecker:
                 or if methods used return None,
                 or if nothing was generated.
         """
-        if generated_text is None:
-            raise ValueError
         if not (isinstance(generated_text, str) and generated_text):
             raise ValueError
         encoded = self._word_processor.encode(generated_text)
@@ -354,6 +351,8 @@ class QualityChecker:
         results = []
         for numeric_type, generator in self._generators.items():
             text = generator.run(seq_len, prompt)
+            if not text:
+                continue
             perplexity = self._calculate_perplexity(text)
             if perplexity is None:
                 raise ValueError
@@ -378,6 +377,7 @@ class Examiner:
         Args:
             json_path (str): Local path to assets file
         """
+        self._json_path = json_path
 
     def _load_from_json(self) -> dict[tuple[str, int], str]:  # type: ignore
         """
