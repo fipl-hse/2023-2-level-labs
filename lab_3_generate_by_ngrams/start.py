@@ -18,8 +18,8 @@ def main() -> None:
     if not(isinstance(encoded, tuple) and encoded):
         return
 
-<<<<<<< HEAD
-    decoded_story = str(story.decode(encoded))
+
+    decoded_story = str(processor.decode(encoded))
     result = decoded_story
     result
 
@@ -27,12 +27,12 @@ def main() -> None:
     print("checks if the building is successful: ", lang_model.build())
 
     model2 = NGramLanguageModel(encoded, 7)
-    greedy = GreedyTextGenerator(model2, story)
+    greedy = GreedyTextGenerator(model2, processor)
     greedy.run(51, "Vernon")
 
-    beam_search = BeamSearchTextGenerator(model2, story, 7)
+    beam_search = BeamSearchTextGenerator(model2, processor, 7)
     print(beam_search.run('Vernon', 56))
-=======
+
     decoded = str(processor.decode(encoded))
     result = decoded
 
@@ -40,7 +40,6 @@ def main() -> None:
     model_7 = NGramLanguageModel(encoded, 7)
     greedy_text_generator = GreedyTextGenerator(model_7, processor)
     print(greedy_text_generator.run(51, 'Vernon'))
->>>>>>> 916b88911c5c8b19ce9d7cb1a03650fd0d573dac
 
     beam_search_generator = BeamSearchTextGenerator(model_7, processor, 7)
     print(beam_search_generator.run('Vernon', 56))
