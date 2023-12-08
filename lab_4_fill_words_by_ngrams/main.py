@@ -6,6 +6,7 @@ Top-p sampling generation and filling gaps with ngrams
 # pylint:disable=too-few-public-methods, too-many-arguments
 from lab_3_generate_by_ngrams.main import (BeamSearchTextGenerator, GreedyTextGenerator,
                                            NGramLanguageModel, TextProcessor)
+import random
 
 
 class WordProcessor(TextProcessor):
@@ -33,9 +34,9 @@ class WordProcessor(TextProcessor):
 
         tokens = []
         for token in text.lower().split():
-            if token in ('!', '?', '.'):
-                tokens.extend([token[-1], self._end_of_word_token])
-            if token.isalpha:
+            if token[-1] in '!?.':
+                tokens.extend([token[:-1], self._end_of_word_token])
+            elif token.isalpha():
                 tokens.append(token)
         return tuple(tokens)
 
@@ -55,7 +56,6 @@ class WordProcessor(TextProcessor):
             self._storage[element] = len(self._storage)
         return None
 
-
     def _postprocess_decoded_text(self, decoded_corpus: tuple[str, ...]) -> str:  # type: ignore
         """
         Convert decoded sentence into the string sequence.
@@ -72,6 +72,14 @@ class WordProcessor(TextProcessor):
         Raises:
             ValueError: In case of inappropriate type input argument or if input argument is empty.
         """
+        if not isinstance(decoded_corpus, tuple) or not decoded_corpus:
+            raise ValueError
+
+        sentences = ''.join(decoded_corpus).split(self._end_of_word_token)
+        text = '.'.join([sentence.strip().capitalize() for sentence in sentences])
+        if text[-1] == ' ':
+            return text[:-1]
+        return text + '.'
 
 
 class TopPGenerator:
@@ -96,6 +104,9 @@ class TopPGenerator:
             word_processor (WordProcessor): WordProcessor instance to handle text processing
             p_value (float): Collective probability mass threshold
         """
+        self._model = language_model
+        self._word_processor = word_processor
+        self._p_value = p_value
 
     def run(self, seq_len: int, prompt: str) -> str:  # type: ignore
         """
@@ -114,6 +125,39 @@ class TopPGenerator:
                 or if sequence has inappropriate length,
                 or if methods used return None.
         """
+        if not isinstance(seq_len, int) or seq_len <= 0:
+            raise ValueError("seq_len must be a positive integer")
+        if not isinstance(prompt, str) or not prompt:
+            raise ValueError("prompt must be a non-empty string")
+
+        encoded = self._word_processor.encode(prompt)
+        if not encoded:
+            raise ValueError("Failed to encode the prompt")
+
+        while seq_len >= 1:
+            tokens = self._model.generate_next_token(encoded)
+            if tokens is None:
+                raise ValueError("Failed to generate next token")
+            if not tokens:
+                break
+            sorted_tokens = sorted(list(tokens.items()), key=lambda pair: (float(pair[1]), pair[0]), reverse=True)
+            sum_probability = 0
+            candidates = []
+            for index, token_prob in enumerate(sorted_tokens):
+                sum_probability += token_prob[1]
+                if sum_probability >= self._p_value:
+                    candidates = sorted_tokens[:index + 1]
+                    break
+            if not candidates:
+                break
+            random_token = random.choice(candidates)
+            encoded += (random_token[0],)
+            seq_len -= 1
+
+        decoded = self._word_processor.decode(encoded)
+        if not decoded:
+            raise ValueError("Failed to decode the generated sequence")
+        return decoded
 
 
 class GeneratorTypes:
