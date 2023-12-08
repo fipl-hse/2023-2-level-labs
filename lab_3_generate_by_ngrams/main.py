@@ -103,6 +103,7 @@ class TextProcessor:
         for key, value in self._storage.items():
             if value == element_id:
                 return key
+        return None
 
     def encode(self, text: str) -> Optional[tuple[int, ...]]:
         """
