@@ -21,7 +21,6 @@ def main() -> None:
     decoded = str(processor.decode(encoded))
     result = decoded
 
-    # n_gram_model = NGramLanguageModel(encoded[:100], n_gram_size=3)
     lang_model = NGramLanguageModel(encoded, 7)
     greedy_text_generator = GreedyTextGenerator(lang_model, processor)
     print(greedy_text_generator.run(51, 'Vernon'))

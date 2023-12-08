@@ -382,22 +382,20 @@ class GreedyTextGenerator:
         In case of corrupt input arguments or methods used return None,
         None is returned
         """
-        if not isinstance(seq_len, int) or not isinstance(
-                prompt, str) or not prompt:
+        if not (isinstance(seq_len, int) and isinstance(prompt, str) and prompt):
             return None
-        encoded_corpus = self._text_processor.encode(prompt)
-        n_size = self._model.get_n_gram_size()
-        if not encoded_corpus or not n_size:
+        encoded_prompt = self._text_processor.encode(prompt)
+        n_gram_size = self._model.get_n_gram_size()
+        if not (n_gram_size and encoded_prompt):
             return None
-        for i in range(seq_len):
-            next_tokens = self._model.generate_next_token(
-                encoded_corpus[1 - n_size:])
-            if not next_tokens:
+        for _ in range(seq_len):
+            next_cand = self._model.generate_next_token(encoded_prompt)
+            if not next_cand:
                 break
-            tokens = [key for key, value in next_tokens.items() \
-                      if value == max(next_tokens.values())]
-            encoded_corpus += sorted(tokens)[0],
-        return self._text_processor.decode(encoded_corpus)
+            best = [key for key, value in next_cand.items() if value == max(next_cand.values())]
+            sorted_best = sorted(best)
+            encoded_prompt += (sorted_best[0],)
+        return self._text_processor.decode(encoded_prompt)
 
 class BeamSearcher:
     """
