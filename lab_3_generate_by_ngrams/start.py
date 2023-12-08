@@ -20,12 +20,12 @@ def main() -> None:
 #     decoded_text = text_processed.decode(encoded_text)
 #     print(decoded_text)
 #     result = decoded_text
-    encoded_text = text_processor.encode(text)
-    decoded_text = text_processor.decode(encoded_text)
+    encoded_text = text_processed.encode(text)
+    decoded_text = text_processed.decode(encoded_text)
     print(encoded_text[:40], decoded_text[:40], sep='\n')
     language_model = NGramLanguageModel(encoded_text, 7)
     # freqs = n_grams.build()
-    greedy_gen = GreedyTextGenerator(language_model, text_processor)
+    greedy_gen = GreedyTextGenerator(language_model, text_processed)
     generate = greedy_gen.run(51, 'Vernon')
     result = generate
     print(result)
