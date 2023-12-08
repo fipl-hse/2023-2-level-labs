@@ -18,21 +18,6 @@ def main() -> None:
     if not(isinstance(encoded, tuple) and encoded):
         return
 
-
-    decoded_story = str(processor.decode(encoded))
-    result = decoded_story
-    result
-
-    lang_model = NGramLanguageModel(encoded, 3)
-    print("checks if the building is successful: ", lang_model.build())
-
-    model2 = NGramLanguageModel(encoded, 7)
-    greedy = GreedyTextGenerator(model2, processor)
-    greedy.run(51, "Vernon")
-
-    beam_search = BeamSearchTextGenerator(model2, processor, 7)
-    print(beam_search.run('Vernon', 56))
-
     decoded = str(processor.decode(encoded))
     result = decoded
 

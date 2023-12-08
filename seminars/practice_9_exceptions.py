@@ -22,7 +22,6 @@ Working with exceptions
 # race conditions              +                  -
 # number of checks (few/many)  +/-                -/+
 
-
 def compare_lbyl_vs_eafp() -> None:
     # LBYL style
     dummy_b = []
@@ -38,13 +37,8 @@ def compare_lbyl_vs_eafp() -> None:
         print(dummy_b[12])
         print(dummy_a['key'])
     # pylint: disable=unused-variable
-
     except (KeyError, IndexError) as my_error:
         print('Error!!')
-
-    except KeyError as my_error:
-        print('KeyError!!')
-
     # pylint: disable=duplicate-except
     except IndexError:
         print('IndexError!!')
@@ -55,38 +49,6 @@ def compare_lbyl_vs_eafp() -> None:
         print('iff no exception')
     finally:
         print('Always!!')
-
-
-
-class EqualNumberError(Exception):
-    pass
-
-
-class BiggestNumberError(Exception):
-    pass
-
-
-def calc(a, b):
-    if a == b:
-        raise EqualNumberError()
-    elif a < b:
-        raise BiggestNumberError()
-    return a / b
-
-
-def find_sum(a, b):
-    try:
-        sum_ = calc(a, b) + a * b
-    except EqualNumberError:
-        print("Numbers shouldn't be equal")
-    except BiggestNumberError:
-        print("Number a shouldn't be bigger than number b")
-    else:
-        print(sum_)
-
-
-find_sum(10, 10)
-
 
 
 def check_exception_raise() -> None:
@@ -171,17 +133,11 @@ def main() -> None:
     propagate_error_without_exceptions()
 
 
-
 # Railway programming
 # ------- OK scenario (return)
 #   \
 # ------- Error scenario (exceptions)
 
 
-
 if __name__ == '__main__':
     main()
-
-# if __name__ == '__main__':
-#     main()
-
