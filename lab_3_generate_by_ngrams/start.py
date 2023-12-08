@@ -2,7 +2,7 @@
 Generation by NGrams starter
 """
 
-from lab_3_generate_by_ngrams.main import (GreedyTextGenerator,
+from lab_3_generate_by_ngrams.main import (BeamSearchTextGenerator, GreedyTextGenerator,
                                            NGramLanguageModel, TextProcessor)
 
 def main() -> None:
