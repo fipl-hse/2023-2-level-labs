@@ -76,7 +76,7 @@ class WordProcessor(TextProcessor):
             raise ValueError
 
         sentences = ' '.join(decoded_corpus).split(self._end_of_word_token)
-        text = '.'.join([sentence.strip().capitalize() for sentence in sentences])
+        text = '. '.join([sentence.strip().capitalize() for sentence in sentences])
         if text[-1] == ' ':
             return text[:-1]
         return text + '.'
