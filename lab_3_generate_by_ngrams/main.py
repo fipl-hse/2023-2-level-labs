@@ -592,7 +592,6 @@ class BeamSearchTextGenerator:
             return None
         return next_token
 
-
 class NGramLanguageModelReader:
     """
     Factory for loading language models ngrams from external JSON.
