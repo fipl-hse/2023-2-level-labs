@@ -34,9 +34,9 @@ class WordProcessor(TextProcessor):
         if not (isinstance(text, str) and text):
             raise ValueError
         punctuation_to_replace = '.?!'
-        text = text.lower().split()
+        split_text = text.lower().split()
         tokens = []
-        for word in text:
+        for word in split_text:
             if word[-1] in punctuation_to_replace:
                 tokens.extend([word[:-1], self._end_of_word_token])
             else:
@@ -151,7 +151,7 @@ class TopPGenerator:
                 candidates.append((word, value))
             sorted_candidates = sorted(candidates, key=lambda x: (x[1], x[0]), reverse=True)
             probability = 0
-            possible_tokens = ()
+            possible_tokens = tuple()
             for word, value in sorted_candidates:
                 probability += value
                 possible_tokens += (word,)
@@ -198,7 +198,7 @@ class GeneratorTypes:
             1: 'Top-P Generator',
             2: 'Beam Search Generator'
         }
-        return generator_types.get(generator_type)
+        return str(generator_types.get(generator_type))
 
 
 class GenerationResultDTO:
@@ -260,8 +260,9 @@ class GenerationResultDTO:
         Returns:
             (str): String with report
         """
-        return f'Perplexity score: {self.__perplexity}\n'\
-               f'{GeneratorTypes().get_conversion_generator_type(self.__type)}\nText: {self.__text}\n'
+        return f'Perplexity score: {self.__perplexity}\n' \
+               f'{GeneratorTypes().get_conversion_generator_type(self.__type)}\n' \
+               f'Text: {self.__text}\n'
 
 class QualityChecker:
     """
