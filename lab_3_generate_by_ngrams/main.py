@@ -113,7 +113,6 @@ class TextProcessor:
 
         return None
 
-
     def encode(self, text: str) -> Optional[tuple[int, ...]]:
         """
         Encode text.
