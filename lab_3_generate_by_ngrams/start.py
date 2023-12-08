@@ -19,7 +19,6 @@ def main() -> None:
         return None
     processor = processor.decode(encoded)
     result = processor
-    if not isinstance(result, )
     model = NGramLanguageModel(encoded[:100], 3)
     print(model.build())
     lang_model = NGramLanguageModel(encoded[:1000], 3)
