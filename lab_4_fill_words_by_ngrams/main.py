@@ -6,6 +6,7 @@ Top-p sampling generation and filling gaps with ngrams
 # pylint:disable=too-few-public-methods, too-many-arguments
 from lab_3_generate_by_ngrams.main import (BeamSearchTextGenerator, GreedyTextGenerator,
                                            NGramLanguageModel, TextProcessor)
+from random import choice
 
 
 class WordProcessor(TextProcessor):
@@ -28,6 +29,12 @@ class WordProcessor(TextProcessor):
         Raises:
             ValueError: In case of inappropriate type input argument or if input argument is empty.
         """
+        if not isinstance(text, str) or not text:
+            raise ValueError
+        eos_token = ' ' + self._end_of_word_token
+        clean_text = [symbol if (symbol.isalpha() or symbol.isspace())
+                  else eos_token if symbol in ('!', '?', '.') else '' for symbol in text.lower()]
+        return tuple(''.join(clean_text).split())
 
     def _put(self, element: str) -> None:
         """
@@ -39,6 +46,10 @@ class WordProcessor(TextProcessor):
         Raises:
             ValueError: In case of inappropriate type input argument or if input argument is empty.
         """
+        if not isinstance(element, str) or not element:
+            raise ValueError
+        if element not in self._storage:
+            self._storage[element] = len(self._storage)
 
     def _postprocess_decoded_text(self, decoded_corpus: tuple[str, ...]) -> str:  # type: ignore
         """
@@ -56,7 +67,11 @@ class WordProcessor(TextProcessor):
         Raises:
             ValueError: In case of inappropriate type input argument or if input argument is empty.
         """
-
+        if not isinstance(decoded_corpus, tuple) or not decoded_corpus:
+            raise ValueError
+        sentences = ' '.join(decoded_corpus).split(f' {self._end_of_word_token}')
+        processed = '. '.join([sen.lstrip().capitalize() for sen in sentences if sen])
+        return processed + '.'
 
 class TopPGenerator:
     """
@@ -80,6 +95,9 @@ class TopPGenerator:
             word_processor (WordProcessor): WordProcessor instance to handle text processing
             p_value (float): Collective probability mass threshold
         """
+        self._model = language_model
+        self._word_processor = word_processor
+        self._p_value = p_value
 
     def run(self, seq_len: int, prompt: str) -> str:  # type: ignore
         """
@@ -98,7 +116,27 @@ class TopPGenerator:
                 or if sequence has inappropriate length,
                 or if methods used return None.
         """
-
+        if not isinstance(seq_len, int) or not seq_len:
+            raise ValueError
+        for generation in range(seq_len):
+            try:
+                prompt_encoded = self._word_processor.encode(prompt)
+                candidates = self._model.generate_next_token(prompt_encoded)
+            except:
+                raise ValueError
+            if not candidates:
+                break
+            rating = sorted(candidates.keys(), lambda x: (-candidates[x], -x))
+            n_value = 0
+            probability_sum = 0
+            while probability_sum < self._p_value:
+                probability_sum += candidates[rating[n_value]]
+                n_value += 1
+            prompt += choice(rating[:n_value])
+        try:
+            return self._word_processor.decode(prompt_encoded)
+        except:
+            raise ValueError
 
 class GeneratorTypes:
     """
