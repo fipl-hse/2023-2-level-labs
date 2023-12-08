@@ -15,10 +15,14 @@ def main() -> None:
         text = text_file.read()
     processor = TextProcessor('_')
     encoded = processor.encode(text)
-    result = processor.decode(encoded)
+    if not isinstance(encoded, tuple):
+        return None
+    processor = processor.decode(encoded)
+    result = processor
+    if not isinstance(result, )
     model = NGramLanguageModel(encoded[:100], 3)
     print(model.build())
-    lang_model = NGramLanguageModel(encoded, 7)
+    lang_model = NGramLanguageModel(encoded[:1000], 3)
     print(lang_model.build())
     greedy_text_generator = GreedyTextGenerator(lang_model, processor)
     print(greedy_text_generator.run(51, 'Vernon'))
