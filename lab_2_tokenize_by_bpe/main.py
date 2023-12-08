@@ -172,7 +172,6 @@ def get_vocabulary(
             tokens.add(token)
             for symbol in token:
                 tokens.add(symbol)
-    new_tokens = sorted(tokens)
     new_tokens.sort(key=len, reverse=True)
     ident_tokens = {}
     for index, token in enumerate(new_tokens):
