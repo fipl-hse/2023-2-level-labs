@@ -110,7 +110,7 @@ class TextProcessor:
         for key, val in self._storage.items():
             if val == element_id:
                 return key
-
+        return None
 
 
     def encode(self, text: str) -> Optional[tuple[int, ...]]:
