@@ -569,6 +569,7 @@ class BeamSearchTextGenerator:
         needed_tokens = sorted([cand for cand, value_prob in cands.items() if
                                 value_prob == min(cands.values())])
         return self._text_processor.decode(needed_tokens[0])
+
     def _get_next_token(
         self, sequence_to_continue: tuple[int, ...]
     ) -> Optional[list[tuple[int, float]]]:
