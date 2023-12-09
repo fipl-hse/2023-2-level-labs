@@ -33,15 +33,16 @@ class WordProcessor(TextProcessor):
         """
         if not (isinstance(text, str) and text):
             raise ValueError
-        punctuation_to_replace = '.?!'
-        split_text = text.lower().split()
+        punctuation_to_replace = '.!?'
         tokens = []
-        for word in split_text:
+        for word in text.lower().split():
             if word[-1] in punctuation_to_replace:
                 tokens.extend([word[:-1], self._end_of_word_token])
             else:
-                tokens.append(''.join([char for char in word
-                                       if char.isalpha()]))
+                cleaned_word = [letter for letter in word if letter.isalpha()]
+                if not cleaned_word:
+                    continue
+                tokens.append(''.join(cleaned_word))
         return tuple(tokens)
 
     def _put(self, element: str) -> None:
@@ -54,7 +55,7 @@ class WordProcessor(TextProcessor):
         Raises:
             ValueError: In case of inappropriate type input argument or if input argument is empty.
         """
-        if not(isinstance(element, str) and element):
+        if not (isinstance(element, str) and element):
             raise ValueError
         if element in self._storage:
             return None
@@ -163,7 +164,6 @@ class TopPGenerator:
         if decoded is None:
             raise ValueError
         return decoded
-
 
 class GeneratorTypes:
     """
@@ -321,7 +321,7 @@ class QualityChecker:
                 raise ValueError
             prob = tokens.get(token)
             if prob is None:
-                raise ValueError
+                continue
             log_prob_sum += math.log(prob)
         if not log_prob_sum:
             raise ValueError
