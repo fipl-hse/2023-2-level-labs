@@ -29,6 +29,7 @@ class WordProcessor(TextProcessor):
             ValueError: In case of inappropriate type input argument or if input argument is empty.
         """
 
+
     def _put(self, element: str) -> None:
         """
         Put an element into the storage, assign a unique id to it.
