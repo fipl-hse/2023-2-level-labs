@@ -4,9 +4,8 @@ Filling word by ngrams starter
 # pylint:disable=too-many-locals,unused-import
 
 from lab_4_fill_words_by_ngrams.main import (BeamSearchTextGenerator, GeneratorTypes,
-                                             NGramLanguageModel, TopPGenerator,
-                                             QualityChecker, WordProcessor)
-
+                                             NGramLanguageModel, QualityChecker,
+                                             TopPGenerator, WordProcessor)
 
 def main() -> None:
     """
