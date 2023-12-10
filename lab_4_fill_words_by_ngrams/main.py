@@ -6,7 +6,7 @@ Top-p sampling generation and filling gaps with ngrams
 # pylint:disable=too-few-public-methods, too-many-arguments
 from lab_3_generate_by_ngrams.main import (BeamSearchTextGenerator, GreedyTextGenerator,
                                            NGramLanguageModel, TextProcessor)
-import random
+from random import choice
 
 
 class WordProcessor(TextProcessor):
@@ -153,7 +153,7 @@ class TopPGenerator:
                 sum_freq += candidate[1]
                 num_candidates += 1
 
-            random_token = random.choice(sorted_candidates[:num_candidates])[0]
+            random_token = choice(sorted_candidates[:num_candidates])[0]
             encoded_list.append(random_token)
             encoded_prompt = tuple(encoded_list)
 
