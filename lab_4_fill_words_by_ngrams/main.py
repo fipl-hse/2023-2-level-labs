@@ -58,7 +58,7 @@ class WordProcessor(TextProcessor):
         Raises:
             ValueError: In case of inappropriate type input argument or if input argument is empty.
         """
-        if not isinstance(element, str) or len(element) == 0:
+        if not isinstance(element, str) or not element:
             raise ValueError("Incorrect input in _put method")
         if element not in self._storage:
             self._storage[element] = len(self._storage)
