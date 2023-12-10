@@ -77,7 +77,7 @@ class WordProcessor(TextProcessor):
         if not isinstance(decoded_corpus, tuple) or not decoded_corpus:
             raise ValueError('Type input is inappropriate or input argument is empty.')
 
-        words = "".join(decoded_corpus)
+        words = " ".join(decoded_corpus)
         sentences = words.split(self._end_of_word_token)
         resulted_text = ". ".join([sentence.strip().capitalize() for sentence in sentences])
 
@@ -145,7 +145,7 @@ class TopPGenerator:
             if not candidates:
                 break
             sorted_candidates = sorted(list(candidates.items()),
-                                       key=lambda pair: pair[1], reverse=True)
+                                       key=lambda pair: (float(pair[1]), pair[0]), reverse=True)
             sum_freq = 0
             num_candidates = 0
             for candidate in sorted_candidates:
