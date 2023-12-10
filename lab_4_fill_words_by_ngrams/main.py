@@ -31,7 +31,7 @@ class WordProcessor(TextProcessor):
             ValueError: In case of inappropriate type input argument or if input argument is empty.
         """
         if not isinstance(text, str) or not text:
-            raise ValueError
+            raise ValueError('Text cannot be empty')
         text_words = text.replace('!', f' {self._end_of_word_token} ').replace('?', f' {self._end_of_word_token} ')\
             .replace('.', f' {self._end_of_word_token} ').lower().split()
         tokens = []
@@ -39,12 +39,10 @@ class WordProcessor(TextProcessor):
             if word.isalpha() or word.isspace() or word == self._end_of_word_token:
                 tokens.append(word)
             else:
-                letters = []
-                for symbol in word:
-                    if symbol.isalpha():
-                        letters.append(symbol)
-                if letters:
-                    tokens.append(''.join(letters))
+                clean_word = ''.join(filter(str.isalpha, word))
+                if not clean_word:
+                    continue
+                tokens.append(clean_word)
         return tuple(tokens)
 
     def _put(self, element: str) -> None:
@@ -58,7 +56,7 @@ class WordProcessor(TextProcessor):
             ValueError: In case of inappropriate type input argument or if input argument is empty.
         """
         if not isinstance(element, str) or not element:
-            raise ValueError
+            raise ValueError('The string is empty')
 
         if element not in self._storage:
             self._storage[element] = len(self._storage)
@@ -135,15 +133,15 @@ class TopPGenerator:
                 or if methods used return None.
         """
         if not isinstance(seq_len, int) or not isinstance(prompt, str) or seq_len < 0 or not prompt:
-            raise ValueError
+            raise ValueError('Sequence is invalid')
         text = self._word_processor.encode(prompt)
         if not text:
-            raise ValueError
+            raise ValueError('Text cannot be empty')
         count = 0
         while count < seq_len:
             word = self._model.generate_next_token(text)
             if word is None:
-                raise ValueError
+                raise ValueError('The word is None')
             if not word:
                 break
             word = sorted(word.items(), key=lambda x: (x[1], x[0]), reverse=True)
