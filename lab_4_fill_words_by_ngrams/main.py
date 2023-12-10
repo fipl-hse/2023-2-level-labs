@@ -59,10 +59,9 @@ class WordProcessor(TextProcessor):
             ValueError: In case of inappropriate type input argument or if input argument is empty.
         """
         if not isinstance(element, str) or not element:
-            raise ValueError("Incorrect input in _put method")
+            raise ValueError
         if element not in self._storage:
-            self._storage[element] = len(self._storage)
-        return None
+            self._storage.update({element: len(self._storage)})
 
     def _postprocess_decoded_text(self, decoded_corpus: tuple[str, ...]) -> str:  # type: ignore
         """
