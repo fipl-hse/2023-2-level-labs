@@ -4,9 +4,10 @@ Lab 4.
 Top-p sampling generation and filling gaps with ngrams
 """
 # pylint:disable=too-few-public-methods, too-many-arguments
+import random
+
 from lab_3_generate_by_ngrams.main import (BeamSearchTextGenerator, GreedyTextGenerator,
                                            NGramLanguageModel, TextProcessor)
-import random
 
 
 class WordProcessor(TextProcessor):
@@ -29,16 +30,23 @@ class WordProcessor(TextProcessor):
         Raises:
             ValueError: In case of inappropriate type input argument or if input argument is empty.
         """
-        if not (isinstance(text, str)) and not text:
-            raise ValueError
+        if not (isinstance(text, str)) or not text:
+            raise ValueError("Inappropriate input in _tokenize method")
 
-        tokens = []
-        for token in text.lower().split():
-            if token[-1] in '!?.':
-                tokens.extend([token[:-1], self._end_of_word_token])
-            elif token.isalpha():
-                tokens.append(token)
-        return tuple(tokens)
+        punc = ['.', '!', '?']
+        for el in punc:
+            text = text.replace(el, f" {self._end_of_word_token} ")
+        clean_text = []
+        for word in text.lower().split():
+            if word == self._end_of_word_token or word.isalpha() or word.isspace():
+                clean_text.append(word)
+            else:
+                clean_word = []
+                for alpha in list(word):
+                    if alpha.isalpha():
+                        clean_word.append(alpha)
+                clean_text.append("".join(clean_word))
+        return tuple(clean_text)
 
     def _put(self, element: str) -> None:
         """
@@ -50,8 +58,8 @@ class WordProcessor(TextProcessor):
         Raises:
             ValueError: In case of inappropriate type input argument or if input argument is empty.
         """
-        if not isinstance(element, str) and not element:
-            raise ValueError
+        if not isinstance(element, str) or len(element) == 0:
+            raise ValueError("Incorrect input in _put method")
         if element not in self._storage:
             self._storage[element] = len(self._storage)
         return None
@@ -72,8 +80,8 @@ class WordProcessor(TextProcessor):
         Raises:
             ValueError: In case of inappropriate type input argument or if input argument is empty.
         """
-        if not isinstance(decoded_corpus, tuple) or not decoded_corpus:
-            raise ValueError
+        if not isinstance(decoded_corpus, tuple) or len(decoded_corpus) == 0:
+            raise ValueError("Inappropriate input in _postprocess_decoded_text method")
 
         sentences = ' '.join(decoded_corpus).split(self._end_of_word_token)
         text = '. '.join([sentence.strip().capitalize() for sentence in sentences])
@@ -125,38 +133,37 @@ class TopPGenerator:
                 or if sequence has inappropriate length,
                 or if methods used return None.
         """
-        if not isinstance(seq_len, int) or seq_len <= 0:
-            raise ValueError("seq_len must be a positive integer")
-        if not isinstance(prompt, str) or not prompt:
-            raise ValueError("prompt must be a non-empty string")
+        if not (isinstance(prompt, str) and prompt and
+                isinstance(seq_len, int) and seq_len > 0):
+            raise ValueError("TopPGenerator.run: Inappropriate input.")
 
         encoded = self._word_processor.encode(prompt)
         if not encoded:
-            raise ValueError("Failed to encode the prompt")
+            raise ValueError("TopPGenerator.run: Couldn't encode prompt.")
 
         while seq_len >= 1:
             tokens = self._model.generate_next_token(encoded)
             if tokens is None:
-                raise ValueError("Failed to generate next token")
+                raise ValueError("TopPGenerator.run: "
+                                 "Model returned None instead of generated tokens.")
             if not tokens:
                 break
-            sorted_tokens = sorted(list(tokens.items()), key=lambda pair: (float(pair[1]), pair[0]), reverse=True)
+            sorted_tokens = sorted(list(tokens.items()),
+                                   key=lambda pair: (float(pair[1]), pair[0]), reverse=True)
             sum_probability = 0
-            candidates = []
-            for index, token_prob in enumerate(sorted_tokens):
-                sum_probability += token_prob[1]
+            for index, (_, prob) in enumerate(sorted_tokens):
+                sum_probability += prob
                 if sum_probability >= self._p_value:
-                    candidates = sorted_tokens[:index + 1]
+                    random_token = random.choice(sorted_tokens[:index + 1])
+                    encoded += (random_token[0],)
                     break
-            if not candidates:
+            else:
                 break
-            random_token = random.choice(candidates)
-            encoded += (random_token[0],)
             seq_len -= 1
 
         decoded = self._word_processor.decode(encoded)
         if not decoded:
-            raise ValueError("Failed to decode the generated sequence")
+            raise ValueError("TopPGenerator.run: Couldn't decode text.")
         return decoded
 
 

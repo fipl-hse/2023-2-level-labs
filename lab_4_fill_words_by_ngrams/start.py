@@ -1,7 +1,8 @@
 """
 Filling word by ngrams starter
 """
-from lab_4_fill_words_by_ngrams.main import (NGramLanguageModel, TopPGenerator, WordProcessor)
+# pylint:disable=too-many-locals,unused-import
+from lab_4_fill_words_by_ngrams.main import WordProcessor, TopPGenerator, NGramLanguageModel
 
 
 def main() -> None:
