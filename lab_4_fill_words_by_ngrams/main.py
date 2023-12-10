@@ -128,37 +128,36 @@ class TopPGenerator:
                 or if sequence has inappropriate length,
                 or if methods used return None.
         """
-        if not (isinstance(prompt, str) and prompt and
-                isinstance(seq_len, int) and seq_len > 0):
-            raise ValueError("TopPGenerator.run: Inappropriate input.")
+        if not isinstance(prompt, str) and not prompt:
+            raise ValueError("prompt must be a non-empty string")
+        if not isinstance(seq_len, int) and seq_len > 0:
+            raise ValueError("seq_len must be a positive integer")
 
-        encoded = self._word_processor.encode(prompt)
-        if not encoded:
-            raise ValueError("TopPGenerator.run: Couldn't encode prompt.")
+        encoded_prompt = self._word_processor.encode(prompt)
+        if not encoded_prompt:
+            raise ValueError("Failed to encode the prompt")
 
         while seq_len >= 1:
-            tokens = self._model.generate_next_token(encoded)
-            if tokens is None:
-                raise ValueError("TopPGenerator.run: "
-                                 "Model returned None instead of generated tokens.")
-            if not tokens:
+            next_tokens = self._model.generate_next_token(encoded_prompt)
+            if next_tokens is None:
+                raise ValueError("Failed to generate next token")
+            if not next_tokens:
                 break
-            sorted_tokens = sorted(list(tokens.items()),
-                                   key=lambda pair: (float(pair[1]), pair[0]), reverse=True)
-            sum_probability = 0
-            for index, (_, prob) in enumerate(sorted_tokens):
-                sum_probability += prob
-                if sum_probability >= self._p_value:
-                    random_token = random.choice(sorted_tokens[:index + 1])
-                    encoded += (random_token[0],)
+            sorted_tokens = sorted(list(next_tokens.items()), key=lambda pair: (float(pair[1]), pair[0]), reverse=True)
+            probability = 0
+            for key, value in enumerate(sorted_tokens):
+                probability += value
+                if probability >= self._p_value:
+                    random_token = random.choice(sorted_tokens[:key + 1])
+                    encoded_prompt += (random_token[0],)
                     break
             else:
                 break
             seq_len -= 1
 
-        decoded = self._word_processor.decode(encoded)
+        decoded = self._word_processor.decode(encoded_prompt)
         if not decoded:
-            raise ValueError("TopPGenerator.run: Couldn't decode text.")
+            raise ValueError
         return decoded
 
 
