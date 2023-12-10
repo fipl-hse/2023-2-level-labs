@@ -39,8 +39,11 @@ class WordProcessor(TextProcessor):
         for element in text.lower().split():
             if element[-1] in punctuation:
                 text_with_end.extend([element[:-1], self._end_of_word_token])
-            if element.isalpha():
-                text_with_end.append(element)
+            else:
+                cleared = [alpha for alpha in element if alpha.isalpha()]
+                if cleared:
+                    text_with_end.append(''.join(cleared))
+
 
         return tuple(text_with_end)
 
@@ -96,7 +99,6 @@ class WordProcessor(TextProcessor):
 
         if resulting_text[-1] != '.':
             resulting_text += '.'
-            return resulting_text
 
         return resulting_text
 
@@ -154,33 +156,32 @@ class TopPGenerator:
         if not encoded:
             raise ValueError
 
-        while seq_len >= 1:
-            tokens = self._model.generate_next_token(encoded)
+        encoded_list = list(encoded)
+        for i in range(seq_len):
+            tokens = self._model.generate_next_token(tuple(encoded_list))
             if tokens is None:
                 raise ValueError
 
             if not tokens:
                 break
 
-            sorted_tokens = sorted(list(tokens.items()), key=lambda pair: (float(pair[1]), -pair[0]), reverse=True)
+            sorted_tokens = dict(sorted(tokens.items(), key=lambda pair: (-pair[1], -pair[0])))
             probability = 0
-            for index, token_prob in enumerate(sorted_tokens):
-                probability += token_prob[1]
-                if probability >= self._p_value:
-                    random_token = random.choice(sorted_tokens[:index + 1])
-                    encoded += (random_token[0],)
-                    break
-            else:
-                break
-            seq_len -= 1
+            possible_tokens = []
 
-        decoded = self._word_processor.decode(encoded)
+            for index, token_prob in sorted_tokens.items():
+                probability += token_prob
+                possible_tokens.append(index)
+                if probability >= self._p_value:
+                    break
+            encoded_list.append(random.choice(possible_tokens))
+
+        decoded = self._word_processor.decode(tuple(encoded_list))
 
         if not decoded:
             raise ValueError
 
         return decoded
-
 
 class GeneratorTypes:
     """
@@ -196,6 +197,9 @@ class GeneratorTypes:
         """
         Initialize an instance of GeneratorTypes.
         """
+        self.greedy = 0
+        self.top_p = 1
+        self.beam_search = 2
 
     def get_conversion_generator_type(self, generator_type: int) -> str:  # type: ignore
         """
@@ -207,6 +211,14 @@ class GeneratorTypes:
         Returns:
             (str): Name of the generator.
         """
+        if generator_type == 0:
+            return 'Greedy Generator'
+
+        if generator_type == 1:
+            return 'Top-P Generator'
+
+        if generator_type == 2:
+            return 'Beam Search Generator'
 
 
 class GenerationResultDTO:
@@ -229,6 +241,9 @@ class GenerationResultDTO:
             generation_type (int):
                 Numeric type of the generator for which perplexity was calculated
         """
+        self.__text = text
+        self.__perplexity = perplexity
+        self.__type = generation_type
 
     def get_perplexity(self) -> float:  # type: ignore
         """
@@ -237,6 +252,7 @@ class GenerationResultDTO:
         Returns:
             (float): Perplexity value
         """
+        return self.__perplexity
 
     def get_text(self) -> str:  # type: ignore
         """
@@ -245,6 +261,7 @@ class GenerationResultDTO:
         Returns:
             (str): Text for which the perplexity was count
         """
+        return self.__text
 
     def get_type(self) -> int:  # type: ignore
         """
@@ -253,6 +270,7 @@ class GenerationResultDTO:
         Returns:
             (int): Numeric type of the generator
         """
+        return self.__type
 
     def __str__(self) -> str:  # type: ignore
         """
@@ -261,7 +279,9 @@ class GenerationResultDTO:
         Returns:
             (str): String with report
         """
-
+        return (f'Perplexity score: {self.__perplexity}\n'
+               f'{GeneratorTypes().get_conversion_generator_type(self.__type)}\n'
+               f'Text: {self.__text}\n')
 
 class QualityChecker:
     """
@@ -285,6 +305,9 @@ class QualityChecker:
                 NGramLanguageModel instance to use for text generation
             word_processor (WordProcessor): WordProcessor instance to handle text processing
         """
+        self._generators = generators
+        self._language_model = language_model
+        self._word_processor = word_processor
 
     def _calculate_perplexity(self, generated_text: str) -> float:  # type: ignore
         """
