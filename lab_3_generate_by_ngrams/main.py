@@ -4,7 +4,6 @@ Lab 3.
 Beam-search and natural language generation evaluation
 """
 # pylint:disable=too-few-public-methods
-import json
 import math
 from typing import Optional
 
