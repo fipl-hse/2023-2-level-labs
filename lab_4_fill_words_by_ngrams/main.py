@@ -33,20 +33,16 @@ class WordProcessor(TextProcessor):
         if not (isinstance(text, str)) or not text:
             raise ValueError("Inappropriate input in _tokenize method")
 
-        punc = ['.', '!', '?']
-        for el in punc:
-            text = text.replace(el, f" {self._end_of_word_token} ")
-        clean_text = []
-        for word in text.lower().split():
-            if word == self._end_of_word_token or word.isalpha() or word.isspace():
-                clean_text.append(word)
-            else:
-                clean_word = []
-                for alpha in list(word):
-                    if alpha.isalpha():
-                        clean_word.append(alpha)
-                clean_text.append("".join(clean_word))
-        return tuple(clean_text)
+        tokens = []
+        for token in text.lower().split():
+            clear_word = ''.join(filter(str.isalpha, token))
+            if not clear_word:
+                continue
+            tokens.append(clear_word)
+
+            if token[-1] in ('!', '.', '?'):
+                tokens.append(self._end_of_word_token)
+        return tuple(tokens)
 
     def _put(self, element: str) -> None:
         """
@@ -59,9 +55,9 @@ class WordProcessor(TextProcessor):
             ValueError: In case of inappropriate type input argument or if input argument is empty.
         """
         if not isinstance(element, str) or not element:
-            raise ValueError
+            raise ValueError("Inappropriate input in _put")
         if element not in self._storage:
-            self._storage.update({element: len(self._storage)})
+            self._storage[element] = len(self._storage)
 
     def _postprocess_decoded_text(self, decoded_corpus: tuple[str, ...]) -> str:  # type: ignore
         """
