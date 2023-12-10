@@ -273,7 +273,7 @@ class GenerationResultDTO:
         str_type = generator.get_conversion_generator_type(self.__type)
 
         return (f'Perplexity score: {self.__perplexity}\n'
-                f'Generator: {str_type}\n'
+                f'{str_type}\n'
                 f'Text: {self.__text}\n')
 
 
