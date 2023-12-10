@@ -80,7 +80,8 @@ class WordProcessor(TextProcessor):
             ValueError: In case of inappropriate type input argument or if input argument is empty.
         """
         if not isinstance(decoded_corpus, tuple) or not decoded_corpus:
-            raise ValueError('WordProcessor._postprocess_decoded_text: inappropriate type of input arguments')
+            raise ValueError('WordProcessor._postprocess_decoded_text: inappropriate type '
+                             'of input arguments')
 
         decoded_text = ' '.join(decoded_corpus).replace(
             f' {self._end_of_word_token}', '.').capitalize()
@@ -319,7 +320,8 @@ class QualityChecker:
                 or if nothing was generated.
         """
         if not isinstance(generated_text, str) or not generated_text:
-            raise ValueError('QualityChecker._calculate_perplexity: inappropriate type of input arguments')
+            raise ValueError('QualityChecker._calculate_perplexity: inappropriate type '
+                             'of input arguments')
 
         encoded = self._word_processor.encode(generated_text)
 
@@ -510,7 +512,8 @@ class GeneratorRuleStudent:
                 or if methods used return None.
         """
         if not isinstance(tasks, list) or not tasks:
-            raise ValueError('GeneratorRuleStudent.take_exam: inappropriate type of input arguments')
+            raise ValueError('GeneratorRuleStudent.take_exam: inappropriate type '
+                             'of input arguments')
 
         answers = {}
 
