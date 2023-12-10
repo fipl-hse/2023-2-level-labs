@@ -6,6 +6,7 @@ Top-p sampling generation and filling gaps with ngrams
 # pylint:disable=too-few-public-methods, too-many-arguments
 from lab_3_generate_by_ngrams.main import (BeamSearchTextGenerator, GreedyTextGenerator,
                                            NGramLanguageModel, TextProcessor)
+import random
 
 
 class WordProcessor(TextProcessor):
@@ -28,6 +29,17 @@ class WordProcessor(TextProcessor):
         Raises:
             ValueError: In case of inappropriate type input argument or if input argument is empty.
         """
+        if not isinstance(text, str) or not text:
+            raise ValueError('Type input is inappropriate or input argument is empty.')
+
+        preprocessed_text = ""
+        for element in text.lower():
+            if element in "?!.":
+                preprocessed_text += f" {self.get_end_of_word_token()}"
+            elif element.isalpha() or element.isspace():
+                preprocessed_text += element
+
+        return tuple(preprocessed_text.split(" "))
 
     def _put(self, element: str) -> None:
         """
@@ -39,6 +51,11 @@ class WordProcessor(TextProcessor):
         Raises:
             ValueError: In case of inappropriate type input argument or if input argument is empty.
         """
+        if not isinstance(element, str) or not element:
+            raise ValueError('Type input is inappropriate or input argument is empty.')
+
+        if element not in self._storage:
+            self._storage[element] = len(self._storage)
 
     def _postprocess_decoded_text(self, decoded_corpus: tuple[str, ...]) -> str:  # type: ignore
         """
@@ -56,6 +73,16 @@ class WordProcessor(TextProcessor):
         Raises:
             ValueError: In case of inappropriate type input argument or if input argument is empty.
         """
+        if not isinstance(decoded_corpus, tuple) or not decoded_corpus:
+            raise ValueError('Type input is inappropriate or input argument is empty.')
+
+        words = "".join(decoded_corpus)
+        sentences = words.split(self._end_of_word_token)
+        resulted_text = ". ".join([sentence.strip().capitalize() for sentence in sentences])
+
+        if resulted_text[-1] == ' ':
+            return resulted_text[:-1]
+        return f"{resulted_text}."
 
 
 class TopPGenerator:
@@ -80,6 +107,9 @@ class TopPGenerator:
             word_processor (WordProcessor): WordProcessor instance to handle text processing
             p_value (float): Collective probability mass threshold
         """
+        self._model = language_model
+        self._word_processor = word_processor
+        self._p_value = p_value
 
     def run(self, seq_len: int, prompt: str) -> str:  # type: ignore
         """
@@ -98,6 +128,41 @@ class TopPGenerator:
                 or if sequence has inappropriate length,
                 or if methods used return None.
         """
+        if not (isinstance(seq_len, int) and isinstance(prompt, str) and
+                seq_len > 0 and prompt):
+            raise ValueError('Type input is inappropriate or input argument is empty.')
+
+        encoded_prompt = self._word_processor.encode(prompt)
+        if encoded_prompt is None:
+            raise ValueError('None is returned')
+
+        encoded_list = list(encoded_prompt)
+        for i in range(seq_len):
+            candidates = self._model.generate_next_token(encoded_prompt)
+            if candidates is None:
+                raise ValueError('None is returned.')
+            if not candidates:
+                break
+            sorted_candidates = sorted(list(candidates.items()),
+                                       key=lambda pair: pair[1], reverse=True)
+            sum_freq = 0
+            num_candidates = 0
+            for candidate in sorted_candidates:
+                if sum_freq >= self._p_value:
+                    break
+                sum_freq += candidate[1]
+                num_candidates += 1
+
+            random_token = random.choice(sorted_candidates[:num_candidates])[0]
+            encoded_list.append(random_token)
+            encoded_prompt = tuple(encoded_list)
+
+        decoded = self._word_processor.decode(encoded_prompt)
+        if decoded is None:
+            raise ValueError('None is returned')
+
+        return decoded
+
 
 
 class GeneratorTypes:
