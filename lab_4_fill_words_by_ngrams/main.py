@@ -116,27 +116,34 @@ class TopPGenerator:
                 or if sequence has inappropriate length,
                 or if methods used return None.
         """
-        if not isinstance(seq_len, int) or not seq_len:
+        if not isinstance(seq_len, int) or seq_len <= 0 or not isinstance(prompt, str) or not prompt:
+            raise ValueError
+        try:
+            prompt_encoded = self._word_processor.encode(prompt)
+        except BaseException:
             raise ValueError
         for generation in range(seq_len):
             try:
-                prompt_encoded = self._word_processor.encode(prompt)
                 candidates = self._model.generate_next_token(prompt_encoded)
-            except:
+                if not len(candidates):
+                    break
+            except BaseException:
                 raise ValueError
-            if not candidates:
-                break
-            rating = sorted(candidates.keys(), lambda x: (-candidates[x], -x))
-            n_value = 0
-            probability_sum = 0
-            while probability_sum < self._p_value:
-                probability_sum += candidates[rating[n_value]]
-                n_value += 1
-            prompt += choice(rating[:n_value])
+            sorted_candidates = sorted(candidates.keys(), key=lambda x: (-candidates[x], -x))
+            selected = []
+            sum_of_probability = 0
+            while sum_of_probability < self._p_value:
+                selected.append(sorted_candidates.pop(0))
+                sum_of_probability += candidates[selected[-1]]
+            prompt += ' ' + self._word_processor.get_token(choice(selected))
+            prompt_encoded = self._word_processor.encode(prompt)
         try:
-            return self._word_processor.decode(prompt_encoded)
-        except:
+            result = self._word_processor.decode(prompt_encoded)
+        except BaseException:
             raise ValueError
+        if result:
+            return result
+        raise ValueError
 
 class GeneratorTypes:
     """
