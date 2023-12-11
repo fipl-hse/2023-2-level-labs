@@ -4,6 +4,7 @@ Lab 4.
 Top-p sampling generation and filling gaps with ngrams
 """
 # pylint:disable=too-few-public-methods, too-many-arguments
+import json
 import math
 import random
 
