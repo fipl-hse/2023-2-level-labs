@@ -20,7 +20,8 @@ def main() -> None:
     print(top_p_result)
     generator_types = main_py.GeneratorTypes()
     generators = {generator_types.top_p: main_py.TopPGenerator(model, word_processor, 0.5),
-                  generator_types.beam_search: main_py.BeamSearchTextGenerator(model, word_processor, 5)}
+                  generator_types.beam_search:
+                      main_py.BeamSearchTextGenerator(model, word_processor, 5)}
     quality_check = main_py.QualityChecker(generators, model, word_processor)
     result = quality_check.run(100, 'The')
     print(result)

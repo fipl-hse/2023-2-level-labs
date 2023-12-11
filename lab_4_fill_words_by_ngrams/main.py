@@ -380,6 +380,7 @@ class Examiner:
             json_path (str): Local path to assets file
         """
         self._json_path = json_path
+        self._questions_and_answers = self._load_from_json()
 
     def _load_from_json(self) -> dict[tuple[str, int], str]:  # type: ignore
         """
@@ -395,6 +396,16 @@ class Examiner:
                 or if attribute _json_path has inappropriate extension,
                 or if inappropriate type loaded data.
         """
+        if not (isinstance(self._json_path, str) and self._json_path and
+                self._json_path.endswith('.json')):
+            raise ValueError
+        with open(self._json_path, 'r', encoding='utf-8') as file:
+            data = json.load(file)
+        if not isinstance(data, list):
+            raise ValueError
+        self._questions_and_answers = {(task['question'], task['location']): task['answer']
+                                       for task in data}
+        return self._questions_and_answers
 
     def provide_questions(self) -> list[tuple[str, int]]:  # type: ignore
         """
@@ -404,6 +415,7 @@ class Examiner:
             list[tuple[str, int]]:
                 List in the form of [(question, position of the word to be filled)]
         """
+        return list(self._questions_and_answers.keys())
 
     def assess_exam(self, answers: dict[str, str]) -> float:  # type: ignore
         """
@@ -418,6 +430,16 @@ class Examiner:
         Raises:
             ValueError: In case of inappropriate type input argument or if input argument is empty.
         """
+        if not (isinstance(answers, dict) and answers):
+            raise ValueError
+        correct = 0
+        total = len(answers)
+        correct_answers = self._questions_and_answers.values()
+        answers_list = answers.values()
+        for index, answer in enumerate(answers_list):
+            if answer == correct_answers[index]:
+                correct += 1
+        return correct/total
 
 
 class GeneratorRuleStudent:
