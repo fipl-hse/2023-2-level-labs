@@ -35,10 +35,10 @@ class WordProcessor(TextProcessor):
 
         tokens = []
         for token in text.lower().split():
-            clear_word = ''.join(filter(str.isalpha, token))
-            if not clear_word:
+            clean_token = ''.join(filter(str.isalpha, token))
+            if not clean_token:
                 continue
-            tokens.append(clear_word)
+            tokens.append(clean_token)
 
             if token[-1] in ('!', '.', '?'):
                 tokens.append(self._end_of_word_token)
@@ -55,7 +55,7 @@ class WordProcessor(TextProcessor):
             ValueError: In case of inappropriate type input argument or if input argument is empty.
         """
         if not isinstance(element, str) or not element:
-            raise ValueError("Inappropriate input in _put")
+            raise ValueError("Inappropriate input in _put method")
         if element not in self._storage:
             self._storage[element] = len(self._storage)
 
@@ -75,7 +75,7 @@ class WordProcessor(TextProcessor):
         Raises:
             ValueError: In case of inappropriate type input argument or if input argument is empty.
         """
-        if not isinstance(decoded_corpus, tuple) or len(decoded_corpus) == 0:
+        if not isinstance(decoded_corpus, tuple) or not decoded_corpus:
             raise ValueError("Inappropriate input in _postprocess_decoded_text method")
 
         sentences = ' '.join(decoded_corpus).split(self._end_of_word_token)
@@ -128,9 +128,9 @@ class TopPGenerator:
                 or if sequence has inappropriate length,
                 or if methods used return None.
         """
-        if not isinstance(prompt, str) and not prompt:
+        if not isinstance(prompt, str) or not prompt:
             raise ValueError("prompt must be a non-empty string")
-        if not isinstance(seq_len, int) and seq_len > 0:
+        if not isinstance(seq_len, int) or seq_len <= 0:
             raise ValueError("seq_len must be a positive integer")
 
         encoded_prompt = self._word_processor.encode(prompt)
@@ -140,15 +140,15 @@ class TopPGenerator:
         while seq_len >= 1:
             next_tokens = self._model.generate_next_token(encoded_prompt)
             if next_tokens is None:
-                raise ValueError("Failed to generate next token")
+                raise ValueError("Failed to generate next tokens")
             if not next_tokens:
                 break
             sorted_tokens = sorted(list(next_tokens.items()), key=lambda pair: (float(pair[1]), pair[0]), reverse=True)
             probability = 0
-            for key, value in enumerate(sorted_tokens):
-                probability += value
+            for i, (_, prob) in enumerate(sorted_tokens):
+                probability += prob
                 if probability >= self._p_value:
-                    random_token = random.choice(sorted_tokens[:key + 1])
+                    random_token = random.choice(sorted_tokens[:i + 1])
                     encoded_prompt += (random_token[0],)
                     break
             else:
