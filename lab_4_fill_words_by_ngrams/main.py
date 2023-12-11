@@ -434,7 +434,7 @@ class Examiner:
             raise ValueError
         correct = 0
         total = len(answers)
-        correct_answers = self._questions_and_answers.values()
+        correct_answers = list(self._questions_and_answers.values())
         answers_list = answers.values()
         for index, answer in enumerate(answers_list):
             if answer == correct_answers[index]:
