@@ -28,6 +28,22 @@ class WordProcessor(TextProcessor):
         Raises:
             ValueError: In case of inappropriate type input argument or if input argument is empty.
         """
+        if not isinstance(text, str) or not text:
+            raise ValueError
+        words = text.lower().split()
+        tokens = []
+        for word in words:
+            end_of_sentence ='!?.'
+            if word.isalpha() and word[-1] not in end_of_sentence:
+                tokens.append(word)
+            elif word[-1] in end_of_sentence:
+                tokens.append(word[:-1])
+                tokens.append(self._end_of_word_token)
+
+        if not tokens:
+            return None
+
+        return tuple(tokens)
 
     def _put(self, element: str) -> None:
         """
@@ -39,6 +55,12 @@ class WordProcessor(TextProcessor):
         Raises:
             ValueError: In case of inappropriate type input argument or if input argument is empty.
         """
+        if not isinstance(element, str) or not element:
+            raise ValueError
+        if element in self._storage:
+            return None
+        self._storage[element] = len(self._storage)
+        return None
 
     def _postprocess_decoded_text(self, decoded_corpus: tuple[str, ...]) -> str:  # type: ignore
         """
@@ -56,6 +78,19 @@ class WordProcessor(TextProcessor):
         Raises:
             ValueError: In case of inappropriate type input argument or if input argument is empty.
         """
+        if not isinstance(decoded_corpus, tuple) or not decoded_corpus:
+            raise ValueError
+        tokens = list(decoded_corpus)
+        tokens[0] = tokens[0].capitalize()
+        if self.get_end_of_word_token() in tokens:
+            for index in range(1, len(tokens)):
+                if tokens[index - 1] == self.get_end_of_word_token():
+                    tokens[index] = tokens[index].capitalize()
+        text = ' '.join(tokens).replace(' ' + self.get_end_of_word_token(),'.')
+        if text[-1] !='.':
+            text += '.'
+        return text
+
 
 
 class TopPGenerator:
