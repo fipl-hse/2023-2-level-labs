@@ -29,7 +29,7 @@ class WordProcessor(TextProcessor):
             ValueError: In case of inappropriate type input argument or if input argument is empty.
         """
         if not isinstance(text, str) or not text:
-            raise ValueError
+            raise ValueError('Type input is inappropriate or input argument is empty.')
 
         tokens = ''
         end_of_word_punctuation = '?.!'
@@ -53,7 +53,7 @@ class WordProcessor(TextProcessor):
             ValueError: In case of inappropriate type input argument or if input argument is empty.
         """
         if not isinstance(element, str) or not element:
-            raise ValueError
+            raise ValueError('Type input is inappropriate or input argument is empty.')
 
         if element not in self._storage:
             self._storage[element] = len(self._storage)
@@ -76,12 +76,16 @@ class WordProcessor(TextProcessor):
             ValueError: In case of inappropriate type input argument or if input argument is empty.
         """
         if not isinstance(decoded_corpus, tuple) or not decoded_corpus:
-            raise ValueError
+            raise ValueError('Type input is inappropriate or input argument is empty.')
 
-        decoded = f"{''.join(decoded_corpus)}."
-        decoded.capitalize().replace(self._end_of_word_token, ' ')
+        sentences = ' '.join(decoded_corpus).split(f" {self._end_of_word_token}")
+        decoded = '. '.join([sentence.strip().capitalize() for sentence in sentences])
+        if decoded[-1] == ' ':
+            return decoded[:-1]
+        if decoded[-1] != '.':
+            decoded += '.'
 
-
+        return decoded
 
 class TopPGenerator:
     """
@@ -105,7 +109,10 @@ class TopPGenerator:
             word_processor (WordProcessor): WordProcessor instance to handle text processing
             p_value (float): Collective probability mass threshold
         """
-
+        self._model = language_model
+        self._word_processor = word_processor
+        self._p_value = p_value
+        
     def run(self, seq_len: int, prompt: str) -> str:  # type: ignore
         """
         Generate sequence with top-p sampling strategy.
@@ -123,7 +130,8 @@ class TopPGenerator:
                 or if sequence has inappropriate length,
                 or if methods used return None.
         """
-
+        if not isinstance(seq_len, int):
+            raise ValueError
 
 class GeneratorTypes:
     """
