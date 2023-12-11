@@ -2,9 +2,7 @@
 Filling word by ngrams starter
 """
 # pylint:disable=too-many-locals,unused-import
-from lab_3_generate_by_ngrams.main import BeamSearchTextGenerator, NGramLanguageModel
-from lab_4_fill_words_by_ngrams.main import (GeneratorTypes, QualityChecker,
-                                             TopPGenerator, WordProcessor)
+import lab_4_fill_words_by_ngrams.main as main_py
 
 
 def main() -> None:
@@ -13,18 +11,19 @@ def main() -> None:
     """
     with open("./assets/Harry_Potter.txt", "r", encoding="utf-8") as text_file:
         text = text_file.read()
-    word_processor = WordProcessor('<eow>')
+    word_processor = main_py.WordProcessor('<eow>')
     encoded_text = word_processor.encode(text)
-    model = NGramLanguageModel(encoded_text, 2)
+    model = main_py.NGramLanguageModel(encoded_text, 2)
     model.build()
-    top_p = TopPGenerator(model, word_processor, 0.5)
+    top_p = main_py.TopPGenerator(model, word_processor, 0.5)
     top_p_result = top_p.run(51, 'Vernon')
     print(top_p_result)
-    generator_types = GeneratorTypes()
-    generators = {generator_types.top_p: TopPGenerator(model, word_processor, 0.5),
-                  generator_types.beam_search: BeamSearchTextGenerator(model, word_processor, 5)}
-    quality_check = QualityChecker(generators, model, word_processor)
+    generator_types = main_py.GeneratorTypes()
+    generators = {generator_types.top_p: main_py.TopPGenerator(model, word_processor, 0.5),
+                  generator_types.beam_search: main_py.BeamSearchTextGenerator(model, word_processor, 5)}
+    quality_check = main_py.QualityChecker(generators, model, word_processor)
     result = quality_check.run(100, 'The')
+    print(result)
     assert result
 
 
