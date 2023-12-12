@@ -4,9 +4,9 @@ Lab 4.
 Top-p sampling generation and filling gaps with ngrams
 """
 # pylint:disable=too-few-public-methods, too-many-arguments
-import random
-import math
 import json
+import math
+import random
 
 from lab_3_generate_by_ngrams.main import (BeamSearchTextGenerator, GreedyTextGenerator,
                                            NGramLanguageModel, TextProcessor)
@@ -33,7 +33,7 @@ class WordProcessor(TextProcessor):
             ValueError: In case of inappropriate type input argument or if input argument is empty.
         """
         if not isinstance(text, str) or not text:
-            raise ValueError
+            raise ValueError('WordProcessor._tokenize: Incorrect input')
 
         tokens = []
         for word in text.lower().split():
@@ -57,12 +57,10 @@ class WordProcessor(TextProcessor):
             ValueError: In case of inappropriate type input argument or if input argument is empty.
         """
         if not isinstance(element, str) or len(element) == 0:
-            raise ValueError
+            raise ValueError('WordProcessor._put: Incorrect input')
 
         if element not in self._storage:
             self._storage[element] = len(self._storage)
-
-        return None
 
     def _postprocess_decoded_text(self, decoded_corpus: tuple[str, ...]) -> str:  # type: ignore
         """
@@ -81,7 +79,7 @@ class WordProcessor(TextProcessor):
             ValueError: In case of inappropriate type input argument or if input argument is empty.
         """
         if not isinstance(decoded_corpus, tuple) or len(decoded_corpus) == 0:
-            raise ValueError
+            raise ValueError('WordProcessor._postprocess_decoded_text: Incorrect input')
 
         words_list = list(decoded_corpus)
         sentences = (' '.join(words_list)).split(self._end_of_word_token)
@@ -139,7 +137,7 @@ class TopPGenerator:
         """
         if (not isinstance(seq_len, int) or not isinstance(prompt, str)
                 or seq_len <= 0):
-            raise ValueError
+            raise ValueError("TopPGenerator.run: Incorrect input")
         encoded = self._word_processor.encode(prompt)
         if not encoded:
             raise ValueError
@@ -151,7 +149,8 @@ class TopPGenerator:
             if not next_tokens:
                 break
 
-            sorted_dict = dict(sorted(list(next_tokens.items()), key=lambda x: (x[1], x[0]), reverse=True))
+            sorted_dict = dict(sorted(list(next_tokens.items()),
+                                      key=lambda x: (x[1], x[0]), reverse=True))
             probability = 0
             possible_tokens = ()
             for word, value in sorted_dict.items():
@@ -306,7 +305,7 @@ class QualityChecker:
                 or if nothing was generated.
         """
         if not isinstance(generated_text, str) or not generated_text:
-            raise ValueError
+            raise ValueError("QualityChecker._calculate_perplexity: Incorrect input")
 
         encoded = self._word_processor.encode(generated_text)
         if not encoded:
@@ -346,7 +345,8 @@ class QualityChecker:
                 or if methods used return None.
         """
         if not isinstance(seq_len, int) or seq_len < 0 or not isinstance(prompt, str) or not prompt:
-            raise ValueError("Incorrect input")
+            raise ValueError("QualityChecker.run: Incorrect input")
+
         results = []
         for num_type, generator in self._generators.items():
             text = generator.run(prompt=prompt, seq_len=seq_len)
@@ -397,7 +397,7 @@ class Examiner:
         """
         if (not isinstance(self._json_path, str) or not self._json_path
                 or self._json_path[-5:] != ".json"):
-            raise ValueError
+            raise ValueError("Examiner._load_from_json: Incorrect input")
 
         with open(self._json_path, 'r', encoding='utf-8') as file:
             question_and_answers = json.load(file)
@@ -429,7 +429,7 @@ class Examiner:
             ValueError: In case of inappropriate type input argument or if input argument is empty.
         """
         if not isinstance(answers, dict) or not answers:
-            raise ValueError
+            raise ValueError("Examiner._load_from_json: Incorrect input")
 
         right_answers = ([key for key in self._questions_and_answers.keys()
                           if answers[key[0]] == self._questions_and_answers[key]])
