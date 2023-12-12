@@ -4,7 +4,8 @@ Filling word by ngrams starter
 # pylint:disable=too-many-locals,unused-import
 
 from lab_3_generate_by_ngrams.main import BeamSearchTextGenerator, GreedyTextGenerator
-from lab_4_fill_words_by_ngrams.main import GeneratorTypes, NGramLanguageModel, QualityChecker, TopPGenerator, WordProcessor
+from lab_4_fill_words_by_ngrams.main import (GeneratorTypes, NGramLanguageModel, QualityChecker,
+                                             TopPGenerator, WordProcessor)
 
 def main() -> None:
     """
@@ -16,13 +17,13 @@ def main() -> None:
     text_encoded = processor.encode(text)
     model = NGramLanguageModel(text_encoded, 2)
     model.build()
-    gen_topP = TopPGenerator(model, processor, 0.5)
-    generation_1 = gen_topP.run(51, 'Vernon')
+    gen_top_p = TopPGenerator(model, processor, 0.5)
+    generation_1 = gen_top_p.run(51, 'Vernon')
     print(generation_1)
     result = generation_1
     generator_types = GeneratorTypes()
     generators = {generator_types.greedy: GreedyTextGenerator(model, processor),
-                 generator_types.top_p: gen_topP,
+                 generator_types.top_p: gen_top_p,
                  generator_types.beam_search: BeamSearchTextGenerator(model, processor, 5)}
     quality_checker = QualityChecker(generators, model, processor)
     results = quality_checker.run(100, 'The')
