@@ -132,7 +132,7 @@ class TopPGenerator:
         """
         if (not isinstance(seq_len, int) or seq_len < 1 or
            not isinstance(prompt, str) or not prompt):
-           raise ValueError
+            raise ValueError
         prompt_encoded = self._word_processor.encode(prompt)
         if not prompt_encoded:
             raise ValueError
@@ -186,12 +186,8 @@ class GeneratorTypes:
         Returns:
             (str): Name of the generator.
         """
-        if generator_type == self.greedy:
-            return 'Greedy Generator'
-        if generator_type == self.top_p:
-            return 'Top-P Generator'
-        if generator_type == self.beam_search:
-            return 'Beam Search Generator'
+        generators = ['Greedy Generator', 'Top-P Generator', 'Beam Search Generator']
+        return generators[generator_type]
 
 
 class GenerationResultDTO:
