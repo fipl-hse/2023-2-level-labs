@@ -6,7 +6,6 @@ Top-p sampling generation and filling gaps with ngrams
 import json
 import math
 from random import choice
-from string import punctuation
 
 # pylint:disable=too-few-public-methods, too-many-arguments
 from lab_3_generate_by_ngrams.main import (BeamSearchTextGenerator, GreedyTextGenerator,
@@ -207,6 +206,7 @@ class GeneratorTypes:
             return 'top-p generator'
         if generator_type == self.beam_search:
             return 'beam search generator'
+        return None
 
 
 class GenerationResultDTO:
@@ -284,7 +284,7 @@ class QualityChecker:
     """
 
     def __init__(
-            self, generators: dict, language_model: NGramLanguageModel, word_processor: WordProcessor
+        self, generators: dict, language_model: NGramLanguageModel, word_processor: WordProcessor
     ) -> None:
         """
         Initialize an instance of QualityChecker.
@@ -434,7 +434,8 @@ class Examiner:
             list[tuple[str, int]]:
                 List in the form of [(question, position of the word to be filled)]
         """
-        questions = [(question, place) for (question, place), answer in self._questions_and_answers.items()]
+        questions = [(question, place) for (question, place), answer
+                     in self._questions_and_answers.items()]
         return questions
 
     def assess_exam(self, answers: dict[str, str]) -> float:  # type: ignore
@@ -456,7 +457,8 @@ class Examiner:
             raise ValueError('Input argument is empty')
         num_questions = 0
         score = 0
-        right_answers = {question: answer for (question, place), answer in self._questions_and_answers.items()}
+        right_answers = {question: answer for (question, place), answer
+                         in self._questions_and_answers.items()}
         for question in answers:
             num_questions += 1
             if answers[question] == right_answers[question]:
@@ -473,7 +475,7 @@ class GeneratorRuleStudent:
     _generator_type: int
 
     def __init__(
-            self, generator_type: int, language_model: NGramLanguageModel, word_processor: WordProcessor
+        self, generator_type: int, language_model: NGramLanguageModel, word_processor: WordProcessor
     ) -> None:
         """
         Initialize an instance of GeneratorRuleStudent.

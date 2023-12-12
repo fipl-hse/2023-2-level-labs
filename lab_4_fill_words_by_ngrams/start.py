@@ -21,7 +21,8 @@ def main() -> None:
     top_p_result = top_p_generator.run(51, 'Vernon')
     generator_types = GeneratorTypes()
     generators = {generator_types.top_p: TopPGenerator(lang_model, word_processor, 0.5),
-                  generator_types.beam_search: BeamSearchTextGenerator(lang_model, word_processor, 5)}
+                  generator_types.beam_search: BeamSearchTextGenerator(lang_model,
+                                                                       word_processor, 5)}
     checker = QualityChecker(generators, lang_model, word_processor)
     result = checker.run(100, 'The')
     assert result
