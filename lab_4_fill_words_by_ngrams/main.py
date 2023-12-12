@@ -140,7 +140,7 @@ class TopPGenerator:
             raise ValueError("TopPGenerator.run: Incorrect input")
         encoded = self._word_processor.encode(prompt)
         if not encoded:
-            raise ValueError
+            raise ValueError("TopPGenerator.run: Encoded is None")
 
         for i in range(seq_len):
             next_tokens = self._model.generate_next_token(encoded)
@@ -152,7 +152,7 @@ class TopPGenerator:
             sorted_dict = dict(sorted(list(next_tokens.items()),
                                       key=lambda x: (x[1], x[0]), reverse=True))
             probability = 0
-            possible_tokens = ()
+            possible_tokens = tuple()
             for word, value in sorted_dict.items():
                 probability += value
                 possible_tokens += (word,)
@@ -309,7 +309,7 @@ class QualityChecker:
 
         encoded = self._word_processor.encode(generated_text)
         if not encoded:
-            raise ValueError
+            raise ValueError("QualityChecker._calculate_perplexity: Encoded is None")
 
         ngram_size = self._language_model.get_n_gram_size()
         log_prob_sum = 0.0
@@ -317,13 +317,13 @@ class QualityChecker:
             context = tuple(encoded[index - ngram_size + 1: index])
             next_tokens = self._language_model.generate_next_token(context)
             if not next_tokens:
-                raise ValueError
+                raise ValueError("QualityChecker._calculate_perplexity: Next_tokens is None")
 
             prob = next_tokens.get(encoded[index])
             if prob:
                 log_prob_sum += math.log(prob)
         if not log_prob_sum:
-            raise ValueError
+            raise ValueError("QualityChecker._calculate_perplexity: Log_prob_sum is None")
         return math.exp(-log_prob_sum / (len(encoded) - ngram_size))
 
     def run(self, seq_len: int, prompt: str) -> list[GenerationResultDTO]:  # type: ignore
@@ -351,11 +351,11 @@ class QualityChecker:
         for num_type, generator in self._generators.items():
             text = generator.run(prompt=prompt, seq_len=seq_len)
             if not text:
-                raise ValueError
+                raise ValueError("QualityChecker.run: Text is None")
 
             perplexity = self._calculate_perplexity(text)
             if not perplexity:
-                raise ValueError
+                raise ValueError("QualityChecker.run: Perplexity is None")
 
             results.append(GenerationResultDTO(text, perplexity, num_type))
         return sorted(results, key=lambda item: (perplexity, num_type))
@@ -402,7 +402,7 @@ class Examiner:
         with open(self._json_path, 'r', encoding='utf-8') as file:
             question_and_answers = json.load(file)
             if not isinstance(question_and_answers, list):
-                raise ValueError
+                raise ValueError("Examiner._load_from_json: Question_and_answers is None")
         return {(i['question'], i['location']): i['answer'] for i in question_and_answers}
 
     def provide_questions(self) -> list[tuple[str, int]]:  # type: ignore
