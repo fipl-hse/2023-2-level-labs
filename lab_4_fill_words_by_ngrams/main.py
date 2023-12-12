@@ -332,7 +332,9 @@ class QualityChecker:
             num_ngrams += 1
         l_sum = -(l_sum / num_ngrams)
         result = pow(math.e, l_sum)
-        return result
+        if type(result) == float:
+            return result
+        return 0.0
 
     def run(self, seq_len: int, prompt: str) -> list[GenerationResultDTO]:  # type: ignore
         """
