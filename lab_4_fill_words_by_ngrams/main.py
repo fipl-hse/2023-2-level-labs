@@ -149,7 +149,7 @@ class TopPGenerator:
             if not next_tokens:
                 break
 
-            sorted_dict = dict(sorted(list(next_tokens.items()),
+            sorted_dict = dict(sorted(next_tokens.items(),
                                       key=lambda x: (x[1], x[0]), reverse=True))
             probability = 0
             possible_tokens = tuple()
