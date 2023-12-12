@@ -3,13 +3,14 @@ Lab 4.
 
 Top-p sampling generation and filling gaps with ngrams
 """
+import json
+import math
+from random import choice
+from string import punctuation
+
 # pylint:disable=too-few-public-methods, too-many-arguments
 from lab_3_generate_by_ngrams.main import (BeamSearchTextGenerator, GreedyTextGenerator,
                                            NGramLanguageModel, TextProcessor)
-from string import punctuation
-from random import choice
-import math
-import json
 
 
 class WordProcessor(TextProcessor):
@@ -41,9 +42,6 @@ class WordProcessor(TextProcessor):
             if element in '?!.':
                 preprocessed_text += ' '
                 preprocessed_text += self.get_end_of_word_token()
-            elif element.isdigit() or (element.isspace() and len(preprocessed_text) > 1
-                                       and preprocessed_text[-1].isspace()) or element in punctuation:
-                pass
             elif element.isalpha() or element.isspace():
                 preprocessed_text += element
 
@@ -87,8 +85,7 @@ class WordProcessor(TextProcessor):
         result = ''
         for word in decoded_corpus:
             if word == self.get_end_of_word_token():
-                result = result[:-1]
-                result += '.'
+                result = result[:-1] + '.'
             else:
                 for letter in word:
                     if not result or (len(result) > 2 and result[-2] == '.'):
@@ -96,8 +93,7 @@ class WordProcessor(TextProcessor):
                     else:
                         result += letter
             result += ' '
-        if result[-1] == ' ':
-            result = result[:-1]
+        result = result.strip()
         if result[-1] != '.':
             result += '.'
         return result
@@ -326,17 +322,12 @@ class QualityChecker:
         encoded_text = self._word_processor.encode(generated_text)
         if encoded_text is None:
             raise ValueError('self._word_processor.encode() returned None')
-        self._language_model.build()
-        # freq_dict = self._language_model._n_gram_frequencies
         l_sum = 0
         num_ngrams = 0
-        # ngrams = self._language_model._extract_n_grams(encoded_text)
         ngrams = self._language_model.generate_next_token(encoded_text)
         if ngrams is None:
-            # raise ValueError('self._language_model._extract_n_grams() returned None')
             raise ValueError('self._language_model.generate_next_token() returned None')
         for ngram in ngrams:
-            # l_sum += math.log(freq_dict[ngram])
             l_sum += math.log(ngrams[ngram])
             num_ngrams += 1
         l_sum = -(l_sum / num_ngrams)
@@ -428,7 +419,7 @@ class Examiner:
             raise ValueError('Inappropriate type of attribute _json_path')
         if not self._json_path:
             raise ValueError('Attribute _json_path is empty')
-        if self._json_path[-4:] != 'json':
+        if not self._json_path.endswith('json'):
             raise ValueError('Attribute _json_path has inappropriate extension')
         with open(self._json_path, 'r', encoding="utf-8") as file:
             self._questions_and_answers = json.load(file)
