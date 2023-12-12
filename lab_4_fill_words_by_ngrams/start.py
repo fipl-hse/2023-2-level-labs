@@ -20,7 +20,6 @@ def main() -> None:
     top_p_generator = TopPGenerator(lang_model, word_processor, 0.5)
     top_p_result = top_p_generator.run(51, 'Vernon')
     generator_types = GeneratorTypes()
-    # generators = {num: generator_types.get_conversion_generator_type(num) for num in range(1, 3)}
     generators = {generator_types.top_p: TopPGenerator(lang_model, word_processor, 0.5),
                   generator_types.beam_search: BeamSearchTextGenerator(lang_model, word_processor, 5)}
     checker = QualityChecker(generators, lang_model, word_processor)

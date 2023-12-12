@@ -9,6 +9,7 @@ from lab_3_generate_by_ngrams.main import (BeamSearchTextGenerator, GreedyTextGe
 from string import punctuation
 from random import choice
 import math
+import json
 
 
 class WordProcessor(TextProcessor):
@@ -205,11 +206,11 @@ class GeneratorTypes:
             (str): Name of the generator.
         """
         if generator_type == self.greedy:
-            return 'Greedy Generator'
+            return 'greedy generator'
         if generator_type == self.top_p:
-            return 'Top-P Generator'
+            return 'top-p generator'
         if generator_type == self.beam_search:
-            return 'Beam Search Generator'
+            return 'beam search generator'
 
 
 class GenerationResultDTO:
@@ -404,6 +405,10 @@ class Examiner:
         Args:
             json_path (str): Local path to assets file
         """
+        if not isinstance(json_path, str) or not json_path:
+            raise ValueError
+        self._json_path = json_path
+        self._questions_and_answers = {}
 
     def _load_from_json(self) -> dict[tuple[str, int], str]:  # type: ignore
         """
@@ -419,6 +424,16 @@ class Examiner:
                 or if attribute _json_path has inappropriate extension,
                 or if inappropriate type loaded data.
         """
+        if not isinstance(self._json_path, str):
+            raise ValueError('Inappropriate type of attribute _json_path')
+        if not self._json_path:
+            raise ValueError('Attribute _json_path is empty')
+        if self._json_path[-4:] != 'json':
+            raise ValueError('Attribute _json_path has inappropriate extension')
+        with open(self._json_path, 'r', encoding="utf-8") as file:
+            self._questions_and_answers = json.load(file)
+        if not isinstance(self._questions_and_answers, list):
+            raise ValueError('Inappropriate type loaded data')
 
     def provide_questions(self) -> list[tuple[str, int]]:  # type: ignore
         """
@@ -428,6 +443,8 @@ class Examiner:
             list[tuple[str, int]]:
                 List in the form of [(question, position of the word to be filled)]
         """
+        questions = [(question, place) for (question, place), answer in self._questions_and_answers.items()]
+        return questions
 
     def assess_exam(self, answers: dict[str, str]) -> float:  # type: ignore
         """
@@ -442,6 +459,18 @@ class Examiner:
         Raises:
             ValueError: In case of inappropriate type input argument or if input argument is empty.
         """
+        if not isinstance(answers, dict):
+            raise ValueError('Inappropriate type input argument')
+        if not answers:
+            raise ValueError('Input argument is empty')
+        num_questions = 0
+        score = 0
+        right_answers = {question: answer for (question, place), answer in self._questions_and_answers.items()}
+        for question in answers:
+            num_questions += 1
+            if answers[question] == right_answers[question]:
+                score += 1
+        return score / num_questions
 
 
 class GeneratorRuleStudent:
@@ -464,6 +493,13 @@ class GeneratorRuleStudent:
                 NGramLanguageModel instance to use for text generation
             word_processor (WordProcessor): WordProcessor instance to handle text processing
         """
+        self._generator_type = generator_type
+        if generator_type == 0:
+            self._generator = GreedyTextGenerator(language_model, word_processor)
+        elif generator_type == 1:
+            self._generator = TopPGenerator(language_model, word_processor, 0.5)
+        elif self._generator_type == 2:
+            self._generator = BeamSearchTextGenerator(language_model, word_processor, 5)
 
     def take_exam(self, tasks: list[tuple[str, int]]) -> dict[str, str]:  # type: ignore
         """
@@ -481,6 +517,21 @@ class GeneratorRuleStudent:
                 or if input argument is empty,
                 or if methods used return None.
         """
+        if not isinstance(tasks, list):
+            raise ValueError('Inappropriate type input argument')
+        if not tasks:
+            raise ValueError('Input argument is empty')
+        answers = {}
+        for (question, place) in tasks:
+            context = question[:place]
+            answer = self._generator.run(1, context)
+            if answer is None:
+                raise ValueError('self._generator.run() returned None')
+            if answer[-1] == '.':
+                answer = answer[:-1]
+            result = answer + question[place:]
+            answers[question] = result
+        return answers
 
     def get_generator_type(self) -> str:  # type: ignore
         """
@@ -489,3 +540,5 @@ class GeneratorRuleStudent:
         Returns:
             str: Generator type
         """
+        generator_types = GeneratorTypes()
+        return generator_types.get_conversion_generator_type(self._generator_type)
