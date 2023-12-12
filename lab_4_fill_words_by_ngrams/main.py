@@ -8,12 +8,10 @@ from lab_3_generate_by_ngrams.main import (BeamSearchTextGenerator, GreedyTextGe
                                            NGramLanguageModel, TextProcessor)
 
 
-
 class WordProcessor(TextProcessor):
     """
     Handle text tokenization, encoding and decoding.
     """
-
     def _tokenize(self, text: str) -> tuple[str, ...]:  # type: ignore
         """
         Tokenize text into tokens, separating sentences with special token.
@@ -29,7 +27,17 @@ class WordProcessor(TextProcessor):
         Raises:
             ValueError: In case of inappropriate type input argument or if input argument is empty.
         """
-
+        if not (isinstance(text, str) and text):
+            raise ValueError
+        clean_txt = []
+        for word in text.lower().split():
+            if word[-1] in '!?.':
+                clean_txt.extend([word[:-1], self._end_of_word_token])
+            else:
+                clean_word = [char for char in word if char.isalpha()]
+                if clean_word:
+                    clean_txt.append(''.join(clean_word))
+        return tuple(clean_txt)
     def _put(self, element: str) -> None:
         """
         Put an element into the storage, assign a unique id to it.
