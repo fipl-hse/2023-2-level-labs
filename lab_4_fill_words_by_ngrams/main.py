@@ -131,7 +131,7 @@ class TopPGenerator:
                 or if methods used return None.
         """
         if (not isinstance(seq_len, int) or seq_len < 1 or
-           not isinstance(prompt, str) or not str):
+           not isinstance(prompt, str) or not prompt):
            raise ValueError
         prompt_encoded = self._word_processor.encode(prompt)
         if not prompt_encoded:
