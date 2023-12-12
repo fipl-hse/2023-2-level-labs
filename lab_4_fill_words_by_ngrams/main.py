@@ -332,7 +332,7 @@ class QualityChecker:
             num_ngrams += 1
         l_sum = -(l_sum / num_ngrams)
         result = pow(math.e, l_sum)
-        if type(result) == float:
+        if isinstance(result, float):
             return result
         return 0.0
 
