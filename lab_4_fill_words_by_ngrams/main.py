@@ -206,7 +206,7 @@ class GeneratorTypes:
             return 'top-p generator'
         if generator_type == self.beam_search:
             return 'beam search generator'
-        return None
+        return ''
 
 
 class GenerationResultDTO:
@@ -322,8 +322,8 @@ class QualityChecker:
         encoded_text = self._word_processor.encode(generated_text)
         if encoded_text is None:
             raise ValueError('self._word_processor.encode() returned None')
-        l_sum = 0
-        num_ngrams = 0
+        l_sum = 0.0
+        num_ngrams = 0.0
         ngrams = self._language_model.generate_next_token(encoded_text)
         if ngrams is None:
             raise ValueError('self._language_model.generate_next_token() returned None')
@@ -517,7 +517,7 @@ class GeneratorRuleStudent:
         answers = {}
         for (question, place) in tasks:
             context = question[:place]
-            answer = self._generator.run(1, context)
+            answer = self._generator.run(seq_len=1, prompt=context)
             if answer is None:
                 raise ValueError('self._generator.run() returned None')
             if answer[-1] == '.':
