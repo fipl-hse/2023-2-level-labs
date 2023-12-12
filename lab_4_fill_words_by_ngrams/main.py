@@ -5,6 +5,8 @@ Top-p sampling generation and filling gaps with ngrams
 """
 # pylint:disable=too-few-public-methods, too-many-arguments
 import random
+import math
+import json
 
 from lab_3_generate_by_ngrams.main import (BeamSearchTextGenerator, GreedyTextGenerator,
                                            NGramLanguageModel, TextProcessor)
@@ -30,16 +32,17 @@ class WordProcessor(TextProcessor):
         Raises:
             ValueError: In case of inappropriate type input argument or if input argument is empty.
         """
-        if not isinstance(text, str) or len(text) == 0:
+        if not isinstance(text, str) or not text:
             raise ValueError
-        text_words = text.lower().split()
 
         tokens = []
-        for word in text_words:
+        for word in text.lower().split():
             if word[-1] in '!?.':
                 tokens.extend([word[:len(word) - 1], self._end_of_word_token])
-            elif word.isalpha():
-                tokens.append(word)
+            else:
+                cleaned_word = [letter for letter in word if letter.isalpha()]
+                if cleaned_word:
+                    tokens.append(''.join(cleaned_word))
 
         return tuple(tokens)
 
@@ -134,8 +137,8 @@ class TopPGenerator:
                 or if sequence has inappropriate length,
                 or if methods used return None.
         """
-        if not (isinstance(seq_len, int) and seq_len > 0
-                and isinstance(prompt, str) and prompt):
+        if (not isinstance(seq_len, int) or not isinstance(prompt, str)
+                or seq_len <= 0):
             raise ValueError
         encoded = self._word_processor.encode(prompt)
         if not encoded:
@@ -179,6 +182,9 @@ class GeneratorTypes:
         """
         Initialize an instance of GeneratorTypes.
         """
+        self.greedy = 0
+        self.top_p = 1
+        self.beam_search = 2
 
     def get_conversion_generator_type(self, generator_type: int) -> str:  # type: ignore
         """
@@ -190,6 +196,8 @@ class GeneratorTypes:
         Returns:
             (str): Name of the generator.
         """
+        generators = ['Greedy Generator', 'Top-P Generator', 'Beam Search Generator']
+        return generators[generator_type]
 
 
 class GenerationResultDTO:
@@ -212,6 +220,9 @@ class GenerationResultDTO:
             generation_type (int):
                 Numeric type of the generator for which perplexity was calculated
         """
+        self.__text = text
+        self.__perplexity = perplexity
+        self.__type = generation_type
 
     def get_perplexity(self) -> float:  # type: ignore
         """
@@ -220,6 +231,7 @@ class GenerationResultDTO:
         Returns:
             (float): Perplexity value
         """
+        return self.__perplexity
 
     def get_text(self) -> str:  # type: ignore
         """
@@ -228,6 +240,7 @@ class GenerationResultDTO:
         Returns:
             (str): Text for which the perplexity was count
         """
+        return self.__text
 
     def get_type(self) -> int:  # type: ignore
         """
@@ -236,6 +249,7 @@ class GenerationResultDTO:
         Returns:
             (int): Numeric type of the generator
         """
+        return self.__type
 
     def __str__(self) -> str:  # type: ignore
         """
@@ -244,6 +258,9 @@ class GenerationResultDTO:
         Returns:
             (str): String with report
         """
+        return (f'Perplexity score: {self.__perplexity}\n'
+                f'{GeneratorTypes().get_conversion_generator_type(self.__type)}\n'
+                f'Text: {self.__text}\n')
 
 
 class QualityChecker:
@@ -268,6 +285,9 @@ class QualityChecker:
                 NGramLanguageModel instance to use for text generation
             word_processor (WordProcessor): WordProcessor instance to handle text processing
         """
+        self._generators = generators
+        self._language_model = language_model
+        self._word_processor = word_processor
 
     def _calculate_perplexity(self, generated_text: str) -> float:  # type: ignore
         """
@@ -285,6 +305,27 @@ class QualityChecker:
                 or if methods used return None,
                 or if nothing was generated.
         """
+        if not isinstance(generated_text, str) or not generated_text:
+            raise ValueError
+
+        encoded = self._word_processor.encode(generated_text)
+        if not encoded:
+            raise ValueError
+
+        ngram_size = self._language_model.get_n_gram_size()
+        log_prob_sum = 0.0
+        for index in range(ngram_size - 1, len(encoded)):
+            context = tuple(encoded[index - ngram_size + 1: index])
+            next_tokens = self._language_model.generate_next_token(context)
+            if not next_tokens:
+                raise ValueError
+
+            prob = next_tokens.get(encoded[index])
+            if prob:
+                log_prob_sum += math.log(prob)
+        if not log_prob_sum:
+            raise ValueError
+        return math.exp(-log_prob_sum / (len(encoded) - ngram_size))
 
     def run(self, seq_len: int, prompt: str) -> list[GenerationResultDTO]:  # type: ignore
         """
@@ -304,6 +345,20 @@ class QualityChecker:
                 or if sequence has inappropriate length,
                 or if methods used return None.
         """
+        if not isinstance(seq_len, int) or seq_len < 0 or not isinstance(prompt, str) or not prompt:
+            raise ValueError("Incorrect input")
+        results = []
+        for num_type, generator in self._generators.items():
+            text = generator.run(prompt=prompt, seq_len=seq_len)
+            if not text:
+                raise ValueError
+
+            perplexity = self._calculate_perplexity(text)
+            if not perplexity:
+                raise ValueError
+
+            results.append(GenerationResultDTO(text, perplexity, num_type))
+        return sorted(results, key=lambda item: (perplexity, num_type))
 
 
 class Examiner:
@@ -323,6 +378,8 @@ class Examiner:
         Args:
             json_path (str): Local path to assets file
         """
+        self._json_path = json_path
+        self._questions_and_answers = self._load_from_json()
 
     def _load_from_json(self) -> dict[tuple[str, int], str]:  # type: ignore
         """
@@ -338,6 +395,15 @@ class Examiner:
                 or if attribute _json_path has inappropriate extension,
                 or if inappropriate type loaded data.
         """
+        if (not isinstance(self._json_path, str) or not self._json_path
+                or self._json_path[-5:] != ".json"):
+            raise ValueError
+
+        with open(self._json_path, 'r', encoding='utf-8') as file:
+            question_and_answers = json.load(file)
+            if not isinstance(question_and_answers, list):
+                raise ValueError
+        return {(i['question'], i['location']): i['answer'] for i in question_and_answers}
 
     def provide_questions(self) -> list[tuple[str, int]]:  # type: ignore
         """
@@ -347,6 +413,7 @@ class Examiner:
             list[tuple[str, int]]:
                 List in the form of [(question, position of the word to be filled)]
         """
+        return list(self._questions_and_answers.keys())
 
     def assess_exam(self, answers: dict[str, str]) -> float:  # type: ignore
         """
@@ -361,6 +428,13 @@ class Examiner:
         Raises:
             ValueError: In case of inappropriate type input argument or if input argument is empty.
         """
+        if not isinstance(answers, dict) or not answers:
+            raise ValueError
+
+        right_answers = ([key for key in self._questions_and_answers.keys()
+                          if answers[key[0]] == self._questions_and_answers[key]])
+
+        return len(right_answers) / len(list(self._questions_and_answers.values()))
 
 
 class GeneratorRuleStudent:
