@@ -31,7 +31,7 @@ class WordProcessor(TextProcessor):
             ValueError: In case of inappropriate type input argument or if input argument is empty.
         """
         if not (isinstance(text, str) and text):
-            raise ValueError
+            raise ValueError('Incorrect input')
 
         tokenized_word = []
         for word in text.lower().split():
@@ -55,7 +55,7 @@ class WordProcessor(TextProcessor):
             ValueError: In case of inappropriate type input argument or if input argument is empty.
         """
         if not (isinstance(element, str) and element):
-            raise ValueError
+            raise ValueError('Incorrect input')
 
         if element in self._storage:
             return None
@@ -81,7 +81,7 @@ class WordProcessor(TextProcessor):
             ValueError: In case of inappropriate type input argument or if input argument is empty.
         """
         if not (isinstance(decoded_corpus, tuple) and decoded_corpus):
-            raise ValueError
+            raise ValueError('Incorrect input')
 
         postprocessed_text = [decoded_corpus[0].capitalize()]
         capital_index = []
@@ -148,17 +148,18 @@ class TopPGenerator:
                 isinstance(seq_len, int) and seq_len > 0
                 and isinstance(prompt, str) and prompt
         ):
-            raise ValueError
+            raise ValueError('Incorrect input')
 
         encoded_prompt = self._word_processor.encode(prompt)
-        if not encoded_prompt:
-            raise ValueError
+        if encoded_prompt is None:
+            raise ValueError('Encoding returned None')
 
-        while len(encoded_prompt) <= seq_len:
+        cur_len = 0
+        while cur_len < seq_len:
 
             possible_tokens = self._model.generate_next_token(encoded_prompt)
             if possible_tokens is None:
-                raise ValueError
+                raise ValueError('Generate next token returned None')
             if not possible_tokens:
                 break
 
@@ -169,17 +170,18 @@ class TopPGenerator:
             n_min_tokens = [sorted_tokens[0]]
             sum_freq = 0
             for token in sorted_tokens[1:]:
-                sum_freq += token[1]
                 if sum_freq < self._p_value:
+                    sum_freq += token[1]
                     n_min_tokens.append(token[0])
-                else:
-                    random_token = random.choice(n_min_tokens)
-                    encoded_prompt += (random_token,)
-                    break
+
+            random_token = random.choice(n_min_tokens)
+            encoded_prompt += (random_token,)
+
+            cur_len += 1
 
         decoded_text = self._word_processor.decode(encoded_prompt)
-        if not decoded_text:
-            raise ValueError
+        if decoded_text is None:
+            raise ValueError('Decoding returned None')
 
         return decoded_text
 
