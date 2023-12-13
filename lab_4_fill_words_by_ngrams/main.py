@@ -432,13 +432,11 @@ class Examiner:
             raise ValueError
         correct = 0
         total = len(answers)
-        correct_answers = list(self._questions_and_answers.values())
-        answers_list = answers.values()
-        for index, answer in enumerate(answers_list):
-            if answer == correct_answers[index]:
+        correct_answers = self._questions_and_answers
+        for question, answer in correct_answers.items():
+            if answer == answers[question[0]]:
                 correct += 1
-        return correct/total
-
+        return float(correct/total)
 
 class GeneratorRuleStudent:
     """
@@ -460,6 +458,11 @@ class GeneratorRuleStudent:
                 NGramLanguageModel instance to use for text generation
             word_processor (WordProcessor): WordProcessor instance to handle text processing
         """
+        self._generator_type = generator_type
+        generators = (GreedyTextGenerator(language_model, word_processor),
+                      BeamSearchTextGenerator(language_model, word_processor, 5),
+                      TopPGenerator(language_model, word_processor, 0.5))
+        self._generator = generators[self._generator_type]
 
     def take_exam(self, tasks: list[tuple[str, int]]) -> dict[str, str]:  # type: ignore
         """
@@ -477,6 +480,8 @@ class GeneratorRuleStudent:
                 or if input argument is empty,
                 or if methods used return None.
         """
+        if not (isinstance(tasks, list) and tasks):
+            raise ValueError
 
     def get_generator_type(self) -> str:  # type: ignore
         """
