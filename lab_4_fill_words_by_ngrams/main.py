@@ -137,7 +137,7 @@ class TopPGenerator:
         if not encoded_prompt:
             raise ValueError("Failed to encode the prompt")
 
-        while seq_len >= 1:
+        for _ in range(seq_len):
             next_tokens = self._model.generate_next_token(encoded_prompt)
             if next_tokens is None:
                 raise ValueError("Failed to generate next tokens")
@@ -151,9 +151,6 @@ class TopPGenerator:
                     random_token = random.choice(sorted_tokens[:i + 1])
                     encoded_prompt += (random_token[0],)
                     break
-            else:
-                break
-            seq_len -= 1
 
         decoded = self._word_processor.decode(encoded_prompt)
         if not decoded:
