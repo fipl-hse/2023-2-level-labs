@@ -7,6 +7,8 @@ Top-p sampling generation and filling gaps with ngrams
 from lab_3_generate_by_ngrams.main import (BeamSearchTextGenerator, GreedyTextGenerator,
                                            NGramLanguageModel, TextProcessor)
 
+import random
+
 
 class WordProcessor(TextProcessor):
     """
@@ -130,8 +132,32 @@ class TopPGenerator:
                 or if sequence has inappropriate length,
                 or if methods used return None.
         """
-        if not isinstance(seq_len, int):
-            raise ValueError
+        if not (isinstance(seq_len, int) and isinstance(prompt, str)):
+            raise ValueError('inappropriate type input arguments')
+        if not (seq_len and prompt):
+            raise ValueError('input arguments are empty')
+        if seq_len < 0:
+            raise ValueError('sequence has inappropriate length')
+
+        encoded = self._word_processor.encode(prompt)
+        if not encoded:
+            raise ValueError("it wasn't possible to encode the prompt")
+
+        while seq_len > 0:
+            tokens = self._model.generate_next_token(encoded)
+            if not tokens:
+                raise ValueError('this method returns None')
+
+            break
+
+
+
+
+
+
+
+
+
 
 class GeneratorTypes:
     """
