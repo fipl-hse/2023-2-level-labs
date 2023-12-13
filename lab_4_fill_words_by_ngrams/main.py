@@ -35,12 +35,12 @@ class WordProcessor(TextProcessor):
             raise ValueError
         words = []
         for word in text.lower().split():
+            cleared_word = ''.join(filter(str.isalpha, word))
+            if not cleared_word:
+                continue
+            words.append(cleared_word)
             if word[-1] in '.?!':
-                words.extend([word[:-1], self._end_of_word_token])
-            else:
-                cleared_word = ''.join(filter(str.isalpha, word))
-                if cleared_word:
-                    words.append(cleared_word)
+                words.append(self._end_of_word_token)
         return tuple(words)
 
     def _put(self, element: str) -> None:
@@ -76,8 +76,8 @@ class WordProcessor(TextProcessor):
         """
         if not (isinstance(decoded_corpus, tuple) and decoded_corpus):
             raise ValueError
-        postprocessed_text = ''.join(decoded_corpus).replace(f'{self._end_of_word_token}', '.')
-        sentences = postprocessed_text.split('.')
+        postprocessed_text = ''.join(decoded_corpus)
+        sentences = postprocessed_text.split(f'{self._end_of_word_token}')
         result = '.'.join([sentence.capitalize() for sentence in sentences])
         if result[-1] != '.':
             result += '.'
@@ -302,7 +302,7 @@ class QualityChecker:
         n_gram_size = self._language_model.get_n_gram_size()
         log_sum = 0.0
         for ind in range(n_gram_size - 1, len(encoded)):
-            context = tuple(encoded[ind - n_gram_size + 1: ind])
+            context = (encoded[ind - n_gram_size + 1: ind])
             generated_tokens = self._language_model.generate_next_token(context)
             if not generated_tokens:
                 raise ValueError
@@ -336,6 +336,17 @@ class QualityChecker:
                 and isinstance(prompt, str) and prompt):
             raise ValueError
         calcs = []
+        for generator_type, generator in self._generators.items():
+            resulting_text = generator.run(prompt=prompt, seq_len=seq_len)
+            if not resulting_text:
+                raise ValueError
+            perplexity = self._calculate_perplexity(resulting_text)
+            if not perplexity:
+                raise ValueError
+            calcs.append(GenerationResultDTO(resulting_text, perplexity, generator_type))
+        result = sorted(calcs, key=lambda x: (perplexity, generator_type))
+        return result
+
 
 class Examiner:
     """
