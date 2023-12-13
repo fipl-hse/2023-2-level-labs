@@ -37,14 +37,14 @@ class WordProcessor(TextProcessor):
         punctuation_to_replace = '.!?'
         tokens = []
         for word in text.lower().split():
+            cleaned_word = [letter for letter in word if letter.isalpha()]
+            if not cleaned_word:
+                continue
+            tokens.append(''.join(cleaned_word))
             if word[-1] in punctuation_to_replace:
-                tokens.extend([word[:-1], self._end_of_word_token])
-            else:
-                cleaned_word = [letter for letter in word if letter.isalpha()]
-                if not cleaned_word:
-                    continue
-                tokens.append(''.join(cleaned_word))
+                tokens.append(self._end_of_word_token)
         return tuple(tokens)
+
 
     def _put(self, element: str) -> None:
         """
@@ -58,9 +58,8 @@ class WordProcessor(TextProcessor):
         """
         if not (isinstance(element, str) and element):
             raise ValueError
-        if element in self._storage:
-            return None
-        self._storage[element] = len(self._storage)
+        if element not in self._storage:
+            self._storage[element] = len(self._storage)
         return None
 
     def _postprocess_decoded_text(self, decoded_corpus: tuple[str, ...]) -> str:  # type: ignore
@@ -153,7 +152,7 @@ class TopPGenerator:
                 candidates.append((word, value))
             sorted_candidates = sorted(candidates, key=lambda x: (x[1], x[0]), reverse=True)
             probability = 0
-            possible_tokens = tuple()
+            possible_tokens = []
             for word, value in sorted_candidates:
                 probability += value
                 possible_tokens += (word,)
