@@ -52,7 +52,7 @@ class TextProcessor:
         preprocessed_text = text.lower().split()
 
         for word in preprocessed_text:
-            tokens = [i for i in word if i.isalpha()]
+            tokens = list(filter(str.isalpha, word))
             tokenized_text.extend(tokens)
             if tokens:
                 tokenized_text.append(self._end_of_word_token)
@@ -138,7 +138,7 @@ class TextProcessor:
         for token in tokenized_text:
             self._put(token)
             token_id = self.get_id(token)
-            if not isinstance(token_id, int):
+            if token_id is None:
                 return None
             encoded_corpus.append(token_id)
 
@@ -154,10 +154,7 @@ class TextProcessor:
         In case of corrupt input arguments or invalid argument length,
         an element is not added to storage
         """
-        if not isinstance(element, str) or len(element) != 1:
-            return None
-
-        if element in self._storage:
+        if not isinstance(element, str) or len(element) != 1 or element in self._storage:
             return None
 
         self._storage[element] = len(self._storage)
@@ -183,13 +180,7 @@ class TextProcessor:
         if not isinstance(encoded_corpus, tuple):
             return None
 
-        decoded_corpus = self._decode(encoded_corpus)
-        if not decoded_corpus:
-            return None
-
-        decoded_text = self._postprocess_decoded_text(decoded_corpus)
-        if not decoded_text:
-            return None
+        decoded_text = self._postprocess_decoded_text(self._decode(encoded_corpus))
 
         return decoded_text
 
@@ -252,7 +243,8 @@ class TextProcessor:
         if not isinstance(decoded_corpus, tuple) or not decoded_corpus:
             return None
 
-        decoded_text = ''.join(decoded_corpus).replace('_', ' ').capitalize()
+        predecoded_text = ''.join(decoded_corpus).split('_')
+        decoded_text = ' '.join(predecoded_text).capitalize()
 
         if decoded_text[-1] == ' ':
             return f"{decoded_text[:-1]}."
@@ -328,11 +320,13 @@ class NGramLanguageModel:
 
         for n_gram in n_grams:
             context_freq_dict[n_gram] = context_freq_dict.get(n_gram, 0) + 1
+        print(context_freq_dict)
 
         lower_ngram_counts = {}
         for ngram, freq in context_freq_dict.items():
             context = ngram[:-1]
             lower_ngram_counts[context] = lower_ngram_counts.get(context, 0) + freq
+        print(lower_ngram_counts)
 
         self._n_gram_frequencies = {ngram: freq / lower_ngram_counts[ngram[:-1]]
                                     for ngram, freq in context_freq_dict.items()}
@@ -382,16 +376,11 @@ class NGramLanguageModel:
 
         In case of corrupt input arguments, None is returned
         """
-        if not isinstance(encoded_corpus, tuple) or len(encoded_corpus) == 0:
+        if not isinstance(encoded_corpus, tuple) or not encoded_corpus:
             return None
 
-        n_gram_size = self._n_gram_size
-        n_grams = []
-        for i in range(len(encoded_corpus) - n_gram_size + 1):
-            n_gram = tuple(encoded_corpus[i:i + n_gram_size])
-            n_grams.append(n_gram)
-
-        return tuple(n_grams)
+        return tuple([encoded_corpus[index:self._n_gram_size + index] for index in
+                      range(len(encoded_corpus) - self._n_gram_size + 1)])
 
 
 class GreedyTextGenerator:
