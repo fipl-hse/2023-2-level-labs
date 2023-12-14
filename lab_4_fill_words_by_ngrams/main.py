@@ -76,10 +76,12 @@ class WordProcessor(TextProcessor):
         if not isinstance(decoded_corpus, tuple) or not decoded_corpus:
             raise ValueError('Inappropriate input or input argument is empty')
 
-        splited_text = "".join(decoded_corpus).split(self._end_of_word_token)
+        splited_text = " ".join(decoded_corpus).split(self._end_of_word_token)
         resulting_text = '. '.join([i.strip().capitalize() for i in splited_text])
 
-        return f"{resulting_text.strip()}."
+        if resulting_text[-1] == ' ':
+            return resulting_text[:-1]
+        return f"{resulting_text}."
 
 
 class TopPGenerator:
@@ -104,6 +106,10 @@ class TopPGenerator:
             word_processor (WordProcessor): WordProcessor instance to handle text processing
             p_value (float): Collective probability mass threshold
         """
+        self._lang_model = language_model
+        self._word_processor = word_processor
+        self._p_value = p_value
+
 
     def run(self, seq_len: int, prompt: str) -> str:  # type: ignore
         """
@@ -122,6 +128,22 @@ class TopPGenerator:
                 or if sequence has inappropriate length,
                 or if methods used return None.
         """
+        if not (isinstance(seq_len, int) and seq_len > 0 and isinstance(prompt, str) and prompt):
+            raise ValueError
+
+        encoded_text = self._word_processor.encode(prompt)
+        if not encoded_text:
+            raise ValueError
+
+        for number in range(seq_len):
+            next_tokens = self._lang_model.generate_next_token(encoded_text)
+            if next_tokens is None:
+                raise ValueError
+            if not next_tokens:
+                break
+
+            sorted_tokens = dict(sorted(next_tokens.items(), key=lambda x: (x[1], x[0]), reverse=True))
+            sum_probability = 0
 
 
 class GeneratorTypes:

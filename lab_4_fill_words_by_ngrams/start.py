@@ -12,7 +12,7 @@ def main() -> None:
         text = text_file.read()
     result = None
     word_processor = main_py.WordProcessor('<eow>')
-    print(word_processor)
+    top_p_generator = main_py.TopPGenerator(language_model, word_processor, 0.5)
     assert word_processor
 
 
