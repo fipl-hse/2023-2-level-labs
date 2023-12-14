@@ -438,11 +438,7 @@ class GreedyTextGenerator:
         In case of corrupt input arguments or methods used return None,
         None is returned
         """
-        if not isinstance(seq_len, int):
-            return None
-        if not isinstance(prompt, str):
-            return None
-        if not prompt:
+        if not (isinstance(seq_len, int) and isinstance(prompt, str)) or len(prompt) == 0:
             return None
 
         encoded_prompt = self._text_processor.encode(prompt)
@@ -450,21 +446,23 @@ class GreedyTextGenerator:
         if not (encoded_prompt and n_gram_size):
             return None
 
-        for i in range(seq_len):
-            next_tokens = self._model.generate_next_token(encoded_prompt[-n_gram_size +1:])
-            if not next_tokens:
+        while seq_len > 0:
+            tokens = self._model.generate_next_token(encoded_prompt[-n_gram_size + 1:])
+            if not tokens:
                 break
 
-            max_freq = max(next_tokens.values())
-            max_freq_tokens = [token for token, freq in next_tokens.items() if freq == max_freq]
-            sorted_tokens = sorted(max_freq_tokens)
-            encoded_prompt += (sorted_tokens[0],)
+            max_freq = max(tokens.values())
+            max_freq_tokens = [token for token, freq in tokens.items() if freq == max_freq]
+            max_freq_tokens = sorted(max_freq_tokens)
+            encoded_prompt += (max_freq_tokens[0],)
 
-        decoded = self._text_processor.decode(encoded_prompt)
-        if not decoded:
+            seq_len -= 1
+
+        decoded_text = self._text_processor.decode(encoded_prompt)
+        if not decoded_text:
             return None
 
-        return decoded
+        return decoded_text
 
 
 class BeamSearcher:
