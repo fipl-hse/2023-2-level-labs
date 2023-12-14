@@ -203,6 +203,8 @@ class GeneratorTypes:
         Returns:
             (str): Name of the generator.
         """
+        if generator_type > 2:
+            raise ValueError("No such type of generator found")
         generators = ['Greedy Generator', 'Top-P Generator', 'Beam Search Generator']
         return generators[generator_type]
 
