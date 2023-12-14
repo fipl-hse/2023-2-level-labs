@@ -450,7 +450,7 @@ class GreedyTextGenerator:
             return None
 
         for i in range(seq_len):
-            next_tokens = self._model.generate_next_token(encoded_prompt)
+            next_tokens = self._model.generate_next_token(encoded_prompt[-n_gram_size +1:])
             if not next_tokens:
                 break
 
@@ -460,6 +460,8 @@ class GreedyTextGenerator:
             encoded_prompt += (sorted_tokens[0],)
 
         decoded = self._text_processor.decode(encoded_prompt)
+        if not decoded:
+            return None
 
         return decoded
 
