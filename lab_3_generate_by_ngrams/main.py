@@ -461,7 +461,7 @@ class GreedyTextGenerator:
             sorted_tokens = sorted(max_freq_tokens)
             encoded_prompt += (sorted_tokens[0],)
 
-         decoded = self._text_processor.decode(encoded_prompt)
+        decoded = self._text_processor.decode(encoded_prompt)
 
         return decoded
 
@@ -514,8 +514,13 @@ class BeamSearcher:
         if not tokens:
             return []
 
-        return sorted([(token, float(freq)) for token, freq in tokens.items()],
-                      key=lambda pair: pair[1], reverse=True)[:self._beam_width]
+        list_of_pairs = []
+        for token, frequency in tokens.items():
+            token_pair = (token, float(frequency))
+            list_of_pairs.append(token_pair)
+        sorted_pairs = sorted(list_of_pairs, key=lambda x: x[1], reverse=True)
+        return sorted_pairs[:self._beam_width]
+
 
     def continue_sequence(
         self,
@@ -538,18 +543,29 @@ class BeamSearcher:
 
         In case of corrupt input arguments or unexpected behaviour of methods used return None.
         """
-        if not (isinstance(sequence, tuple) and isinstance(next_tokens, list)
-                and isinstance(sequence_candidates, dict) and sequence
-                and next_tokens and sequence_candidates and len(next_tokens) <= self._beam_width
-                and sequence in sequence_candidates):
+        if not isinstance(sequence, tuple):
+            return None
+        if not isinstance(next_tokens, list):
+            return None
+        if not isinstance(sequence_candidates, dict):
+            return None
+        if not sequence:
+            return None
+        if not next_tokens:
+            return None
+        if not sequence_candidates:
+            return None
+        if not len(next_tokens) <= self._beam_width:
+            return None
+        if not sequence in sequence_candidates:
             return None
 
         for token in next_tokens:
             new_sequence = sequence + (token[0],)
-            new_freq = sequence_candidates[sequence] - math.log(token[1])
-            sequence_candidates[new_sequence] = new_freq
+            new_frequency = sequence_candidates[sequence] - math.log(token[1])
+            sequence_candidates[new_sequence] = new_frequency
 
-        del sequence_candidates[sequence]
+        sequence_candidates.pop(sequence)
 
         return sequence_candidates
 
@@ -567,11 +583,15 @@ class BeamSearcher:
 
         In case of corrupt input arguments return None.
         """
-        if not (isinstance(sequence_candidates, dict) and sequence_candidates):
+        if not isinstance (sequence_candidates, dict):
+            return None
+        if not sequence_candidates:
             return None
 
-        return dict(sorted(list(sequence_candidates.items()),
-                           key=lambda x: x[1])[:self._beam_width])
+        sorted_sequences = sorted(sequence_candidates.items(), key=lambda x: x[1])
+        chosen_sequences = sorted_sequences[:self._beam_width]
+
+        return dict(sorted_sequences)
 
 
 class BeamSearchTextGenerator:
@@ -618,7 +638,11 @@ class BeamSearchTextGenerator:
         In case of corrupt input arguments or methods used return None,
         None is returned
         """
-        if not (isinstance(prompt, str) and isinstance(seq_len, int) and prompt and seq_len):
+        if not isinstance(prompt, str):
+            return None
+        if not isinstance(seq_len, int):
+            return None
+        if not prompt and seq_len:
             return None
 
         encoded_prompt = self._text_processor.encode(prompt)
@@ -631,28 +655,28 @@ class BeamSearchTextGenerator:
             new_sequence_candidates = sequence_candidates.copy()
 
             for sequence in sequence_candidates:
-                tokens = self._get_next_token(sequence)
-                if tokens is None:
+                next_tokens = self._get_next_token(sequence)
+                if next_tokens is None:
                     return None
 
-                continuation_candidates = self.beam_searcher.continue_sequence(
-                    sequence, tokens, new_sequence_candidates)
-                if continuation_candidates is None:
+                continued_candidates = self.beam_searcher.continue_sequence(
+                    sequence, next_tokens, new_sequence_candidates)
+                if continued_candidates is None:
                     break
 
             if not new_sequence_candidates:
                 break
 
-            best_sequence_candidates = self.beam_searcher.prune_sequence_candidates(
+            chosen_candidates = self.beam_searcher.prune_sequence_candidates(
                 new_sequence_candidates)
 
-            if not best_sequence_candidates:
+            if not chosen_candidates:
                 return None
-            sequence_candidates = best_sequence_candidates
-
-        decoded = self._text_processor.decode(min(sequence_candidates,
-                                                  key=lambda x: sequence_candidates[x]))
+            sequence_candidates = chosen_candidates
+        best_sequence = min(sequence_candidates, key=lambda x: sequence_candidates[x])
+        decoded = self._text_processor.decode(best_sequence)
         return decoded
+
 
     def _get_next_token(
         self, sequence_to_continue: tuple[int, ...]
@@ -669,7 +693,9 @@ class BeamSearchTextGenerator:
 
         In case of corrupt input arguments return None.
         """
-        if not isinstance(sequence_to_continue, tuple) or len(sequence_to_continue) == 0:
+        if not isinstance(sequence_to_continue, tuple):
+            return None
+        if not len(sequence_to_continue) == 0:
             return None
 
         tokens = self.beam_searcher.get_next_token(sequence_to_continue)
