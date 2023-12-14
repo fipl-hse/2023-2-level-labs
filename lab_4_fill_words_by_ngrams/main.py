@@ -74,6 +74,20 @@ class WordProcessor(TextProcessor):
         Raises:
             ValueError: In case of inappropriate type input argument or if input argument is empty.
         """
+        if not (isinstance(decoded_corpus, tuple) and decoded_corpus):
+            raise ValueError('Inappropriate input or input argument is empty')
+
+        decoded_sentences = ''
+        sentences = ' '.join(list(decoded_corpus)).split(self._end_of_word_token)
+
+        for sentence in sentences:
+            sentence = sentence.strip().capitalize()
+            if not sentence:
+                break
+            sentence = f"{sentence}. "
+            decoded_sentences += sentence
+
+            return decoded_sentences.strip()
 
 
 class TopPGenerator:
@@ -82,7 +96,9 @@ class TopPGenerator:
 
     Attributes:
         _model (NGramLanguageModel): NGramLanguageModel instance to use for text generation
+    generation
         _word_processor (WordProcessor): WordProcessor instance to handle text processing
+    processing
         _p_value (float) : Collective probability mass threshold for generation
     """
 
@@ -116,6 +132,39 @@ class TopPGenerator:
                 or if sequence has inappropriate length,
                 or if methods used return None.
         """
+        if not (isinstance(seq_len, int) and seq_len > 0 and isinstance(prompt, str) and prompt):
+            raise ValueError('Inappropriate input or input argument is empty or seq_len is a negative int')
+
+        encoded_text = self._word_processor.encode(prompt)
+        if not encoded_text:
+            raise ValueError('Could not encode')
+
+        for i in range(seq_len):
+            next_tokens = self._model.generate_next_token(encoded_text)
+            if next_tokens is None:
+                raise ValueError('None is returned')
+            if not next_tokens:
+                break
+
+
+            sorted_tokens = dict(sorted(next_tokens.items(), key=lambda x: (x[1], x[0]), reverse=True))
+
+            sum_probability = 0
+            possible_tokens = []
+
+            for token, value in sorted_tokens.items():
+                if sum_probability < self._p_value:
+                    sum_probability += value
+                    possible_tokens.append(token)
+                chosen_token = random.choice(possible_tokens)
+                encoded_text += (chosen_token,)
+                break
+
+        decoded_text = self._word_processor.decode(encoded_text)
+        if not decoded_text:
+            raise ValueError('Could not decode')
+
+        return decoded_text
 
 
 class GeneratorTypes:
@@ -132,7 +181,12 @@ class GeneratorTypes:
         """
         Initialize an instance of GeneratorTypes.
         """
-
+        if generator_type == 0:
+             return 'Greedy Generator'
+        if generator_type == 1:
+             return 'Top-P Generator'
+        if generator_type == 2:
+             return 'Beam Search Generator'
     def get_conversion_generator_type(self, generator_type: int) -> str:  # type: ignore
         """
         Retrieve string type of generator.
@@ -143,6 +197,12 @@ class GeneratorTypes:
         Returns:
             (str): Name of the generator.
         """
+        if generator_type == 0:
+             return 'Greedy Generator'
+        if generator_type == 1:
+             return 'Top-P Generator'
+        if generator_type == 2:
+             return 'Beam Search Generator'
 
 
 class GenerationResultDTO:
