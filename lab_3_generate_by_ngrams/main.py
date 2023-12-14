@@ -376,6 +376,7 @@ class NGramLanguageModel:
 
         return token_frequencies
 
+
     def _extract_n_grams(
         self, encoded_corpus: tuple[int, ...]
     ) -> Optional[tuple[tuple[int, ...], ...]]:
@@ -557,7 +558,7 @@ class BeamSearcher:
             return None
         if not len(next_tokens) <= self._beam_width:
             return None
-        if not sequence in sequence_candidates:
+        if sequence not in sequence_candidates:
             return None
 
         for token in next_tokens:
@@ -591,7 +592,7 @@ class BeamSearcher:
         sorted_sequences = sorted(sequence_candidates.items(), key=lambda x: x[1])
         chosen_sequences = sorted_sequences[:self._beam_width]
 
-        return dict(sorted_sequences)
+        return dict(chosen_sequences)
 
 
 class BeamSearchTextGenerator:
@@ -696,10 +697,12 @@ class BeamSearchTextGenerator:
         """
         if not isinstance(sequence_to_continue, tuple):
             return None
-        if not len(sequence_to_continue) == 0:
+        if len(sequence_to_continue) == 0:
             return None
 
         tokens = self.beam_searcher.get_next_token(sequence_to_continue)
+        if not tokens:
+            return None
 
         return tokens
 
