@@ -348,6 +348,7 @@ class QualityChecker:
         return result
 
 
+
 class Examiner:
     """
     A class that conducts an exam.
