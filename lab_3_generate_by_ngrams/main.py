@@ -360,7 +360,8 @@ class NGramLanguageModel:
 
         In case of corrupt input arguments, None is returned
         """
-        if not isinstance(sequence, tuple) or len(sequence) < self._n_gram_size - 1:
+        if (not isinstance(sequence, tuple) or len(sequence) == 0
+                or len(sequence) < self._n_gram_size - 1):
             return None
 
         token_frequencies = {}
@@ -368,14 +369,13 @@ class NGramLanguageModel:
         context_size = self._n_gram_size - 1
         context = sequence[-context_size:]
 
-        for n_gram, frequency in self._n_gram_frequencies.items():
+        for n_gram, freq in self._n_gram_frequencies.items():
             if n_gram[:-1] == context:
                 token = n_gram[-1]
                 if token not in token_frequencies:
-                    token_frequencies[token] = frequency
+                    token_frequencies[token] = freq
 
         return token_frequencies
-
 
     def _extract_n_grams(
         self, encoded_corpus: tuple[int, ...]
