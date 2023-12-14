@@ -5,6 +5,7 @@ Top-p sampling generation and filling gaps with ngrams
 """
 # pylint:disable=too-few-public-methods, too-many-arguments
 import random
+import math
 from typing import Tuple
 
 from lab_3_generate_by_ngrams.main import (BeamSearchTextGenerator, GreedyTextGenerator,
@@ -311,6 +312,31 @@ class QualityChecker:
                 or if methods used return None,
                 or if nothing was generated.
         """
+        if not (isinstance(generated_text, str) and generated_text):
+            raise ValueError('Inappropriate input or input argument is empty')
+
+        encoded = self._word_processor.encode(generated_text)
+        if not encoded:
+            raise ValueError('Could not encode')
+
+        ngram_size = self._language_model.get_n_gram_size()
+
+        sum_log = 0.0
+
+        for i in range(ngram_size - 1, len(encoded)):
+            context = encoded[i - ngram_size + 1: i]
+            next_tokens = self._language_model.generate_next_token(context)
+            if not next_tokens:
+                raise ValueError('None is returned')
+
+            probability = next_tokens.get(encoded[i])
+            if probability:
+                sum_log += math.log(probability)
+
+        if not sum_log:
+            raise ValueError('None is returned')
+
+        return math.exp(-sum_log / (len(encoded) - ngram_size))
 
     def run(self, seq_len: int, prompt: str) -> list[GenerationResultDTO]:  # type: ignore
         """
@@ -330,7 +356,10 @@ class QualityChecker:
                 or if sequence has inappropriate length,
                 or if methods used return None.
         """
+        if not (isinstance(seq_len, int) and isinstance(prompt, str) and prompt and seq_len < 0):
+            raise ValueError('Inappropriate input or input argument is empty or seq_len is a negative int')
 
+        
 
 class Examiner:
     """
