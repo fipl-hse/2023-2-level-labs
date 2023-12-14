@@ -28,6 +28,18 @@ class WordProcessor(TextProcessor):
         Raises:
             ValueError: In case of inappropriate type input argument or if input argument is empty.
         """
+        if not isinstance(text, str) or not text:
+            raise ValueError("Inappropriate type input argument or input argument is empty")
+
+        tokenized_text = []
+        for i in text.lower().split():
+            if i[-1] in ('.', '!', '?'):
+                tokenized_text.extend([i[:-1], self._end_of_word_token])
+            else:
+                tokenized_text.append(i)
+
+        return tuple(tokenized_text)
+
 
     def _put(self, element: str) -> None:
         """
@@ -39,6 +51,11 @@ class WordProcessor(TextProcessor):
         Raises:
             ValueError: In case of inappropriate type input argument or if input argument is empty.
         """
+        if not isinstance(element, str) or not element:
+            raise ValueError('Inappropriate input or input argument is empty')
+
+        if element not in self._storage:
+            self._storage[element] = len(self._storage)
 
     def _postprocess_decoded_text(self, decoded_corpus: tuple[str, ...]) -> str:  # type: ignore
         """
@@ -56,6 +73,13 @@ class WordProcessor(TextProcessor):
         Raises:
             ValueError: In case of inappropriate type input argument or if input argument is empty.
         """
+        if not isinstance(decoded_corpus, tuple) or not decoded_corpus:
+            raise ValueError('Inappropriate input or input argument is empty')
+
+        splited_text = "".join(decoded_corpus).split(self._end_of_word_token)
+        resulting_text = '. '.join([i.strip().capitalize() for i in splited_text])
+
+        return f"{resulting_text.strip()}."
 
 
 class TopPGenerator:
