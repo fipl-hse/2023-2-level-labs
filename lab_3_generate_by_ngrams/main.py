@@ -115,8 +115,8 @@ class TextProcessor:
         if element_id not in self._storage.values():
             return None
 
-        for element, id in self._storage.items():
-            if element_id == id:
+        for element, ident in self._storage.items():
+            if element_id == ident:
                 return element
 
         return None
@@ -642,7 +642,7 @@ class BeamSearchTextGenerator:
             return None
         if not isinstance(seq_len, int):
             return None
-        if not prompt and seq_len:
+        if not prompt or not seq_len:
             return None
 
         encoded_prompt = self._text_processor.encode(prompt)
@@ -673,6 +673,7 @@ class BeamSearchTextGenerator:
             if not chosen_candidates:
                 return None
             sequence_candidates = chosen_candidates
+
         best_sequence = min(sequence_candidates, key=lambda x: sequence_candidates[x])
         decoded = self._text_processor.decode(best_sequence)
         return decoded
