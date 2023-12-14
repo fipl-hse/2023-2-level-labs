@@ -542,17 +542,11 @@ class BeamSearcher:
 
         In case of corrupt input arguments or unexpected behaviour of methods used return None.
         """
-        if not isinstance(sequence, tuple):
+        if not isinstance(sequence, tuple) or not sequence:
             return None
-        if not isinstance(next_tokens, list):
+        if not isinstance(next_tokens, list) or not next_tokens:
             return None
-        if not isinstance(sequence_candidates, dict):
-            return None
-        if not sequence:
-            return None
-        if not next_tokens:
-            return None
-        if not sequence_candidates:
+        if not isinstance(sequence_candidates, dict) or not sequence_candidates:
             return None
         if not len(next_tokens) <= self._beam_width:
             return None
@@ -637,9 +631,7 @@ class BeamSearchTextGenerator:
         In case of corrupt input arguments or methods used return None,
         None is returned
         """
-        if not isinstance(prompt, str):
-            return None
-        if not isinstance(seq_len, int):
+        if not isinstance(prompt, str) or not isinstance(seq_len, int):
             return None
         if not prompt or not seq_len:
             return None
