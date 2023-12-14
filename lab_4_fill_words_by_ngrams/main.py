@@ -6,7 +6,6 @@ Top-p sampling generation and filling gaps with ngrams
 # pylint:disable=too-few-public-methods, too-many-arguments
 import random
 import math
-from typing import Tuple
 
 from lab_3_generate_by_ngrams.main import (BeamSearchTextGenerator, GreedyTextGenerator,
                                            NGramLanguageModel, TextProcessor)
@@ -88,7 +87,7 @@ class WordProcessor(TextProcessor):
             sentence = sentence.strip().capitalize()
             if not sentence:
                 break
-            sentence = f"{sentence}. "
+            sentence = f'{sentence}. '
             decoded_sentences += sentence
 
         return decoded_sentences.strip()
@@ -144,7 +143,8 @@ class TopPGenerator:
         if not encoded_text:
             raise ValueError('Could not encode')
 
-        for i in range(seq_len):
+        #for i in range(seq_len):
+        while seq_len >= 1:
             next_tokens = self._model.generate_next_token(encoded_text)
             if next_tokens is None:
                 raise ValueError('None is returned')
@@ -163,6 +163,8 @@ class TopPGenerator:
                 chosen_token = random.choice(possible_tokens)
                 encoded_text += (chosen_token,)
                 break
+
+            break
 
         decoded_text = self._word_processor.decode(encoded_text)
         if not decoded_text:
@@ -199,12 +201,10 @@ class GeneratorTypes:
         Returns:
             (str): Name of the generator.
         """
-        if generator_type == 0:
-            return 'Greedy Generator'
-        if generator_type == 1:
-            return 'Top-P Generator'
-        if generator_type == 2:
-            return 'Beam Search Generator'
+        generator_types = {self.greedy: 'Greedy Generator', self.top_p: 'Top-P Generator',
+                           self.beam_search: 'Beam Search Generator'}
+
+        return generator_types[generator_type]
 
 
 class GenerationResultDTO:
