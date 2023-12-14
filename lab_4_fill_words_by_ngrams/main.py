@@ -80,7 +80,7 @@ class WordProcessor(TextProcessor):
 
         sentences = ' '.join(decoded_corpus).split(self._end_of_word_token)
         text = '. '.join([sentence.strip().capitalize() for sentence in sentences])
-        if text[-1] == ' ':
+        if text[-1].strip() == '':
             return text[:-1]
         return text + '.'
 
