@@ -46,8 +46,6 @@ class TextProcessor:
         """
         if not isinstance(text, str):
             return None
-        if not len(text) == 0:
-            return None
 
         text_words = text.lower()
         splitted_text = text_words.split()
@@ -57,7 +55,9 @@ class TextProcessor:
             for symbol in word:
                 if symbol.isalpha():
                     word_tokens.append(symbol)
-            list_of_tokens.extend(word_tokens)
+            if not word_tokens:
+                continue
+            list_of_tokens += word_tokens
             if word_tokens:
                 list_of_tokens.append(self._end_of_word_token)
 
@@ -84,7 +84,7 @@ class TextProcessor:
         """
         if not isinstance(element, str):
             return None
-        if element in self._storage:
+        if element not in self._storage:
             return None
 
         return self._storage[element]
@@ -191,12 +191,12 @@ class TextProcessor:
         In case of corrupt input arguments, None is returned.
         In case any of methods used return None, None is returned.
         """
-        if not isinstance(encoded_corpus, tuple):
+        if not (isinstance(encoded_corpus, tuple) and encoded_corpus):
             return None
 
         decoded_corpus = self._decode(encoded_corpus)
 
-        if not decoded_corpus:
+        if decoded_corpus is None:
             return None
 
         decoded_text = self._postprocess_decoded_text(decoded_corpus)
@@ -235,14 +235,12 @@ class TextProcessor:
         In case of corrupt input arguments, None is returned.
         In case any of methods used return None, None is returned.
         """
-        if not isinstance(corpus, tuple):
-            return None
-        if len(corpus) == 0:
+        if not (isinstance(corpus, tuple) and corpus):
             return None
 
         decoded_corpus = []
-        for id in corpus:
-            token = self.get_token(id)
+        for ident in corpus:
+            token = self.get_token(ident)
             if not token:
                 return None
             decoded_corpus.append(token)
@@ -266,7 +264,7 @@ class TextProcessor:
         """
         if not isinstance(decoded_corpus, tuple):
             return None
-        if not len(decoded_corpus) == 0:
+        if len(decoded_corpus) == 0:
             return None
 
         decoded_text = ''.join(decoded_corpus)
@@ -275,7 +273,7 @@ class TextProcessor:
         if decoded_text[-1] == ' ':
             decoded_text = decoded_text[:-1]
 
-        return decoded_text + '.'
+        return f'{decoded_text}.'
 
 
 class NGramLanguageModel:
@@ -443,7 +441,7 @@ class GreedyTextGenerator:
             return None
         if not isinstance(prompt, str):
             return None
-        if len(prompt) == 0:
+        if not prompt:
             return None
 
         encoded_prompt = self._text_processor.encode(prompt)
