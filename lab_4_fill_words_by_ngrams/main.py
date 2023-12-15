@@ -80,12 +80,11 @@ class WordProcessor(TextProcessor):
         decoded_corpus = ' '.join(decoded_corpus).replace(f' {self._end_of_word_token}', '.').capitalize()
         capitalized_text = decoded_corpus.split('. ')
         for i in range(1, len(capitalized_text)):
-            capitalized_text[i] = capitalized_text[i][0].upper() + capitalized_text[i][1:]
+            capitalized_text[i] = capitalized_text[i].capitalize()
         final_text = '. '.join(capitalized_text)
-        if final_text.endswith("."):
-            return final_text
-        else:
-            return final_text + '.'
+        if not final_text.endswith("."):
+            final_text = final_text + '.'
+        return final_text
 
 
 class TopPGenerator:
