@@ -130,6 +130,30 @@ class TopPGenerator:
                 or if sequence has inappropriate length,
                 or if methods used return None.
         """
+        if not isinstance(seq_len, int) or not isinstance(prompt, str) or not prompt or seq_len <= 0:
+            raise ValueError
+        encoded_text = self._word_processor.encode(prompt)
+        if not encoded_text:
+            raise ValueError
+        for i in range(seq_len):
+            generated_tokens = self._model.generate_next_token(encoded_text)
+            if generated_tokens is None:
+                raise ValueError
+            if not generated_tokens:
+                break
+            sorted_dict = dict(sorted(generated_tokens.items(), key=lambda x: (x[1], x[0]), reverse=True))
+            counter = 0
+            possible_tokens = tuple()
+            for word, value in sorted_dict.items():
+                counter += value
+                possible_tokens += (word,)
+                if counter >= self._p_value:
+                    break
+            encoded_text += (random.choice(possible_tokens),)
+        decoded_text = self._word_processor.decode(encoded_text)
+        if not decoded_text:
+            raise ValueError
+        return decoded_text
 
 
 class GeneratorTypes:
