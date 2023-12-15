@@ -19,7 +19,7 @@ def main() -> None:
     encoded = processor.encode(text)
 
     if not(isinstance(encoded, tuple) and encoded):
-        return None
+        raise ValueError
 
     model = NGramLanguageModel(encoded[:10000], 2)
     model.build()

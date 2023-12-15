@@ -58,7 +58,7 @@ class WordProcessor(TextProcessor):
             ValueError: In case of inappropriate type input argument or if input argument is empty.
         """
         if not isinstance(element, str) or not element:
-            raise ValueError('WordProcessor._put: inappropriate type of input arguments')
+            raise ValueError('Inappropriate type of input arguments')
 
         if element not in self._storage:
             self._storage[element] = len(self._storage)
@@ -80,8 +80,7 @@ class WordProcessor(TextProcessor):
             ValueError: In case of inappropriate type input argument or if input argument is empty.
         """
         if not isinstance(decoded_corpus, tuple) or not decoded_corpus:
-            raise ValueError('WordProcessor._postprocess_decoded_text: inappropriate type '
-                             'of input arguments')
+            raise ValueError('Inappropriate type of input arguments')
 
         decoded_text = ' '.join(decoded_corpus).replace(
             f' {self._end_of_word_token}', '.').capitalize()
@@ -141,7 +140,7 @@ class TopPGenerator:
         """
         if not isinstance(seq_len, int) or not isinstance(
                 prompt, str) or seq_len <= 0:
-            raise ValueError('TopPGenerator.run: inappropriate type of input arguments')
+            raise ValueError('Inappropriate type of input arguments')
 
         encoded = self._word_processor.encode(prompt)
 
@@ -154,7 +153,7 @@ class TopPGenerator:
             next_tokens = self._model.generate_next_token(tuple(encoded_list))
 
             if next_tokens is None:
-                raise ValueError('TopPGenerator.run: generate_next_token returned None')
+                raise ValueError('Generate_next_token returned None')
 
             if not next_tokens:
                 break
@@ -173,7 +172,7 @@ class TopPGenerator:
         decoded = self._word_processor.decode(tuple(encoded_list))
 
         if not decoded:
-            raise ValueError('TopPGenerator.run: decoded text is empty')
+            raise ValueError('Decoded text is empty')
 
         return decoded
 
@@ -195,6 +194,8 @@ class GeneratorTypes:
         self.greedy = 0
         self.top_p = 1
         self.beam_search = 2
+        self.types = {self.greedy: 'Greedy Generator', self.top_p: 'Top-P Generator',
+                      self.beam_search: 'Beam Search Generator'}
 
     def get_conversion_generator_type(self, generator_type: int) -> str:  # type: ignore
         """
@@ -206,9 +207,7 @@ class GeneratorTypes:
         Returns:
             (str): Name of the generator.
         """
-        types = {self.greedy: 'Greedy Generator', self.top_p: 'Top-P Generator',
-                 self.beam_search: 'Beam Search Generator'}
-        return types[generator_type]
+        return self.types[generator_type]
 
 
 class GenerationResultDTO:
@@ -320,13 +319,12 @@ class QualityChecker:
                 or if nothing was generated.
         """
         if not isinstance(generated_text, str) or not generated_text:
-            raise ValueError('QualityChecker._calculate_perplexity: inappropriate type '
-                             'of input arguments')
+            raise ValueError('Inappropriate type of input arguments')
 
         encoded = self._word_processor.encode(generated_text)
 
         if not encoded:
-            raise ValueError('QualityChecker._calculate_perplexity: encoded text is empty')
+            raise ValueError('Encoded text is empty')
 
         n_gram_size = self._language_model.get_n_gram_size()
         sum_log = 0.0
@@ -336,7 +334,7 @@ class QualityChecker:
             generated_tokens = self._language_model.generate_next_token(context)
 
             if not generated_tokens:
-                raise ValueError('QualityChecker._calculate_perplexity: none generated tokens')
+                raise ValueError('None generated tokens')
 
             probability = generated_tokens.get(encoded[index])
 
@@ -344,7 +342,7 @@ class QualityChecker:
                 sum_log += math.log(probability)
 
         if not sum_log:
-            raise ValueError('QualityChecker._calculate_perplexity: sum of probabilities is 0')
+            raise ValueError('Sum of probabilities is 0')
 
         return math.exp(-sum_log / (len(encoded) - n_gram_size))
 
@@ -367,19 +365,19 @@ class QualityChecker:
                 or if methods used return None.
         """
         if not isinstance(seq_len, int) or not isinstance(prompt, str) or seq_len <= 0:
-            raise ValueError('QualityChecker.run: inappropriate type of input arguments')
+            raise ValueError('Inappropriate type of input arguments')
 
         result = []
         for digit, generator in self._generators.items():
             generated_text = generator.run(prompt=prompt, seq_len=seq_len)
 
             if not generated_text:
-                raise ValueError('QualityChecker.run: none generated tokens')
+                raise ValueError('None generated tokens')
 
             perplexity = self._calculate_perplexity(generated_text)
 
             if not perplexity:
-                raise ValueError('QualityChecker.run: none perplexity')
+                raise ValueError('None perplexity')
 
             result.append(GenerationResultDTO(generated_text, perplexity, digit))
 
@@ -422,13 +420,13 @@ class Examiner:
         """
         if not (isinstance(self._json_path, str) and self._json_path and '.json'
                 in self._json_path):
-            raise ValueError('Examiner._load_from_json: inappropriate type of input arguments')
+            raise ValueError('Inappropriate type of input arguments')
 
         with open(self._json_path, 'r', encoding='utf-8') as file:
             data = json.load(file)
 
         if not isinstance(data, list):
-            raise ValueError('Examiner._load_from_json: inappropriate type of loaded data')
+            raise ValueError('Inappropriate type of loaded data')
 
         self._questions_and_answers = {(i['question'], i['location']): i['answer'] for i in data}
 
@@ -458,7 +456,7 @@ class Examiner:
             ValueError: In case of inappropriate type input argument or if input argument is empty.
         """
         if not isinstance(answers, dict) or not answers:
-            raise ValueError('Examiner.assess_exam: inappropriate type of input arguments')
+            raise ValueError('Inappropriate type of input arguments')
 
         right_answers = 0
 
@@ -512,8 +510,7 @@ class GeneratorRuleStudent:
                 or if methods used return None.
         """
         if not isinstance(tasks, list) or not tasks:
-            raise ValueError('GeneratorRuleStudent.take_exam: inappropriate type '
-                             'of input arguments')
+            raise ValueError('Inappropriate type of input arguments')
 
         answers = {}
 
@@ -522,7 +519,7 @@ class GeneratorRuleStudent:
             answer = self._generator.run(seq_len=1, prompt=context)
 
             if not answer:
-                raise ValueError('GeneratorRuleStudent.take_exam: answer is empty')
+                raise ValueError('Answer is empty')
 
             if answer[-1] == '.':
                 answer = f'{answer[:-1]} '
