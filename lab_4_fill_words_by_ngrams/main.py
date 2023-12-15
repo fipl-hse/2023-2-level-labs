@@ -194,6 +194,7 @@ class GeneratorTypes:
         self.greedy = 0
         self.top_p = 1
         self.beam_search = 2
+
         self.types = {self.greedy: 'Greedy Generator', self.top_p: 'Top-P Generator',
                       self.beam_search: 'Beam Search Generator'}
 

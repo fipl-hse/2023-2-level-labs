@@ -58,7 +58,6 @@ def main() -> None:
         print(' '.join(answers.values()))
 
     assert result
-    return None
 
 
 if __name__ == "__main__":
