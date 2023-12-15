@@ -436,7 +436,8 @@ class Examiner:
         for question, answer in correct_answers.items():
             if answer == answers[question[0]]:
                 correct += 1
-        return float(correct/total)
+        result = correct/total
+        return result
 
 class GeneratorRuleStudent:
     """
@@ -482,6 +483,18 @@ class GeneratorRuleStudent:
         """
         if not (isinstance(tasks, list) and tasks):
             raise ValueError
+        exam_tasks = {}
+        for (question, position) in tasks:
+            left_context = question[:position]
+            right_context = question[position:]
+            context = self._generator.run(seq_len=1, prompt=left_context)
+            if not context:
+                raise ValueError
+            if context[-1] == '.':
+                context = context[:-1] + ' '
+            answer = context + right_context
+            exam_tasks.update({question: answer})
+        return exam_tasks
 
     def get_generator_type(self) -> str:  # type: ignore
         """
@@ -490,3 +503,5 @@ class GeneratorRuleStudent:
         Returns:
             str: Generator type
         """
+        generator = GeneratorTypes()
+        return generator.get_conversion_generator_type(self._generator_type)
