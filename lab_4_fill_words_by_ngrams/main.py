@@ -3,7 +3,9 @@ Lab 4.
 
 Top-p sampling generation and filling gaps with ngrams
 """
+# pylint:disable=too-few-public-methods, too-many-arguments
 from random import choice
+from math import exp, log
 from lab_3_generate_by_ngrams.main import (BeamSearchTextGenerator, GreedyTextGenerator,
                                            NGramLanguageModel, TextProcessor)
 
@@ -29,7 +31,7 @@ class WordProcessor(TextProcessor):
             ValueError: In case of inappropriate type input argument or if input argument is empty.
         """
         if not (isinstance(text, str) and text):
-            raise ValueError
+            raise ValueError ("WordProcessor._tokenize: inappropriate input")
 
         prepared_tokens = []
 
@@ -54,7 +56,7 @@ class WordProcessor(TextProcessor):
             ValueError: In case of inappropriate type input argument or if input argument is empty.
         """
         if not (isinstance(element, str) and element):
-            raise ValueError
+            raise ValueError ("WordProcessor._put: inappropriate input")
 
         if element not in self._storage:
             self._storage[element] = len(self._storage)
@@ -76,7 +78,7 @@ class WordProcessor(TextProcessor):
             ValueError: In case of inappropriate type input argument or if input argument is empty.
         """
         if not (isinstance(decoded_corpus, tuple) and decoded_corpus):
-            raise ValueError
+            raise ValueError ("WordProcessor._postprocess_decoded_text: inappropriate input")
 
         sentences = ' '.join(decoded_corpus).split(self._end_of_word_token)
         text = '. '.join([sentence.strip().capitalize() for sentence in sentences if sentence])
@@ -128,34 +130,37 @@ class TopPGenerator:
         """
         if not (isinstance(prompt, str) and prompt and
                 isinstance(seq_len, int) and seq_len > 0):
-            raise ValueError
+            raise ValueError ("TopPGenerator.run: inappropriate input")
 
         encoded_prompt = self._word_processor.encode(prompt)
         if not encoded_prompt:
-            raise ValueError
+            raise ValueError ('TopPGenerator.run: encoded text is empty')
 
         while seq_len > 0:
             tokens = self._model.generate_next_token(encoded_prompt)
             if tokens is None:
-                raise ValueError
+                raise ValueError ('TopPGenerator.run: generate_next_token returned None')
 
             if not tokens:
                 break
+
             sorted_tokens = sorted(tokens.items(),
                                    key=lambda x: (x[1], x[0]), reverse=True)
             collective_prob = 0
-
+            possible_tokens = []
+    
             for token in sorted_tokens:
                 if collective_prob < self._p_value:
                     collective_prob += token[1]
-
-            random_token = choice(sorted_tokens[:sorted_tokens.index(token) + 1])
-            encoded_prompt += (random_token[0],)
+                    possible_tokens.append(token[0])
+    
+            random_token = choice(possible_tokens)
+            encoded_prompt += (random_token,)
             seq_len -= 1
 
         decoded_text = self._word_processor.decode(encoded_prompt)
         if not decoded_text:
-            raise ValueError
+            raise ValueError ('TopPGenerator.run: decoded text is empty')
         return decoded_text
 
 
@@ -173,6 +178,9 @@ class GeneratorTypes:
         """
         Initialize an instance of GeneratorTypes.
         """
+        self.greedy = 0
+        self.top_p = 1
+        self.beam_search = 2
 
     def get_conversion_generator_type(self, generator_type: int) -> str:  # type: ignore
         """
@@ -184,7 +192,8 @@ class GeneratorTypes:
         Returns:
             (str): Name of the generator.
         """
-
+        generators = ['Greedy Generator', 'Top-P Generator', 'Beam Search Generator']
+        return generators[generator_type]
 
 class GenerationResultDTO:
     """
@@ -206,6 +215,9 @@ class GenerationResultDTO:
             generation_type (int):
                 Numeric type of the generator for which perplexity was calculated
         """
+        self.__text = text
+        self.__perplexity = perplexity
+        self.__type = generation_type
 
     def get_perplexity(self) -> float:  # type: ignore
         """
@@ -214,6 +226,7 @@ class GenerationResultDTO:
         Returns:
             (float): Perplexity value
         """
+        return self.__perplexity
 
     def get_text(self) -> str:  # type: ignore
         """
@@ -222,6 +235,7 @@ class GenerationResultDTO:
         Returns:
             (str): Text for which the perplexity was count
         """
+        return self.__text
 
     def get_type(self) -> int:  # type: ignore
         """
@@ -230,6 +244,7 @@ class GenerationResultDTO:
         Returns:
             (int): Numeric type of the generator
         """
+        return self.__type
 
     def __str__(self) -> str:  # type: ignore
         """
@@ -238,7 +253,9 @@ class GenerationResultDTO:
         Returns:
             (str): String with report
         """
-
+        return f"Perplexity score: {self.__perplexity}\n" \
+               f"{GeneratorTypes().get_conversion_generator_type(self.__type)}\n" \
+               f"Text: {self.__text}\n"
 
 class QualityChecker:
     """
@@ -262,6 +279,9 @@ class QualityChecker:
                 NGramLanguageModel instance to use for text generation
             word_processor (WordProcessor): WordProcessor instance to handle text processing
         """
+        self._generators = generators
+        self._language_model = language_model
+        self._word_processor = word_processor
 
     def _calculate_perplexity(self, generated_text: str) -> float:  # type: ignore
         """
@@ -279,6 +299,31 @@ class QualityChecker:
                 or if methods used return None,
                 or if nothing was generated.
         """
+        if not (isinstance(generated_text, str) and generated_text):
+            raise  ("QualityChecker._calculate_perplexity: inappropriate input")
+
+        encoded_seq = self._word_processor.encode(generated_text)
+        if not encoded_seq:
+            raise ValueError ("QualityChecker._calculate_perplexity: encoded text is empty")
+
+        n_gram_size = self._language_model.get_n_gram_size()
+        log_prob = 0.0
+
+        for index in range(n_gram_size - 1, len(encoded_seq)):
+            context = tuple(encoded_seq[index - n_gram_size + 1: index])
+            generated_tokens = self._language_model.generate_next_token(context)
+            if not generated_tokens:
+                raise ValueError ('QualityChecker._calculate_perplexity: none generated tokens')
+
+            probability = generated_tokens.get(encoded_seq[index])
+            if probability:
+                log_prob += log(probability)
+
+        if not log_prob:
+            raise ValueError ('QualityChecker._calculate_perplexity: sum of probabilities is 0')
+
+        return exp(log_prob / -(len(encoded_seq) - n_gram_size))
+
 
     def run(self, seq_len: int, prompt: str) -> list[GenerationResultDTO]:  # type: ignore
         """
@@ -298,6 +343,23 @@ class QualityChecker:
                 or if sequence has inappropriate length,
                 or if methods used return None.
         """
+        if not isinstance(seq_len, int) or seq_len < 0 or not isinstance(prompt, str) or not prompt:
+            raise ValueError ("QualityChecker.run: inappropriate input")
+
+        estimation= []
+
+        for num_type, generator in self._generators.items():
+            generated_text = generator.run(prompt=prompt, seq_len=seq_len)
+            if not generated_text:
+                raise ValueError ("QualityChecker.run: nothing was generated")
+
+            perplexity = self._calculate_perplexity(generated_text)
+            if not perplexity:
+                raise ValueError ("QualityChecker.run: no calculated perplexity")
+
+            estimation.append(GenerationResultDTO(generated_text, perplexity, num_type))
+        return sorted(estimation, key=lambda x: (x.get_perplexity(), x.get_type()))
+        
 
 
 class Examiner:
