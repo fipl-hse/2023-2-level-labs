@@ -34,12 +34,13 @@ class WordProcessor(TextProcessor):
             raise ValueError('Incorrect input')
 
         tokenized_word = []
+        set_digits = {'.', '!', '?'}
         for word in text.lower().split():
             if word.isalpha():
                 tokenized_word.append(word)
-            elif word[:-1].isalpha() and word[-1] in {'.', '!', '?'}:
+            elif word[:-1].isalpha() and word[-1] in set_digits:
                 tokenized_word.extend([word[:-1], self._end_of_word_token])
-            elif word[-1] in ['.', '!', '?']:
+            elif word[-1] in set_digits:
                 tokenized_word.append(self._end_of_word_token)
 
         return tuple(tokenized_word)
@@ -214,7 +215,8 @@ class GeneratorTypes:
         Returns:
             (str): Name of the generator.
         """
-        generator_types = {0: 'Greedy Generator', 1: 'Top-P Generator', 2: 'Beam Search Generator'}
+        generator_types = {self.greedy: 'Greedy Generator', self.top_p: 'Top-P Generator',
+                           self.beam_search: 'Beam Search Generator'}
         if generator_type not in generator_types:
             return None
         return generator_types[generator_type]
