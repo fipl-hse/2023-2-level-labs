@@ -300,7 +300,7 @@ class QualityChecker:
                 or if nothing was generated.
         """
         if not (isinstance(generated_text, str) and generated_text):
-            raise  ("QualityChecker._calculate_perplexity: inappropriate input")
+            raise ValueError ("QualityChecker._calculate_perplexity: inappropriate input")
 
         encoded_seq = self._word_processor.encode(generated_text)
         if not encoded_seq:
