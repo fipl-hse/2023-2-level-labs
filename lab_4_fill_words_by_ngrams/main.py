@@ -148,12 +148,12 @@ class TopPGenerator:
                                    key=lambda x: (x[1], x[0]), reverse=True)
             collective_prob = 0
             possible_tokens = []
-    
+
             for token in sorted_tokens:
                 if collective_prob < self._p_value:
                     collective_prob += token[1]
                     possible_tokens.append(token[0])
-    
+
             random_token = choice(possible_tokens)
             encoded_prompt += (random_token,)
             seq_len -= 1
@@ -359,7 +359,7 @@ class QualityChecker:
 
             estimation.append(GenerationResultDTO(generated_text, perplexity, num_type))
         return sorted(estimation, key=lambda x: (x.get_perplexity(), x.get_type()))
-        
+    
 
 
 class Examiner:
