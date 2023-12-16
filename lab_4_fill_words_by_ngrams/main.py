@@ -4,6 +4,7 @@ Lab 4.
 Top-p sampling generation and filling gaps with ngrams
 """
 # pylint:disable=too-few-public-methods, too-many-arguments
+import json
 from random import choice
 from math import exp, log
 from lab_3_generate_by_ngrams.main import (BeamSearchTextGenerator, GreedyTextGenerator,
@@ -359,7 +360,6 @@ class QualityChecker:
 
             estimation.append(GenerationResultDTO(generated_text, perplexity, num_type))
         return sorted(estimation, key=lambda x: (x.get_perplexity(), x.get_type()))
-    
 
 
 class Examiner:
@@ -379,6 +379,8 @@ class Examiner:
         Args:
             json_path (str): Local path to assets file
         """
+        self._json_path = json_path
+        self._questions_and_answers = self._load_from_json()
 
     def _load_from_json(self) -> dict[tuple[str, int], str]:  # type: ignore
         """
@@ -394,6 +396,20 @@ class Examiner:
                 or if attribute _json_path has inappropriate extension,
                 or if inappropriate type loaded data.
         """
+        if not (isinstance(self._json_path, str) and self._json_path and '.json'
+                in self._json_path):
+            raise ValueError('Examiner._load_from_json: inappropriate input')
+
+        with open(self._json_path, 'r', encoding='utf-8') as file:
+            test_data = json.load(file)
+
+        if not isinstance(test_data, list):
+            raise ValueError('Examiner._load_from_json: inappropriate type of json data')
+
+        self._questions_and_answers = {(i['question'], i['location']): i['answer']
+                                      for i in test_data}
+
+        return self._questions_and_answers
 
     def provide_questions(self) -> list[tuple[str, int]]:  # type: ignore
         """
@@ -403,6 +419,7 @@ class Examiner:
             list[tuple[str, int]]:
                 List in the form of [(question, position of the word to be filled)]
         """
+        return list(self._questions_and_answers)
 
     def assess_exam(self, answers: dict[str, str]) -> float:  # type: ignore
         """
@@ -417,7 +434,16 @@ class Examiner:
         Raises:
             ValueError: In case of inappropriate type input argument or if input argument is empty.
         """
+        if not isinstance(answers, dict) or not answers:
+            raise ValueError('Examiner.assess_exam: inappropriate input')
 
+        correct_answers = 0.0
+
+        for q, a in self._questions_and_answers.items():
+            if answers[q[0]] == a:
+                correct_answers += 1
+
+        return correct_answers/len(answers)
 
 class GeneratorRuleStudent:
     """
@@ -439,6 +465,11 @@ class GeneratorRuleStudent:
                 NGramLanguageModel instance to use for text generation
             word_processor (WordProcessor): WordProcessor instance to handle text processing
         """
+        self._generator_type = generator_type
+        generators = (GreedyTextGenerator(language_model, word_processor),
+                TopPGenerator(language_model, word_processor, 0.5),
+                BeamSearchTextGenerator(language_model, word_processor, 5))
+        self._generator = generators[self._generator_type]
 
     def take_exam(self, tasks: list[tuple[str, int]]) -> dict[str, str]:  # type: ignore
         """
@@ -456,6 +487,20 @@ class GeneratorRuleStudent:
                 or if input argument is empty,
                 or if methods used return None.
         """
+        if not (isinstance(tasks, list) and tasks):
+            raise ValueError("GeneratorRuleStudent.take_exam: inappropriate input")
+
+        answers = {}
+        for (question, position) in tasks:
+            left_context = question[:position]
+            right_context = question[position:]
+            generated_seq = self._generator.run(seq_len=1, prompt=left_context)
+            if not generated_seq:
+                raise ValueError("GeneratorRuleStudent.take_exam: no answers were generated")
+            if generated_seq[-1] == '.':
+                generated_seq = generated_seq[:-1] + " "
+            answers[question] = generated_seq + right_context
+        return answers
 
     def get_generator_type(self) -> str:  # type: ignore
         """
@@ -464,3 +509,4 @@ class GeneratorRuleStudent:
         Returns:
             str: Generator type
         """
+        return GeneratorTypes().get_conversion_generator_type(self._generator_type)

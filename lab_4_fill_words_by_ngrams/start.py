@@ -4,8 +4,8 @@ Filling word by ngrams starter
 # pylint:disable=too-many-locals,unused-import
 from lab_3_generate_by_ngrams.main import (BeamSearchTextGenerator, GreedyTextGenerator,
                                            NGramLanguageModel)
-from lab_4_fill_words_by_ngrams.main import (GeneratorTypes, QualityChecker, TopPGenerator,
-                                             WordProcessor)
+from lab_4_fill_words_by_ngrams.main import (Examiner, GeneratorRuleStudent, GeneratorTypes,
+                                             QualityChecker, TopPGenerator, WordProcessor)
 
 
 def main() -> None:
@@ -33,8 +33,17 @@ def main() -> None:
 
     quality_checker = QualityChecker(gen_dict, lang_model, word_processor)
     run_check = quality_checker.run(100, 'The')
-    for current_check in run_check:
-        print(current_check)
+    #for current_check in run_check:
+        #print(current_check)
+
+    examiner = Examiner('./assets/question_and_answers.json')
+    tasks = examiner.provide_questions()
+    students = [GeneratorRuleStudent(i, lang_model, word_processor) for i in range(3)]
+
+    for student in students:
+        student_answers = student.take_exam(tasks)
+        score = examiner.assess_exam(student_answers)
+        print(student.get_generator_type(), f": {int(score * 10)} score")
     assert result
 if __name__ == "__main__":
     main()
