@@ -7,7 +7,7 @@ Top-p sampling generation and filling gaps with ngrams
 from lab_3_generate_by_ngrams.main import (BeamSearchTextGenerator, GreedyTextGenerator,
                                            NGramLanguageModel, TextProcessor)
 
-import random
+from random import choice
 
 
 class WordProcessor(TextProcessor):
@@ -37,7 +37,7 @@ class WordProcessor(TextProcessor):
         end_of_word_punctuation = '?.!'
         for word in text.lower():
             if word in end_of_word_punctuation:
-                tokens += ' ' + self._end_of_word_token
+                tokens += f' {self._end_of_word_token}'
             elif word.isalpha() or word.isspace():
                 tokens += word
 
@@ -143,21 +143,30 @@ class TopPGenerator:
         if not encoded:
             raise ValueError("it wasn't possible to encode the prompt")
 
-        while seq_len > 0:
+        # len_counter = 0
+        # while seq_len > 0:
+        for i in range(seq_len):
             tokens = self._model.generate_next_token(encoded)
-            if not tokens:
+            if tokens is None:
                 raise ValueError('this method returns None')
+            if not tokens:
+                break
 
-            break
+            sorted_tokens = sorted(tokens.items(), key=lambda kv: (kv[1], kv[0]), reverse=True)
 
+            tokens = []
+            probability = 0
+            for token in sorted_tokens:
+                if probability < self._p_value:
+                    probability += token[1]
+                    tokens.append(token[0])
+            random = choice(tokens)
+            encoded += (random,)
 
-
-
-
-
-
-
-
+        decoded = self._word_processor.decode(encoded)
+        if not decoded:
+            raise ValueError("it wasn't possible to decode")
+        return decoded
 
 class GeneratorTypes:
     """
