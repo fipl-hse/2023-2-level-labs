@@ -43,6 +43,8 @@ def main() -> None:
         result += f"Accuracy of student ({student.get_generator_type()}): {accuracy}\n"
     print(result)
 
+    assert result
+
 
 if __name__ == "__main__":
     main()
