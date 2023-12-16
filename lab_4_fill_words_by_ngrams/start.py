@@ -15,17 +15,12 @@ def main() -> None:
 
     processor = WordProcessor('.')
     encoded = processor.encode(text)
-
-    if not (isinstance(encoded, tuple) and encoded):
-        return None
-
     model = NGramLanguageModel(encoded[:10000], 2)
     model.build()
     generator = TopPGenerator(model, processor, 0.5)
 
-    generated = generator.run(51, 'Vernon')
-    print(generated)
-    result = generated
+    result = generator.run(51, 'Vernon')
+    print(result)
 
     assert result
 

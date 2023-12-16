@@ -3,10 +3,10 @@ Lab 4.
 
 Top-p sampling generation and filling gaps with ngrams
 """
+import json
+import math
 # pylint:disable=too-few-public-methods, too-many-arguments
 import random
-import math
-import json
 
 from lab_3_generate_by_ngrams.main import (BeamSearchTextGenerator, GreedyTextGenerator,
                                            NGramLanguageModel, TextProcessor)
@@ -469,7 +469,8 @@ class Examiner:
             if answers[key[0]] == self._questions_and_answers[key]:
                 correct_answers += 1
 
-        return correct_answers/len(answers)
+        accuracy_score = correct_answers/len(answers)
+        return accuracy_score
 
 
 class GeneratorRuleStudent:
@@ -492,6 +493,11 @@ class GeneratorRuleStudent:
                 NGramLanguageModel instance to use for text generation
             word_processor (WordProcessor): WordProcessor instance to handle text processing
         """
+        self._generator_type = generator_type
+        generators = (GreedyTextGenerator(language_model, word_processor),
+                      BeamSearchTextGenerator(language_model, word_processor, 5),
+                      TopPGenerator(language_model, word_processor, 0.5))
+        self._generator = generators[self._generator_type]
 
     def take_exam(self, tasks: list[tuple[str, int]]) -> dict[str, str]:  # type: ignore
         """
@@ -509,6 +515,24 @@ class GeneratorRuleStudent:
                 or if input argument is empty,
                 or if methods used return None.
         """
+        if not isinstance(tasks, list) or not tasks:
+            raise ValueError('Inappropriate type of input arguments')
+
+        answers = {}
+
+        for (question, position) in tasks:
+            context = question[:position]
+            answer = self._generator.run(seq_len=1, prompt=context)
+
+            if not answer:
+                raise ValueError
+
+            if answer[-1] == '.':
+                answer = str(answer[:-1]) + ' '
+
+            answers[question] = str(answer) + str(question[position:])
+
+        return answers
 
     def get_generator_type(self) -> str:  # type: ignore
         """
@@ -517,3 +541,6 @@ class GeneratorRuleStudent:
         Returns:
             str: Generator type
         """
+        gen_type = GeneratorTypes()
+
+        return gen_type.get_conversion_generator_type(self._generator_type)
