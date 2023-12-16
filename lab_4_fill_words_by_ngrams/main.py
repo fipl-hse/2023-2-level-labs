@@ -33,17 +33,22 @@ class WordProcessor(TextProcessor):
             ValueError: In case of inappropriate type input argument or if input argument is empty.
         """
         if not (isinstance(text, str) and text):
-            raise ValueError('Incorrect input')
+            raise ValueError("Inappropriate input.")
+
+        for digit in {'.', '!', '?'}:
+            text = text.replace(digit, f" {self._end_of_word_token} ")
 
         tokenized_word = []
-        set_digits = {'.', '!', '?'}
         for word in text.lower().split():
-            if word.isalpha():
+            if word == self._end_of_word_token or word.isalpha() or word.isspace():
                 tokenized_word.append(word)
-            elif word[:-1].isalpha() and word[-1] in set_digits:
-                tokenized_word.extend([word[:-1], self._end_of_word_token])
-            elif word[-1] in set_digits:
-                tokenized_word.append(self._end_of_word_token)
+            else:
+                clean_word = []
+                for alpha in list(word):
+                    if alpha.isalpha():
+                        clean_word.append(alpha)
+                if clean_word:
+                    tokenized_word.append("".join(clean_word))
 
         return tuple(tokenized_word)
 
@@ -145,12 +150,12 @@ class TopPGenerator:
         """
         if not (
                 isinstance(seq_len, int) and seq_len > 0
-                and isinstance(prompt, str) and prompt
+                and isinstance(prompt, str) and prompt and seq_len
         ):
             raise ValueError('Incorrect input')
 
         encoded_prompt = self._word_processor.encode(prompt)
-        if encoded_prompt is None:
+        if not encoded_prompt:
             raise ValueError('Encoding returned None')
 
         cur_len = 0
@@ -166,9 +171,9 @@ class TopPGenerator:
                 list(possible_tokens.items()), key=lambda x: (x[1], x[0]), reverse=True
             )
 
-            n_min_tokens = [sorted_tokens[0]]
+            n_min_tokens = []
             sum_freq = 0
-            for token in sorted_tokens[1:]:
+            for token in sorted_tokens:
                 if sum_freq < self._p_value:
                     sum_freq += token[1]
                     n_min_tokens.append(token[0])
@@ -179,7 +184,7 @@ class TopPGenerator:
             cur_len += 1
 
         decoded_text = self._word_processor.decode(encoded_prompt)
-        if decoded_text is None:
+        if not decoded_text:
             raise ValueError('Decoding returned None')
 
         return decoded_text
@@ -343,19 +348,18 @@ class QualityChecker:
             token = encoded_text[index]
             next_token_probs_dict = self._language_model.generate_next_token(context)
 
-            if not next_token_probs_dict:
+            if next_token_probs_dict is None:
                 raise ValueError('Generating returned None')
 
-            next_token_prob = next_token_probs_dict.get(token)
+            prob = next_token_probs_dict.get(token)
+            if prob is None:
+                continue
 
-            if next_token_prob:
-                sum_log_probs += math.log(next_token_prob, 2)
-
+            sum_log_probs += math.log(prob)
         if not sum_log_probs:
-            raise ValueError('Sum is 0')
+            raise ValueError("Probability sum is 0")
 
-        perplexity = pow(2, -(sum_log_probs / (len(encoded_text) - n_gram_size + 1)))
-
+        perplexity = math.exp(-sum_log_probs / (len(encoded_text) - n_gram_size))
         return perplexity
 
     def run(self, seq_len: int, prompt: str) -> list[GenerationResultDTO]:  # type: ignore
@@ -539,7 +543,7 @@ class GeneratorRuleStudent:
         answers = {}
         for (question, location) in tasks:
             context = question[:location]
-            answer = self._generator.run(1, context)
+            answer = self._generator.run(seq_len=1, prompt=context)
             if not answer:
                 raise ValueError('Generating returned None')
 
