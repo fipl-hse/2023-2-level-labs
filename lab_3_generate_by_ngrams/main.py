@@ -217,8 +217,8 @@ class TextProcessor:
             return None
 
         decoded_corpus = []
-        for i in corpus:
-            token = self.get_token(i)
+        for index in corpus:
+            token = self.get_token(index)
             if not token:
                 return None
             decoded_corpus.append(token)
