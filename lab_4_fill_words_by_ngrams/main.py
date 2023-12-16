@@ -221,8 +221,6 @@ class GeneratorTypes:
         """
         generator_types = {self.greedy: 'Greedy Generator', self.top_p: 'Top-P Generator',
                            self.beam_search: 'Beam Search Generator'}
-        if generator_type not in generator_types:
-            return None
         return generator_types[generator_type]
 
 
