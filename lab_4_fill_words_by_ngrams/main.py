@@ -36,12 +36,11 @@ class WordProcessor(TextProcessor):
 
         cleaned_text = []
         for word in text.lower().split():
+            cleaned_word = [letter for letter in word if letter.isalpha()]
+            if cleaned_word:
+                cleaned_text.append(''.join(cleaned_word))
             if word[-1] in '.!?':
-                cleaned_text.extend([word[:-1], self._end_of_word_token])
-            else:
-                cleaned_word = [letter for letter in word if letter.isalpha()]
-                if cleaned_word:
-                    cleaned_text.append(''.join(cleaned_word))
+                cleaned_text.append(self._end_of_word_token)
 
         return tuple(cleaned_text)
 
@@ -136,14 +135,17 @@ class TopPGenerator:
                 or if sequence has inappropriate length,
                 or if methods used return None.
         """
-        if not (isinstance(seq_len, int) and seq_len > 0 and isinstance(prompt, str) and prompt):
-            raise ValueError('Inappropriate input or input argument is empty or seq_len is a negative int')
+        if not (isinstance(seq_len, int) and isinstance(prompt, str)):
+            raise ValueError('Inappropriate input')
+        if not prompt:
+            raise ValueError('Input argument is empty')
+        if not seq_len > 0:
+            raise ValueError('seq_len is a negative int')
 
         encoded_text = self._word_processor.encode(prompt)
         if not encoded_text:
             raise ValueError('Could not encode')
 
-        #for i in range(seq_len):
         while seq_len >= 1:
             next_tokens = self._model.generate_next_token(encoded_text)
             if next_tokens is None:
@@ -151,7 +153,9 @@ class TopPGenerator:
             if not next_tokens:
                 break
 
-            sorted_tokens = dict(sorted(next_tokens.items(), key=lambda x: (x[1], x[0]), reverse=True))
+            sorted_tokens = dict(
+                sorted(next_tokens.items(), key=lambda x: (x[1], x[0]), reverse=True)
+            )
 
             sum_probability = 0
             possible_tokens = []
@@ -356,10 +360,28 @@ class QualityChecker:
                 or if sequence has inappropriate length,
                 or if methods used return None.
         """
-        if not (isinstance(seq_len, int) and isinstance(prompt, str) and prompt and seq_len < 0):
-            raise ValueError('Inappropriate input or input argument is empty or seq_len is a negative int')
+        if not (isinstance(seq_len, int) and isinstance(prompt, str)):
+            raise ValueError('Inappropriate input')
+        if not prompt:
+            raise ValueError('input argument is empty')
+        if not seq_len > 0:
+            raise ValueError('seq_len is a negative int')
 
-        
+        results = []
+
+        for num, generator in self._generators.items():
+            generated_text = generator.run(seq_len, prompt)
+            if not generated_text:
+                continue
+
+            perplexity = self._calculate_perplexity(generated_text)
+            if not perplexity:
+                raise ValueError('None is returned')
+
+            results.append(GenerationResultDTO(generated_text, perplexity, num))
+        results.sort(key=lambda x: (x.get_perplexity(), x.get_type()))
+        return results
+
 
 class Examiner:
     """
