@@ -359,6 +359,7 @@ class QualityChecker:
             raise ValueError("Probability sum is 0")
 
         perplexity = math.exp(-sum_log_probs / (len(encoded_text) - n_gram_size))
+
         return perplexity
 
     def run(self, seq_len: int, prompt: str) -> list[GenerationResultDTO]:  # type: ignore
