@@ -3,6 +3,8 @@ Lab 4.
 
 Top-p sampling generation and filling gaps with ngrams
 """
+import random
+
 # pylint:disable=too-few-public-methods, too-many-arguments
 from lab_3_generate_by_ngrams.main import (BeamSearchTextGenerator, GreedyTextGenerator,
                                            NGramLanguageModel, TextProcessor)
@@ -28,6 +30,16 @@ class WordProcessor(TextProcessor):
         Raises:
             ValueError: In case of inappropriate type input argument or if input argument is empty.
         """
+        if not isinstance(text,str) or not text:
+            raise ValueError
+        text = text.lower().split()
+        tokenized_text = []
+        for i in text:
+            if i[-1] in ('.', '!', '?'):
+                tokenized_text.extend([i[:-1], self._end_of_word_token])
+            else:
+                tokenized_text.append(i)
+        return tuple(tokenized_text)
 
     def _put(self, element: str) -> None:
         """
@@ -39,6 +51,12 @@ class WordProcessor(TextProcessor):
         Raises:
             ValueError: In case of inappropriate type input argument or if input argument is empty.
         """
+        if not (isinstance(element, str) and element):
+            raise ValueError
+        if element in self._storage:
+            return None
+        self._storage[element] = len(self._storage)
+        return None
 
     def _postprocess_decoded_text(self, decoded_corpus: tuple[str, ...]) -> str:  # type: ignore
         """
@@ -56,6 +74,19 @@ class WordProcessor(TextProcessor):
         Raises:
             ValueError: In case of inappropriate type input argument or if input argument is empty.
         """
+        if not (isinstance(decoded_corpus, tuple)
+                and decoded_corpus):
+            raise ValueError
+        decoded_sentences = ''
+        list_of_tokens = list(decoded_corpus)
+        sentences = (' '.join(list_of_tokens)).split(self._end_of_word_token)
+        for sentence in sentences:
+            sentence = sentence.strip().capitalize()
+            if not sentence:
+                break
+            sentence = sentence + '. '
+            decoded_sentences += sentence
+        return decoded_sentences.strip()
 
 
 class TopPGenerator:
@@ -80,6 +111,9 @@ class TopPGenerator:
             word_processor (WordProcessor): WordProcessor instance to handle text processing
             p_value (float): Collective probability mass threshold
         """
+        self._model = language_model
+        self._word_processor = word_processor
+        self._p_value = p_value
 
     def run(self, seq_len: int, prompt: str) -> str:  # type: ignore
         """
@@ -98,6 +132,34 @@ class TopPGenerator:
                 or if sequence has inappropriate length,
                 or if methods used return None.
         """
+        if not isinstance(seq_len, int) or not isinstance(prompt, str) or not prompt or seq_len <= 0:
+            raise ValueError
+        encoded_text = self._word_processor.encode(prompt)
+        if not encoded_text:
+            raise ValueError
+        for i in range(seq_len):
+            next_tokens = self._model.generate_next_token(encoded_text)
+            if next_tokens is None:
+                raise ValueError
+            if not next_tokens:
+                break
+            candidates = []
+            for word, value in next_tokens.items():
+                candidates.append((word, value))
+            sorted_candidates = sorted(candidates, key=lambda x: (x[1], x[0]), reverse=True)
+            probability = 0
+            possible_tokens = []
+            for word, value in sorted_candidates:
+                probability += value
+                possible_tokens += (word,)
+                if probability >= self._p_value:
+                    random_word = random.choice(possible_tokens)
+                    encoded_text += (random_word,)
+                    break
+        decoded = self._word_processor.decode(encoded_text)
+        if decoded is None:
+            raise ValueError
+        return decoded
 
 
 class GeneratorTypes:
