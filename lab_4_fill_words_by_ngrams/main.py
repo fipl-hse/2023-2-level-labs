@@ -65,8 +65,6 @@ class WordProcessor(TextProcessor):
         if element not in self._storage:
             self._storage[element] = len(self._storage)
 
-        return None
-
     def _postprocess_decoded_text(self, decoded_corpus: tuple[str, ...]) -> str:  # type: ignore
         """
         Convert decoded sentence into the string sequence.
@@ -92,7 +90,7 @@ class WordProcessor(TextProcessor):
             if word == self._end_of_word_token:
                 resulting_text += '.'
             elif not resulting_text:
-                    resulting_text += word.capitalize()
+                resulting_text += word.capitalize()
             elif resulting_text[-1] == '.':
                 resulting_text += ' ' + word.capitalize()
             else:
@@ -212,14 +210,13 @@ class GeneratorTypes:
         Returns:
             (str): Name of the generator.
         """
-        if generator_type == 0:
-            return 'Greedy Generator'
+        self.greedy = 0
+        self.top_p = 1
+        self.beam_search = 2
 
-        if generator_type == 1:
-            return 'Top-P Generator'
-
-        if generator_type == 2:
-            return 'Beam Search Generator'
+        self.types = {self.greedy: 'Greedy Generator', self.top_p: 'Top-P Generator',
+                      self.beam_search: 'Beam Search Generator'}
+        return self.types[generator_type]
 
 
 class GenerationResultDTO:
