@@ -30,7 +30,7 @@ def main() -> None:
     quality_checker = QualityChecker(gens, model, processor)
     checks = quality_checker.run(100, 'The')
 
-    result_quality_check = [str(cur_check) for cur_check in run_check]
+    result_quality_check = [str(cur_check) for cur_check in checks]
     print("\n".join(result_quality_check))
     path = 'assets/question_and_answers.json'
     examiner = Examiner(f'{path}')
