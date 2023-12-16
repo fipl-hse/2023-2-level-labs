@@ -4,9 +4,9 @@ Lab 4.
 Top-p sampling generation and filling gaps with ngrams
 """
 # pylint:disable=too-few-public-methods, too-many-arguments
-import random
-import math
 import json
+import math
+import random
 
 from lab_3_generate_by_ngrams.main import (BeamSearchTextGenerator, GreedyTextGenerator,
                                            NGramLanguageModel, TextProcessor)
@@ -297,7 +297,7 @@ class QualityChecker:
     """
 
     def __init__(
-            self, generators: dict, language_model: NGramLanguageModel, word_processor: WordProcessor
+        self, generators: dict, language_model: NGramLanguageModel, word_processor: WordProcessor
     ) -> None:
         """
         Initialize an instance of QualityChecker.
@@ -498,7 +498,7 @@ class GeneratorRuleStudent:
     _generator_type: int
 
     def __init__(
-            self, generator_type: int, language_model: NGramLanguageModel, word_processor: WordProcessor
+        self, generator_type: int, language_model: NGramLanguageModel, word_processor: WordProcessor
     ) -> None:
         """
         Initialize an instance of GeneratorRuleStudent.

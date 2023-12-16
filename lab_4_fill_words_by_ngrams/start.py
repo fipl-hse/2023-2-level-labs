@@ -30,18 +30,18 @@ def main() -> None:
     quality_checker = QualityChecker(gens, model, processor)
     checks = quality_checker.run(100, 'The')
 
-    students = []
-    for student_id in range(3):
-        students.append(GeneratorRuleStudent(student_id, model, processor))
-    json_path = str(PROJECT_ROOT / 'lab_4_fill_words_by_ngrams' / 'assets' /
-                    'question_and_answers.json')
-    examiner = Examiner(json_path)
-
-    for student in students:
-        student_answers = student.take_exam(examiner.provide_questions())
-        score = examiner.assess_exam(student_answers)
-        print(student.get_generator_type(), score)
-    assert result
+    result_quality_check = [str(cur_check) for cur_check in run_check]
+    print("\n".join(result_quality_check))
+    path = 'assets/question_and_answers.json'
+    examiner = Examiner(f'{path}')
+    tasks = examiner.provide_questions()
+    students = [GeneratorRuleStudent(i, model, processor) for i in range(3)]
+    answers = {student: student.take_exam(tasks) for student in students}
+    assessment = {student: examiner.assess_exam(answer) for student, answer in answers.items()}
+    result = ""
+    for student, accuracy in assessment.items():
+        result += f"Accuracy of student ({student.get_generator_type()}): {accuracy}\n"
+    print(result)
 
 
 if __name__ == "__main__":
