@@ -5,8 +5,9 @@ Top-p sampling generation and filling gaps with ngrams
 """
 # pylint:disable=too-few-public-methods, too-many-arguments
 import json
-from random import choice
 from math import exp, log
+from random import choice
+
 from lab_3_generate_by_ngrams.main import (BeamSearchTextGenerator, GreedyTextGenerator,
                                            NGramLanguageModel, TextProcessor)
 
@@ -439,8 +440,8 @@ class Examiner:
 
         correct_answers = 0.0
 
-        for q, a in self._questions_and_answers.items():
-            if answers[q[0]] == a:
+        for question, answer in self._questions_and_answers.items():
+            if answers[question[0]] == answer:
                 correct_answers += 1
 
         return correct_answers/len(answers)
@@ -510,3 +511,4 @@ class GeneratorRuleStudent:
             str: Generator type
         """
         return GeneratorTypes().get_conversion_generator_type(self._generator_type)
+    
