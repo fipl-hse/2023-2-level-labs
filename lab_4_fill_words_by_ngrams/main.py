@@ -6,7 +6,6 @@ Top-p sampling generation and filling gaps with ngrams
 
 import math
 import random
-import json
 
 from lab_3_generate_by_ngrams.main import (BeamSearchTextGenerator, GreedyTextGenerator,
                                            NGramLanguageModel, TextProcessor)
@@ -402,8 +401,7 @@ class Examiner:
         Args:
             json_path (str): Local path to assets file
         """
-        self._json_path = json_path
-        self._questions_and_answers = self._load_from_json()
+
 
     def _load_from_json(self) -> dict[tuple[str, int], str]:  # type: ignore
         """
@@ -419,17 +417,7 @@ class Examiner:
                 or if attribute _json_path has inappropriate extension,
                 or if inappropriate type loaded data.
         """
-        if not (isinstance(self._json_path, str) and self._json_path):
-            raise ValueError("Inappropriate input.")
 
-        with open(self._json_path, 'r', encoding='utf-8') as file:
-            q_as = json.load(file)
-        if not isinstance(q_as, list):
-            raise ValueError("Type of json data is not correct.")
-
-        self._questions_and_answers = {(q_a['question'], q_a['location']): q_a['answer']
-                                       for q_a in q_as}
-        return self._questions_and_answers
 
     def provide_questions(self) -> list[tuple[str, int]]:  # type: ignore
         """
@@ -439,7 +427,6 @@ class Examiner:
             list[tuple[str, int]]:
                 List in the form of [(question, position of the word to be filled)]
         """
-        return list(self._questions_and_answers)
 
     def assess_exam(self, answers: dict[str, str]) -> float:  # type: ignore
         """
@@ -454,17 +441,7 @@ class Examiner:
         Raises:
             ValueError: In case of inappropriate type input argument or if input argument is empty.
         """
-        if not (isinstance(answers, dict) and answers):
-            raise ValueError("Inappropriate input.")
 
-        true_answers = 0.0
-        for question, answer in answers.items():
-            actual_answer = next(ans for (que, loc), ans
-                                 in self._questions_and_answers.items()
-                                 if que == question)
-            if actual_answer.lower() == answer.lower():
-                true_answers += 1.
-        return true_answers / len(answers)
 
 
 class GeneratorRuleStudent:
