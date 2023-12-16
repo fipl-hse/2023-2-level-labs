@@ -309,24 +309,25 @@ class NGramLanguageModel:
         In case of corrupt input arguments or methods used return None,
         1 is returned
         """
-        if not isinstance(self._encoded_corpus, tuple) or len(self._encoded_corpus) == 0:
+        if not isinstance(self._encoded_corpus, tuple) or not self._encoded_corpus:
             return 1
 
         n_grams = self._extract_n_grams(self._encoded_corpus)
-        if not n_grams or not isinstance(n_grams, tuple):
+        if not n_grams:
             return 1
 
         context_freq_dict = {}
 
         for n_gram in n_grams:
             context_freq_dict[n_gram] = context_freq_dict.get(n_gram, 0) + 1
-        print(context_freq_dict)
+        #context_freq_dict = {n_gram: n_grams.count(n_gram) for n_gram in n_grams}
+        #when I use dictcomp, tests take 3 times longer (15 -> 45 s)
+        #does counting each n_gram every time take that long?
 
         lower_ngram_counts = {}
         for ngram, freq in context_freq_dict.items():
             context = ngram[:-1]
             lower_ngram_counts[context] = lower_ngram_counts.get(context, 0) + freq
-        print(lower_ngram_counts)
 
         self._n_gram_frequencies = {ngram: freq / lower_ngram_counts[ngram[:-1]]
                                     for ngram, freq in context_freq_dict.items()}
