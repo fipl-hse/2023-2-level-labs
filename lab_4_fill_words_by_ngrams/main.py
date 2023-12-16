@@ -143,8 +143,7 @@ class TopPGenerator:
         if not encoded:
             raise ValueError("it wasn't possible to encode the prompt")
 
-        # len_counter = 0
-        # while seq_len > 0:
+
         for i in range(seq_len):
             tokens = self._model.generate_next_token(encoded)
             if tokens is None:
