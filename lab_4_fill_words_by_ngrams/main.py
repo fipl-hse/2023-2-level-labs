@@ -35,7 +35,7 @@ class WordProcessor(TextProcessor):
         if not (isinstance(text, str) and text):
             raise ValueError("Inappropriate input.")
 
-        for digit in {'.', '!', '?'}:
+        for digit in ('.', '!', '?'):
             text = text.replace(digit, f" {self._end_of_word_token} ")
 
         tokenized_word = []
@@ -88,19 +88,20 @@ class WordProcessor(TextProcessor):
             raise ValueError('Incorrect input')
 
         postprocessed_text = [decoded_corpus[0].capitalize()]
-        capital_index = []
-        for word in decoded_corpus[1:]:
-            if word.isalpha():
-                postprocessed_text.append(f' {word.lower()}')
-            else:
-                last_word = postprocessed_text.pop()
-                postprocessed_text.append(f'{last_word}.')
-                capital_index.append((len(postprocessed_text)))
+        sentence_end = False
 
-        for i in capital_index[:-1]:
-            postprocessed_text[i] = ' ' + postprocessed_text[i][1:].capitalize()
-        if decoded_corpus[-1] != self._end_of_word_token:
-            postprocessed_text.append('.')
+        for word in decoded_corpus[1:]:
+            if word.isalpha() and not sentence_end:
+                postprocessed_text.append(f' {word.lower()}')
+            elif word.isalpha() and sentence_end:
+                postprocessed_text.append(f' {word.capitalize()}')
+                sentence_end = False
+            else:
+                postprocessed_text[-1] = f'{postprocessed_text[-1]}.'
+                sentence_end = True
+
+        if postprocessed_text[-1][-1] != '.':
+            postprocessed_text[-1] = f'{postprocessed_text[-1]}.'
 
         return ''.join(postprocessed_text)
 
