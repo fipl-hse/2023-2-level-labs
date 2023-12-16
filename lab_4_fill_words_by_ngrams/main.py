@@ -33,14 +33,16 @@ class WordProcessor(TextProcessor):
         if not isinstance(text, str) or not text:
             raise ValueError('Type input is inappropriate or input argument is empty.')
 
-        preprocessed_text = ""
-        for element in text.lower():
-            if element in "?!.":
-                preprocessed_text += f" {self.get_end_of_word_token()}"
-            elif element.isalpha() or element.isspace():
-                preprocessed_text += element
-
-        return tuple(preprocessed_text.split(" "))
+        tokens = []
+        punctuation_signs = '?!.'
+        for word in text.lower().split():
+            cleaned_word = [letter for letter in word if letter.isalpha()]
+            if not cleaned_word:
+                continue
+            tokens.append(''.join(cleaned_word))
+            if word[-1] in punctuation_signs:
+                tokens.append(self._end_of_word_token)
+        return tuple(tokens)
 
     def _put(self, element: str) -> None:
         """
@@ -145,7 +147,7 @@ class TopPGenerator:
             if not candidates:
                 break
             sorted_candidates = sorted(list(candidates.items()),
-                                       key=lambda pair: (float(pair[1]), pair[0]), reverse=True)
+                                       key=lambda pair: (pair[1], pair[0]), reverse=True)
             sum_freq = 0
             num_candidates = 0
             for candidate in sorted_candidates:
