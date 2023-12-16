@@ -195,6 +195,8 @@ class GeneratorTypes:
         self.greedy = 0
         self.top_p = 1
         self.beam_search = 2
+        self.types = {self.greedy: 'Greedy Generator', self.top_p: 'Top-P Generator',
+                      self.beam_search: 'Beam Search Generator'}
 
     def get_conversion_generator_type(self, generator_type: int) -> str:  # type: ignore
         """
@@ -207,12 +209,7 @@ class GeneratorTypes:
             (str): Name of the generator.
         """
 
-        generators = {
-             0: 'Greedy Generator',
-             1: 'Top-P Generator',
-             2: 'Beam Search Generator'
-        }
-        return str(generators.get(generator_type))
+        return self.types[generator_type]
 
 
 class GenerationResultDTO:
