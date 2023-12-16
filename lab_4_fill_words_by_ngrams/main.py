@@ -182,6 +182,7 @@ class TopPGenerator:
 
         return decoded
 
+
 class GeneratorTypes:
     """
     A class that represents types of generators.
@@ -426,9 +427,8 @@ class Examiner:
         if not isinstance(q_as, list):
             raise ValueError
 
-        self._questions_and_answers = {(q_a['question'], q_a['location']): q_a['answer']
+        return {(q_a['question'], q_a['location']): q_a['answer']
                                        for q_a in q_as}
-        return self._questions_and_answers
 
     def provide_questions(self) -> list[tuple[str, int]]:  # type: ignore
         """
@@ -457,9 +457,11 @@ class Examiner:
             raise ValueError
 
         correct_answers = 0
-
-        for key in self._questions_and_answers.keys():
-            if answers[key[0]] == self._questions_and_answers[key]:
+        for question, answer in answers.items():
+            student_answer = next(ans for (que, loc), ans
+                                 in self._questions_and_answers.items()
+                                 if que == question)
+            if student_answer.lower() == answer.lower():
                 correct_answers += 1
 
         accuracy_score = correct_answers/len(answers)
