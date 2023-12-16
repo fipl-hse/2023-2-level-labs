@@ -2,7 +2,10 @@
 Filling word by ngrams starter
 """
 # pylint:disable=too-many-locals,unused-import
-import lab_4_fill_words_by_ngrams.main as main_py
+from lab_3_generate_by_ngrams.main import BeamSearchTextGenerator, GreedyTextGenerator
+from lab_4_fill_words_by_ngrams.main import (GeneratorTypes, NGramLanguageModel, QualityChecker,
+                                             TopPGenerator, WordProcessor)
+
 
 def main() -> None:
     """
@@ -12,13 +15,22 @@ def main() -> None:
         text = text_file.read()
     result = None
 
-    word_processor = main_py.WordProcessor('<eow>')
-    encoded_text = word_processor.encode(text)
-    language_model = main_py.NGramLanguageModel(encoded_text, 2)
-    language_model.build()
-    top_p_generator = main_py.TopPGenerator(language_model, word_processor, 0.5)
-    result = top_p_generator.run(51, 'Vernon')
-    print(result)
+    processor = WordProcessor('<eow>')
+    text_encoded = processor.encode(text)
+    model = NGramLanguageModel(text_encoded, 2)
+    model.build()
+    gen_top_p = TopPGenerator(model, processor, 0.5)
+    generation_1 = gen_top_p.run(51, 'Vernon')
+    print(generation_1)
+    result = generation_1
+    generator_types = GeneratorTypes()
+    generators = {generator_types.greedy: GreedyTextGenerator(model, processor),
+                  generator_types.top_p: gen_top_p,
+                  generator_types.beam_search: BeamSearchTextGenerator(model, processor, 5)}
+    quality_checker = QualityChecker(generators, model, processor)
+    results = quality_checker.run(100, 'The')
+    for res in results:
+        print(res)
 
     assert result
 
