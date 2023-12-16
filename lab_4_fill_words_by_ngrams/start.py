@@ -3,8 +3,10 @@ Filling word by ngrams starter
 """
 # pylint:disable=too-many-locals,unused-import
 
-from lab_4_fill_words_by_ngrams.main import NGramLanguageModel, TopPGenerator, WordProcessor
-
+from lab_3_generate_by_ngrams.main import BeamSearchTextGenerator, GreedyTextGenerator
+from lab_4_fill_words_by_ngrams.main import (Examiner, GeneratorRuleStudent, GeneratorTypes,
+                                             NGramLanguageModel, QualityChecker, TopPGenerator,
+                                             WordProcessor)
 
 def main() -> None:
     """
@@ -15,12 +17,45 @@ def main() -> None:
 
     processor = WordProcessor('.')
     encoded = processor.encode(text)
+
+    if not (isinstance(encoded, tuple) and encoded):
+        raise ValueError
+
     model = NGramLanguageModel(encoded[:10000], 2)
     model.build()
     generator = TopPGenerator(model, processor, 0.5)
 
-    result = generator.run(51, 'Vernon')
-    print(result)
+    generated = generator.run(51, 'Vernon')
+    print(generated)
+    result = generated
+
+    generators = GeneratorTypes()
+    gen_dict = {generators.greedy: GreedyTextGenerator(
+        model, processor), generators.top_p: generator, generators.beam_search:
+        BeamSearchTextGenerator(model, processor, 5)}
+
+    quality = QualityChecker(gen_dict, model, processor)
+    checking = quality.run(100, 'The')
+
+    for check in checking:
+        print(str(check))
+
+    examiner = Examiner('./assets/question_and_answers.json')
+    questions = examiner.provide_questions()
+
+    list_of_students = []
+
+    for i in range(3):
+        list_of_students.append(GeneratorRuleStudent(i, model, processor))
+
+    for student in list_of_students:
+        answers = student.take_exam(questions)
+        exam = examiner.assess_exam(answers)
+        gen = student.get_generator_type()
+        result = str(exam)
+
+        print(gen, exam)
+        print(' '.join(answers.values()))
 
     assert result
 

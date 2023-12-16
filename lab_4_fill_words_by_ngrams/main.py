@@ -46,8 +46,8 @@ class WordProcessor(TextProcessor):
                 if cleared:
                     text_with_end.append(''.join(cleared))
 
-
         return tuple(text_with_end)
+
 
     def _put(self, element: str) -> None:
         """
@@ -210,10 +210,6 @@ class GeneratorTypes:
         Returns:
             (str): Name of the generator.
         """
-        self.greedy = 0
-        self.top_p = 1
-        self.beam_search = 2
-
         self.types = {self.greedy: 'Greedy Generator', self.top_p: 'Top-P Generator',
                       self.beam_search: 'Beam Search Generator'}
         return self.types[generator_type]
