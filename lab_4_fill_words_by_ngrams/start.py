@@ -23,8 +23,18 @@ def main() -> None:
                   generator_types.beam_search:
                       main_py.BeamSearchTextGenerator(model, word_processor, 5)}
     quality_check = main_py.QualityChecker(generators, model, word_processor)
-    result = quality_check.run(100, 'The')
-    print(result)
+    quality_result = quality_check.run(100, 'The')
+    print(quality_result)
+    examiner = main_py.Examiner('./assets/question_and_answers.json')
+    questions = examiner.provide_questions()
+    students = [main_py.GeneratorRuleStudent(i, model, word_processor) for i in range(3)]
+    for student in students:
+        answers = student.take_exam(questions)
+        result = examiner.assess_exam(answers)
+        gen_type = student.get_generator_type()
+        print('Type of generator:', gen_type)
+        print('Answers:', ''.join(answers.values()))
+        print('Accuracy:', result)
     assert result
 
 
