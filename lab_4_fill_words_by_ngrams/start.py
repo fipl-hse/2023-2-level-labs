@@ -22,6 +22,25 @@ def main() -> None:
     generator = TopPGenerator(model, processor, 0.5)
     result = generator.run(51, 'Vernon')
     print(result, '\n')
+
+    gen_types = GeneratorTypes()
+    gens = {gen_types.greedy: GreedyTextGenerator(model, processor),
+            gen_types.top_p: generator,
+            gen_types.beam_search: BeamSearchTextGenerator(model, processor, 5)}
+    quality_checker = QualityChecker(gens, model, processor)
+    checks = quality_checker.run(100, 'The')
+
+    students = []
+    for student_id in range(3):
+        students.append(GeneratorRuleStudent(student_id, model, processor))
+    json_path = str(PROJECT_ROOT / 'lab_4_fill_words_by_ngrams' / 'assets' /
+                    'question_and_answers.json')
+    examiner = Examiner(json_path)
+
+    for student in students:
+        student_answers = student.take_exam(examiner.provide_questions())
+        score = examiner.assess_exam(student_answers)
+        print(student.get_generator_type(), score)
     assert result
 
 
