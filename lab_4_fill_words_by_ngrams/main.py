@@ -61,8 +61,10 @@ class WordProcessor(TextProcessor):
         """
         if not isinstance(element, str) or not element:
             raise ValueError(f'Input: {element}')
+
         if element in self._storage:
             return None
+
         self._storage[element] = len(self._storage)
         return None
 
@@ -84,12 +86,15 @@ class WordProcessor(TextProcessor):
         """
         if not isinstance(decoded_corpus, tuple) or not decoded_corpus:
             raise ValueError
+
         tokens = list(decoded_corpus)
         tokens[0] = tokens[0].capitalize()
+
         if self.get_end_of_word_token() in tokens:
             for index in range(1, len(tokens)):
                 if tokens[index - 1] == self.get_end_of_word_token():
                     tokens[index] = tokens[index].capitalize()
+
         text = ' '.join(tokens).replace(' ' + self.get_end_of_word_token(), '.')
         if text[-1] != '.':
             text += '.'
@@ -144,6 +149,7 @@ class TopPGenerator:
                 isinstance(prompt, str) and prompt
         ):
             raise ValueError
+
         encoded = self._word_processor.encode(prompt)
         if not encoded:
             raise ValueError
@@ -312,21 +318,26 @@ class QualityChecker:
         """
         if not (isinstance(generated_text, str) and generated_text):
             raise ValueError
+
         encoded = self._word_processor.encode(generated_text)
         if not encoded:
             raise ValueError
+
         size = self._language_model.get_n_gram_size()
         if not size:
             raise ValueError
+
         summary_log = 0.0
         for index in range(size - 1, len(encoded)):
             context = tuple(encoded[index - size + 1: index])
             generated_tokens = self._language_model.generate_next_token(context)
             if not generated_tokens:
                 raise ValueError
+
             probability = generated_tokens.get(encoded[index])
             if probability:
                 summary_log += log(probability)
+
         if not summary_log:
             raise ValueError
 
@@ -356,14 +367,17 @@ class QualityChecker:
                 isinstance(prompt, str) and prompt
         ):
             raise ValueError
+
         results = []
         for type_of_gen, generator in self._generators.items():
             generated = generator.run(seq_len=seq_len, prompt=prompt)
             if not generated:
                 raise ValueError
+
             perplexity = self._calculate_perplexity(generated)
             if not perplexity:
                 raise ValueError
+
             results.append(GenerationResultDTO(generated, perplexity, type_of_gen))
         return results
 
@@ -407,10 +421,12 @@ class Examiner:
                 self._json_path[-5:] == '.json'
         ):
             raise ValueError
+
         with open(self._json_path, 'r', encoding='utf-8') as file:
             data = load(file)
         if not isinstance(data, list):
             raise ValueError
+
         self._questions_and_answers = {(t['question'], t['location']): t['answer'] for t in data}
         return self._questions_and_answers
 
@@ -439,6 +455,7 @@ class Examiner:
         """
         if not(isinstance(answers, dict) and answers):
             raise ValueError
+
         right_ans = sum(1 for key in self._questions_and_answers
                         if answers[key[0]] == self._questions_and_answers[key])
         return right_ans / len(answers)
@@ -488,15 +505,18 @@ class GeneratorRuleStudent:
         """
         if not(isinstance(tasks, list) and tasks):
             raise ValueError
+
         answers = {}
         for (task, position) in tasks:
             context = task[:position]
             answer = self._generator.run(seq_len=1, prompt=context)
             if not answer:
                 raise ValueError
+
             if answer[-1] == '.':
                 answer = answer[:-1] + ' '
             answers[task] = f'{answer}{task[position:]}'
+
         return answers
 
     def get_generator_type(self) -> str:  # type: ignore
