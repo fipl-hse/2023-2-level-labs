@@ -41,6 +41,5 @@ def main() -> None:
     print(result)
     assert result
 
-
 if __name__ == "__main__":
     main()
