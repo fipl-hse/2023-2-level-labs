@@ -390,13 +390,14 @@ class NGramLanguageModel:
 
         In case of corrupt input arguments, None is returned
         """
-        if not isinstance(encoded_corpus, tuple) or len(encoded_corpus) == 0:
+        if not isinstance(encoded_corpus, tuple):
+            return None
+        if len(encoded_corpus) == 0:
             return None
 
-        n_gram_size = self._n_gram_size
         n_grams = []
-        for i in range(len(encoded_corpus) - n_gram_size + 1):
-            n_gram = tuple(encoded_corpus[i:i + n_gram_size])
+        for i in range(len(encoded_corpus) - self._n_gram_size + 1):
+            n_gram = tuple(encoded_corpus[i:i + self._n_gram_size])
             n_grams.append(n_gram)
 
         return tuple(n_grams)
