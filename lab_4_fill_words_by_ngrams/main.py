@@ -32,10 +32,11 @@ class WordProcessor(TextProcessor):
         """
         if not isinstance(text, str) or not text:
             raise ValueError('Text cannot be empty')
-        text_words = text.replace('!', f' {self._end_of_word_token} ').replace('?', f' {self._end_of_word_token} ')\
-            .replace('.', f' {self._end_of_word_token} ').lower().split()
+        text_words = text
+        for el in ['!', '?', '.']:
+            text_words = text_words.replace(el, f' {self._end_of_word_token} ')
         tokens = []
-        for word in text_words:
+        for word in text_words.lower().split():
             if word.isalpha() or word.isspace() or word == self._end_of_word_token:
                 tokens.append(word)
             else:
@@ -79,7 +80,8 @@ class WordProcessor(TextProcessor):
         """
         if not isinstance(decoded_corpus, tuple) or not decoded_corpus:
             raise ValueError
-        decoded_corpus = ' '.join(decoded_corpus).replace(f' {self._end_of_word_token}', '.')
+        end_of_word_with_space = f' {self._end_of_word_token}'
+        decoded_corpus = ' '.join(decoded_corpus).replace(end_of_word_with_space, '.')
         result = []
         for sentence in decoded_corpus.split('. '):
             result.append(sentence.capitalize())
@@ -151,12 +153,14 @@ class TopPGenerator:
                 if sum_ < self._p_value:
                     sum_ += token[1]
                     tokens.append(token[0])
+                else:
+                    break
             randomized = random.choice(tokens)
             text += (randomized, )
             count += 1
         decoded = self._word_processor.decode(text)
         if decoded is None:
-            raise ValueError
+            raise ValueError('Decoded text is empty')
         return decoded
 
 
