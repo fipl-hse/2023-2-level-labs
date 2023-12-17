@@ -437,6 +437,7 @@ class GreedyTextGenerator:
         In case of corrupt input arguments or methods used return None,
         None is returned
         """
+
         if not (isinstance(seq_len, int) and isinstance(prompt, str)) or len(prompt) == 0:
             return None
 
@@ -512,12 +513,8 @@ class BeamSearcher:
         if not tokens:
             return []
 
-        list_of_pairs = []
-        for token, frequency in tokens.items():
-            token_pair = (token, float(frequency))
-            list_of_pairs.append(token_pair)
-        sorted_pairs = sorted(list_of_pairs, key=lambda x: x[1], reverse=True)
-        return sorted_pairs[:self._beam_width]
+        return sorted([(token, float(freq)) for token, freq in tokens.items()],
+                      key=lambda pair: pair[1], reverse=True)[:self._beam_width]
 
 
     def continue_sequence(
