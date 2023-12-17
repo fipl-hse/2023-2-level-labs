@@ -28,7 +28,7 @@ class WordProcessor(TextProcessor):
             ValueError: In case of inappropriate type input argument or if input argument is empty.
         """
         if not (isinstance(text, str) and text):
-            raise ValueError
+            raise ValueError('Inappropriate type input argument or input argument is empty.')
         clean_txt = []
         for word in text.lower().split():
             if word[-1] in '!?.':
@@ -38,6 +38,7 @@ class WordProcessor(TextProcessor):
                 if clean_word:
                     clean_txt.append(''.join(clean_word))
         return tuple(clean_txt)
+
     def _put(self, element: str) -> None:
         """
         Put an element into the storage, assign a unique id to it.
@@ -48,7 +49,10 @@ class WordProcessor(TextProcessor):
         Raises:
             ValueError: In case of inappropriate type input argument or if input argument is empty.
         """
-
+        if not (isinstance(element, str) and element):
+            raise ValueError('Inappropriate type input argument or input argument is empty.')
+        if element not in self._storage:
+            self._storage[element] = len(self._storage)
     def _postprocess_decoded_text(self, decoded_corpus: tuple[str, ...]) -> str:  # type: ignore
         """
         Convert decoded sentence into the string sequence.
