@@ -30,18 +30,15 @@ class WordProcessor(TextProcessor):
             ValueError: In case of inappropriate type input argument or if input argument is empty.
         """
         if not isinstance(text, str) or not text:
-            return ValueError
+            raise ValueError
         new_text = re.sub(r'[!?.]', self._end_of_word_token, text)
-        clean_text = ''
-        for symbol in new_text.lower():
-            if symbol.isalpha or symbol.isspace() or symbol == self._end_of_word_token:
-                clean_text += symbol
-        final_text = clean_text.split(' ')
-        for index, word in enumerate(final_text):
-            if self._end_of_word_token in word:
-                word = word[:-len(self._end_of_word_token)]
-                final_text.insert(index + 1, self._end_of_word_token)
-        return final_text
+        clean_text = []
+        for word in new_text.lower().split():
+            clean_word = ''.join(filter(str.isalpha, word))
+            if not clean_word:
+                continue
+            clean_text.append(clean_word)
+        return tuple(clean_text)
 
     def _put(self, element: str) -> None:
         """
@@ -54,7 +51,7 @@ class WordProcessor(TextProcessor):
             ValueError: In case of inappropriate type input argument or if input argument is empty.
         """
         if not isinstance(element, str) or not element:
-            return ValueError
+            raise ValueError
         if element not in self._storage:
             self._storage[element] = len(self._storage)
 
@@ -75,8 +72,11 @@ class WordProcessor(TextProcessor):
             ValueError: In case of inappropriate type input argument or if input argument is empty.
         """
         if not isinstance(decoded_corpus, tuple) or not decoded_corpus:
-            return ValueError
-        decoded_text = ' '.join(decoded_corpus).replace(self._end_of_word_token, '.').capitalize()
+            raise ValueError
+        decoded_sentences = ' '.join(decoded_corpus).split(self._end_of_word_token)
+        decoded_text = '. '.join([decoded_sentence.strip().capitalize() for decoded_sentence in decoded_sentences])
+        if decoded_text[-1] == ' ':
+            return decoded_text[:-1]
         return decoded_text
 
 
@@ -123,6 +123,12 @@ class TopPGenerator:
                 or if sequence has inappropriate length,
                 or if methods used return None.
         """
+        if not isinstance(seq_len, int) or not seq_len > 0 or not isinstance(prompt, str) or not prompt:
+            raise ValueError
+        encoded = self._word_processor.encode(prompt)
+        if not encoded:
+            raise ValueError
+
 
 
 class GeneratorTypes:
