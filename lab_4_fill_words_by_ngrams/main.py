@@ -195,6 +195,9 @@ class GeneratorTypes:
         self.top_p = 1
         self.beam_search = 2
 
+        self.generator_types = {self.greedy: 'Greedy Generator', self.top_p: 'Top-P Generator',
+                                self.beam_search: 'Beam Search Generator'}
+
     def get_conversion_generator_type(self, generator_type: int) -> str:  # type: ignore
         """
         Retrieve string type of generator.
@@ -205,10 +208,7 @@ class GeneratorTypes:
         Returns:
             (str): Name of the generator.
         """
-        generator_types = {self.greedy: 'Greedy Generator', self.top_p: 'Top-P Generator',
-                           self.beam_search: 'Beam Search Generator'}
-
-        return generator_types[generator_type]
+        return self.generator_types[generator_type]
 
 
 class GenerationResultDTO:
@@ -338,7 +338,7 @@ class QualityChecker:
                 sum_log += math.log(probability)
 
         if not sum_log:
-            raise ValueError('None is returned')
+            raise ValueError('Sum is 0')
 
         return math.exp(-sum_log / (len(encoded) - ngram_size))
 
