@@ -3,7 +3,6 @@ Lab 4.
 
 Top-p sampling generation and filling gaps with ngrams
 """
-
 # pylint:disable=too-few-public-methods, too-many-arguments
 from json import load
 from math import exp, log
