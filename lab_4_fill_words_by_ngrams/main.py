@@ -7,6 +7,7 @@ Top-p sampling generation and filling gaps with ngrams
 import math
 # pylint:disable=too-few-public-methods, too-many-arguments
 import random
+import json
 
 from lab_3_generate_by_ngrams.main import (BeamSearchTextGenerator, GreedyTextGenerator,
                                            NGramLanguageModel, TextProcessor)
@@ -36,8 +37,9 @@ class WordProcessor(TextProcessor):
             raise ValueError("Incorrect input data")
 
         tokens = []
+        punctuation = "?!."
         for token in text.lower().split():
-            if token[-1] in "?!.":
+            if token[-1] in punctuation:
                 tokens.extend([token[:-1], self._end_of_word_token])
             else:
                 clean_text = [char for char in token if char.isalpha()]
@@ -323,7 +325,7 @@ class QualityChecker:
 
         encoded_generated_text = self._word_processor.encode(generated_text)
         if not encoded_generated_text:
-            raise ValueError
+            raise ValueError("Method encode() returns None")
 
         n_gram_size = self._language_model.get_n_gram_size()
         log_probability = 0.0
@@ -399,7 +401,8 @@ class Examiner:
         Args:
             json_path (str): Local path to assets file
         """
-
+        self._json_path = json_path
+        self._questions_and_answers = self._load_from_json()
 
     def _load_from_json(self) -> dict[tuple[str, int], str]:  # type: ignore
         """
@@ -416,6 +419,23 @@ class Examiner:
                 or if inappropriate type loaded data.
         """
 
+        if not (isinstance(self._json_path, str) and self._json_path
+                and ".json" in self._json_path):
+            raise ValueError("Incorrect input data")
+
+        with open (self._json_path, "r", encoding="utf-8") as file:
+            data = json.load(file)
+
+        if not isinstance(data, list):
+            raise ValueError("uploaded data has incorrect type")
+
+        self._questions_and_answers = {
+            (task['question'], task['location']): task['answer']
+            for task in data
+        }
+
+        return self._questions_and_answers
+
 
     def provide_questions(self) -> list[tuple[str, int]]:  # type: ignore
         """
@@ -425,6 +445,8 @@ class Examiner:
             list[tuple[str, int]]:
                 List in the form of [(question, position of the word to be filled)]
         """
+
+        return list(self._questions_and_answers.keys())
 
     def assess_exam(self, answers: dict[str, str]) -> float:  # type: ignore
         """
@@ -440,6 +462,20 @@ class Examiner:
             ValueError: In case of inappropriate type input argument or if input argument is empty.
         """
 
+        if not(isinstance(answers, dict) and answers):
+            raise ValueError("Incorrect inpur data")
+
+        student_answers = list(answers.values())
+        correct_answers = list(self._questions_and_answers.values())
+
+        number_of_correct_answers = 0
+
+        for student_answer, correct_answer in zip(student_answers, correct_answers):
+            if student_answer != correct_answer:
+                continue
+            number_of_correct_answers += 1
+
+        return number_of_correct_answers / len(answers)
 
 
 class GeneratorRuleStudent:
@@ -462,6 +498,11 @@ class GeneratorRuleStudent:
                 NGramLanguageModel instance to use for text generation
             word_processor (WordProcessor): WordProcessor instance to handle text processing
         """
+        self._generator_type = generator_type
+        generators = (GreedyTextGenerator(language_model, word_processor),
+                      TopPGenerator(language_model, word_processor, 0.5),
+                      BeamSearchTextGenerator(language_model, word_processor, 5))
+        self._generator = generators[self._generator_type]
 
     def take_exam(self, tasks: list[tuple[str, int]]) -> dict[str, str]:  # type: ignore
         """
@@ -480,6 +521,23 @@ class GeneratorRuleStudent:
                 or if methods used return None.
         """
 
+        if not (isinstance(tasks, list) and tasks):
+            raise ValueError("Incorrect input data")
+
+        answers = {}
+        for (question, location) in tasks:
+            context = question[:location]
+            answer = self._generator.run(seq_len=1, prompt=context)
+            if not answer:
+                raise ValueError("Generating returned None")
+
+            if answer[-1] == ".":
+                answer = f"{answer[:-1]} "
+
+            answers[question] = f"{answer}{question[location:]}"
+
+        return answers
+
     def get_generator_type(self) -> str:  # type: ignore
         """
         Retrieve generator type.
@@ -487,3 +545,4 @@ class GeneratorRuleStudent:
         Returns:
             str: Generator type
         """
+        return GeneratorTypes().get_conversion_generator_type(self._generator_type)
