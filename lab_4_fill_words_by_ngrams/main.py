@@ -6,6 +6,7 @@ Top-p sampling generation and filling gaps with ngrams
 # pylint:disable=too-few-public-methods, too-many-arguments
 from lab_3_generate_by_ngrams.main import (BeamSearchTextGenerator, GreedyTextGenerator,
                                            NGramLanguageModel, TextProcessor)
+import random
 import re
 
 
@@ -31,14 +32,16 @@ class WordProcessor(TextProcessor):
         """
         if not isinstance(text, str) or not text:
             raise ValueError
-        new_text = re.sub(r'[!?.]', self._end_of_word_token, text)
-        clean_text = []
-        for word in new_text.lower().split():
+        tokens = []
+        bad_end_symbols = ('!', '.', '?')
+        for word in text.lower().split():
             clean_word = ''.join(filter(str.isalpha, word))
             if not clean_word:
                 continue
-            clean_text.append(clean_word)
-        return tuple(clean_text)
+            tokens.append(clean_word)
+            if word[-1] in bad_end_symbols:
+                tokens.append(self._end_of_word_token)
+        return tuple(tokens)
 
     def _put(self, element: str) -> None:
         """
@@ -77,7 +80,7 @@ class WordProcessor(TextProcessor):
         decoded_text = '. '.join([decoded_sentence.strip().capitalize() for decoded_sentence in decoded_sentences])
         if decoded_text[-1] == ' ':
             return decoded_text[:-1]
-        return decoded_text
+        return f"{decoded_text}."
 
 
 class TopPGenerator:
@@ -103,7 +106,7 @@ class TopPGenerator:
             p_value (float): Collective probability mass threshold
         """
         self._word_processor = word_processor
-        self._language_model = language_model
+        self._model = language_model
         self._p_value = p_value
 
     def run(self, seq_len: int, prompt: str) -> str:  # type: ignore
@@ -128,6 +131,27 @@ class TopPGenerator:
         encoded = self._word_processor.encode(prompt)
         if not encoded:
             raise ValueError
+        current_len = 0
+        while current_len < seq_len:
+            new_tokens = self._model.generate_next_token(encoded)
+            if new_tokens is None:
+                raise ValueError
+            if not new_tokens:
+                break
+            sorted_tokens = sorted(list(new_tokens.items()), key=lambda x: (x[1], x[0]), reverse=True)
+            min_tokens = []
+            freq_sum = 0
+            for token in sorted_tokens:
+                if freq_sum < self._p_value:
+                    freq_sum += token[1]
+                    min_tokens.append(token[0])
+            random_token = random.choice(min_tokens)
+            encoded += (random_token,)
+            current_len += 1
+        decoded = self._word_processor.decode(encoded)
+        if not decoded:
+            raise ValueError
+        return decoded
 
 
 
