@@ -360,8 +360,7 @@ class NGramLanguageModel:
         In case of corrupt input arguments, None is returned
         """
 
-        if (not isinstance(sequence, tuple) or len(sequence) == 0
-                or len(sequence) < self._n_gram_size - 1):
+        if not isinstance(sequence, tuple) or len(sequence) < self._n_gram_size - 1:
             return None
 
         token_frequencies = {}
@@ -369,11 +368,11 @@ class NGramLanguageModel:
         context_size = self._n_gram_size - 1
         context = sequence[-context_size:]
 
-        for n_gram, freq in self._n_gram_frequencies.items():
+        for n_gram, frequency in self._n_gram_frequencies.items():
             if n_gram[:-1] == context:
                 token = n_gram[-1]
                 if token not in token_frequencies:
-                    token_frequencies[token] = freq
+                    token_frequencies[token] = frequency
 
         return token_frequencies
 
@@ -391,14 +390,13 @@ class NGramLanguageModel:
 
         In case of corrupt input arguments, None is returned
         """
-        if not isinstance(encoded_corpus, tuple):
-            return None
-        if len(encoded_corpus) == 0:
+        if not isinstance(encoded_corpus, tuple) or len(encoded_corpus) == 0:
             return None
 
+        n_gram_size = self._n_gram_size
         n_grams = []
-        for i in range(len(encoded_corpus) - self._n_gram_size + 1):
-            n_gram = tuple(encoded_corpus[i:i + self._n_gram_size])
+        for i in range(len(encoded_corpus) - n_gram_size + 1):
+            n_gram = tuple(encoded_corpus[i:i + n_gram_size])
             n_grams.append(n_gram)
 
         return tuple(n_grams)
