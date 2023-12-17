@@ -2,7 +2,9 @@
 Filling word by ngrams starter
 """
 # pylint:disable=too-many-locals,unused-import
-from lab_4_fill_words_by_ngrams.main import NGramLanguageModel, TopPGenerator, WordProcessor
+from lab_3_generate_by_ngrams.main import BeamSearchTextGenerator, GreedyTextGenerator
+from lab_4_fill_words_by_ngrams.main import (GeneratorTypes, NGramLanguageModel, QualityChecker,
+                                             TopPGenerator, WordProcessor)
 
 
 def main() -> None:
@@ -18,6 +20,14 @@ def main() -> None:
     generator = TopPGenerator(model, processor, 0.5)
     result = generator.run(51, 'Vernon')
     print(result, '\n')
+    gen_types = GeneratorTypes()
+    gens = {gen_types.greedy: GreedyTextGenerator(model, processor),
+            gen_types.top_p: generator,
+            gen_types.beam_search: BeamSearchTextGenerator(model, processor, 5)}
+    quality_checker = QualityChecker(gens, model, processor)
+    checks = quality_checker.run(100, 'The')
+    for check in checks:
+        print(check)
     assert result
 
 
