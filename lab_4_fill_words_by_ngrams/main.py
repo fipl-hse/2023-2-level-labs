@@ -32,9 +32,9 @@ class WordProcessor(TextProcessor):
             ValueError: In case of inappropriate type input argument or if input argument is empty.
         """
         if not isinstance(text, str) or not text:
-            raise ValueError
-        for symbol in ['.', '!', '?']:
-            text = text.replace(symbol, ' ' + self._end_of_word_token)
+            raise ValueError('Wrong input')
+        for symbol in ('.', '!', '?'):
+            text = text.replace(symbol, f" {self._end_of_word_token}")
         tokens = []
         for word in text.lower().split():
             if word == self._end_of_word_token or word.isalpha():
@@ -59,7 +59,7 @@ class WordProcessor(TextProcessor):
             ValueError: In case of inappropriate type input argument or if input argument is empty.
         """
         if not isinstance(element, str) or not element:
-            raise ValueError
+            raise ValueError('Wrong input')
         if element not in self._storage:
             self._storage.update({element: len(self._storage)})
 
@@ -80,12 +80,12 @@ class WordProcessor(TextProcessor):
             ValueError: In case of inappropriate type input argument or if input argument is empty.
         """
         if not isinstance(decoded_corpus, tuple) or not decoded_corpus:
-            raise ValueError
+            raise ValueError('Wrong input')
         corpus = ' '.join(decoded_corpus).split(self._end_of_word_token)
         text = '. '.join([sent.strip().capitalize() for sent in corpus])
         if text[-1] == ' ':
             return text[:-1]
-        return text + '.'
+        return f"{text}."
 
 class TopPGenerator:
     """
@@ -132,14 +132,14 @@ class TopPGenerator:
         """
         if (not isinstance(seq_len, int) or seq_len < 1 or
            not isinstance(prompt, str) or not prompt):
-            raise ValueError
+            raise ValueError('Wrong input')
         prompt_encoded = self._word_processor.encode(prompt)
         if not prompt_encoded:
-            raise ValueError
+            raise ValueError('Method returned nothing')
         while seq_len > 0:
             tokens = self._model.generate_next_token(prompt_encoded)
             if tokens is None:
-                raise ValueError
+                raise ValueError('Method returned nothing')
             if not tokens:
                 break
             tokens_sorted = sorted(tokens.items(), key=lambda pair: (pair[1], pair[0]),
@@ -154,7 +154,7 @@ class TopPGenerator:
             seq_len -= 1
         text = self._word_processor.decode(prompt_encoded)
         if not text:
-            raise ValueError
+            raise ValueError('Method returned nothing')
         return text
 
 
@@ -296,22 +296,22 @@ class QualityChecker:
                 or if nothing was generated.
         """
         if not isinstance(generated_text, str) or not generated_text:
-            raise ValueError
+            raise ValueError('Wrong input')
         text_encoded = self._word_processor.encode(generated_text)
         if not text_encoded:
-            raise ValueError
+            raise ValueError('Method returned nothing')
         ngram_size = self._language_model.get_n_gram_size()
         logs = 0.
         for i in range(ngram_size - 1, len(text_encoded)):
             context = tuple(text_encoded[i - ngram_size + 1: i])
             tokens = self._language_model.generate_next_token(context)
             if not tokens:
-                raise ValueError
+                raise ValueError('Method returned nothing')
             probability = tokens.get(i)
             if probability:
                 logs += math.log(probability)
         if not logs:
-            raise ValueError
+            raise ValueError('Can not divide by zero')
         return math.exp(-logs / (len(text_encoded) - ngram_size))
 
 
@@ -335,15 +335,15 @@ class QualityChecker:
         """
         if (not isinstance(prompt, str) or not prompt or
             not isinstance(seq_len, int) or seq_len < 0):
-            raise ValueError
+            raise ValueError('Wrong input')
         info = []
         for generation_type, generator in self._generators.items():
             text = generator.run(seq_len=seq_len, prompt=prompt)
             if not text:
-                raise ValueError
+                raise ValueError('Method returned nothing')
             perplexity = self._calculate_perplexity(text)
             if not perplexity:
-                raise ValueError
+                raise ValueError('Method returned nothing')
             info.append(GenerationResultDTO(text, perplexity, generation_type))
         return sorted(info, key=lambda dto: (dto.get_perplexity(), dto.get_type()))
 

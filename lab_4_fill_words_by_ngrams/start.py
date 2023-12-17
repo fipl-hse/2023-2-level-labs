@@ -20,7 +20,6 @@ def main() -> None:
     model.build()
     gen_top_p = TopPGenerator(model, processor, 0.5)
     generation_1 = gen_top_p.run(51, 'Vernon')
-    print(generation_1)
     result = generation_1
     generator_types = GeneratorTypes()
     generators = {generator_types.greedy: GreedyTextGenerator(model, processor),
