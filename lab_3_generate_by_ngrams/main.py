@@ -575,11 +575,15 @@ class BeamSearcher:
 
         In case of corrupt input arguments return None.
         """
-        if not (isinstance(sequence_candidates, dict) and sequence_candidates):
+        if not isinstance(sequence_candidates, dict):
+            return None
+        if not sequence_candidates:
             return None
 
-        return dict(sorted(list(sequence_candidates.items()),
-                           key=lambda x: x[1])[:self._beam_width])
+        sorted_sequences = sorted(sequence_candidates.items(), key=lambda x: x[1])
+        chosen_sequences = sorted_sequences[:self._beam_width]
+
+        return dict(chosen_sequences)
 
 class BeamSearchTextGenerator:
     """
@@ -625,9 +629,7 @@ class BeamSearchTextGenerator:
         In case of corrupt input arguments or methods used return None,
         None is returned
         """
-        if not isinstance(prompt, str) or not isinstance(seq_len, int):
-            return None
-        if not prompt or not seq_len:
+        if not (isinstance(prompt, str) and isinstance(seq_len, int) and prompt and seq_len):
             return None
 
         encoded_prompt = self._text_processor.encode(prompt)
@@ -640,27 +642,28 @@ class BeamSearchTextGenerator:
             new_sequence_candidates = sequence_candidates.copy()
 
             for sequence in sequence_candidates:
-                next_tokens = self._get_next_token(sequence)
-                if next_tokens is None:
+                tokens = self._get_next_token(sequence)
+                if not tokens:
                     return None
 
-                continued_candidates = self.beam_searcher.continue_sequence(
-                    sequence, next_tokens, new_sequence_candidates)
-                if continued_candidates is None:
-                    break
+                continuation_candidates = self.beam_searcher.continue_sequence(
+                    sequence, tokens, new_sequence_candidates)
+                if not continuation_candidates:
+                    return self._text_processor.decode(sorted(tuple(sequence_candidates),
+                                                              key=lambda x: x[1])[0])
 
             if not new_sequence_candidates:
                 break
 
-            chosen_candidates = self.beam_searcher.prune_sequence_candidates(
+            best_sequence_candidates = self.beam_searcher.prune_sequence_candidates(
                 new_sequence_candidates)
 
-            if not chosen_candidates:
+            if not best_sequence_candidates:
                 return None
-            sequence_candidates = chosen_candidates
+            sequence_candidates = best_sequence_candidates
 
-        best_sequence = min(sequence_candidates, key=lambda x: sequence_candidates[x])
-        decoded = self._text_processor.decode(best_sequence)
+        decoded = self._text_processor.decode(min(sequence_candidates,
+                                                  key=lambda x: sequence_candidates[x]))
         return decoded
 
 
