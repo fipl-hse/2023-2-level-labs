@@ -163,7 +163,7 @@ class TopPGenerator:
 
         decoded = self._word_processor.decode(encoded)
         if not decoded:
-            raise ValueError
+            raise ValueError('Decoded is None')
 
         return decoded
 
