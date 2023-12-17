@@ -124,6 +124,8 @@ class TopPGenerator:
                 or not isinstance(prompt, str) or not prompt):
             raise ValueError('Problematic input in TopPGenerator.run()')
         prompt_encoded = self._word_processor.encode(prompt)
+        if not prompt_encoded:
+            raise ValueError('Problem with encoding prompt in TopPGenerator.run()')
         for generation in range(seq_len):
             candidates = self._model.generate_next_token(prompt_encoded)
             if not isinstance(candidates, dict):
@@ -136,8 +138,13 @@ class TopPGenerator:
             while sum_of_probability < self._p_value:
                 selected.append(sorted_candidates.pop(0))
                 sum_of_probability += candidates[selected[-1]]
-            prompt += ' ' + self._word_processor.get_token(choice(selected))
+            chosen = self._word_processor.get_token(choice(selected))
+            if not chosen:
+                raise ValueError('Prompt not continued in TopPGenerator.run()')
+            prompt += f' {chosen}'
             prompt_encoded = self._word_processor.encode(prompt)
+            if not prompt_encoded:
+                raise ValueError('Problem with encode in TopPGenerator.run()')
         result = self._word_processor.decode(prompt_encoded)
         if not result:
             raise ValueError('No result in TopPGenerator.run()')
