@@ -164,9 +164,10 @@ class TextProcessor:
         In case of corrupt input arguments or invalid argument length,
         an element is not added to storage
         """
-        if not isinstance(element, str) or len(element) != 1:
+        if not isinstance(element, str):
             return None
-
+        if len(element) != 1:
+            return None
         if element in self._storage:
             return None
 
@@ -190,16 +191,14 @@ class TextProcessor:
         In case of corrupt input arguments, None is returned.
         In case any of methods used return None, None is returned.
         """
-        if not (isinstance(encoded_corpus, tuple) and encoded_corpus):
+        if not isinstance(encoded_corpus, tuple):
             return None
 
         decoded_corpus = self._decode(encoded_corpus)
-
-        if decoded_corpus is None:
+        if not decoded_corpus:
             return None
 
         decoded_text = self._postprocess_decoded_text(decoded_corpus)
-
         if not decoded_text:
             return None
 
