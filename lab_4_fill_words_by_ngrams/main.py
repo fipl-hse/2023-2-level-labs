@@ -3,11 +3,12 @@ Lab 4.
 
 Top-p sampling generation and filling gaps with ngrams
 """
+from math import e, log
+from random import choice
+
 # pylint:disable=too-few-public-methods, too-many-arguments
 from lab_3_generate_by_ngrams.main import (BeamSearchTextGenerator, GreedyTextGenerator,
                                            NGramLanguageModel, TextProcessor)
-from math import e, log
-from random import choice
 
 
 class WordProcessor(TextProcessor):
@@ -31,10 +32,11 @@ class WordProcessor(TextProcessor):
             ValueError: In case of inappropriate type input argument or if input argument is empty.
         """
         if not isinstance(text, str) or not text:
-            raise ValueError
-        eos_token = ' ' + self._end_of_word_token
+            raise ValueError('Problematic input in WordProcessor._tokenize()')
+        eos_token = f' {self._end_of_word_token}'
         clean_text = [symbol if (symbol.isalpha() or symbol.isspace())
-                      else eos_token if symbol in ('!', '?', '.') else '' for symbol in text.lower()]
+                      else eos_token if symbol in ('!', '?', '.')
+                      else '' for symbol in text.lower()]
         return tuple(''.join(clean_text).split())
 
     def _put(self, element: str) -> None:
@@ -48,7 +50,7 @@ class WordProcessor(TextProcessor):
             ValueError: In case of inappropriate type input argument or if input argument is empty.
         """
         if not isinstance(element, str) or not element:
-            raise ValueError
+            raise ValueError('Problematic input in WordProcessor._put()')
         if element not in self._storage:
             self._storage[element] = len(self._storage)
 
@@ -69,10 +71,10 @@ class WordProcessor(TextProcessor):
             ValueError: In case of inappropriate type input argument or if input argument is empty.
         """
         if not isinstance(decoded_corpus, tuple) or not decoded_corpus:
-            raise ValueError
+            raise ValueError('Problematic input in WordProcessor._postprocess_decoded_text()')
         sentences = ' '.join(decoded_corpus).split(f' {self._end_of_word_token}')
         processed = '. '.join([sen.lstrip().capitalize() for sen in sentences if sen])
-        return processed + '.'
+        return f'{processed}.'
 
 
 class TopPGenerator:
@@ -118,19 +120,16 @@ class TopPGenerator:
                 or if sequence has inappropriate length,
                 or if methods used return None.
         """
-        if not isinstance(seq_len, int) or seq_len <= 0 or not isinstance(prompt, str) or not prompt:
-            raise ValueError
-        try:
-            prompt_encoded = self._word_processor.encode(prompt)
-        except BaseException:
-            raise ValueError
+        if (not isinstance(seq_len, int) or seq_len <= 0
+                or not isinstance(prompt, str) or not prompt):
+            raise ValueError('Problematic input in TopPGenerator.run()')
+        prompt_encoded = self._word_processor.encode(prompt)
         for generation in range(seq_len):
-            try:
-                candidates = self._model.generate_next_token(prompt_encoded)
-                if not len(candidates):
-                    break
-            except BaseException:
-                raise ValueError
+            candidates = self._model.generate_next_token(prompt_encoded)
+            if not isinstance(candidates, dict):
+                raise ValueError('Wrong type of generated tokens in TopPGenerator.run()')
+            if not len(candidates):
+                break
             sorted_candidates = sorted(candidates.keys(), key=lambda x: (-candidates[x], -x))
             selected = []
             sum_of_probability = 0
@@ -139,13 +138,10 @@ class TopPGenerator:
                 sum_of_probability += candidates[selected[-1]]
             prompt += ' ' + self._word_processor.get_token(choice(selected))
             prompt_encoded = self._word_processor.encode(prompt)
-        try:
-            result = self._word_processor.decode(prompt_encoded)
-        except BaseException:
-            raise ValueError
-        if result:
-            return result
-        raise ValueError
+        result = self._word_processor.decode(prompt_encoded)
+        if not result:
+            raise ValueError('No result in TopPGenerator.run()')
+        return result
 
 
 class GeneratorTypes:
@@ -165,6 +161,10 @@ class GeneratorTypes:
         self.greedy = 0
         self.top_p = 1
         self.beam_search = 2
+        self.names = {self.greedy: 'Greedy Generator',
+                      self.top_p: 'Top-P Generator',
+                      self.beam_search: 'Beam Search Generator'
+                      }
 
     def get_conversion_generator_type(self, generator_type: int) -> str:  # type: ignore
         """
@@ -176,11 +176,7 @@ class GeneratorTypes:
         Returns:
             (str): Name of the generator.
         """
-        names = {self.greedy: 'Greedy Generator',
-                 self.top_p: 'Top-P Generator',
-                 self.beam_search: 'Beam Search Generator',
-                 }
-        return names[generator_type]
+        return self.names[generator_type]
 
 
 class GenerationResultDTO:
@@ -289,24 +285,20 @@ class QualityChecker:
                 or if nothing was generated.
         """
         if not isinstance(generated_text, str) or not generated_text:
-            raise ValueError
+            raise ValueError('Problematic input in QualityChecker._calculate_perplexity()')
         n_gram_size = self._language_model.get_n_gram_size()
-        try:
-            encoded_text = self._word_processor.encode(generated_text)
-            divisor = len(encoded_text) - n_gram_size + 1
-        except BaseException:
-            raise ValueError
+        encoded_text = self._word_processor.encode(generated_text)
+        if not isinstance(encoded_text, tuple):
+            raise ValueError('Wrong type of encoded_text in QualityChecker._calculate_perplexity()')
+        divisor = len(encoded_text) - n_gram_size + 1
         if divisor < 1:
-            raise ValueError
+            raise ValueError('Problem with text length in QualityChecker._calculate_perplexity()')
         log_probabilities = 0
         for i in range(divisor):
             context = encoded_text[i: i + n_gram_size - 1]
-            try:
-                probabilities = self._language_model.generate_next_token(context)
-            except BaseException:
-                raise ValueError
+            probabilities = self._language_model.generate_next_token(context)
             if not probabilities:
-                raise ValueError
+                raise ValueError('No generated tokens in QualityChecker._calculate_perplexity()')
             log_probabilities += log(probabilities[encoded_text[i + n_gram_size - 1]])
         return e ** (-log_probabilities / (divisor - 1))
 
@@ -328,15 +320,14 @@ class QualityChecker:
                 or if sequence has inappropriate length,
                 or if methods used return None.
         """
+        if not isinstance(seq_len, int) or seq_len < 1 or not isinstance(prompt, str) or not prompt:
+            raise ValueError('Problematic input in QualityChecker.run()')
         evaluation_results = []
         for numeric, algorithm in self._generators.items():
-            try:
-                generated_seq = algorithm.run(seq_len, prompt)
-                quality = self._calculate_perplexity(generated_seq)
-            except BaseException:
-                raise ValueError
+            generated_seq = algorithm.run(seq_len=seq_len, prompt=prompt)
+            quality = self._calculate_perplexity(generated_seq)
             if not quality:
-                raise ValueError
+                raise ValueError('No perplexity score in QualityChecker.run()')
             evaluation_results.append(GenerationResultDTO(generated_seq, quality, numeric))
         return sorted(evaluation_results, key=lambda x: (x.get_perplexity(), x.get_type()))
 
