@@ -3,11 +3,13 @@ Lab 4.
 
 Top-p sampling generation and filling gaps with ngrams
 """
-from random import choice
+
 
 # pylint:disable=too-few-public-methods, too-many-arguments
-from lab_3_generate_by_ngrams.main import (BeamSearchTextGenerator, GreedyTextGenerator,
-                                           NGramLanguageModel, TextProcessor)
+from random import choice
+
+from lab_3_generate_by_ngrams.main import (BeamSearchTextGenerator, GreedyTextGenerator, NGramLanguageModel,
+                                           TextProcessor)
 
 
 class WordProcessor(TextProcessor):
@@ -149,7 +151,6 @@ class TopPGenerator:
 
             sorted_tokens = dict(sorted(list(tokens.items()), key=lambda x: (float(x[1]), x[0]), reverse=True))
             sum_probability = 0
-
             possible_tokens = []
 
             for key, value in sorted_tokens.items():
@@ -159,14 +160,12 @@ class TopPGenerator:
                 random_token = choice(possible_tokens)
                 encoded_text += (random_token,)
                 break
+            break
 
-            decoded_text = self._word_processor.decode(encoded_text)
-            if not decoded_text:
-                raise ValueError
-            return decoded_text
-
-
-
+        decoded_text = self._word_processor.decode(encoded_text)
+        if not decoded_text:
+            raise ValueError
+        return decoded_text
 
 class GeneratorTypes:
     """
