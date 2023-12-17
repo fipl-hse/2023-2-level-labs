@@ -4,8 +4,11 @@ Lab 4.
 Top-p sampling generation and filling gaps with ngrams
 """
 # pylint:disable=too-few-public-methods, too-many-arguments
+
 from random import choice
 from math import exp, log
+from json import load
+
 from lab_3_generate_by_ngrams.main import (BeamSearchTextGenerator, GreedyTextGenerator,
                                            NGramLanguageModel, TextProcessor)
 
@@ -259,7 +262,7 @@ class GenerationResultDTO:
             (str): String with report
         """
         return (f'Perplexity score: {self.__perplexity}\n'
-                f'{GeneratorTypes.get_conversion_generator_type(self.__type)}\n'
+                f'{GeneratorTypes.get_conversion_generator_type(GeneratorTypes(), self.__type)}\n'
                 f'Text: {self.__text}\n'
                 )
 
@@ -381,6 +384,8 @@ class Examiner:
         Args:
             json_path (str): Local path to assets file
         """
+        self._json_path = json_path
+        self._questions_and_answers = self._load_from_json()
 
     def _load_from_json(self) -> dict[tuple[str, int], str]:  # type: ignore
         """
@@ -396,6 +401,14 @@ class Examiner:
                 or if attribute _json_path has inappropriate extension,
                 or if inappropriate type loaded data.
         """
+        if not (isinstance(self._json_path, str) and self._json_path and self._json_path[-5:] == '.json'):
+            raise ValueError
+        with open(self._json_path, 'r', encoding='utf-8') as file:
+            data = load(file)
+        if not isinstance(data, list):
+            raise ValueError
+        self._questions_and_answers = {(task['question'], task['location']): task['answer'] for task in data}
+        return self._questions_and_answers
 
     def provide_questions(self) -> list[tuple[str, int]]:  # type: ignore
         """
@@ -405,6 +418,7 @@ class Examiner:
             list[tuple[str, int]]:
                 List in the form of [(question, position of the word to be filled)]
         """
+        return list(self._questions_and_answers.keys())
 
     def assess_exam(self, answers: dict[str, str]) -> float:  # type: ignore
         """
@@ -419,6 +433,11 @@ class Examiner:
         Raises:
             ValueError: In case of inappropriate type input argument or if input argument is empty.
         """
+        if not(isinstance(answers, dict) and answers):
+            raise ValueError
+        right_ans = sum(1 for key in self._questions_and_answers
+                        if answers[key[0]] == self._questions_and_answers[key])
+        return right_ans / len(answers)
 
 
 class GeneratorRuleStudent:
@@ -441,6 +460,11 @@ class GeneratorRuleStudent:
                 NGramLanguageModel instance to use for text generation
             word_processor (WordProcessor): WordProcessor instance to handle text processing
         """
+        self._generator_type = generator_type
+        generators = [GreedyTextGenerator(language_model, word_processor),
+                      TopPGenerator(language_model, word_processor, 0.5),
+                      BeamSearchTextGenerator(language_model, word_processor, 5)]
+        self._generator = generators[self._generator_type]
 
     def take_exam(self, tasks: list[tuple[str, int]]) -> dict[str, str]:  # type: ignore
         """
@@ -458,6 +482,18 @@ class GeneratorRuleStudent:
                 or if input argument is empty,
                 or if methods used return None.
         """
+        if not(isinstance(tasks, list) and tasks):
+            raise ValueError
+        answers = {}
+        for (task, position) in tasks:
+            context = task[:position]
+            answer = self._generator.run(seq_len=1,prompt=context)
+            if not answer:
+                raise ValueError
+            if answer[-1] == '.':
+                answer = answer[:-1] + ' '
+            answers[task] = f'{answer}{task[position:]}'
+        return answers
 
     def get_generator_type(self) -> str:  # type: ignore
         """
@@ -466,3 +502,4 @@ class GeneratorRuleStudent:
         Returns:
             str: Generator type
         """
+        return GeneratorTypes.get_conversion_generator_type(GeneratorTypes(), self._generator_type)
