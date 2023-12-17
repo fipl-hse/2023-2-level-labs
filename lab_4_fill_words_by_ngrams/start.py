@@ -13,7 +13,7 @@ def main() -> None:
     processor = WordProcessor('.')
     encoded = processor.encode(text)
     if not isinstance(encoded, tuple) or not encoded:
-        return None
+        raise ValueError
 
     model = NGramLanguageModel(encoded[:10000], 2)
     model.build()
