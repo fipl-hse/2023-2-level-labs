@@ -69,6 +69,11 @@ class WordProcessor(TextProcessor):
         Raises:
             ValueError: In case of inappropriate type input argument or if input argument is empty.
         """
+        if not (isinstance(decoded_corpus, tuple) and decoded_corpus):
+            raise ValueError('Inappropriate type input argument or input argument is empty.')
+
+        decoded_sentences = ''
+        sentences = ' '.join()
 
 
 class TopPGenerator:
