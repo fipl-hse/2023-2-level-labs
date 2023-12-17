@@ -513,9 +513,12 @@ class BeamSearcher:
         if not tokens:
             return []
 
-        return sorted([(token, float(freq)) for token, freq in tokens.items()],
-                      key=lambda pair: pair[1], reverse=True)[:self._beam_width]
-
+        list_of_pairs = []
+        for token, frequency in tokens.items():
+            token_pair = (token, float(frequency))
+            list_of_pairs.append(token_pair)
+        sorted_pairs = sorted(list_of_pairs, key=lambda x: x[1], reverse=True)
+        return sorted_pairs[:self._beam_width]
 
     def continue_sequence(
         self,
@@ -538,23 +541,18 @@ class BeamSearcher:
 
         In case of corrupt input arguments or unexpected behaviour of methods used return None.
         """
-        if not isinstance(sequence, tuple) or not sequence:
-            return None
-        if not isinstance(next_tokens, list) or not next_tokens:
-            return None
-        if not isinstance(sequence_candidates, dict) or not sequence_candidates:
-            return None
-        if not len(next_tokens) <= self._beam_width:
-            return None
-        if sequence not in sequence_candidates:
+        if not (isinstance(sequence, tuple) and isinstance(next_tokens, list)
+                and isinstance(sequence_candidates, dict) and sequence
+                and next_tokens and sequence_candidates and len(next_tokens) <= self._beam_width
+                and sequence in sequence_candidates):
             return None
 
         for token in next_tokens:
             new_sequence = sequence + (token[0],)
-            new_frequency = sequence_candidates[sequence] - math.log(token[1])
-            sequence_candidates[new_sequence] = new_frequency
+            new_freq = sequence_candidates[sequence] - math.log(token[1])
+            sequence_candidates[new_sequence] = new_freq
 
-        sequence_candidates.pop(sequence)
+        del sequence_candidates[sequence]
 
         return sequence_candidates
 
