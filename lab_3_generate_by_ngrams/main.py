@@ -164,10 +164,9 @@ class TextProcessor:
         In case of corrupt input arguments or invalid argument length,
         an element is not added to storage
         """
-        if not isinstance(element, str):
+        if not isinstance(element, str) or len(element) != 1:
             return None
-        if len(element) != 1:
-            return None
+
         if element in self._storage:
             return None
 
