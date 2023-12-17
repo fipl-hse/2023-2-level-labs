@@ -453,7 +453,7 @@ class GreedyTextGenerator:
 
             max_freq = max(tokens.values())
             max_freq_tokens = [token for token, freq in tokens.items() if freq == max_freq]
-            max_freq_tokens = sorted(max_freq_tokens)
+            max_freq_tokens = sorted(max_freq_tokens, reverse=True)
             encoded_prompt += (max_freq_tokens[0],)
 
             seq_len -= 1
