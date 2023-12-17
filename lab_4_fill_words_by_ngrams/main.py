@@ -185,6 +185,11 @@ class GeneratorTypes:
         self.greedy = 0
         self.top_p = 1
         self.beam_search = 2
+        self._types = {
+            self.greedy: 'Greedy Generator',
+            self.top_p: 'Top-P Generator',
+            self.beam_search: 'Beam Search Generator'
+        }
 
     def get_conversion_generator_type(self, generator_type: int) -> str:  # type: ignore
         """
@@ -196,12 +201,7 @@ class GeneratorTypes:
         Returns:
             (str): Name of the generator.
         """
-        types = {
-            self.greedy: 'Greedy Generator',
-            self.top_p: 'Top-P Generator',
-            self.beam_search: 'Beam Search Generator'
-        }
-        return types[generator_type]
+        return self._types[generator_type]
 
 
 class GenerationResultDTO:
@@ -491,7 +491,7 @@ class GeneratorRuleStudent:
         for (question, position) in tasks:
             next_sequence = self._generator.run(seq_len=1, prompt=question[:position])
             if not next_sequence:
-                raise ValueError
+                raise ValueError('Next sequence is None')
 
             if next_sequence[-1] == '.':
                 next_sequence = next_sequence[:-1] + ' '
