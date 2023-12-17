@@ -235,7 +235,7 @@ class TextProcessor:
         In case of corrupt input arguments, None is returned.
         In case any of methods used return None, None is returned.
         """
-        if not isinstance(corpus, tuple) or len(corpus) == 0:
+        if not (isinstance(corpus, tuple) and corpus):
             return None
 
         decoded_corpus = []
@@ -262,19 +262,15 @@ class TextProcessor:
 
         In case of corrupt input arguments, None is returned
         """
-        if not isinstance(decoded_corpus, tuple):
-            return None
-        if len(decoded_corpus) == 0:
+        if not isinstance(decoded_corpus, tuple) or len(decoded_corpus) == 0:
             return None
 
-        decoded_text = ''.join(decoded_corpus)
-        decoded_text = decoded_text.replace('_', ' ')
-        decoded_text = decoded_text.capitalize()
+        decoded_text = ''.join(decoded_corpus).replace('_', ' ').capitalize()
+
         if decoded_text[-1] == ' ':
-            decoded_text = decoded_text[:-1]
+            return f"{decoded_text[:-1]}."
 
-        return f'{decoded_text}.'
-
+        return f"{decoded_text}."
 
 class NGramLanguageModel:
     """
@@ -742,8 +738,6 @@ class NGramLanguageModelReader:
             TextProcessor: processor created for the current JSON file.
         """
 
-
-
 class BackOffGenerator:
     """
     Language model for back-off based text generation.
@@ -765,7 +759,6 @@ class BackOffGenerator:
             language_models (tuple[NGramLanguageModel]): Language models to use for text generation
             text_processor (TextProcessor): A TextProcessor instance to handle text processing
         """
-
 
     def run(self, seq_len: int, prompt: str) -> Optional[str]:
         """
