@@ -31,19 +31,18 @@ class WordProcessor(TextProcessor):
             ValueError: In case of inappropriate type input argument or if input argument is empty.
         """
         if not isinstance(text, str) or len(text) == 0:
-            raise ValueError
+            raise ValueError('WordProcessor._tokenize: inappropriate type of input arguments')
 
         great_text = ''
 
         good_punctuation = '!.?'
 
         for word in text.lower():
-            if not word.isalnum():
-                if word in good_punctuation:
-                    great_text += f' {self._end_of_word_token}'
-                elif word.isspace() and not great_text[-1].isspace():
-                    great_text += f'{word}'
-            elif not word.isdigit():
+            if word.isalpha():
+                great_text += f'{word}'
+            elif word in good_punctuation:
+                great_text += f' {self._end_of_word_token}'
+            elif word.isspace() and not great_text[-1].isspace():
                 great_text += f'{word}'
 
         return tuple(great_text.split())
@@ -59,7 +58,7 @@ class WordProcessor(TextProcessor):
             ValueError: In case of inappropriate type input argument or if input argument is empty.
         """
         if not isinstance(element, str) or len(element) == 0:
-            raise ValueError
+            raise ValueError('WordProcessor._put: inappropriate type of input arguments')
 
         if element not in self._storage:
             self._storage[element] = len(self._storage)
@@ -81,7 +80,7 @@ class WordProcessor(TextProcessor):
             ValueError: In case of inappropriate type input argument or if input argument is empty.
         """
         if not isinstance(decoded_corpus, tuple) or len(decoded_corpus) == 0:
-            raise ValueError
+            raise ValueError('WordProcessor._postprocess_decoded_text: inappropriate type of input arguments')
 
         great_text = ''
 
@@ -147,18 +146,18 @@ class TopPGenerator:
                 or if methods used return None.
         """
         if not ((isinstance(seq_len, int) and seq_len > 0) and (isinstance(prompt, str) or len(prompt) == 0)):
-            raise ValueError
+            raise ValueError('TopPGenerator.run: inappropriate type of input arguments')
 
         encoded_prompt = self._word_processor.encode(prompt)
 
         if not encoded_prompt:
-            raise ValueError
+            raise ValueError('WordProcessor.encode: inappropriate type of input arguments')
 
         while seq_len >= 1:
             next_word_dict = self._model.generate_next_token(encoded_prompt)
 
             if next_word_dict is None:
-                raise ValueError
+                raise ValueError('NGramLanguageModel.generate_next_token: inappropriate type of input arguments')
 
             if not next_word_dict:
                 break
@@ -182,7 +181,7 @@ class TopPGenerator:
         decoded_seq = self._word_processor.decode(encoded_prompt)
 
         if not decoded_seq:
-            raise ValueError
+            raise ValueError('WordProcessor.decode: inappropriate type of input arguments')
 
         return decoded_seq
 
