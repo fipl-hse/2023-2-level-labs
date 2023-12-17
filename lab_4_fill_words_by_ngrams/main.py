@@ -391,8 +391,8 @@ class Examiner:
             ques_ans = json.load(file)
         if not isinstance(ques_ans, list):
             raise ValueError
-        self._questions_and_answers = {(ques_ans_dict['question'], ques_ans_dict['location']): ques_ans_dict['answer']
-                                       for ques_ans_dict in ques_ans}
+        self._questions_and_answers = {(qu_an['question'], qu_an['location']): qu_an['answer']
+                                       for qu_an in ques_ans}
         return self._questions_and_answers
 
     def provide_questions(self) -> list[tuple[str, int]]:  # type: ignore
