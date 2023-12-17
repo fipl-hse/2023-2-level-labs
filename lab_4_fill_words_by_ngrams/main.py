@@ -4,6 +4,8 @@ Lab 4.
 Top-p sampling generation and filling gaps with ngrams
 """
 # pylint:disable=too-few-public-methods, too-many-arguments
+from random import choice
+
 from lab_3_generate_by_ngrams.main import (BeamSearchTextGenerator, GreedyTextGenerator,
                                            NGramLanguageModel, TextProcessor)
 
@@ -109,6 +111,9 @@ class TopPGenerator:
             word_processor (WordProcessor): WordProcessor instance to handle text processing
             p_value (float): Collective probability mass threshold
         """
+        self._model = language_model
+        self._word_processor = word_processor
+        self._p_value = p_value
 
     def run(self, seq_len: int, prompt: str) -> str:  # type: ignore
         """
@@ -127,6 +132,37 @@ class TopPGenerator:
                 or if sequence has inappropriate length,
                 or if methods used return None.
         """
+        if not (isinstance(prompt, str) and prompt and
+                isinstance(seq_len, int) and seq_len > 0):
+            raise ValueError
+
+        encoded = self._word_processor.encode(prompt)
+        if not encoded:
+            raise ValueError
+
+        while seq_len >= 1:
+            tokens = self._model.generate_next_token(encoded)
+            if tokens is None:
+                raise ValueError
+            if not tokens:
+                break
+            sorted_tokens = sorted(list(tokens.items()),
+                                   key=lambda pair: (float(pair[1]), pair[0]), reverse=True)
+            sum_probability = 0
+            for index, (_, prob) in enumerate(sorted_tokens):
+                sum_probability += prob
+                if sum_probability >= self._p_value:
+                    random_token = choice(sorted_tokens[:index + 1])
+                    encoded += (random_token[0],)
+                    break
+            else:
+                break
+            seq_len -= 1
+
+            decoded = self._word_processor.decode(encoded)
+            if not decoded:
+                raise ValueError
+            return decoded
 
 
 class GeneratorTypes:
