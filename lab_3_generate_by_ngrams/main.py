@@ -137,7 +137,8 @@ class TextProcessor:
             return None
 
         for i in tokenized_text:
-            self._put(i)
+            if i:
+                self._put(i)
 
         encoded_corpus = []
 
