@@ -3,8 +3,9 @@ Filling word by ngrams starter
 """
 # pylint:disable=too-many-locals,unused-import
 from lab_3_generate_by_ngrams.main import BeamSearchTextGenerator, GreedyTextGenerator
-from lab_4_fill_words_by_ngrams.main import (GeneratorTypes, NGramLanguageModel, QualityChecker,
-                                             TopPGenerator, WordProcessor)
+from lab_4_fill_words_by_ngrams.main import (Examiner, GeneratorRuleStudent, GeneratorTypes,
+                                             NGramLanguageModel, QualityChecker, TopPGenerator,
+                                             WordProcessor)
 
 
 def main() -> None:
@@ -37,6 +38,23 @@ def main() -> None:
     perplexity = quality.run(100, 'The')
     for score in perplexity:
         print(str(score))
+
+    examiner = Examiner('./assets/question_and_answers.json')
+    questions = examiner.provide_questions()
+
+    list_of_students = []
+
+    for i in range(3):
+        list_of_students.append(GeneratorRuleStudent(i, model, processor))
+
+    for student in list_of_students:
+        answers = student.take_exam(questions)
+        exam = examiner.assess_exam(answers)
+        gen = student.get_generator_type()
+        result = str(exam)
+
+        print(gen, exam)
+        print(' '.join(answers.values()))
 
     assert result
 
