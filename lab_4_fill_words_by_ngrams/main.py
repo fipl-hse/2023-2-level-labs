@@ -192,6 +192,7 @@ class GeneratorTypes:
         self.greedy = 0
         self.top_p = 1
         self.beam_search = 2
+        self.generators = ['Greedy Generator', 'Top-P Generator', 'Beam Search Generator']
 
     def get_conversion_generator_type(self, generator_type: int) -> str:  # type: ignore
         """
@@ -205,8 +206,7 @@ class GeneratorTypes:
         """
         if generator_type > 2:
             raise ValueError("No such type of generator found")
-        generators = ['Greedy Generator', 'Top-P Generator', 'Beam Search Generator']
-        return generators[generator_type]
+        return self.generators[generator_type]
 
 
 class GenerationResultDTO:
