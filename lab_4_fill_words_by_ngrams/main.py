@@ -42,13 +42,14 @@ class WordProcessor(TextProcessor):
         for word in text.lower().split():
             if word == self._end_of_word_token or word.isalpha() or word.isspace():
                 tokenized_word.append(word)
-            else:
-                clean_word = []
-                for alpha in list(word):
-                    if alpha.isalpha():
-                        clean_word.append(alpha)
-                if clean_word:
-                    tokenized_word.append("".join(clean_word))
+                continue
+
+            clean_word = []
+            for alpha in list(word):
+                if alpha.isalpha():
+                    clean_word.append(alpha)
+            if clean_word:
+                tokenized_word.append("".join(clean_word))
 
         return tuple(tokenized_word)
 
@@ -117,7 +118,7 @@ class TopPGenerator:
     """
 
     def __init__(
-            self, language_model: NGramLanguageModel, word_processor: WordProcessor, p_value: float
+        self, language_model: NGramLanguageModel, word_processor: WordProcessor, p_value: float
     ) -> None:
         """
         Initialize an instance of TopPGenerator.
@@ -208,6 +209,9 @@ class GeneratorTypes:
         self.greedy = 0
         self.top_p = 1
         self.beam_search = 2
+        self.types = {self.greedy: 'Greedy Generator',
+                      self.top_p: 'Top-P Generator',
+                      self.beam_search: 'Beam Search Generator'}
 
     def get_conversion_generator_type(self, generator_type: int) -> str:  # type: ignore
         """
@@ -219,9 +223,7 @@ class GeneratorTypes:
         Returns:
             (str): Name of the generator.
         """
-        generator_types = {self.greedy: 'Greedy Generator', self.top_p: 'Top-P Generator',
-                           self.beam_search: 'Beam Search Generator'}
-        return generator_types[generator_type]
+        return self.types[generator_type]
 
 
 class GenerationResultDTO:
