@@ -339,17 +339,11 @@ class NGramLanguageModel:
         if not n_grams or not isinstance(n_grams, tuple):
             return 1
 
-        context_freq_dict = {}
-
         for n_gram in set(n_grams):
-            absolute_freq = n_grams.count(n_gram)
-            context = n_gram[:-1]
-            if context not in context_freq_dict:
-                context_freq_dict[context] = [n_gram_1[:-1] == context
-                                              for n_gram_1 in n_grams].count(True)
-            context_freq = context_freq_dict[context]
-
-            self._n_gram_frequencies[n_gram] = absolute_freq / context_freq
+            number_of_n_grams = n_grams.count(n_gram)
+            context_count = len([context for context in n_grams
+                                 if context[:-1] == n_gram[:-1]])
+            self._n_gram_frequencies[n_gram] = number_of_n_grams / context_count
 
         return 0
 
@@ -366,7 +360,8 @@ class NGramLanguageModel:
         In case of corrupt input arguments, None is returned
         """
 
-        if not isinstance(sequence, tuple) or len(sequence) < self._n_gram_size - 1:
+        if (not isinstance(sequence, tuple) or len(sequence) == 0
+                or len(sequence) < self._n_gram_size - 1):
             return None
 
         token_frequencies = {}
@@ -374,11 +369,11 @@ class NGramLanguageModel:
         context_size = self._n_gram_size - 1
         context = sequence[-context_size:]
 
-        for n_gram, frequency in self._n_gram_frequencies.items():
+        for n_gram, freq in self._n_gram_frequencies.items():
             if n_gram[:-1] == context:
                 token = n_gram[-1]
                 if token not in token_frequencies:
-                    token_frequencies[token] = frequency
+                    token_frequencies[token] = freq
 
         return token_frequencies
 
