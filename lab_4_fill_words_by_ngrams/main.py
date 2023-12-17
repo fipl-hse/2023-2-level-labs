@@ -3,11 +3,10 @@ Lab 4.
 
 Top-p sampling generation and filling gaps with ngrams
 """
-# pylint:disable=too-few-public-methods, too-many-arguments
-
-from random import choice
-from math import exp, log
 from json import load
+from math import exp, log
+# pylint:disable=too-few-public-methods, too-many-arguments
+from random import choice
 
 from lab_3_generate_by_ngrams.main import (BeamSearchTextGenerator, GreedyTextGenerator,
                                            NGramLanguageModel, TextProcessor)
@@ -155,7 +154,9 @@ class TopPGenerator:
                 raise ValueError
             if not next_tokens:
                 break
-            sorted_tokens = sorted(list(next_tokens.items()), key=lambda x: (x[1], x[0]), reverse=True)
+            sorted_tokens = sorted(list(next_tokens.items()),
+                                   key=lambda x: (x[1], x[0]), reverse=True)
+
             summa = 0
             for index, variant in enumerate(sorted_tokens):
                 summa += variant[1]
@@ -401,13 +402,16 @@ class Examiner:
                 or if attribute _json_path has inappropriate extension,
                 or if inappropriate type loaded data.
         """
-        if not (isinstance(self._json_path, str) and self._json_path and self._json_path[-5:] == '.json'):
+        if not (
+                isinstance(self._json_path, str) and self._json_path and
+                self._json_path[-5:] == '.json'
+        ):
             raise ValueError
         with open(self._json_path, 'r', encoding='utf-8') as file:
             data = load(file)
         if not isinstance(data, list):
             raise ValueError
-        self._questions_and_answers = {(task['question'], task['location']): task['answer'] for task in data}
+        self._questions_and_answers = {(t['question'], t['location']): t['answer'] for t in data}
         return self._questions_and_answers
 
     def provide_questions(self) -> list[tuple[str, int]]:  # type: ignore
@@ -461,9 +465,9 @@ class GeneratorRuleStudent:
             word_processor (WordProcessor): WordProcessor instance to handle text processing
         """
         self._generator_type = generator_type
-        generators = [GreedyTextGenerator(language_model, word_processor),
+        generators = (GreedyTextGenerator(language_model, word_processor),
                       TopPGenerator(language_model, word_processor, 0.5),
-                      BeamSearchTextGenerator(language_model, word_processor, 5)]
+                      BeamSearchTextGenerator(language_model, word_processor, 5))
         self._generator = generators[self._generator_type]
 
     def take_exam(self, tasks: list[tuple[str, int]]) -> dict[str, str]:  # type: ignore
@@ -487,7 +491,7 @@ class GeneratorRuleStudent:
         answers = {}
         for (task, position) in tasks:
             context = task[:position]
-            answer = self._generator.run(seq_len=1,prompt=context)
+            answer = self._generator.run(seq_len=1, prompt=context)
             if not answer:
                 raise ValueError
             if answer[-1] == '.':
