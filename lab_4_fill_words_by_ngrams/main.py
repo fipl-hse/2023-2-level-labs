@@ -5,7 +5,6 @@ Top-p sampling generation and filling gaps with ngrams
 """
 # pylint:disable=too-few-public-methods, too-many-arguments
 import math
-
 import random
 
 from lab_3_generate_by_ngrams.main import (BeamSearchTextGenerator, GreedyTextGenerator,
@@ -78,8 +77,8 @@ class WordProcessor(TextProcessor):
         """
         if not isinstance(decoded_corpus, tuple) or not decoded_corpus:
             raise ValueError
-        decoded_sentences = ' '.join(decoded_corpus).split(self._end_of_word_token)
-        decoded_text = '. '.join([decoded_sentence.strip().capitalize() for decoded_sentence in decoded_sentences])
+        sentences = ' '.join(decoded_corpus).split(self._end_of_word_token)
+        decoded_text = '. '.join([sentence.strip().capitalize() for sentence in sentences])
         if decoded_text[-1] == ' ':
             return decoded_text[:-1]
         return f"{decoded_text}."
@@ -128,7 +127,8 @@ class TopPGenerator:
                 or if sequence has inappropriate length,
                 or if methods used return None.
         """
-        if not isinstance(seq_len, int) or not seq_len > 0 or not isinstance(prompt, str) or not prompt:
+        if (not isinstance(seq_len, int) or not seq_len > 0
+                or not isinstance(prompt, str) or not prompt):
             raise ValueError
         encoded = self._word_processor.encode(prompt)
         if not encoded:
@@ -140,7 +140,8 @@ class TopPGenerator:
                 raise ValueError
             if not new_tokens:
                 break
-            sorted_tokens = sorted(list(new_tokens.items()), key=lambda x: (x[1], x[0]), reverse=True)
+            sorted_tokens = sorted(list(new_tokens.items()),
+                                   key=lambda x: (x[1], x[0]), reverse=True)
             min_tokens = []
             freq_sum = 0
             for token in sorted_tokens:
@@ -334,7 +335,8 @@ class QualityChecker:
                 or if sequence has inappropriate length,
                 or if methods used return None.
         """
-        if not isinstance(seq_len, int) or not seq_len >= 1 or not isinstance(prompt, str) or not prompt:
+        if (not isinstance(seq_len, int) or not seq_len >= 1
+                or not isinstance(prompt, str) or not prompt):
             raise ValueError
         results = []
         for gen_type, generator in self._generators.items():
