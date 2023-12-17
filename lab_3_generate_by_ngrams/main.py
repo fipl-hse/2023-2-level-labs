@@ -262,15 +262,18 @@ class TextProcessor:
 
         In case of corrupt input arguments, None is returned
         """
-        if not isinstance(decoded_corpus, tuple) or len(decoded_corpus) == 0:
+        if not isinstance(decoded_corpus, tuple):
+            return None
+        if len(decoded_corpus) == 0:
             return None
 
-        decoded_text = ''.join(decoded_corpus).replace('_', ' ').capitalize()
-
+        decoded_text = ''.join(decoded_corpus)
+        decoded_text = decoded_text.replace('_', ' ')
+        decoded_text = decoded_text.capitalize()
         if decoded_text[-1] == ' ':
-            return f"{decoded_text[:-1]}."
+            decoded_text = decoded_text[:-1]
 
-        return f"{decoded_text}."
+        return f'{decoded_text}.'
 
 class NGramLanguageModel:
     """
@@ -336,11 +339,17 @@ class NGramLanguageModel:
         if not n_grams or not isinstance(n_grams, tuple):
             return 1
 
+        context_freq_dict = {}
+
         for n_gram in set(n_grams):
-            number_of_n_grams = n_grams.count(n_gram)
-            context_count = len([context for context in n_grams
-                                 if context[:-1] == n_gram[:-1]])
-            self._n_gram_frequencies[n_gram] = number_of_n_grams / context_count
+            absolute_freq = n_grams.count(n_gram)
+            context = n_gram[:-1]
+            if context not in context_freq_dict:
+                context_freq_dict[context] = [n_gram_1[:-1] == context
+                                              for n_gram_1 in n_grams].count(True)
+            context_freq = context_freq_dict[context]
+
+            self._n_gram_frequencies[n_gram] = absolute_freq / context_freq
 
         return 0
 
