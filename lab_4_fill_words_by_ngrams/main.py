@@ -5,6 +5,7 @@ Top-p sampling generation and filling gaps with ngrams
 """
 # pylint:disable=too-few-public-methods, too-many-arguments
 import random
+import math
 
 from lab_3_generate_by_ngrams.main import (BeamSearchTextGenerator, GreedyTextGenerator,
                                            NGramLanguageModel, TextProcessor)
@@ -184,6 +185,12 @@ class GeneratorTypes:
         """
         Initialize an instance of GeneratorTypes.
         """
+        self.greedy = 0
+        self.top_p = 1
+        self.beam_search = 2
+
+        self.types = {self.greedy: 'Greedy Generator', self.top_p: 'Top-P Generator',
+                      self.beam_search: 'Beam Search Generator'}
 
     def get_conversion_generator_type(self, generator_type: int) -> str:  # type: ignore
         """
@@ -195,7 +202,7 @@ class GeneratorTypes:
         Returns:
             (str): Name of the generator.
         """
-
+        return self.types[generator_type]
 
 class GenerationResultDTO:
     """
@@ -217,6 +224,9 @@ class GenerationResultDTO:
             generation_type (int):
                 Numeric type of the generator for which perplexity was calculated
         """
+        self.__text = text
+        self.__perplexity = perplexity
+        self.__type = generation_type
 
     def get_perplexity(self) -> float:  # type: ignore
         """
@@ -225,6 +235,7 @@ class GenerationResultDTO:
         Returns:
             (float): Perplexity value
         """
+        return self.__perplexity
 
     def get_text(self) -> str:  # type: ignore
         """
@@ -233,6 +244,7 @@ class GenerationResultDTO:
         Returns:
             (str): Text for which the perplexity was count
         """
+        return self.__text
 
     def get_type(self) -> int:  # type: ignore
         """
@@ -241,6 +253,7 @@ class GenerationResultDTO:
         Returns:
             (int): Numeric type of the generator
         """
+        return self.__type
 
     def __str__(self) -> str:  # type: ignore
         """
@@ -249,6 +262,10 @@ class GenerationResultDTO:
         Returns:
             (str): String with report
         """
+        return (f'Perplexity score: {self.__perplexity}\n'
+                f'{GeneratorTypes.get_conversion_generator_type(GeneratorTypes(), self.__type)}\n'
+                f'Text: {self.__text}\n'
+                )
 
 
 class QualityChecker:
@@ -273,8 +290,13 @@ class QualityChecker:
                 NGramLanguageModel instance to use for text generation
             word_processor (WordProcessor): WordProcessor instance to handle text processing
         """
+        self._generators = generators
+        self._language_model = language_model
+        self._word_processor = word_processor
 
-    def _calculate_perplexity(self, generated_text: str) -> float:  # type: ignore
+    def _calculate_perplexity(self, generated_text: str, log_probs=None,
+                        encoded=None, sum_log_probs=None) -> float:  # type: ignore
+
         """
         Calculate perplexity for the text made by generator.
 
@@ -290,6 +312,32 @@ class QualityChecker:
                 or if methods used return None,
                 or if nothing was generated.
         """
+        if not (isinstance(generated_text, str) and generated_text):
+            raise ValueError
+
+        encoded_seq = self._word_processor.encode(generated_text)
+        if not encoded_seq:
+            raise ValueError
+
+        n_gram_size = self._language_model.get_n_gram_size()
+        log_prob = 0.0
+
+        for index in range(n_gram_size - 1, len(encoded_seq)):
+            context = tuple(encoded_seq[index - n_gram_size + 1: index])
+            generated_tokens = self._language_model.generate_next_token(context)
+            if not generated_tokens:
+                raise ValueError
+
+            probability = generated_tokens.get(encoded_seq[index])
+            if probability:
+                log_prob += math.log(probability)
+
+        if not log_prob:
+            raise ValueError
+
+        return math.exp(log_prob / -(len(encoded_seq) - n_gram_size))
+
+
 
     def run(self, seq_len: int, prompt: str) -> list[GenerationResultDTO]:  # type: ignore
         """
@@ -309,6 +357,24 @@ class QualityChecker:
                 or if sequence has inappropriate length,
                 or if methods used return None.
         """
+
+        if not isinstance(seq_len, int) or seq_len < 0 or not isinstance(prompt, str) or not prompt:
+            raise ValueError
+
+        sub = []
+
+        for num_type, generator in self._generators.items():
+            generated_text = generator.run(prompt=prompt, seq_len=seq_len)
+            if not generated_text:
+                raise ValueError
+
+            perplex = self._calculate_perplexity(generated_text)
+            if not perplex:
+                raise ValueError
+
+            sub.append(GenerationResultDTO(generated_text, perplex, num_type))
+        return sorted(sub, key=lambda x: (x.get_perplexity(), x.get_type()))
+
 
 
 class Examiner:
