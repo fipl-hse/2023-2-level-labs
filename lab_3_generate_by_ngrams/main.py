@@ -413,8 +413,8 @@ class GreedyTextGenerator:
             next_tokens = self._model.generate_next_token(encoded)
             if not next_tokens:
                 break
-
-            best_predictions = [token for token, freq in next_tokens.items() if freq == max(next_tokens.values())]
+            max_freq = max(next_tokens.values())
+            best_predictions = [token for token, freq in next_tokens.items() if freq == max_freq]
             encoded += (sorted(best_predictions)[0],)
 
         return self._text_processor.decode(encoded)
