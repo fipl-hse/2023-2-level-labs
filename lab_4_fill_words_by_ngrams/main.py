@@ -33,8 +33,9 @@ class WordProcessor(TextProcessor):
         if not (isinstance(text, str) and text):
             raise ValueError('Inappropriate type input argument or input argument is empty.')
         clean_txt = []
+        punctuation = '!?.'
         for word in text.lower().split():
-            if word[-1] in '!?.':
+            if word[-1] in punctuation:
                 clean_txt.extend([word[:-1], self._end_of_word_token])
             else:
                 clean_word = [char for char in word if char.isalpha()]
@@ -127,6 +128,34 @@ class TopPGenerator:
                 or if sequence has inappropriate length,
                 or if methods used return None.
         """
+        if not (isinstance(seq_len, int) and seq_len > 0 and isinstance(prompt, str) and prompt):
+            raise ValueError('Inappropriate type input argument or input argument is empty.')
+
+        encoded_text = self._word_processor.encode(prompt)
+        if not encoded_text:
+            raise ValueError('Inappropriate type input argument or input argument is empty.')
+        current_seq = 0
+        while seq_len > current_seq:
+            seq_len -= 1
+            next_tokens = self._model.generate_next_token(encoded_text)
+            if next_tokens is None:
+                raise ValueError('Inappropriate type input argument or input argument is empty.')
+            if not next_tokens:
+                break
+            sorted_next_tokens = dict(sorted(next_tokens.items(), key=lambda x: (x[1], x[0]), reverse=True))
+            possible_tokens = []
+            chance = 0
+            for token in sorted_next_tokens:
+                if chance < self._p_value:
+                    chance += token[1]
+                    possible_tokens.append(token[0])
+            token_random = random.choice(possible_tokens)
+            encoded_text += (token_random,)
+            current_seq += 1
+        decoded_text = self._word_processor.decode(encoded_text)
+        if decoded_text is None:
+            raise ValueError('Inappropriate type input argument or input argument is empty.')
+        return decoded_text
 
 
 class GeneratorTypes:
@@ -138,7 +167,6 @@ class GeneratorTypes:
         top_p (int): Numeric type of Top-P generator
         beam_search (int): Numeric type of Beam Search generator
     """
-
     def __init__(self) -> None:
         """
         Initialize an instance of GeneratorTypes.
