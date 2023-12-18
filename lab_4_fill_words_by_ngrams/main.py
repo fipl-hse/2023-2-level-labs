@@ -95,7 +95,6 @@ class TopPGenerator:
         _word_processor (WordProcessor): WordProcessor instance to handle text processing
         _p_value (float) : Collective probability mass threshold for generation
     """
-
     def __init__(
         self, language_model: NGramLanguageModel, word_processor: WordProcessor, p_value: float
     ) -> None:
@@ -108,7 +107,9 @@ class TopPGenerator:
             word_processor (WordProcessor): WordProcessor instance to handle text processing
             p_value (float): Collective probability mass threshold
         """
-
+        self._model = language_model
+        self._word_processor = word_processor
+        self._p_value = p_value
     def run(self, seq_len: int, prompt: str) -> str:  # type: ignore
         """
         Generate sequence with top-p sampling strategy.
