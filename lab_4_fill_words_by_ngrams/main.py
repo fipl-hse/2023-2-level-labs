@@ -73,7 +73,8 @@ class WordProcessor(TextProcessor):
         Raises:
             ValueError: In case of inappropriate type input argument or if input argument is empty.
         """
-        if not isinstance(decoded_corpus, tuple) or decoded_corpus is None or len(decoded_corpus) == 0:
+        if (not isinstance(decoded_corpus, tuple) or decoded_corpus is None
+                or len(decoded_corpus) == 0):
             raise ValueError('Type input is inappropriate or input argument is empty.')
         tokenized_text = list(decoded_corpus)
         if tokenized_text is None:
