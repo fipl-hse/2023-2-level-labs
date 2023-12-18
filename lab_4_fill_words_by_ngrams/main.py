@@ -7,6 +7,7 @@ Top-p sampling generation and filling gaps with ngrams
 
 import math
 from random import choice
+
 from lab_3_generate_by_ngrams.main import (BeamSearchTextGenerator, GreedyTextGenerator,
                                            NGramLanguageModel, TextProcessor)
 
