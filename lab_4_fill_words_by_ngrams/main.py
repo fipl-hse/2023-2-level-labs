@@ -3,7 +3,7 @@ Lab 4.
 
 Top-p sampling generation and filling gaps with ngrams
 """
-from math import e, log
+from math import exp, log
 from random import choice
 
 # pylint:disable=too-few-public-methods, too-many-arguments
@@ -130,13 +130,14 @@ class TopPGenerator:
             candidates = self._model.generate_next_token(prompt_encoded)
             if not isinstance(candidates, dict):
                 raise ValueError('Wrong type of generated tokens in TopPGenerator.run()')
-            if not len(candidates):
+            if not candidates:
                 break
-            sorted_candidates = sorted(candidates.keys(), key=lambda x: (-candidates[x], -x))
+            sorted_candidates = sorted(candidates.items(), key=lambda x: (-x[1], -x[0]))
+            sorted_keys = [i for i, j in sorted_candidates]
             selected = []
             sum_of_probability = 0
             while sum_of_probability < self._p_value:
-                selected.append(sorted_candidates.pop(0))
+                selected.append(sorted_keys.pop(0))
                 sum_of_probability += candidates[selected[-1]]
             chosen = self._word_processor.get_token(choice(selected))
             if not chosen:
@@ -300,14 +301,14 @@ class QualityChecker:
         divisor = len(encoded_text) - n_gram_size + 1
         if divisor < 1:
             raise ValueError('Problem with text length in QualityChecker._calculate_perplexity()')
-        log_probabilities = 0
+        log_probabilities = .0
         for i in range(divisor):
             context = encoded_text[i: i + n_gram_size - 1]
             probabilities = self._language_model.generate_next_token(context)
             if not probabilities:
                 raise ValueError('No generated tokens in QualityChecker._calculate_perplexity()')
             log_probabilities += log(probabilities[encoded_text[i + n_gram_size - 1]])
-        return e ** (-log_probabilities / (divisor - 1))
+        return exp(-log_probabilities / (divisor - 1))
 
     def run(self, seq_len: int, prompt: str) -> list[GenerationResultDTO]:  # type: ignore
         """

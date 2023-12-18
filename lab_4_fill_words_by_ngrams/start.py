@@ -27,9 +27,10 @@ def main() -> None:
         type_storage.beam_search: BeamSearchTextGenerator(model, processor, 5)
     }
     checker = QualityChecker(generators, model, processor)
-    for report in checker.run(100, 'The'):
+    result = checker.run(100, 'The')
+    for report in result:
         print(report)
-    # assert result
+    assert result
 
 
 if __name__ == "__main__":
