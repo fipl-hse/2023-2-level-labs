@@ -4,7 +4,6 @@ Filling word by ngrams starter
 # pylint:disable=too-many-locals,unused-import
 from lab_3_generate_by_ngrams.main import (BeamSearchTextGenerator, GreedyTextGenerator,
                                            NGramLanguageModel)
-
 from lab_4_fill_words_by_ngrams.main import (GeneratorTypes, QualityChecker, TopPGenerator,
                                              WordProcessor)
 
@@ -37,7 +36,6 @@ def main() -> None:
         print(current_check)
 
     assert result
-
 
 
 if __name__ == "__main__":

@@ -3,9 +3,9 @@ Lab 4.
 
 Top-p sampling generation and filling gaps with ngrams
 """
+import math
 # pylint:disable=too-few-public-methods, too-many-arguments
 import random
-import math
 
 from lab_3_generate_by_ngrams.main import (BeamSearchTextGenerator, GreedyTextGenerator,
                                            NGramLanguageModel, TextProcessor)
