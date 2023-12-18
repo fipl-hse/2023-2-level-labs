@@ -31,7 +31,7 @@ class WordProcessor(TextProcessor):
             ValueError: In case of inappropriate type input argument or if input argument is empty.
         """
         if not (isinstance(text, str) and text):
-            raise ValueError
+            raise ValueError('Text cannot be empty')
         punctuation_to_replace = '.!?'
         tokens = []
         for word in text.lower().split():
@@ -54,11 +54,9 @@ class WordProcessor(TextProcessor):
             ValueError: In case of inappropriate type input argument or if input argument is empty.
         """
         if not (isinstance(element, str) and element):
-            raise ValueError
-        if element in self._storage:
-            return None
-        self._storage[element] = len(self._storage)
-        return None
+            raise ValueError('The string is empty')
+        if element not in self._storage:
+            self._storage[element] = len(self._storage)
 
     def _postprocess_decoded_text(self, decoded_corpus: tuple[str, ...]) -> str:  # type: ignore
         """
@@ -78,17 +76,12 @@ class WordProcessor(TextProcessor):
         """
         if not (isinstance(decoded_corpus, tuple)
                 and decoded_corpus):
-            raise ValueError
-        decoded_sentences = ''
-        list_of_tokens = list(decoded_corpus)
-        sentences = (' '.join(list_of_tokens)).split(self._end_of_word_token)
-        for sentence in sentences:
-            sentence = sentence.strip().capitalize()
-            if not sentence:
-                break
-            sentence = sentence + '. '
-            decoded_sentences += sentence
-        return decoded_sentences.strip()
+            raise ValueError('Inappropriate input in decoded_corpus')
+        sentences = ' '.join(decoded_corpus).split(self._end_of_word_token)
+        text = '. '.join([sentence.strip().capitalize() for sentence in sentences])
+        if text[-1] == ' ':
+            return text[:-1]
+        return f"{text}."
 
 
 class TopPGenerator:
@@ -135,7 +128,8 @@ class TopPGenerator:
                 or if methods used return None.
         """
         if not isinstance(seq_len, int) or not isinstance(prompt, str) or not prompt or seq_len <= 0:
-            raise ValueError
+            raise ValueError('''Inappropriate input: seq_len must be a positive integer/'
+                             ' prompt must be a non-empty string''')
         encoded_text = self._word_processor.encode(prompt)
         if not encoded_text:
             raise ValueError
@@ -160,7 +154,7 @@ class TopPGenerator:
                     break
         decoded = self._word_processor.decode(encoded_text)
         if decoded is None:
-            raise ValueError
+            raise ValueError('Decoded text is empty')
         return decoded
 
 
