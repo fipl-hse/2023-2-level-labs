@@ -104,7 +104,7 @@ class TextProcessor:
         """
         if not isinstance(element_id, int):
             return None
-        if element_id not in self._storage.values()):
+        if element_id not in self._storage.values():
             return None
         token = None
         for item in self._storage.items():
