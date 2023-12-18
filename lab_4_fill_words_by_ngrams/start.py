@@ -27,8 +27,8 @@ def main() -> None:
                   generator_types.beam_search: BeamSearchTextGenerator(model, processor, 5)}
     # quality_checker = QualityChecker(generators, model, processor)
     # results = quality_checker.run(100, 'The')
-    for res in results:
-        print(res)
+    # for res in results:
+    #     print(res)
     assert result
 
 
