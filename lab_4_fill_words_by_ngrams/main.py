@@ -299,7 +299,8 @@ class QualityChecker:
                 or if methods used return None,
                 or if nothing was generated.
         """
-        if not isinstance(generated_text, str) or generated_text is None or len(generated_text) == 0:
+        if (not isinstance(generated_text, str) or generated_text is None
+                or len(generated_text) == 0):
             raise ValueError('Inappropriate input or input argument is empty')
         encoded_text = self._word_processor.encode(generated_text)
         if encoded_text is None or len(encoded_text) == 0:
