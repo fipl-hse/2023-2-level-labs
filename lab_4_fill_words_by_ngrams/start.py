@@ -14,7 +14,7 @@ def main() -> None:
     processor = WordProcessor('.')
     encoded = processor.encode(text)
     if not isinstance(encoded, tuple) or encoded is None:
-        return None
+        return
     language_model = NGramLanguageModel(encoded, 2)
     language_model.build()
     generator = TopPGenerator(language_model, processor, 0.5)
