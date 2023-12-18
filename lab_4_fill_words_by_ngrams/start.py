@@ -29,7 +29,8 @@ def main() -> None:
     generators = GeneratorTypes()
     generators_dict = {generators.greedy: GreedyTextGenerator(lang_model, word_processor),
                        generators.top_p: top_p_generator,
-                       generators.beam_search: BeamSearchTextGenerator(lang_model, word_processor, 5)}
+                       generators.beam_search:
+                           BeamSearchTextGenerator(lang_model, word_processor, 5)}
     quality_checker = QualityChecker(generators_dict, lang_model, word_processor)
     checking = quality_checker.run(100, 'The')
     for check in checking:

@@ -96,7 +96,7 @@ class TopPGenerator:
     """
 
     def __init__(
-            self, language_model: NGramLanguageModel, word_processor: WordProcessor, p_value: float
+        self, language_model: NGramLanguageModel, word_processor: WordProcessor, p_value: float
     ) -> None:
         """
         Initialize an instance of TopPGenerator.
@@ -264,7 +264,7 @@ class QualityChecker:
     """
 
     def __init__(
-            self, generators: dict, language_model: NGramLanguageModel, word_processor: WordProcessor
+        self, generators: dict, language_model: NGramLanguageModel, word_processor: WordProcessor
     ) -> None:
         """
         Initialize an instance of QualityChecker.
@@ -391,7 +391,8 @@ class Examiner:
             questions_answers = json.load(file)
         if not isinstance(questions_answers, list):
             raise ValueError
-        self._questions_answers = {(task['question'], task['location']): task['answer'] for task in questions_answers}
+        self._questions_answers = {(task['question'], task['location']): task['answer']
+                                   for task in questions_answers}
         return self._questions_answers
 
     def provide_questions(self) -> list[tuple[str, int]]:  # type: ignore
@@ -436,7 +437,7 @@ class GeneratorRuleStudent:
     _generator_type: int
 
     def __init__(
-            self, generator_type: int, language_model: NGramLanguageModel, word_processor: WordProcessor
+        self, generator_type: int, language_model: NGramLanguageModel, word_processor: WordProcessor
     ) -> None:
         """
         Initialize an instance of GeneratorRuleStudent.
