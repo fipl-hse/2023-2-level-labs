@@ -38,7 +38,7 @@ class WordProcessor(TextProcessor):
         for word in text.lower():
             if word.isalpha() or word.isspace():
                 tokenized_text += word
-            elif word == '?' or word == '.' or word == '!':
+            elif word in ('?', '.', '!'):
                 tokenized_text += f' {self._end_of_word_token}'
         return tuple(tokenized_text.split())
 
@@ -130,7 +130,8 @@ class TopPGenerator:
                 or if sequence has inappropriate length,
                 or if methods used return None.
         """
-        if not isinstance(seq_len, int) or seq_len <= 0 or not isinstance(prompt, str) or prompt is None:
+        if (not isinstance(seq_len, int) or seq_len <= 0 or not isinstance(prompt, str)
+                or prompt is None):
             raise ValueError('Type input is inappropriate or input argument is empty.')
         encoded_text = self._word_processor.encode(prompt)
         if encoded_text is None:
