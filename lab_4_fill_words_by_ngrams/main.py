@@ -34,17 +34,24 @@ class WordProcessor(TextProcessor):
         """
         if not isinstance(text, str) or not text:
             raise ValueError('Type input is inappropriate or input argument is empty.')
-        text = repr(text)
-        text = text.replace('\\n', ' ')
-        preprocessed_text = ''
-        for element in text.lower():
-            if element in '?!.':
-                preprocessed_text += ' '
-                preprocessed_text += self.get_end_of_word_token()
-            elif element.isalpha() or element.isspace():
-                preprocessed_text += element
 
-        return tuple(preprocessed_text.split(' '))
+        for digit in ('.', '!', '?'):
+            text = text.replace(digit, f" {self._end_of_word_token} ")
+
+        tokenized_word = []
+        for word in text.lower().split():
+            if word == self._end_of_word_token or word.isalpha() or word.isspace():
+                tokenized_word.append(word)
+                continue
+
+            clean_word = []
+            for alpha in list(word):
+                if alpha.isalpha():
+                    clean_word.append(alpha)
+            if clean_word:
+                tokenized_word.append("".join(clean_word))
+
+        return tuple(tokenized_word)
 
     def _put(self, element: str) -> None:
         """
@@ -84,15 +91,14 @@ class WordProcessor(TextProcessor):
         result = ''
         for word in decoded_corpus:
             if word == self.get_end_of_word_token():
-                result = result[:-1] + '.'
+                result += '.'
+            elif not result:
+                result += word.capitalize()
+            elif result[-1] == '.':
+                result += ' ' + word.capitalize()
             else:
-                for letter in word:
-                    if not result or (len(result) > 2 and result[-2] == '.'):
-                        result += letter.upper()
-                    else:
-                        result += letter
-            result += ' '
-        result = result.strip()
+                result += ' ' + word
+
         if result[-1] != '.':
             result += '.'
         return result
@@ -201,11 +207,11 @@ class GeneratorTypes:
             (str): Name of the generator.
         """
         if generator_type == self.greedy:
-            return 'greedy generator'
+            return 'Greedy Generator'
         if generator_type == self.top_p:
-            return 'top-p generator'
+            return 'Top-P Generator'
         if generator_type == self.beam_search:
-            return 'beam search generator'
+            return 'Beam Search Generator'
         return ''
 
 
@@ -320,21 +326,29 @@ class QualityChecker:
         if not isinstance(generated_text, str):
             raise ValueError('Inappropriate type argument')
         encoded_text = self._word_processor.encode(generated_text)
-        if encoded_text is None:
+        if not encoded_text:
             raise ValueError('self._word_processor.encode() returned None')
+        ngram_size = self._language_model.get_n_gram_size()
         l_sum = 0.0
-        num_ngrams = 0.0
-        ngrams = self._language_model.generate_next_token(encoded_text)
-        if ngrams is None:
-            raise ValueError('self._language_model.generate_next_token() returned None')
-        for ngram in ngrams:
-            l_sum += math.log(ngrams[ngram])
-            num_ngrams += 1
-        l_sum = -(l_sum / num_ngrams)
-        result = pow(math.e, l_sum)
-        if isinstance(result, float):
-            return result
-        return 0.0
+
+        for index in range(ngram_size - 1, len(encoded_text)):
+            context = tuple(encoded_text[index - ngram_size + 1: index])
+            token = encoded_text[index]
+            tokens = self._language_model.generate_next_token(context)
+
+            if tokens is None:
+                raise ValueError('self._language_model.generate_next_token() returned None')
+
+            probability = tokens.get(token)
+            if probability is None:
+                continue
+
+            l_sum += math.log(probability)
+        if not l_sum:
+            raise ValueError("Probability sum is 0")
+
+        result = math.exp(-l_sum / (len(encoded_text) - ngram_size))
+        return result
 
     def run(self, seq_len: int, prompt: str) -> list[GenerationResultDTO]:  # type: ignore
         """
@@ -367,7 +381,7 @@ class QualityChecker:
         results_list = []
 
         for generator, num_type in generators_inv.items():
-            text = generator.run(seq_len, prompt)
+            text = generator.run(seq_len=seq_len, prompt=prompt)
             if text is None:
                 raise ValueError(f'{generator} methode run() returned None')
             perplexity = self._calculate_perplexity(text)
@@ -423,10 +437,19 @@ class Examiner:
             raise ValueError('Attribute _json_path is empty')
         if not self._json_path.endswith('json'):
             raise ValueError('Attribute _json_path has inappropriate extension')
+
         with open(self._json_path, 'r', encoding="utf-8") as file:
-            self._questions_and_answers = json.load(file)
-        if not isinstance(self._questions_and_answers, list):
+            questions = json.load(file)
+
+        if not isinstance(questions, list):
             raise ValueError('Inappropriate type loaded data')
+
+        self._questions_and_answers = {
+            (dictionary['question'], dictionary['location']): dictionary['answer']
+            for dictionary in questions
+        }
+
+        return self._questions_and_answers
 
     def provide_questions(self) -> list[tuple[str, int]]:  # type: ignore
         """
@@ -436,8 +459,8 @@ class Examiner:
             list[tuple[str, int]]:
                 List in the form of [(question, position of the word to be filled)]
         """
-        questions = [(question, place) for (question, place), answer
-                     in self._questions_and_answers.items()]
+        self._load_from_json()
+        questions = list(self._questions_and_answers.keys())
         return questions
 
     def assess_exam(self, answers: dict[str, str]) -> float:  # type: ignore
@@ -489,12 +512,10 @@ class GeneratorRuleStudent:
             word_processor (WordProcessor): WordProcessor instance to handle text processing
         """
         self._generator_type = generator_type
-        if generator_type == 0:
-            self._generator = GreedyTextGenerator(language_model, word_processor)
-        elif generator_type == 1:
-            self._generator = TopPGenerator(language_model, word_processor, 0.5)
-        elif self._generator_type == 2:
-            self._generator = BeamSearchTextGenerator(language_model, word_processor, 5)
+        generators = (GreedyTextGenerator(language_model, word_processor),
+                      TopPGenerator(language_model, word_processor, 0.5),
+                      BeamSearchTextGenerator(language_model, word_processor, 5))
+        self._generator = generators[generator_type]
 
     def take_exam(self, tasks: list[tuple[str, int]]) -> dict[str, str]:  # type: ignore
         """
@@ -523,7 +544,7 @@ class GeneratorRuleStudent:
             if answer is None:
                 raise ValueError('self._generator.run() returned None')
             if answer[-1] == '.':
-                answer = answer[:-1]
+                answer = answer[:-1] + ' '
             result = answer + question[place:]
             answers[question] = result
         return answers
