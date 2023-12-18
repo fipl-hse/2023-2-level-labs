@@ -22,7 +22,8 @@ def main() -> None:
     print(result)
 
     generator_types = main_py.GeneratorTypes()
-    generators = {generator_types.greedy: main_py.GreedyTextGenerator(language_model, word_processor),
+    generators = {generator_types.greedy:
+                      main_py.GreedyTextGenerator(language_model, word_processor),
                   generator_types.top_p: top_p_generator,
                   generator_types.beam_search:
                       main_py.BeamSearchTextGenerator(language_model, word_processor, 5)}
