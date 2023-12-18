@@ -31,15 +31,14 @@ class WordProcessor(TextProcessor):
             ValueError: In case of inappropriate type input argument or if input argument is empty.
         """
         if not (isinstance(text, str) and text):
-            raise ValueError
+            raise ValueError("Inappropriate type input argument or if input argument is empty")
 
         tokenized_text = []
         for a_word in text.lower().split():
             clean_word = ''.join(filter(str.isalpha, a_word))
-            if clean_word:
-                tokenized_text.append(clean_word)
-            else:
+            if not clean_word:
                 continue
+            tokenized_text.append(clean_word)
             if a_word[-1] in ('!', '.', '?'):
                 tokenized_text.append(self._end_of_word_token)
 
@@ -57,7 +56,7 @@ class WordProcessor(TextProcessor):
             ValueError: In case of inappropriate type input argument or if input argument is empty.
         """
         if not (isinstance(element, str) and element):
-            raise ValueError('Inappropriate input or input argument is empty')
+            raise ValueError("Inappropriate type input argument or if input argument is empty")
 
         if element not in self._storage:
             self._storage[element] = len(self._storage)
@@ -79,7 +78,7 @@ class WordProcessor(TextProcessor):
             ValueError: In case of inappropriate type input argument or if input argument is empty.
         """
         if not (isinstance(decoded_corpus, tuple) and decoded_corpus):
-            raise ValueError('Inappropriate input or input argument is empty')
+            raise ValueError("inappropriate type input argument or if input argument is empty")
 
         splited_text = " ".join(decoded_corpus).split(self._end_of_word_token)
         resulting_text = '. '.join([i.strip().capitalize() for i in splited_text])
@@ -133,8 +132,12 @@ class TopPGenerator:
                 or if sequence has inappropriate length,
                 or if methods used return None.
         """
-        if not (isinstance(seq_len, int) and seq_len > 0 and isinstance(prompt, str) and prompt):
-            raise ValueError
+        if not (isinstance(seq_len, int) and isinstance(prompt, str)):
+            raise ValueError('Inappropriate type input arguments')
+        if not prompt:
+            raise ValueError('Input arguments are empty')
+        if not seq_len > 0:
+            raise ValueError('Sequence has inappropriate length')
 
         encoded_text = self._word_processor.encode(prompt)
         if not encoded_text:
