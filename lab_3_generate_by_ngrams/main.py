@@ -106,6 +106,7 @@ class TextProcessor:
             return None
         if element_id not in self._storage.values()):
             return None
+        for
 
 
     def encode(self, text: str) -> Optional[tuple[int, ...]]:
@@ -259,7 +260,6 @@ class NGramLanguageModel:
         _n_gram_frequencies (dict): Frequencies for n-grams
         _encoded_corpus (tuple): Encoded text
     """
-
 
     def __init__(self, encoded_corpus: tuple | None, n_gram_size: int) -> None:
         """
