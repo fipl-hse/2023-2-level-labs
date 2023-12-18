@@ -1,13 +1,12 @@
 """
 Lab 4.
 
-Top-p sampling generation and filling gaps with ngrams
-"""
+ Top-p sampling generation and filling gaps with ngrams
+ """
+# pylint:disable=too-few-public-methods, too-many-arguments
 import json
 from math import exp, log
 from random import choice
-
-# pylint:disable=too-few-public-methods, too-many-arguments
 from lab_3_generate_by_ngrams.main import (BeamSearchTextGenerator, GreedyTextGenerator,
                                            NGramLanguageModel, TextProcessor)
 
@@ -343,23 +342,6 @@ class QualityChecker:
                 or if sequence has inappropriate length,
                 or if methods used return None.
         """
-        if not isinstance(seq_len, int) or seq_len < 0 or not isinstance(prompt, str) or not prompt:
-            raise ValueError("QualityChecker.run: inappropriate input")
-
-        estimation = []
-
-        for num_type, generator in self._generators.items():
-            generated_text = generator.run(prompt=prompt, seq_len=seq_len)
-            if not generated_text:
-                raise ValueError("QualityChecker.run: nothing was generated")
-
-            perplexity = self._calculate_perplexity(generated_text)
-            if not perplexity:
-                raise ValueError("QualityChecker.run: no calculated perplexity")
-
-            estimation.append(GenerationResultDTO(generated_text, perplexity, num_type))
-        return sorted(estimation, key=lambda x: (x.get_perplexity(), x.get_type()))
-
 
 class Examiner:
     """
@@ -378,6 +360,8 @@ class Examiner:
         Args:
             json_path (str): Local path to assets file
         """
+        self._json_path = json_path
+        self._questions_and_answers = self._load_from_json()
 
     def _load_from_json(self) -> dict[tuple[str, int], str]:  # type: ignore
         """
