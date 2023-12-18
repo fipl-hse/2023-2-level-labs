@@ -298,22 +298,22 @@ class QualityChecker:
                 or if methods used return None,
                 or if nothing was generated.
         """
-        if not isinstance(generated_text, str) or generated_text is None:
+        if not isinstance(generated_text, str) or generated_text is None or len(generated_text) == 0:
             raise ValueError('Inappropriate input or input argument is empty')
         encoded_text = self._word_processor.encode(generated_text)
-        if encoded_text is None:
+        if encoded_text is None or len(encoded_text) == 0:
             raise ValueError('Could not encode')
         ngram_size = self._language_model.get_n_gram_size()
         sum_log = 0.0
         for i in range(ngram_size - 1, len(encoded_text)):
             context = encoded_text[i - ngram_size + 1: i]
             next_tokens = self._language_model.generate_next_token(context)
-            if next_tokens is None:
+            if next_tokens is None or len(next_tokens) == 0:
                 raise ValueError('None is returned')
             probability = next_tokens.get(encoded_text[i])
             if probability:
                 sum_log += math.log(probability)
-        if sum_log is None:
+        if not sum_log:
             raise ValueError('Sum is 0')
         return math.exp(-sum_log / (len(encoded_text) - ngram_size))
 
