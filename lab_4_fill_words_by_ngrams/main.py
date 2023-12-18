@@ -6,11 +6,11 @@ Top-p sampling generation and filling gaps with ngrams
 #pylint:disable=too-few-public-methods, too-many-arguments
 
 import json
-from math import exp, log
+
 from random import choice
+from math import (exp, log)
 from lab_3_generate_by_ngrams.main import (BeamSearchTextGenerator, GreedyTextGenerator,
                                            NGramLanguageModel, TextProcessor)
-
 
 class WordProcessor(TextProcessor):
     """
@@ -332,6 +332,23 @@ class QualityChecker:
                 or if sequence has inappropriate length,
                 or if methods used return None.
         """
+        if not isinstance(seq_len, int) or not isinstance(prompt, str):
+            raise ValueError('Inappropriate input')
+        if prompt is None:
+            raise ValueError('input argument is empty')
+        if seq_len <= 0:
+            raise ValueError('seq_len is a negative int')
+        new_list = []
+        for num, generator in self._generators.items():
+            generated_text = generator.run(seq_len, prompt)
+            if generated_text is None:
+                continue
+            perplexity = self._calculate_perplexity(generated_text)
+            if perplexity is None:
+                raise ValueError('None is returned')
+            new_list.append(GenerationResultDTO(generated_text, perplexity, num))
+        new_list.sort(key=lambda x: (x.get_perplexity(), x.get_type()))
+        return new_list
 
 
 class Examiner:
