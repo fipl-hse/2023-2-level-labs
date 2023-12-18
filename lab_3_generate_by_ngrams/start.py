@@ -15,19 +15,18 @@ def main() -> None:
         text = text_file.read()
     textprocessor = TextProcessor('_')
     encoded_text = textprocessor.encode(text)
+    if encoded_text:
+        result = textprocessor.decode(encoded_text)
+        print(result)
+        model_for_build = NGramLanguageModel(encoded_text[:10], 2)
+        print(model_for_build.build())
+        model = NGramLanguageModel(encoded_text, 7)
+        greedy_text_generator = GreedyTextGenerator(model, textprocessor)
+        print(greedy_text_generator.run(51, 'Vernon'))
+        beam_search_generator = BeamSearchTextGenerator(model, textprocessor, 7)
+        print(beam_search_generator.run('Vernon', 56))
+        assert result
     assert isinstance(encoded_text, tuple)
-    decoded_text = textprocessor.decode(encoded_text)
-    result = decoded_text
-    ngramlanguagemodel = NGramLanguageModel(encoded_text[:100], 3)
-    build = ngramlanguagemodel.build()
-    print(build)
-    ngramlanguagemodel_2 = NGramLanguageModel(encoded_text, 7)
-    greedytextgenerator = GreedyTextGenerator(ngramlanguagemodel_2, textprocessor)
-    predicted_text = greedytextgenerator.run(51, 'Vernon')
-    print(predicted_text)
-    beamsearchtextgenerator = BeamSearchTextGenerator(ngramlanguagemodel_2, textprocessor, 7)
-    predicted_text_2 = beamsearchtextgenerator.run('Vernon', 56)
-    print(predicted_text_2)
     assert result
 
 
