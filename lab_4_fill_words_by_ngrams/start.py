@@ -26,7 +26,8 @@ def main() -> None:
                                                                        word_processor, 5)}
     checker = QualityChecker(generators, lang_model, word_processor)
 
-    examiner = Examiner("/Users/alesamaskovceva/Documents/python/2023-2-level-labs/lab_4_fill_words_by_ngrams"
+    examiner = Examiner("/Users/alesamaskovceva/Documents/python"
+                        "/2023-2-level-labs/lab_4_fill_words_by_ngrams"
                         "/assets/question_and_answers.json")
     questions = examiner.provide_questions()
     students = [GeneratorRuleStudent(generator_types.greedy, lang_model, word_processor),
