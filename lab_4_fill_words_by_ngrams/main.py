@@ -294,8 +294,7 @@ class QualityChecker:
         self._language_model = language_model
         self._word_processor = word_processor
 
-    def _calculate_perplexity(self, generated_text: str, log_probs=None,
-                        encoded=None, sum_log_probs=None) -> float:  # type: ignore
+    def _calculate_perplexity(self, generated_text: str) -> float:  # type: ignore
 
         """
         Calculate perplexity for the text made by generator.
@@ -320,7 +319,7 @@ class QualityChecker:
             raise ValueError
 
         n_gram_size = self._language_model.get_n_gram_size()
-        log_prob = 0.0
+        sum_log_probs = 0.0
 
         for index in range(n_gram_size - 1, len(encoded_seq)):
             context = tuple(encoded_seq[index - n_gram_size + 1: index])
@@ -330,12 +329,12 @@ class QualityChecker:
 
             probability = generated_tokens.get(encoded_seq[index])
             if probability:
-                log_prob += math.log(probability)
+                sum_log_probs += math.log(probability)
 
-        if not log_prob:
+        if not sum_log_probs:
             raise ValueError
 
-        return math.exp(log_prob / -(len(encoded_seq) - n_gram_size))
+        return math.exp(sum_log_probs / -(len(encoded_seq) - n_gram_size))
 
 
 
