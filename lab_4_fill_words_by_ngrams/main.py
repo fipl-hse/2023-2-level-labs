@@ -351,7 +351,6 @@ class QualityChecker:
         return new_list
 
 
-
 class Examiner:
     """
     A class that conducts an exam.
