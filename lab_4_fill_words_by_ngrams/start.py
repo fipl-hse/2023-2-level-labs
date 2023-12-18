@@ -5,6 +5,7 @@ Filling word by ngrams starter
 # from lab_4_fill_words_by_ngrams.main import (NGramLanguageModel, TopPGenerator, WordProcessor)
 import lab_4_fill_words_by_ngrams.main as main_py
 
+
 def main() -> None:
     """
     Launches an implementation.
