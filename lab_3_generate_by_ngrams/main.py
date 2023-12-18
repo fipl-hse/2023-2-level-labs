@@ -313,8 +313,7 @@ class NGramLanguageModel:
             return 1
         for n_gram in set(n_grams):
             number_of_n_grams = n_grams.count(n_gram)
-            context_count = len([context for context in n_grams
-                                 if context[:-1] == n_gram[:-1]])
+            context_count = ngram[:-1]
             self._n_gram_frequencies[n_gram] = number_of_n_grams / context_count
         return 0
 
