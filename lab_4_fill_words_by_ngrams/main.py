@@ -32,7 +32,7 @@ class WordProcessor(TextProcessor):
         Raises:
             ValueError: In case of inappropriate type input argument or if input argument is empty.
         """
-        if not isinstance(text, str) or text is None:
+        if not isinstance(text, str) or text is None or len(text) == 0:
             raise ValueError('Type input is inappropriate or input argument is empty.')
         tokenized_text = ''
         for word in text.lower():
@@ -52,7 +52,7 @@ class WordProcessor(TextProcessor):
         Raises:
             ValueError: In case of inappropriate type input argument or if input argument is empty.
         """
-        if not isinstance(element, str) or element is None:
+        if not isinstance(element, str) or element is None or len(element) == 0:
             raise ValueError('Type input is inappropriate or input argument is empty.')
         if element not in self._storage:
             self._storage[element] = len(self._storage)
@@ -73,9 +73,11 @@ class WordProcessor(TextProcessor):
         Raises:
             ValueError: In case of inappropriate type input argument or if input argument is empty.
         """
-        if not isinstance(decoded_corpus, tuple) or decoded_corpus is None:
+        if not isinstance(decoded_corpus, tuple) or decoded_corpus is None or len(decoded_corpus) == 0:
             raise ValueError('Type input is inappropriate or input argument is empty.')
         tokenized_text = list(decoded_corpus)
+        if tokenized_text is None:
+            raise ValueError('Type input is inappropriate or input argument is empty.')
         tokenized_text[0] = tokenized_text[0].capitalize()
         if self.get_end_of_word_token() in tokenized_text:
             for i in range(1, len(tokenized_text)):
