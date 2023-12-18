@@ -714,7 +714,6 @@ class NGramLanguageModelReader:
             eow_token (str): Special token for text processor
         """
 
-
     def load(self, n_gram_size: int) -> Optional[NGramLanguageModel]:
         """
         Fill attribute `_n_gram_frequencies` from dictionary with N-grams.
@@ -731,7 +730,6 @@ class NGramLanguageModelReader:
         In case of corrupt input arguments or unexpected behaviour of methods used, return 1.
         """
 
-
     def get_text_processor(self) -> TextProcessor:  # type: ignore[empty-body]
         """
         Get method for the processor created for the current JSON file.
@@ -739,6 +737,7 @@ class NGramLanguageModelReader:
         Returns:
             TextProcessor: processor created for the current JSON file.
         """
+
 
 class BackOffGenerator:
     """
