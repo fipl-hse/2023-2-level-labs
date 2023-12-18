@@ -3,7 +3,6 @@ Lab 1
 Language detection
 """
 import json
-import string
 
 
 def tokenize(text: str) -> list[str] | None:
@@ -13,15 +12,10 @@ def tokenize(text: str) -> list[str] | None:
     :param text: a text
     :return: a list of lower-cased tokens without punctuation
     """
-    if not isinstance(text,str):
+    if not isinstance(text, str):
         return None
-    text = text.lower()
-    text = text.replace(' ', '')
-    text = text.replace('\n', '')
-    for punc in text:
-        if punc in string.punctuation or punc.isdigit():
-            text = text.replace(punc, "")
-    return list(text)
+
+    return [token.lower() for token in text if token.isalpha()]
 
 
 def calculate_frequencies(tokens: list[str] | None) -> dict[str, float] | None:
