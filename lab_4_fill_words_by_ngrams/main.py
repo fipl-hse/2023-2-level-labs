@@ -57,7 +57,7 @@ class WordProcessor(TextProcessor):
         Raises:
             ValueError: In case of inappropriate type input argument or if input argument is empty.
         """
-        if not isinstance(element, str) or len(element) == 0:
+        if not isinstance(element, str) or not element:
             raise ValueError('Incorrect input')
 
         if element not in self._storage:
@@ -79,7 +79,7 @@ class WordProcessor(TextProcessor):
         Raises:
             ValueError: In case of inappropriate type input argument or if input argument is empty.
         """
-        if not isinstance(decoded_corpus, tuple) or len(decoded_corpus) == 0:
+        if not isinstance(decoded_corpus, tuple) or not decoded_corpus:
             raise ValueError('Incorrect input')
 
         words_list = list(decoded_corpus)
@@ -146,7 +146,7 @@ class TopPGenerator:
         for i in range(seq_len):
             next_tokens = self._model.generate_next_token(encoded)
             if next_tokens is None:
-                raise ValueError
+                raise ValueError('Next tokens are None')
             if not next_tokens:
                 break
 
