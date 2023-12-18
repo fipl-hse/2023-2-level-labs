@@ -34,14 +34,18 @@ class WordProcessor(TextProcessor):
         if not isinstance(text, str) or not text:
             raise ValueError('Incorrect input')
         new_text = []
+        symbols = ['.', '!', '?']
         for word in text.lower().split():
-            symbols = ['.', '!', '?']
+            cleared = ''.join(filter(str.isalpha, word))
+            if cleared:
+                new_text.append(cleared)
             if word[-1] in symbols:
-                new_text.extend([word[:-1], self._end_of_word_token])
-            else:
-                cleared = ''.join(filter(str.isalpha, word))
-                if cleared:
-                    new_text.append(cleared)
+                new_text.append(self._end_of_word_token)
+                # new_text.extend([word[:-1], self._end_of_word_token])
+            # else:
+            #     cleared = ''.join(filter(str.isalpha, word))
+            #     if cleared:
+            #         new_text.append(cleared)
         return tuple(new_text)
 
     def _put(self, element: str) -> None:
@@ -77,10 +81,8 @@ class WordProcessor(TextProcessor):
         """
         if not isinstance(decoded_corpus, tuple) or not decoded_corpus:
             raise ValueError('Incorrect input')
-        text = (' '.join(decoded_corpus).replace(f' {self._end_of_word_token}', '.')).split('. ')
-        for num, sentence in enumerate(text):
-            text[num] = sentence.capitalize()
-        text = '. '.join(text)
+        text = (' '.join(decoded_corpus).replace(f' {self._end_of_word_token}', '.'))
+        text = '. '.join([sentence.capitalize() for sentence in text.split('. ')])
         if text[-1] != '.':
             text += '.'
         return text
@@ -130,10 +132,10 @@ class TopPGenerator:
                 or if methods used return None.
         """
         if not isinstance(seq_len, int) or not isinstance(prompt, str) \
-                or not prompt or seq_len <= 0:
+                or not prompt or not seq_len > 0:
             raise ValueError('Incorrect input')
         encoded = self._word_processor.encode(prompt)
-        if encoded is None:
+        if not encoded:
             raise ValueError("Encode returned nothing")
         encoded_seq = list(encoded)
         num = 0
@@ -251,9 +253,9 @@ class GenerationResultDTO:
         Returns:
             (str): String with report
         """
-        return f'Perplexity score: {self.__perplexity}\n'\
-               f'{GeneratorTypes().get_conversion_generator_type(self.__type)}\n'\
-               f'Text: {self.__text}\n'
+        return (f'Perplexity score: {self.__perplexity}\n'
+                f'{GeneratorTypes().get_conversion_generator_type(self.__type)}\n'
+                f'Text: {self.__text}\n')
 
 
 class QualityChecker:
@@ -304,7 +306,7 @@ class QualityChecker:
         if not encoded:
             raise ValueError('Nothing was encoded')
         n_gram_size = self._language_model.get_n_gram_size()
-        sum_logs = 0
+        sum_logs = 0.0
         for i in range(n_gram_size - 1, len(encoded)):
             context = tuple(encoded[i - n_gram_size + 1: i])
             next_tokens = self._language_model.generate_next_token(context)
@@ -335,13 +337,12 @@ class QualityChecker:
                 or if sequence has inappropriate length,
                 or if methods used return None.
         """
-        # if not isinstance(seq_len, int) or not isinstance(prompt, str) \
-        #         or not prompt or not seq_len > 0:
-        if not(isinstance(seq_len, int) and isinstance(prompt, str) and seq_len > 0 and prompt):
+        if not isinstance(seq_len, int) or not isinstance(prompt, str) \
+                or not prompt or not seq_len > 0:
             raise ValueError('Incorrect input')
         report = []
         for num, name_type in self._generators.items():
-            generated_text = name_type.run(prompt, seq_len)
+            generated_text = name_type.run(prompt=prompt, seq_len=seq_len)
             if not generated_text:
                 raise ValueError('Nothing was generated')
             perplexity = self._calculate_perplexity(generated_text)
