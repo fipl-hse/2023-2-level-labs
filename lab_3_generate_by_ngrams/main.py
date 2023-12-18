@@ -406,23 +406,24 @@ class GreedyTextGenerator:
         In case of corrupt input arguments or methods used return None,
         None is returned
         """
-        if (not isinstance(seq_len, int) or
-            not isinstance(prompt, str) or not prompt):
+        if not (isinstance(seq_len, int) and isinstance(prompt, str) and prompt):
             return None
-        prompt_encoded = self._text_processor.encode(prompt)
         n_gram_size = self._model.get_n_gram_size()
-        if not prompt_encoded or not n_gram_size:
+        encoded = self._text_processor.encode(prompt)
+        if not (encoded and n_gram_size):
             return None
-        m_freq = []
-        for prediction in range(seq_len):
-            seq = tuple(prompt_encoded[-n_gram_size + 1:])
-            variants = self._model.generate_next_token(seq)
-            if not variants:
+        max_freq = []
+        for iteration in range(seq_len):
+            tokens = self._model.generate_next_token(encoded[-n_gram_size + 1:])
+            if not tokens:
                 break
-            m_freq.append(max(variants.values()))
-            candidates = filter(lambda freq: freq[1] == m_freq[-1], variants.items())
-            prompt_encoded += (sorted(candidates)[0][0],)
-        return self._text_processor.decode(prompt_encoded)
+            max_freq.append(max(tokens.values()))
+            biggest_token = filter(lambda x: x[1] == max_freq[-1], tokens.items())
+            encoded += (sorted(biggest_token)[0][0],)
+        text = self._text_processor.decode(encoded)
+        if not text:
+            return None
+        return text
 
 
 class BeamSearcher:
