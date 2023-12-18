@@ -13,6 +13,8 @@ def tokenize(text: str) -> list[str] | None:
     :param text: a text
     :return: a list of lower-cased tokens without punctuation
     """
+    if not isinstance(text,str):
+        return None
     text = text.lower()
     text = text.replace(' ', '')
     text = text.replace('\n', '')

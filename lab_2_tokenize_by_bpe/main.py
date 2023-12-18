@@ -14,20 +14,6 @@ def prepare_word(
     :param end_of_word: a token that signifies the end of word
     :return: preprocessed word
     """
-    if start_of_word is not None:
-        tokens = [start_of_word]
-    else:
-        tokens = []
-    tokens.extend(list(raw_word))
-
-    if end_of_word is not None:
-        tokens.append(end_of_word)
-
-    return tuple(tokens)
-
-#raw_word = "Goodbye!"
-#result = prepare_word(raw_word, None, '</s>')
-#print(result)
 
 
 def collect_frequencies(
@@ -40,17 +26,7 @@ def collect_frequencies(
     :param end_of_word: a token that signifies the end of word
     :return: dictionary in the form of <preprocessed word: number of occurrences>
     """
-    frequencies = {}
-    words = text.split()
-    for word in words:
-        prepared_word = prepare_word(word, start_of_word, end_of_word)
-        frequencies[prepared_word] = frequencies.get(prepared_word, 0) + 1
 
-    return frequencies
-
-#text = "It's far, farther, farthest and old, older, oldest"
-#result = collect_frequencies(text, None, '</s>')
-#print(result)
 
 def count_tokens_pairs(
     word_frequencies: dict[tuple[str, ...], int]
