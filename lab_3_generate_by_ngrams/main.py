@@ -430,9 +430,16 @@ class GreedyTextGenerator:
                 break
             max_freq = max(next_tokens.values())
             best_predictions = [token for token, freq in next_tokens.items() if freq == max_freq]
-            encoded += (sorted(best_predictions)[0],)
+            max_freq_tokens = sorted(best_predictions, reverse=True)
+            encoded += (max_freq_tokens[0],)
 
-        return self._text_processor.decode(encoded)
+            seq_len -= 1
+
+        decoded_text = self._text_processor.decode(encoded)
+        if not decoded_text:
+            return None
+
+        return decoded_text
 
 
 class BeamSearcher:
