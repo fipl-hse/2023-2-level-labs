@@ -150,10 +150,10 @@ class TopPGenerator:
                                        key=lambda pair: (pair[1], pair[0]), reverse=True)
             sum_freq = 0
             num_candidates = 0
-            for candidate in sorted_candidates:
+            for _, freq in sorted_candidates:
                 if sum_freq >= self._p_value:
                     break
-                sum_freq += candidate[1]
+                sum_freq += freq
                 num_candidates += 1
 
             random_token = choice(sorted_candidates[:num_candidates])[0]
@@ -165,7 +165,6 @@ class TopPGenerator:
             raise ValueError('None is returned')
 
         return decoded
-
 
 
 class GeneratorTypes:
