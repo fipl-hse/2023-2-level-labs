@@ -150,6 +150,11 @@ class TopPGenerator:
         ):
             raise ValueError
 
+        if not (isinstance(prompt, str) and prompt
+                and isinstance(seq_len, int) and seq_len > 0
+        ):
+            raise ValueError
+
         encoded = self._word_processor.encode(prompt)
 
         if not encoded:
@@ -164,14 +169,14 @@ class TopPGenerator:
             if not tokens:
                 break
 
-            sorted_tokens = dict(sorted(tokens.items(), key=lambda pair: (-pair[1], -pair[0])))
-            probability = 0
+            sorted_tokens = sorted(tokens.items(), key=lambda pair: (-pair[1], -pair[0]))
+            cumulative_prob = 0
             possible_tokens = []
 
-            for index, token_prob in sorted_tokens.items():
-                probability += token_prob
+            for index, token_prob in sorted_tokens:
+                cumulative_prob += token_prob
                 possible_tokens.append(index)
-                if probability >= self._p_value:
+                if cumulative_prob >= self._p_value:
                     break
             encoded_list.append(random.choice(possible_tokens))
 
