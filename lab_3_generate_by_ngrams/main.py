@@ -106,7 +106,13 @@ class TextProcessor:
             return None
         if element_id not in self._storage.values()):
             return None
-        for
+        token = None
+        for item in self._storage.items():
+            if item[1] == element_id:
+                token = item[0]
+                break
+
+        return token
 
 
     def encode(self, text: str) -> Optional[tuple[int, ...]]:
