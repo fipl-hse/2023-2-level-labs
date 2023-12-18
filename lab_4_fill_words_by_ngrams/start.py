@@ -25,8 +25,8 @@ def main() -> None:
     generators = {generator_types.greedy: GreedyTextGenerator(model, processor),
                   generator_types.top_p: gen_top_p,
                   generator_types.beam_search: BeamSearchTextGenerator(model, processor, 5)}
-    quality_checker = QualityChecker(generators, model, processor)
-    results = quality_checker.run(100, 'The')
+    # quality_checker = QualityChecker(generators, model, processor)
+    # results = quality_checker.run(100, 'The')
     for res in results:
         print(res)
     assert result
