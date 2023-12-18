@@ -4,6 +4,9 @@ Lab 4.
 Top-p sampling generation and filling gaps with ngrams
 """
 # pylint:disable=too-few-public-methods, too-many-arguments
+import random
+from typing import Tuple
+
 from lab_3_generate_by_ngrams.main import (BeamSearchTextGenerator, GreedyTextGenerator,
                                            NGramLanguageModel, TextProcessor)
 
@@ -72,9 +75,16 @@ class WordProcessor(TextProcessor):
         if not (isinstance(decoded_corpus, tuple) and decoded_corpus):
             raise ValueError('Inappropriate type input argument or input argument is empty.')
 
-        decoded_sentences = ''
-        sentences = ' '.join()
+        decoded_sentences = ''.join(decoded_corpus)
+        sentences = decoded_sentences.split(f'{self._end_of_word_token}')
 
+        for sentence in sentences:
+            sentence = sentence.strip().capitalize()
+            if not sentence:
+                break
+            sentence = f'{sentence}.'
+            decoded_sentences += sentence
+        return decoded_sentences.strip()
 
 class TopPGenerator:
     """
