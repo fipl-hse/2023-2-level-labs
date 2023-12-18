@@ -269,9 +269,9 @@ class GenerationResultDTO:
         Returns:
             (str): String with report
         """
-        return (f'Perplexity score: {self.__perplexity}\n'
-                f'{GeneratorTypes().get_conversion_generator_type(self.__type)}\n'
-                f'Text: {self.__text}\n')
+        return f'Perplexity score: {self.__perplexity}\n'\
+               f'{GeneratorTypes().get_conversion_generator_type(self.__type)}\n'\
+               f'Text: {self.__text}\n'
 
 
 class QualityChecker:
@@ -369,7 +369,7 @@ class QualityChecker:
 
         results = []
 
-        for num, generator in self._generators.items():
+        for num_type, generator in self._generators.items():
             generated_text = generator.run(seq_len, prompt)
             if not generated_text:
                 continue
@@ -378,7 +378,7 @@ class QualityChecker:
             if not perplexity:
                 raise ValueError('None is returned')
 
-            results.append(GenerationResultDTO(generated_text, perplexity, num))
+            results.append(GenerationResultDTO(generated_text, perplexity, num_type))
 
         results.sort(key=lambda x: (x.get_perplexity(), x.get_type()))
         return results

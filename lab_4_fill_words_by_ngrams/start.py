@@ -22,13 +22,17 @@ def main() -> None:
     print(result)
 
     generator_types = main_py.GeneratorTypes()
-    generators = {generator_types.top_p: main_py.TopPGenerator(language_model, word_processor, 0.5),
+    generators = {generator_types.greedy: main_py.GreedyTextGenerator(language_model, word_processor),
+                  generator_types.top_p: top_p_generator,
                   generator_types.beam_search:
                       main_py.BeamSearchTextGenerator(language_model, word_processor, 5)}
 
     quality_check = main_py.QualityChecker(generators, language_model, word_processor)
-    quality_result = quality_check.run(100, 'The')
-    print(quality_result)
+    quality_results = quality_check.run(100, 'The')
+
+    for quality_result in quality_results:
+        print(quality_result)
+
     assert result
 
 
