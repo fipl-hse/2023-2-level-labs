@@ -58,7 +58,7 @@ class WordProcessor(TextProcessor):
         if element not in self._storage:
             self._storage[element] = len(self._storage)
 
-    def _postprocess_decoded_text(self, decoded_corpus: tuple[str, ...]) -> list[Any]:  # type: ignore
+    def _postprocess_decoded_text(self, decoded_corpus: tuple[str, ...]) -> str:  # type: ignore
         """
         Convert decoded sentence into the string sequence.
 
@@ -75,20 +75,12 @@ class WordProcessor(TextProcessor):
             ValueError: In case of inappropriate type input argument or if input argument is empty.
         """
         if not (isinstance(decoded_corpus, tuple) and decoded_corpus):
-            raise ValueError('Inappropriate type input argument or input argument is empty.')
-
-        decoded_sentences = ' '.join(decoded_corpus)
-        sentences = decoded_sentences.split(f'{self._end_of_word_token}')
-
-        ideal_sentences = []
-
-        for sentence in sentences:
-            sentence = sentence.strip().capitalize()
-            if not sentence:
-                break
-            sentence = f'{sentence}.'
-            ideal_sentences += sentence
-        return ''.join(ideal_sentences)
+            raise ValueError
+        sentences = ' '.join(decoded_corpus).split(self._end_of_word_token)
+        result = '. '.join([sentence.strip().capitalize() for sentence in sentences])
+        if result[-1] == ' ':
+            return result[:-1]
+        return f'{result}.'
 
 class TopPGenerator:
     """
@@ -139,13 +131,13 @@ class TopPGenerator:
             raise ValueError('Inappropriate type input argument or input argument is empty.')
         current_seq = 0
         while seq_len > current_seq:
-            seq_len -= 1
+            # seq_len -= 1
             next_tokens = self._model.generate_next_token(encoded_text)
             if next_tokens is None:
                 raise ValueError('Inappropriate type input argument or input argument is empty.')
             if not next_tokens:
                 break
-            sorted_next_tokens = dict(sorted(next_tokens.items(), key=lambda x: (x[1], x[0]), reverse=True))
+            sorted_next_tokens = sorted(next_tokens.items(), key=lambda x: (x[1], x[0]), reverse=True)
             possible_tokens = []
             chance = 0
             for token in sorted_next_tokens:
