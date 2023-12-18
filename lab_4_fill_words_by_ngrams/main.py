@@ -6,7 +6,7 @@ Top-p sampling generation and filling gaps with ngrams
 #pylint:disable=too-few-public-methods, too-many-arguments
 
 import json
-
+import math
 from random import choice
 from math import (exp, log)
 from lab_3_generate_by_ngrams.main import (BeamSearchTextGenerator, GreedyTextGenerator,
