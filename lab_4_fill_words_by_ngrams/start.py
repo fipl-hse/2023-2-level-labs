@@ -23,7 +23,6 @@ def main() -> None:
     top_p_generator = TopPGenerator(lang_model, word_processor, 0.5)
     result_top = top_p_generator.run(51, 'Vernon')
     print(result_top)
-    result = result_top
     generators = GeneratorTypes()
     generators_dict = {generators.greedy: GreedyTextGenerator(lang_model, word_processor),
                        generators.top_p: top_p_generator,
@@ -40,12 +39,12 @@ def main() -> None:
         students.append(GeneratorRuleStudent(stud_id, lang_model, word_processor))
     for student in students:
         answers = student.take_exam(questions)
-        exam = examiner.assess_exam(answers)
+        result = examiner.assess_exam(answers)
         generator_type = student.get_generator_type()
         print('Type of generator is ', generator_type)
         print('Answers: ', ''.join(answers.values()))
-        print('Share of the correct answers is ', str(exam))
-    assert result
+        print('Share of the correct answers is ', str(result))
+        assert result
 
 
 if __name__ == "__main__":
