@@ -6,6 +6,7 @@ from lab_3_generate_by_ngrams.main import BeamSearchTextGenerator, GreedyTextGen
 from lab_4_fill_words_by_ngrams.main import (GeneratorTypes, NGramLanguageModel, QualityChecker,
                                              TopPGenerator, WordProcessor)
 
+
 def main() -> None:
     """
     Launches an implementation.
@@ -30,3 +31,6 @@ def main() -> None:
         print(res)
     assert result
 
+
+if __name__ == "__main__":
+    main()

@@ -352,8 +352,8 @@ class Examiner:
         Args:
             json_path (str): Local path to assets file
         """
-        self._json_path = json_path
-        self._questions_and_answers = self._load_from_json()
+        # self._json_path = json_path
+        # self._questions_and_answers = self._load_from_json()
 
     def _load_from_json(self) -> dict[tuple[str, int], str]:  # type: ignore
         """
