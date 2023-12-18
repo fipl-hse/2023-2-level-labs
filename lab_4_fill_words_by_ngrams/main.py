@@ -415,7 +415,7 @@ class Examiner:
         if not isinstance(json_path, str) or not json_path:
             raise ValueError
         self._json_path = json_path
-        self._questions_and_answers = {}
+        self._questions_and_answers = self._load_from_json()
 
     def _load_from_json(self) -> dict[tuple[str, int], str]:  # type: ignore
         """
@@ -459,7 +459,6 @@ class Examiner:
             list[tuple[str, int]]:
                 List in the form of [(question, position of the word to be filled)]
         """
-        self._load_from_json()
         questions = list(self._questions_and_answers.keys())
         return questions
 
