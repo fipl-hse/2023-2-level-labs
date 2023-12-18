@@ -192,6 +192,13 @@ class TextProcessor:
         Args:
             content (dict): ngrams from external JSON
         """
+        if not isinstance(content, dict) or not content:
+            return None
+        for n_gram in content['freq']:
+            for letter in n_gram:
+                if letter.isalpha():
+                    self._put(letter)
+        return None
 
     def _decode(self, corpus: tuple[int, ...]) -> Optional[tuple[str, ...]]:
         """
@@ -283,6 +290,10 @@ class NGramLanguageModel:
         Args:
             frequencies (dict): Computed in advance frequencies for n-grams
         """
+        if not isinstance(frequencies, dict) or not frequencies:
+            return None
+        self._n_gram_frequencies = frequencies
+        return None
 
     def build(self) -> int:
         """
@@ -395,38 +406,23 @@ class GreedyTextGenerator:
         In case of corrupt input arguments or methods used return None,
         None is returned
         """
-        if not isinstance(seq_len, int) or not isinstance(prompt, str) or len(prompt) == 0:
+        if (not isinstance(seq_len, int) or
+            not isinstance(prompt, str) or not prompt):
             return None
-
-        encoded_prompt = self._text_processor.encode(prompt)
-        if encoded_prompt is None:
+        prompt_encoded = self._text_processor.encode(prompt)
+        n_gram_size = self._model.get_n_gram_size()
+        if not prompt_encoded or not n_gram_size:
             return None
-        ngram_size = self._model.get_n_gram_size()
-
-        text = prompt
-
-        for i in range(seq_len):
-            tokens = self._model.generate_next_token(encoded_prompt[-ngram_size + 1:])
-            if tokens is None:
-                return f"{prompt}."
-            if len(tokens) == 0:
+        m_freq = []
+        for prediction in range(seq_len):
+            seq = tuple(prompt_encoded[-n_gram_size + 1:])
+            variants = self._model.generate_next_token(seq)
+            if not variants:
                 break
-            max_freq = max(tokens.values())
-            max_candidates = []
-            for candidate, freq in tokens.items():
-                if freq == max_freq:
-                    max_candidates.append(candidate)
-            encoded_prompt = encoded_prompt + (sorted(max_candidates)[0],)
-            best_candidate = self._text_processor.get_token(encoded_prompt[-1])
-            if best_candidate is None:
-                return None
-            text += best_candidate
-
-        decoded_prompt = f"{self._text_processor.decode(encoded_prompt)}"
-        if decoded_prompt is None:
-            return None
-
-        return decoded_prompt
+            m_freq.append(max(variants.values()))
+            candidates = filter(lambda freq: freq[1] == m_freq[-1], variants.items())
+            prompt_encoded += (sorted(candidates)[0][0],)
+        return self._text_processor.decode(prompt_encoded)
 
 
 class BeamSearcher:
