@@ -33,7 +33,7 @@ class WordProcessor(TextProcessor):
             ValueError: In case of inappropriate type input argument or if input argument is empty.
         """
         if not isinstance(text, str) or not text:
-            raise ValueError
+            raise ValueError('Trying to tokenize empty or not string text')
         tokens = []
         bad_end_symbols = ('!', '.', '?')
         for word in text.lower().split():
@@ -56,7 +56,7 @@ class WordProcessor(TextProcessor):
             ValueError: In case of inappropriate type input argument or if input argument is empty.
         """
         if not isinstance(element, str) or not element:
-            raise ValueError
+            raise ValueError('Trying to put not string or empty element')
         if element not in self._storage:
             self._storage[element] = len(self._storage)
 
@@ -77,7 +77,7 @@ class WordProcessor(TextProcessor):
             ValueError: In case of inappropriate type input argument or if input argument is empty.
         """
         if not isinstance(decoded_corpus, tuple) or not decoded_corpus:
-            raise ValueError
+            raise ValueError('Trying to postprocess non-tuple or empty text')
         sentences = ' '.join(decoded_corpus).split(self._end_of_word_token)
         decoded_text = '. '.join([sentence.strip().capitalize() for sentence in sentences])
         if decoded_text[-1] == ' ':
@@ -130,15 +130,15 @@ class TopPGenerator:
         """
         if (not isinstance(seq_len, int) or not seq_len > 0
                 or not isinstance(prompt, str) or not prompt):
-            raise ValueError
+            raise ValueError('Trying to run with bad prompt or seq_len')
         encoded = self._word_processor.encode(prompt)
         if not encoded:
-            raise ValueError
+            raise ValueError('Encoded returned None')
         current_len = 0
         while current_len < seq_len:
             new_tokens = self._model.generate_next_token(encoded)
             if new_tokens is None:
-                raise ValueError
+                raise ValueError('Next token was not generated')
             if not new_tokens:
                 break
             sorted_tokens = sorted(list(new_tokens.items()),
@@ -154,7 +154,7 @@ class TopPGenerator:
             current_len += 1
         decoded = self._word_processor.decode(encoded)
         if not decoded:
-            raise ValueError
+            raise ValueError('Decoded returned None')
         return decoded
 
 
@@ -298,10 +298,10 @@ class QualityChecker:
                 or if nothing was generated.
         """
         if not isinstance(generated_text, str) or not generated_text:
-            raise ValueError
+            raise ValueError('Trying to calculate perplexity with non-string or empty text')
         encoded = self._word_processor.encode(generated_text)
         if not encoded:
-            raise ValueError
+            raise ValueError('Encoded returned None')
         n_gram_size = self._language_model.get_n_gram_size()
         sum_log_prob = 0.0
         for index in range(n_gram_size - 1, len(encoded)):
@@ -309,12 +309,12 @@ class QualityChecker:
             token = encoded[index]
             generated_tokens = self._language_model.generate_next_token(context)
             if not generated_tokens:
-                raise ValueError
+                raise ValueError('Next token was not generated')
             prob = generated_tokens.get(token)
             if prob:
                 sum_log_prob += math.log(prob)
         if not sum_log_prob:
-            raise ValueError
+            raise ValueError('sum_log_prob was not counted')
         perplexity = math.exp(-sum_log_prob / (len(encoded) - n_gram_size))
         return perplexity
 
@@ -338,15 +338,15 @@ class QualityChecker:
         """
         if (not isinstance(seq_len, int) or not seq_len >= 1
                 or not isinstance(prompt, str) or not prompt):
-            raise ValueError
+            raise ValueError('Trying to run with bad seq_len or prompt')
         results = []
         for gen_type, generator in self._generators.items():
             text = generator.run(seq_len=seq_len, prompt=prompt)
             if not text:
-                raise ValueError
+                raise ValueError('Text was not generated')
             perplexity = self._calculate_perplexity(text)
             if not perplexity:
-                raise ValueError
+                raise ValueError('Perplexity was not counted')
             results.append(GenerationResultDTO(text, perplexity, gen_type))
         return sorted(results, key=lambda x: (x.get_perplexity(), x.get_type()))
 
@@ -390,7 +390,7 @@ class Examiner:
         with open(self._json_path, 'r', encoding='utf-8') as file:
             ques_ans = json.load(file)
         if not isinstance(ques_ans, list):
-            raise ValueError
+            raise ValueError('Questions and answers were not loaded')
         self._questions_and_answers = {(qu_an['question'], qu_an['location']): qu_an['answer']
                                        for qu_an in ques_ans}
         return self._questions_and_answers
@@ -419,7 +419,7 @@ class Examiner:
             ValueError: In case of inappropriate type input argument or if input argument is empty.
         """
         if not isinstance(answers, dict) or not answers:
-            raise ValueError
+            raise ValueError('Trying to asses non-dict or empty answers')
         right_ans = {key[0]: value for key, value in self._questions_and_answers.items()}
         cor_ans = 0
         for ques in answers:
@@ -471,13 +471,13 @@ class GeneratorRuleStudent:
                 or if methods used return None.
         """
         if not isinstance(tasks, list) or not tasks:
-            raise ValueError
+            raise ValueError('Trying to take exam with non-list or empty tasks')
         answers = {}
         for (question, location) in tasks:
             context = question[:location]
             answer = self._generator.run(seq_len=1, prompt=context)
             if not answer:
-                raise ValueError
+                raise ValueError('Answer was not returned')
             if answer[-1] == '.':
                 answer = f"{answer[:-1]} "
             answers[question] = f'{answer}{question[location:]}'
