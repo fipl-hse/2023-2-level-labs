@@ -4,6 +4,7 @@ Lab 4.
 Top-p sampling generation and filling gaps with ngrams
 """
 # pylint:disable=too-few-public-methods, too-many-arguments
+import json
 import math
 from random import choice
 
@@ -36,16 +37,13 @@ class WordProcessor(TextProcessor):
         new_text = []
         symbols = ['.', '!', '?']
         for word in text.lower().split():
-            cleared = ''.join(filter(str.isalpha, word))
-            if cleared:
-                new_text.append(cleared)
             if word[-1] in symbols:
-                new_text.append(self._end_of_word_token)
-                # new_text.extend([word[:-1], self._end_of_word_token])
-            # else:
-            #     cleared = ''.join(filter(str.isalpha, word))
-            #     if cleared:
-            #         new_text.append(cleared)
+                if word[:-1].isalpha():
+                    new_text.extend([word[:-1], self._end_of_word_token])
+            else:
+                cleared = ''.join(filter(str.isalpha, word))
+                if cleared:
+                    new_text.append(cleared)
         return tuple(new_text)
 
     def _put(self, element: str) -> None:
@@ -369,6 +367,8 @@ class Examiner:
         Args:
             json_path (str): Local path to assets file
         """
+        self._json_path = json_path
+        self._questions_and_answers = self._load_from_json()
 
     def _load_from_json(self) -> dict[tuple[str, int], str]:  # type: ignore
         """
