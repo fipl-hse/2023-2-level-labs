@@ -269,7 +269,8 @@ class QualityChecker:
     """
 
     def __init__(
-            self, generators: dict, language_model: NGramLanguageModel, word_processor: WordProcessor
+            self, generators: dict, language_model: NGramLanguageModel, word_processor:
+            WordProcessor
     ) -> None:
         """
         Initialize an instance of QualityChecker.
@@ -441,7 +442,8 @@ class GeneratorRuleStudent:
     _generator_type: int
 
     def __init__(
-            self, generator_type: int, language_model: NGramLanguageModel, word_processor: WordProcessor
+            self, generator_type: int, language_model: NGramLanguageModel, word_processor:
+            WordProcessor
     ) -> None:
         """
         Initialize an instance of GeneratorRuleStudent.
