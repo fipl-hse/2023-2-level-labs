@@ -311,18 +311,27 @@ class NGramLanguageModel:
         In case of corrupt input arguments or methods used return None,
         1 is returned
         """
-        if not (isinstance(self._encoded_corpus, tuple)
-                and self._encoded_corpus):
+        if not isinstance(self._encoded_corpus, tuple) or len(self._encoded_corpus) == 0:
             return 1
-        n_grams = self._extract_n_grams(self._encoded_corpus)
-        if not (isinstance(n_grams, tuple) and n_grams):
-            return 1
-        for n_gram in set(n_grams):
-            number_of_n_grams = n_grams.count(n_gram)
-            context_count = n_gram[:-1]
-            self._n_gram_frequencies[n_gram] = number_of_n_grams / context_count
-        return 0
 
+        n_grams = self._extract_n_grams(self._encoded_corpus)
+        if not n_grams or not isinstance(n_grams, tuple):
+            return 1
+
+        context_freq_dict = {}
+
+        for n_gram in n_grams:
+            context_freq_dict[n_gram] = context_freq_dict.get(n_gram, 0) + 1
+
+        lower_ngram_counts = {}
+        for ngram, freq in context_freq_dict.items():
+            context = ngram[:-1]
+            lower_ngram_counts[context] = lower_ngram_counts.get(context, 0) + freq
+
+        self._n_gram_frequencies = {ngram: freq / lower_ngram_counts[ngram[:-1]]
+                                    for ngram, freq in context_freq_dict.items()}
+
+        return 0
 
     def generate_next_token(self, sequence: tuple[int, ...]) -> Optional[dict]:
         """
