@@ -3,7 +3,10 @@ Lab 4.
 
 Top-p sampling generation and filling gaps with ngrams
 """
-# pylint:disable=too-few-public-methods, too-many-arguments
+#pylint:disable=too-few-public-methods, too-many-arguments
+
+import json
+from math import exp, log
 from random import choice
 from lab_3_generate_by_ngrams.main import (BeamSearchTextGenerator, GreedyTextGenerator,
                                            NGramLanguageModel, TextProcessor)
@@ -168,6 +171,11 @@ class GeneratorTypes:
         """
         Initialize an instance of GeneratorTypes.
         """
+        self.greedy = 0
+        self.top_p = 1
+        self.beam_search = 2
+        self.generator_types = {self.greedy: 'Greedy Generator', self.top_p: 'Top-P Generator',
+                                self.beam_search: 'Beam Search Generator'}
 
     def get_conversion_generator_type(self, generator_type: int) -> str:  # type: ignore
         """
@@ -179,6 +187,7 @@ class GeneratorTypes:
         Returns:
             (str): Name of the generator.
         """
+        return self.generator_types[generator_type]
 
 
 class GenerationResultDTO:
@@ -201,6 +210,9 @@ class GenerationResultDTO:
             generation_type (int):
                 Numeric type of the generator for which perplexity was calculated
         """
+        self.__text = text
+        self.__perplexity = perplexity
+        self.__type = generation_type
 
     def get_perplexity(self) -> float:  # type: ignore
         """
@@ -209,6 +221,7 @@ class GenerationResultDTO:
         Returns:
             (float): Perplexity value
         """
+        return self.__perplexity
 
     def get_text(self) -> str:  # type: ignore
         """
@@ -217,6 +230,7 @@ class GenerationResultDTO:
         Returns:
             (str): Text for which the perplexity was count
         """
+        return self.__text
 
     def get_type(self) -> int:  # type: ignore
         """
@@ -225,6 +239,7 @@ class GenerationResultDTO:
         Returns:
             (int): Numeric type of the generator
         """
+        return self.__type
 
     def __str__(self) -> str:  # type: ignore
         """
@@ -233,6 +248,9 @@ class GenerationResultDTO:
         Returns:
             (str): String with report
         """
+        return (f'Perplexity score: {self.__perplexity}\n'
+                f'{GeneratorTypes().get_conversion_generator_type(self.__type)}\n'
+                f'Text: {self.__text}\n')
 
 
 class QualityChecker:
@@ -257,6 +275,9 @@ class QualityChecker:
                 NGramLanguageModel instance to use for text generation
             word_processor (WordProcessor): WordProcessor instance to handle text processing
         """
+        self._generators = generators
+        self._language_model = language_model
+        self._word_processor = word_processor
 
     def _calculate_perplexity(self, generated_text: str) -> float:  # type: ignore
         """
@@ -274,6 +295,24 @@ class QualityChecker:
                 or if methods used return None,
                 or if nothing was generated.
         """
+        if not isinstance(generated_text, str) or generated_text is None:
+            raise ValueError('Inappropriate input or input argument is empty')
+        encoded_text = self._word_processor.encode(generated_text)
+        if encoded_text is None:
+            raise ValueError('Could not encode')
+        ngram_size = self._language_model.get_n_gram_size()
+        sum_log = 0.0
+        for i in range(ngram_size - 1, len(encoded_text)):
+            context = encoded_text[i - ngram_size + 1: i]
+            next_tokens = self._language_model.generate_next_token(context)
+            if next_tokens is None:
+                raise ValueError('None is returned')
+            probability = next_tokens.get(encoded_text[i])
+            if probability:
+                sum_log += math.log(probability)
+        if sum_log is None:
+            raise ValueError('Sum is 0')
+        return math.exp(-sum_log / (len(encoded_text) - ngram_size))
 
     def run(self, seq_len: int, prompt: str) -> list[GenerationResultDTO]:  # type: ignore
         """
