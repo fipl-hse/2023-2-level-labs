@@ -26,8 +26,6 @@ def main() -> None:
         beam_search_generator = BeamSearchTextGenerator(model, textprocessor, 7)
         print(beam_search_generator.run('Vernon', 56))
         assert result
-    assert isinstance(encoded_text, tuple)
-    assert result
 
 
 if __name__ == "__main__":

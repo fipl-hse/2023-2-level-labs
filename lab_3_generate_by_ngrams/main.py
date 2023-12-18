@@ -192,13 +192,6 @@ class TextProcessor:
         Args:
             content (dict): ngrams from external JSON
         """
-        if not isinstance(content, dict) or not content:
-            return None
-        for n_gram in content['freq']:
-            for letter in n_gram:
-                if letter.isalpha():
-                    self._put(letter)
-        return None
 
     def _decode(self, corpus: tuple[int, ...]) -> Optional[tuple[str, ...]]:
         """
@@ -421,7 +414,7 @@ class GreedyTextGenerator:
             max_freq.append(max(tokens.values()))
             candidates_max = filter(lambda token_freq: token_freq[1] == max_freq[-1],
                                     tokens.items())
-            encoded += (sorted(candidates_max)[0][0],)
+            encoded += (sorted(candidates_max, reverse=True)[0][0],)
 
         return self._text_processor.decode(encoded)
 
