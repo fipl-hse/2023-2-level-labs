@@ -39,14 +39,14 @@ class WordProcessor(TextProcessor):
         for word in text.lower().split():
             if word == self._end_of_word_token or word.isalpha():
                 tokens.append(word)
-            else:
-                new_word = []
-                for symb in list(word):
-                    if symb.isalpha():
-                        new_word.append(symb)
-                if new_word:
-                    tokens.append("".join(new_word))
-            return tuple(tokens)
+                continue
+            new_word = []
+            for symb in list(word):
+                if symb.isalpha():
+                    new_word.append(symb)
+            if new_word:
+                tokens.append("".join(new_word))
+        return tuple(tokens)
 
     def _put(self, element: str) -> None:
         """
@@ -62,6 +62,7 @@ class WordProcessor(TextProcessor):
             raise ValueError
         if element not in self._storage:
             self._storage.update({element: len(self._storage)})
+
     def _postprocess_decoded_text(self, decoded_corpus: tuple[str, ...]) -> str:  # type: ignore
         """
         Convert decoded sentence into the string sequence.
@@ -132,8 +133,8 @@ class TopPGenerator:
                 or if sequence has inappropriate length,
                 or if methods used return None.
         """
-        if (not isinstance(seq_len, int) or seq_len < 1 or
-                not isinstance(prompt, str) or not prompt):
+        if not (isinstance(seq_len, int) and seq_len > 0 and
+                isinstance(prompt, str) and prompt):
             raise ValueError
         prompt_encoded = self._word_processor.encode(prompt)
         if not prompt_encoded:
