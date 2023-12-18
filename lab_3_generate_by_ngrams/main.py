@@ -432,7 +432,6 @@ class GreedyTextGenerator:
             best_predictions = [token for token, freq in next_tokens.items() if freq == max_freq]
             max_freq_tokens = sorted(best_predictions, reverse=True)
             encoded += (max_freq_tokens[0],)
-
             seq_len -= 1
 
         decoded_text = self._text_processor.decode(encoded)
