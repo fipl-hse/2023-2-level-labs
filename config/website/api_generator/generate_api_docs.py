@@ -2,25 +2,11 @@
 Generator for API docs for Sphinx.
 """
 
-import subprocess
 from pathlib import Path
-from typing import Iterable
 
+from config.cli_unifier import _run_console_tool
 from config.constants import PROJECT_CONFIG_PATH
 from config.project_config import ProjectConfig
-
-
-def prepare_args_for_shell(args: Iterable[str]) -> str:
-    """
-    Util for argument preparation for CLI.
-
-    Args:
-        args (list): arguments to join
-
-    Returns:
-         str: arguments for CLI
-    """
-    return ' '.join(args)
 
 
 def generate_api_docs(labs_paths: list[Path],
@@ -43,16 +29,15 @@ def generate_api_docs(labs_paths: list[Path],
         lab_api_doc_path = lab_path
 
         args = [
-            'sphinx-apidoc',
             '-o',
-            lab_api_doc_path,
+            str(lab_api_doc_path),
             '--no-toc',
             '--no-headings',
             '--suffix',
             'api.rst',
             '-t',
-            apidoc_templates_path,
-            lab_path
+            str(apidoc_templates_path),
+            str(lab_path)
         ]
         if overwrite:
             args.insert(-1, '-f')
@@ -61,18 +46,13 @@ def generate_api_docs(labs_paths: list[Path],
                           lab_path.joinpath('assets'),
                           lab_path.joinpath('start.py'),
                           lab_path.joinpath('helpers.py'))
-        args.extend(excluded_paths)
+        args.extend(map(str, excluded_paths))
 
-        command = prepare_args_for_shell(map(str, args))
-
-        print(f'FULL COMMAND: {command}')
-        result = subprocess.run(args=command,
-                                shell=True,
-                                check=True)
-        if result.returncode == 0:
+        res_process = _run_console_tool('sphinx-apidoc', args, debug=False)
+        if res_process.returncode == 0:
             print(f'API DOC FOR {lab_path} GENERATED IN {lab_api_doc_path}\n')
         else:
-            print(f'ERROR CODE: {result.returncode!r}. ERROR: {result.stderr!r}\n')
+            print(f'ERROR CODE: {res_process.returncode!r}. ERROR: {res_process.stderr!r}\n')
 
 
 if __name__ == '__main__':

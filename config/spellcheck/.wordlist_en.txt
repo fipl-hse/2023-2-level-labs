@@ -72,6 +72,7 @@ commit
 committing-changes
 community
 compare
+completedprocess
 concordance
 config
 content
@@ -132,6 +133,7 @@ exam
 examiner
 except
 exception
+exe
 expiration
 extract
 f-string
@@ -219,6 +221,7 @@ lbyl
 leap
 learning
 lectures-content-label
+legb
 len
 letterstorage
 level-labs
@@ -375,6 +378,7 @@ storage
 str
 string
 submodules
+subprocess
 super
 surname
 take
