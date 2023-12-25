@@ -7,13 +7,11 @@ on:
     branches: [ main ]
 
 concurrency:
-  group: ${{ github.repository }}-${{ github.ref }}
+  group: ${{ github.repository }}-${{ github.ref }}-public
   cancel-in-progress: true
 
 env:
   REPOSITORY_TYPE: public
-  GITHUB_REPOSITORY: ${{ github.repository }}
-  BRANCH_NAME: ${{ github.ref }}
 
 jobs:
   install-dependencies:
@@ -111,40 +109,6 @@ jobs:
         run: |
           bash config/run_start.sh "$PR_NAME"
 
-  coverage:
-    name: Coverage
-    runs-on: ubuntu-latest
-    timeout-minutes: 5
-    needs: [ unittests ]
-    env:
-      PR_NAME: ${{ github.event.pull_request.title }}
-
-    steps:
-      - uses: actions/checkout@v3
-      - name: Setup FIPL environment
-        uses: fipl-hse/setup-env-action@v0.9
-      - name: Run start
-        if: ${{ env.REPOSITORY_TYPE == 'admin' }}
-        run: |
-          bash config/collect_coverage/run_coverage.sh "$PR_NAME"
-
-  spellcheck:
-    name: Spellcheck
-    runs-on: ubuntu-latest
-    timeout-minutes: 2
-    needs: [ install-dependencies ]
-    steps:
-      - uses: actions/checkout@master
-      - name: Install Aspell
-        run: |
-          sudo apt-get install aspell aspell-en aspell-ru
-      - name: Setup FIPL environment
-        uses: fipl-hse/setup-env-action@v0.9
-      - name: Spell check
-        if: ${{ env.REPOSITORY_TYPE == 'admin' }}
-        run: |
-          bash config/spellcheck/_stage_spellcheck.sh
-
   flake8-checks:
     name: Import style checks
     runs-on: ubuntu-latest
@@ -158,93 +122,3 @@ jobs:
       - name: Flake8 check
         run: |
           bash config/stage_1_style_tests/_stage_run_flake8.sh
-
-  doc8-checks:
-    name: Doc8 checks
-    runs-on: ubuntu-latest
-    timeout-minutes: 2
-    needs: [ install-dependencies ]
-
-    steps:
-      - uses: actions/checkout@v3
-      - name: Setup FIPL environment
-        uses: fipl-hse/setup-env-action@v0.9
-      - name: Doc8 check
-        if: ${{ env.REPOSITORY_TYPE == 'admin' }}
-        run: |
-          bash config/stage_1_style_tests/_stage_run_doc8.sh
-
-  docstring-style-checks:
-    name: Docstring style checks
-    runs-on: ubuntu-latest
-    timeout-minutes: 2
-    needs: [ install-dependencies ]
-
-    steps:
-      - uses: actions/checkout@v3
-      - name: Setup FIPL environment
-        uses: fipl-hse/setup-env-action@v0.9
-      - name: Docstring style checks
-        if: ${{ env.REPOSITORY_TYPE == 'admin' }}
-        run: |
-          bash config/stage_1_style_tests/_stage_docstring_check.sh
-
-  sphinx-build:
-    name: Sphinx build
-    runs-on: ubuntu-latest
-    timeout-minutes: 2
-    needs: [ install-dependencies ]
-
-    steps:
-      - uses: actions/checkout@v3
-      - name: Setup FIPL environment
-        uses: fipl-hse/setup-env-action@v0.9
-      - name: Build Sphinx project
-        if: ${{ env.REPOSITORY_TYPE == 'admin' }}
-        run: |
-          bash config/website/_stage_run_sphinx_build.sh
-
-  requirements-check:
-    name: Requirements check
-    runs-on: ubuntu-latest
-    timeout-minutes: 2
-    needs: [ install-dependencies ]
-
-    steps:
-      - uses: actions/checkout@v3
-      - name: Setup FIPL environment
-        uses: fipl-hse/setup-env-action@v0.9
-      - name: Dependencies check
-        if: ${{ env.REPOSITORY_TYPE == 'admin' }}
-        run: |
-          bash config/stage_1_style_tests/_stage_requirements_check.sh
-
-  newline-check:
-    name: Newline check
-    runs-on: ubuntu-latest
-    timeout-minutes: 2
-    needs: [ install-dependencies ]
-
-    steps:
-      - uses: actions/checkout@v3
-      - name: Setup FIPL environment
-        uses: fipl-hse/setup-env-action@v0.9
-      - name: Newline check
-        if: ${{ env.REPOSITORY_TYPE == 'admin' }}
-        run: |
-          bash config/stage_1_style_tests/_stage_newline_check.sh
-
-  stubs-relevance-check:
-    name: Stubs relevance check
-    runs-on: ubuntu-latest
-    timeout-minutes: 2
-    needs: [ install-dependencies ]
-
-    steps:
-      - uses: actions/checkout@v3
-      - name: Setup FIPL environment
-        uses: fipl-hse/setup-env-action@v0.9
-      - name: Stub relevance check
-        if: ${{ env.REPOSITORY_TYPE == 'admin' }}
-        run: |
-          bash config/stage_1_style_tests/_stage_actual_stubs.sh
